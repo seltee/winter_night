@@ -1,6 +1,7 @@
 #pragma once
 #include "core/api.h"
 #include "features/renderer/renderer.h"
+#include <memory>
 
 namespace WNE
 {
@@ -19,23 +20,23 @@ namespace WNE
         WindowType windowType;
         bool focused = false;
         bool closeRequested = false;
-        Renderer *renderer = nullptr;
+        std::unique_ptr<Renderer> renderer;
 
         Window();
-        virtual ~Window();
 
     public:
-        static Window *create(int width, int height);
-        static Window *createFullscreen(int width, int height);
-        static Window *createBorderless(int width, int height);
-        static Window *createResizable(int width, int height);
+        virtual ~Window();
+
+        static std::unique_ptr<Window> create(int width, int height);
+        static std::unique_ptr<Window> createFullscreen(int width, int height);
+        static std::unique_ptr<Window> createBorderless(int width, int height);
+        static std::unique_ptr<Window> createResizable(int width, int height);
 
         virtual void update(float delta);
         virtual void render();
         virtual void updateWindowSize();
 
         virtual void close();
-        void destroy();
 
         inline int getWidth()
         {

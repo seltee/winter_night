@@ -12,6 +12,7 @@
 #include "features/renderer/vulkan/vulkanDevice.h"
 #include "features/renderer/vulkan/vulkanFrame.h"
 #include "core/core.h"
+#include <memory>
 
 #define VULKAN_INSTANCE_REQUIRED_EXTENSIONS 2
 
@@ -22,10 +23,16 @@ namespace WNE
     class WNE_API VulkanInstance
     {
     public:
+        static std::unique_ptr<VulkanInstance> create(void *hwnd, uint32 w, uint32 h)
+        {
+            auto instance = std::unique_ptr<VulkanInstance>(new VulkanInstance());
+            if (!instance->initNT(hwnd, w, h))
+                return nullptr;
+            return instance;
+        }
+
         ~VulkanInstance();
 
-        bool initNT(void *hWnd, uint32 width, uint32 height);
-        bool init(uint32 width, uint32 height, VkSurfaceKHR surface);
         void changeSize(uint32 width, uint32 height);
         void render();
 
@@ -39,18 +46,21 @@ namespace WNE
         VkQueue graphicsQueue = nullptr;
         VkQueue presentQueue = nullptr;
 
-        VulkanShader *defaultShader = nullptr;
-        VulkanPipeline *pipeline = nullptr;
-        VulkanRenderPass *renderPass = nullptr;
-        VulkanFrameBuffer *frameBuffer = nullptr;
-        VulkanSwapChain *swapChain = nullptr;
-        VulkanDevice *vDevice = nullptr;
-        std::vector<VulkanFrame *> frames;
+        std::unique_ptr<VulkanShader> defaultShader = nullptr;
+        std::unique_ptr<VulkanPipeline> pipeline = nullptr;
+        std::unique_ptr<VulkanRenderPass> renderPass = nullptr;
+        std::unique_ptr<VulkanFrameBuffer> frameBuffer = nullptr;
+        std::unique_ptr<VulkanSwapChain> swapChain = nullptr;
+        std::unique_ptr<VulkanDevice> vDevice = nullptr;
+        std::vector<std::unique_ptr<VulkanFrame>> frames;
 
         const char *const instanceExtNames[VULKAN_INSTANCE_REQUIRED_EXTENSIONS] = {
             "VK_KHR_surface",
             "VK_KHR_win32_surface"};
 
+        VulkanInstance() = default;
+        bool initNT(void *hWnd, uint32 width, uint32 height);
+        bool init(uint32 width, uint32 height, VkSurfaceKHR surface);
         bool initInstance();
     };
 }

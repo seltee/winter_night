@@ -1,4 +1,5 @@
 #include "features/os/nt/windowNT.h"
+#include "features/renderer/vulkan/rendererVulkanNT.h"
 #include <windows.h>
 #include <iostream>
 
@@ -73,7 +74,7 @@ bool WindowNT::setup(int width, int height, WindowType type)
         return false;
     }
 
-    renderer = Renderer::createRendererNT(hWnd, width, height);
+    renderer = RendererVulkanNT::create(hWnd, width, height);
     if (!renderer)
     {
         CloseWindow(hWnd);

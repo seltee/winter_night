@@ -17,24 +17,13 @@ VulkanInstance::~VulkanInstance()
     {
         VkDevice device = vDevice->getDevice();
         vkDeviceWaitIdle(device);
-        delete vDevice;
     }
-    for (const auto &frame : frames)
-        delete frame;
     if (surface)
         vkDestroySurfaceKHR(instance, surface, nullptr);
     if (instance)
         vkDestroyInstance(instance, nullptr);
-    if (swapChain)
-        delete swapChain;
     if (vulkanInstanceExtensions)
         delete vulkanInstanceExtensions;
-    if (pipeline)
-        delete pipeline;
-    if (defaultShader)
-        delete defaultShader;
-    if (frameBuffer)
-        delete frameBuffer;
 }
 
 bool VulkanInstance::initNT(void *hWnd, uint32 width, uint32 height)
@@ -66,9 +55,10 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
 {
     this->surface = surface;
 
-    vDevice = new VulkanDevice(instance, surface);
+    vDevice = std::make_unique<VulkanDevice>(instance, surface);
     if (!vDevice->setup())
     {
+        vDevice.reset();
         std::cout << "Unable to create device" << std::endl;
         return false;
     }
@@ -85,36 +75,36 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
     vkGetDeviceQueue(device, vulkanQueueFamilies.getGraphicsFamily().value(), 0, &graphicsQueue);
     vkGetDeviceQueue(device, vulkanQueueFamilies.getPresentFamily().value(), 0, &presentQueue);
 
-    swapChain = new VulkanSwapChain(device);
+    swapChain = std::make_unique<VulkanSwapChain>(device);
     if (!swapChain->setup(width, height, physicalDevice, surface))
     {
         std::cout << "Unable to create swap chain" << std::endl;
         return false;
     }
 
-    renderPass = new VulkanRenderPass();
+    renderPass = std::make_unique<VulkanRenderPass>();
     if (!renderPass->setup(swapChain->getImageFormat(), device))
     {
         std::cout << "Unable to create render pass" << std::endl;
         return false;
     }
 
-    defaultShader = new VulkanShader();
+    defaultShader = std::make_unique<VulkanShader>();
     if (!defaultShader->makeFromFiles("./shaders/shader.vert.spv", "./shaders/shader.frag.spv", device))
     {
         std::cout << "Unable to compule default shader" << std::endl;
         return false;
     }
 
-    pipeline = new VulkanPipeline();
-    if (!pipeline->setup(width, height, swapChain->getExtent(), device, renderPass, defaultShader))
+    pipeline = std::make_unique<VulkanPipeline>();
+    if (!pipeline->setup(width, height, swapChain->getExtent(), device, renderPass.get(), defaultShader.get()))
     {
         std::cout << "Unable to create vulkan pipeline" << std::endl;
         return false;
     }
 
-    frameBuffer = new VulkanFrameBuffer(device);
-    if (!frameBuffer->setup(swapChain, renderPass))
+    frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
+    if (!frameBuffer->setup(swapChain.get(), renderPass.get()))
     {
         std::cout << "Unable to create vulkan frame buffer" << std::endl;
         return false;
@@ -122,14 +112,13 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
 
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        VulkanFrame *frame = new VulkanFrame(vDevice, swapChain);
-        if (!frame->setup(renderPass, frameBuffer))
+        auto frame = std::make_unique<VulkanFrame>(vDevice.get(), swapChain.get());
+        if (!frame->setup(renderPass.get(), frameBuffer.get()))
         {
-            delete frame;
             std::cout << "Unable to create frame " << i << std::endl;
             return false;
         }
-        frames.push_back(frame);
+        frames.emplace_back(std::move(frame));
     }
 
     return true;
@@ -142,55 +131,43 @@ void VulkanInstance::changeSize(uint32 width, uint32 height)
 
     vkDeviceWaitIdle(device);
 
-    if (swapChain)
-        delete swapChain;
-
-    swapChain = new VulkanSwapChain(device);
+    swapChain = std::make_unique<VulkanSwapChain>(device);
     if (!swapChain->setup(width, height, physicalDevice, surface))
     {
         std::cout << "Unable to create swap chain" << std::endl;
         throw std::runtime_error("failed to recreate swap chain");
     }
 
-    if (pipeline)
-        delete pipeline;
-    pipeline = new VulkanPipeline();
-    if (!pipeline->setup(width, height, swapChain->getExtent(), device, renderPass, defaultShader))
+    pipeline = std::make_unique<VulkanPipeline>();
+    if (!pipeline->setup(width, height, swapChain->getExtent(), device, renderPass.get(), defaultShader.get()))
     {
         std::cout << "Unable to create vulkan pipeline" << std::endl;
         throw std::runtime_error("failed to recreate pipeline");
     }
 
-    if (frameBuffer)
-        delete frameBuffer;
-
-    frameBuffer = new VulkanFrameBuffer(device);
-    if (!frameBuffer->setup(swapChain, renderPass))
+    frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
+    if (!frameBuffer->setup(swapChain.get(), renderPass.get()))
     {
         std::cout << "Unable to create vulkan frame buffer" << std::endl;
         throw std::runtime_error("failed to recreate swap chain");
     }
 
-    for (const auto &frame : frames)
-        delete frame;
     frames.clear();
-
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        VulkanFrame *frame = new VulkanFrame(vDevice, swapChain);
-        if (!frame->setup(renderPass, frameBuffer))
+        auto frame = std::make_unique<VulkanFrame>(vDevice.get(), swapChain.get());
+        if (!frame->setup(renderPass.get(), frameBuffer.get()))
         {
-            delete frame;
             std::cout << "Unable to create frame " << i << std::endl;
             throw std::runtime_error("failed to recreate frame");
         }
-        frames.push_back(frame);
+        frames.emplace_back(std::move(frame));
     }
 }
 
 void VulkanInstance::render()
 {
-    frames[currentFrame]->render(pipeline, graphicsQueue, presentQueue);
+    frames[currentFrame]->render(pipeline.get(), graphicsQueue, presentQueue);
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 

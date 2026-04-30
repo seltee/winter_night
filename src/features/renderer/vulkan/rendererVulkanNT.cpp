@@ -29,21 +29,11 @@ ModelRender *createFromModel(Model *model)
     return VulkanModelRender::fromModel(model);
 }
 
-void RendererVulkanNT::setHWND(void *hWnd)
+bool RendererVulkanNT::setup(void *hWnd, uint32 width, uint32 height)
 {
-    if (this->hWnd == nullptr)
-    {
-        this->hWnd = hWnd;
+    instance = VulkanInstance::create(hWnd, width, height);
+    if (!instance){
+        return false;
     }
-}
-
-bool RendererVulkanNT::setup(uint32 width, uint32 height)
-{
-    instance = new VulkanInstance();
-    if (instance->initNT(hWnd, width, height))
-    {
-        return true;
-    }
-    delete instance;
-    return false;
+    return true;
 }

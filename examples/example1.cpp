@@ -3,7 +3,7 @@
 
 int main()
 {
-    WNE::Window *window = WNE::Window::create(1920, 1080);
+    auto window = WNE::Window::create(1920, 1080);
 
     if (!window)
         return 1;
@@ -12,7 +12,6 @@ int main()
     {
         WNE::Engine::getInstance()->update();
     }
-    window->destroy();
 
     return 0;
 }
