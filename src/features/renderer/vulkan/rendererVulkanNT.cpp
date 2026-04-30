@@ -36,8 +36,7 @@ void RendererVulkanNT::changeWindowSize(uint32 width, uint32 height)
 
 std::shared_ptr<Mesh> RendererVulkanNT::createMesh(std::shared_ptr<Model> model)
 {
-
-    return VulkanMesh::create(model, instance->getVulkanDevice());
+    return VulkanMesh::create(model, instance->getVulkanUtils());
 }
 
 bool RendererVulkanNT::setup(void *hWnd, uint32 width, uint32 height)

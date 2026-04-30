@@ -2,6 +2,7 @@
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/renderer/vulkan/vulkanQueueFamilies.h"
 #include "features/renderer/vulkan/vulkanCommandBuffer.h"
+#include "features/renderer/vulkan/vulkanCommandPool.h"
 #include "features/renderer/vulkan/vulkanInstanceExtensions.h"
 #include "features/renderer/vulkan/vulkanDeviceExtensions.h"
 #include "features/renderer/vulkan/vulkanShader.h"
@@ -11,6 +12,7 @@
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
 #include "features/renderer/vulkan/vulkanFrame.h"
+#include "features/renderer/vulkan/vulkanUtils.h"
 #include "core/core.h"
 #include <memory>
 
@@ -41,9 +43,14 @@ namespace WNE
         void startRendering();
         void finishRendering();
 
+        VulkanUtils *getVulkanUtils()
+        {
+            return utils.get();
+        }
+
         VulkanDevice *getVulkanDevice()
         {
-            return vDevice.get();
+            return vulkanDevice.get();
         }
 
         VulkanFrame *getCurrentFrame()
@@ -69,7 +76,9 @@ namespace WNE
         std::unique_ptr<VulkanRenderPass> renderPass = nullptr;
         std::unique_ptr<VulkanFrameBuffer> frameBuffer = nullptr;
         std::unique_ptr<VulkanSwapChain> swapChain = nullptr;
-        std::unique_ptr<VulkanDevice> vDevice = nullptr;
+        std::unique_ptr<VulkanCommandPool> commandPool = nullptr;
+        std::unique_ptr<VulkanDevice> vulkanDevice = nullptr;
+        std::unique_ptr<VulkanUtils> utils = nullptr;
         std::vector<std::unique_ptr<VulkanFrame>> frames;
 
         const char *const instanceExtNames[VULKAN_INSTANCE_REQUIRED_EXTENSIONS] = {

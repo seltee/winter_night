@@ -4,18 +4,21 @@
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanPipeline.h"
+#include "features/renderer/vulkan/vulkanCommandPool.h"
+#include "features/renderer/vulkan/vulkanDevice.h"
 
 namespace WNE
 {
     class VulkanCommandBuffer
     {
     public:
-        VulkanCommandBuffer(VkDevice device,
-                            VkPhysicalDevice physicalDevice,
+        VulkanCommandBuffer(VulkanDevice *vkDevice,
                             VulkanRenderPass *renderPass,
                             VulkanFrameBuffer *frameBuffer,
-                            VkExtent2D *swapChainExtent);
+                            VkExtent2D *swapChainExtent,
+                            VulkanCommandPool *commandPool);
         ~VulkanCommandBuffer();
+
         bool setup(VkSurfaceKHR surface);
 
         void recordCommandBuffer(uint32_t imageIndex);
@@ -31,10 +34,11 @@ namespace WNE
     protected:
         VkPhysicalDevice physicalDevice;
         VkDevice device;
-        VulkanRenderPass *renderPass;
-        VulkanFrameBuffer *frameBuffer;
         VkExtent2D *swapChainExtent;
-        VkCommandPool commandPool;
         VkCommandBuffer commandBuffer;
+
+        VulkanFrameBuffer *frameBuffer;
+        VulkanRenderPass *renderPass;
+        VulkanCommandPool *commandPool;
     };
 }

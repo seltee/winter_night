@@ -59,6 +59,7 @@ bool VulkanShader::makeFromFiles(const std::string &vertFilePath, const std::str
 
 std::vector<char> VulkanShader::readFile(const std::string &path) // better: take std::string
 {
+    // get rid of throw
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     if (!file.is_open())
     {

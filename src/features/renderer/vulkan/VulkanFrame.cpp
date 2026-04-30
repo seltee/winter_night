@@ -4,11 +4,12 @@
 
 using namespace WNE;
 
-VulkanFrame::VulkanFrame(VulkanDevice *vDevice, VulkanSwapChain *swapChain)
+VulkanFrame::VulkanFrame(VulkanDevice *vulkanDevice, VulkanSwapChain *swapChain)
 {
-    this->device = vDevice->getDevice();
-    this->physicalDevice = vDevice->getPhysicalDevice();
-    this->surface = vDevice->getSurface();
+    this->vulkanDevice = vulkanDevice;
+    this->device = vulkanDevice->getDevice();
+    this->physicalDevice = vulkanDevice->getPhysicalDevice();
+    this->surface = vulkanDevice->getSurface();
     this->swapChain = swapChain;
 }
 
@@ -22,9 +23,9 @@ VulkanFrame::~VulkanFrame()
         vkDestroyFence(device, inFlightFence, nullptr);
 }
 
-bool VulkanFrame::setup(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffer)
+bool VulkanFrame::setup(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffer, VulkanCommandPool *commandPool)
 {
-    commandBuffer = new VulkanCommandBuffer(device, physicalDevice, renderPass, frameBuffer, swapChain->getExtent());
+    commandBuffer = new VulkanCommandBuffer(vulkanDevice, renderPass, frameBuffer, swapChain->getExtent(), commandPool);
     if (!commandBuffer->setup(surface))
     {
         std::cout << "Unable to create vulkan command buffer" << std::endl;
@@ -61,7 +62,7 @@ void VulkanFrame::startFrame(VulkanPipeline *pipeline)
 
 void VulkanFrame::finishFrame(VkQueue graphicsQueue, VkQueue presentQueue)
 {
-
+    // get rid of throw
     commandBuffer->endRenderPass();
 
     VkSubmitInfo submitInfo{};

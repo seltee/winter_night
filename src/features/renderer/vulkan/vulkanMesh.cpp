@@ -7,9 +7,10 @@
 
 using namespace WNE;
 
-VulkanMesh::VulkanMesh(VulkanDevice *vulkanDevice)
+VulkanMesh::VulkanMesh(VulkanUtils *vulkanUtils)
 {
-    this->vulkanDevice = vulkanDevice;
+    this->vulkanUtils = vulkanUtils;
+    this->vulkanDevice = vulkanUtils->getVulkanDevice();
 }
 
 VulkanMesh::~VulkanMesh()
@@ -20,9 +21,9 @@ VulkanMesh::~VulkanMesh()
         vkFreeMemory(vulkanDevice->getDevice(), vertexBufferMemory, nullptr);
 }
 
-std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, VulkanDevice *vulkanDevice)
+std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, VulkanUtils *vulkanUtils)
 {
-    auto mesh = std::make_shared<VulkanMesh>(vulkanDevice);
+    auto mesh = std::make_shared<VulkanMesh>(vulkanUtils);
     if (model->getDataType() == ModelDataType::VertexColored)
     {
         if (mesh->setup(model->getAsVertexColored()))
@@ -34,46 +35,42 @@ std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, Vul
 
 bool VulkanMesh::setup(std::vector<VertexColored> &verticies)
 {
-    VkBufferCreateInfo bufferInfo{};
-    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferInfo.size = sizeof(VertexColored) * verticies.size();
-    bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    // todo don't allocate so many buffers
+    uint64 bufferSize = sizeof(VertexColored) * verticies.size();
 
-    if (vkCreateBuffer(vulkanDevice->getDevice(), &bufferInfo, nullptr, &vertexBuffer) != VK_SUCCESS)
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    if (!vulkanUtils->createBuffer(
+            bufferSize,
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            stagingBuffer,
+            stagingBufferMemory))
     {
         std::cout << "Error creating buffer" << std::endl;
         return false;
     }
 
-    VkMemoryRequirements memRequirements;
-    vkGetBufferMemoryRequirements(vulkanDevice->getDevice(), vertexBuffer, &memRequirements);
-
-    auto memoryType = vulkanDevice->findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    if (memoryType == -1)
-    {
-        std::cout << "Unable to find supported GPU video memory type" << std::endl;
-        return false;
-    }
-
-    VkMemoryAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = (uint32_t)memoryType;
-
-    if (vkAllocateMemory(vulkanDevice->getDevice(), &allocInfo, nullptr, &vertexBufferMemory) != VK_SUCCESS)
-    {
-        std::cout << "failed to allocate vertex buffer memory" << std::endl;
-        return false;
-    }
-
-    vkBindBufferMemory(vulkanDevice->getDevice(), vertexBuffer, vertexBufferMemory, 0);
-
-    // todo maybe move to vkFlushMappedMemoryRanges
     void *mappedMemory;
-    vkMapMemory(vulkanDevice->getDevice(), vertexBufferMemory, 0, bufferInfo.size, 0, &mappedMemory);
-    memcpy(mappedMemory, verticies.data(), (size_t)bufferInfo.size);
-    vkUnmapMemory(vulkanDevice->getDevice(), vertexBufferMemory);
+    vkMapMemory(vulkanDevice->getDevice(), stagingBufferMemory, 0, bufferSize, 0, &mappedMemory);
+    memcpy(mappedMemory, verticies.data(), (size_t)bufferSize);
+    vkUnmapMemory(vulkanDevice->getDevice(), stagingBufferMemory);
+
+    if (!vulkanUtils->createBuffer(
+            bufferSize,
+            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            vertexBuffer,
+            vertexBufferMemory))
+    {
+        std::cout << "Error creating local GPU buffer" << std::endl;
+        return false;
+    }
+
+    vulkanUtils->copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+
+    vkDestroyBuffer(vulkanDevice->getDevice(), stagingBuffer, nullptr);
+    vkFreeMemory(vulkanDevice->getDevice(), stagingBufferMemory, nullptr);
 
     amountOfVerticies = (uint32)verticies.size();
     return true;

@@ -12,9 +12,9 @@ namespace WNE
     class VulkanFrame
     {
     public:
-        VulkanFrame(VulkanDevice *vDevice, VulkanSwapChain *swapChain);
+        VulkanFrame(VulkanDevice *vulkanDevice, VulkanSwapChain *swapChain);
         ~VulkanFrame();
-        bool setup(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffer);
+        bool setup(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffer, VulkanCommandPool *commandPool);
 
         void startFrame(VulkanPipeline *pipeline);
         void finishFrame(VkQueue graphicsQueue, VkQueue presentQueue);
@@ -25,14 +25,16 @@ namespace WNE
         }
 
     protected:
-        VulkanSwapChain *swapChain = nullptr;
-        VulkanCommandBuffer *commandBuffer = nullptr;
         VkSemaphore imageAvailableSemaphore = nullptr;
         VkSemaphore renderFinishedSemaphore = nullptr;
         VkFence inFlightFence = nullptr;
-        VkDevice device;
-        VkPhysicalDevice physicalDevice;
-        VkSurfaceKHR surface;
+        VkDevice device = nullptr;
+        VkPhysicalDevice physicalDevice = nullptr;
+        VkSurfaceKHR surface = nullptr;
+
+        VulkanSwapChain *swapChain = nullptr;
+        VulkanCommandBuffer *commandBuffer = nullptr;
+        VulkanDevice *vulkanDevice = nullptr;
 
         uint32 imageIndex = 0;
     };

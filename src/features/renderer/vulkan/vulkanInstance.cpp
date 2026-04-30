@@ -13,9 +13,9 @@ bool _checkDeviceExtensionSupport(VkPhysicalDevice device);
 
 VulkanInstance::~VulkanInstance()
 {
-    if (vDevice)
+    if (vulkanDevice)
     {
-        VkDevice device = vDevice->getDevice();
+        VkDevice device = vulkanDevice->getDevice();
         vkDeviceWaitIdle(device);
     }
     if (surface)
@@ -53,19 +53,20 @@ bool VulkanInstance::initNT(void *hWnd, uint32 width, uint32 height)
 
 bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
 {
+    // get rid of throw
     this->width = width;
     this->height = height;
     this->surface = surface;
 
-    vDevice = std::make_unique<VulkanDevice>(instance, surface);
-    if (!vDevice->setup())
+    vulkanDevice = std::make_unique<VulkanDevice>(instance, surface);
+    if (!vulkanDevice->setup())
     {
-        vDevice.reset();
+        vulkanDevice.reset();
         std::cout << "Unable to create device" << std::endl;
         return false;
     }
-    VkPhysicalDevice physicalDevice = vDevice->getPhysicalDevice();
-    VkDevice device = vDevice->getDevice();
+    VkPhysicalDevice physicalDevice = vulkanDevice->getPhysicalDevice();
+    VkDevice device = vulkanDevice->getDevice();
 
     VulkanQueueFamilies vulkanQueueFamilies;
     if (!vulkanQueueFamilies.setup(physicalDevice, surface))
@@ -76,6 +77,15 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
 
     vkGetDeviceQueue(device, vulkanQueueFamilies.getGraphicsFamily().value(), 0, &graphicsQueue);
     vkGetDeviceQueue(device, vulkanQueueFamilies.getPresentFamily().value(), 0, &presentQueue);
+
+    commandPool = std::make_unique<VulkanCommandPool>(device, physicalDevice);
+    if (!commandPool->setup(surface))
+    {
+        std::cout << "Unable to create command pool" << std::endl;
+        throw std::runtime_error("failed to create command pool");
+    }
+    
+    utils = std::make_unique<VulkanUtils>(vulkanDevice.get(), commandPool.get(), graphicsQueue, presentQueue);
 
     swapChain = std::make_unique<VulkanSwapChain>(device);
     if (!swapChain->setup(width, height, physicalDevice, surface, !isImmidiateSwap))
@@ -114,8 +124,8 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
 
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        auto frame = std::make_unique<VulkanFrame>(vDevice.get(), swapChain.get());
-        if (!frame->setup(renderPass.get(), frameBuffer.get()))
+        auto frame = std::make_unique<VulkanFrame>(vulkanDevice.get(), swapChain.get());
+        if (!frame->setup(renderPass.get(), frameBuffer.get(), commandPool.get()))
         {
             std::cout << "Unable to create frame " << i << std::endl;
             return false;
@@ -131,8 +141,8 @@ void VulkanInstance::changeSize(uint32 width, uint32 height)
     this->width = width;
     this->height = height;
 
-    VkPhysicalDevice physicalDevice = vDevice->getPhysicalDevice();
-    VkDevice device = vDevice->getDevice();
+    VkPhysicalDevice physicalDevice = vulkanDevice->getPhysicalDevice();
+    VkDevice device = vulkanDevice->getDevice();
 
     vkDeviceWaitIdle(device);
 
@@ -160,8 +170,8 @@ void VulkanInstance::changeSize(uint32 width, uint32 height)
     frames.clear();
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        auto frame = std::make_unique<VulkanFrame>(vDevice.get(), swapChain.get());
-        if (!frame->setup(renderPass.get(), frameBuffer.get()))
+        auto frame = std::make_unique<VulkanFrame>(vulkanDevice.get(), swapChain.get());
+        if (!frame->setup(renderPass.get(), frameBuffer.get(), commandPool.get()))
         {
             std::cout << "Unable to create frame " << i << std::endl;
             throw std::runtime_error("failed to recreate frame");

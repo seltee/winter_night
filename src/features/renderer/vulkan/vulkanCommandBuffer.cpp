@@ -13,49 +13,30 @@ In addition, this allows command recording to happen in multiple threads if so d
 
 using namespace WNE;
 
-VulkanCommandBuffer::VulkanCommandBuffer(VkDevice device,
-                                         VkPhysicalDevice physicalDevice,
+VulkanCommandBuffer::VulkanCommandBuffer(VulkanDevice *vkDevice,
                                          VulkanRenderPass *renderPass,
                                          VulkanFrameBuffer *frameBuffer,
-                                         VkExtent2D *swapChainExtent)
+                                         VkExtent2D *swapChainExtent,
+                                         VulkanCommandPool *commandPool)
 {
-    this->device = device;
-    this->physicalDevice = physicalDevice;
+    this->device = vkDevice->getDevice();
+    this->physicalDevice = vkDevice->getPhysicalDevice();
     this->renderPass = renderPass;
     this->frameBuffer = frameBuffer;
     this->swapChainExtent = swapChainExtent;
+    this->commandPool = commandPool;
 }
 
 VulkanCommandBuffer::~VulkanCommandBuffer()
 {
-    if (commandPool)
-    {
-        vkDestroyCommandPool(device, commandPool, nullptr);
-    }
 }
 
 bool VulkanCommandBuffer::setup(VkSurfaceKHR surface)
 {
-
-    // command pool
-    VulkanQueueFamilies vulkanQueueFamilies;
-    vulkanQueueFamilies.setup(physicalDevice, surface);
-
-    VkCommandPoolCreateInfo poolInfo{};
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-    poolInfo.queueFamilyIndex = vulkanQueueFamilies.getGraphicsFamily().value();
-
-    if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
-    {
-        std::cout << "Failed to create command pool" << std::endl;
-        return false;
-    }
-
     // command buffer
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = commandPool;
+    allocInfo.commandPool = commandPool->getCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
@@ -70,6 +51,7 @@ bool VulkanCommandBuffer::setup(VkSurfaceKHR surface)
 
 void VulkanCommandBuffer::recordCommandBuffer(uint32_t imageIndex)
 {
+    // get rid of throw
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = 0;                  // Optional
@@ -116,6 +98,7 @@ void VulkanCommandBuffer::bindPipeline(VulkanPipeline *vulkanPipeline)
 
 void VulkanCommandBuffer::endRenderPass()
 {
+    vkCmdDraw(commandBuffer, 3, 1, 0, 0);
     vkCmdEndRenderPass(commandBuffer);
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
     {
