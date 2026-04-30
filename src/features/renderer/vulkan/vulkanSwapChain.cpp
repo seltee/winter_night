@@ -14,7 +14,7 @@ struct SwapChainSupportDetails
 
 SwapChainSupportDetails _querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 VkSurfaceFormatKHR _chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
-VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
+VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes, bool isImmidiateSwap);
 VkExtent2D _chooseSwapExtent(int screenWidth, int screenHeight);
 bool _checkDeviceExtensionSupport(VkPhysicalDevice device);
 
@@ -31,12 +31,12 @@ VulkanSwapChain::~VulkanSwapChain()
         vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
 
-bool VulkanSwapChain::setup(int width, int height, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
+bool VulkanSwapChain::setup(int width, int height, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, bool isImmidiateSwap)
 {
     swapChainExtent = new VkExtent2D();
     unsigned int unImageCount;
 
-    swapChain = createSwapChain(physicalDevice, device, surface, width, height, &swapChainImageFormat, swapChainExtent, &unImageCount);
+    swapChain = createSwapChain(physicalDevice, device, surface, width, height, &swapChainImageFormat, swapChainExtent, &unImageCount, isImmidiateSwap);
     if (!swapChain)
     {
         std::cout << "Unable to create swap chain" << std::endl;
@@ -65,12 +65,13 @@ VkSwapchainKHR VulkanSwapChain::createSwapChain(
     int nWindowHeight,
     unsigned int *swapChainImageFormat,
     VkExtent2D *swapChainExtent,
-    unsigned int *punImageCount)
+    unsigned int *punImageCount,
+    bool isImmidiateSwap)
 {
     SwapChainSupportDetails swapChainSupport = _querySwapChainSupport(physicalDevice, surface);
 
     VkSurfaceFormatKHR surfaceFormat = _chooseSwapSurfaceFormat(swapChainSupport.formats);
-    VkPresentModeKHR presentMode = _chooseSwapPresentMode(swapChainSupport.presentModes);
+    VkPresentModeKHR presentMode = _chooseSwapPresentMode(swapChainSupport.presentModes, isImmidiateSwap);
 
     VkExtent2D extent = _chooseSwapExtent(nWindowWidth, nWindowHeight);
 
@@ -218,9 +219,16 @@ VkSurfaceFormatKHR _chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR
     return availableFormats[0];
 }
 
-VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes)
+VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes, bool isImmidiateSwap)
 {
-    return VK_PRESENT_MODE_FIFO_KHR;
+    if (isImmidiateSwap)
+    {
+        return VK_PRESENT_MODE_IMMEDIATE_KHR;
+    }
+    else
+    {
+        return VK_PRESENT_MODE_FIFO_KHR;
+    }
 
     // todo
     // VK_PRESENT_MODE_MAILBOX_KHR for desctop devices, VK_PRESENT_MODE_FIFO_KHR is for mobile

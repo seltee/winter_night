@@ -115,7 +115,6 @@ void WindowNT::updateWindowSize()
     GetWindowRect((HWND__ *)hWnd, &rect);
     width = rect.right - rect.left;
     height = rect.bottom - rect.top;
-    std::cout << "CHANGED " << getWidth() << " " << getHeight() << std::endl;
     if (renderer)
     {
         renderer->changeWindowSize(width, height);

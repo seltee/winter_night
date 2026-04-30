@@ -9,6 +9,7 @@ int main()
         return 1;
 
     auto renderer = window->getRenderer();
+    renderer->setSyncState(false);
 
     const std::vector<VertexColored> vertices = {
         {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},

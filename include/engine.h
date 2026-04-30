@@ -17,6 +17,8 @@ namespace WNE
         static Engine *instance;
         std::vector<Window *> windows;
         std::chrono::_V2::system_clock::time_point timePoint;
+        float fpsCounter = 0.0f;
+        int framesCounter = 0;
 
     public:
         static Engine *getInstance();

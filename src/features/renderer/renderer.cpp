@@ -25,6 +25,15 @@ void *Renderer::getFrameData()
     return nullptr;
 }
 
+void Renderer::setSyncState(bool syncEnabled)
+{
+}
+
+bool Renderer::getSyncState()
+{
+    return false;
+}
+
 void Renderer::addScene(std::shared_ptr<Scene> scene)
 {
     scenes.push_back(std::move(scene));

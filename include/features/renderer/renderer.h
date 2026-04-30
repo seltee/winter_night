@@ -17,6 +17,9 @@ namespace WNE
         virtual std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model);
         virtual void *getFrameData();
 
+        virtual void setSyncState(bool syncEnabled);
+        virtual bool getSyncState();
+
         void addScene(std::shared_ptr<Scene> scene);
     protected:
         std::vector<std::shared_ptr<Scene>> scenes;

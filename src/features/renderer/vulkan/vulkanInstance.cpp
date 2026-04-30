@@ -53,6 +53,8 @@ bool VulkanInstance::initNT(void *hWnd, uint32 width, uint32 height)
 
 bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
 {
+    this->width = width;
+    this->height = height;
     this->surface = surface;
 
     vDevice = std::make_unique<VulkanDevice>(instance, surface);
@@ -76,7 +78,7 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
     vkGetDeviceQueue(device, vulkanQueueFamilies.getPresentFamily().value(), 0, &presentQueue);
 
     swapChain = std::make_unique<VulkanSwapChain>(device);
-    if (!swapChain->setup(width, height, physicalDevice, surface))
+    if (!swapChain->setup(width, height, physicalDevice, surface, !isImmidiateSwap))
     {
         std::cout << "Unable to create swap chain" << std::endl;
         return false;
@@ -126,13 +128,16 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
 
 void VulkanInstance::changeSize(uint32 width, uint32 height)
 {
+    this->width = width;
+    this->height = height;
+
     VkPhysicalDevice physicalDevice = vDevice->getPhysicalDevice();
     VkDevice device = vDevice->getDevice();
 
     vkDeviceWaitIdle(device);
 
     swapChain = std::make_unique<VulkanSwapChain>(device);
-    if (!swapChain->setup(width, height, physicalDevice, surface))
+    if (!swapChain->setup(width, height, physicalDevice, surface, !isImmidiateSwap))
     {
         std::cout << "Unable to create swap chain" << std::endl;
         throw std::runtime_error("failed to recreate swap chain");
@@ -163,6 +168,17 @@ void VulkanInstance::changeSize(uint32 width, uint32 height)
         }
         frames.emplace_back(std::move(frame));
     }
+}
+
+void VulkanInstance::setSyncState(bool syncEnabled)
+{
+    isImmidiateSwap = syncEnabled;
+    changeSize(width, height);
+}
+
+bool VulkanInstance::getSyncState()
+{
+    return isImmidiateSwap;
 }
 
 void VulkanInstance::startRendering()

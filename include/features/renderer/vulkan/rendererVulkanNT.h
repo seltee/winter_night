@@ -18,6 +18,9 @@ namespace WNE
         }
         void *getFrameData() override final;
 
+        void setSyncState(bool syncEnabled) override final;
+        bool getSyncState() override final;
+
         void render() override final;
 
         void changeWindowSize(uint32 width, uint32 height) override final;

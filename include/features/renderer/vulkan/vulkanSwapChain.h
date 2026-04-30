@@ -11,7 +11,7 @@ namespace WNE
     public:
         VulkanSwapChain(VkDevice device);
         ~VulkanSwapChain();
-        bool setup(int width, int height, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface);
+        bool setup(int width, int height, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, bool isImmidiateSwap);
 
         inline unsigned int getImageFormat()
         {
@@ -50,7 +50,8 @@ namespace WNE
             int nWindowHeight,
             unsigned int *swapChainImageFormat,
             VkExtent2D *swapChainExtent,
-            unsigned int *punImageCount);
+            unsigned int *punImageCount, 
+            bool isImmidiateSwap);
 
         bool createSwapChainImages(
             VkDevice device,

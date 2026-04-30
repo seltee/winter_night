@@ -156,6 +156,5 @@ bool VulkanPipeline::setup(int width, int height, VkExtent2D *swapChainExtent, V
         return false;
     }
 
-    printf("READY\n");
     return true;
 }

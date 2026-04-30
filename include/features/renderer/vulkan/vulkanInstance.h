@@ -35,6 +35,9 @@ namespace WNE
 
         void changeSize(uint32 width, uint32 height);
 
+        void setSyncState(bool syncEnabled);
+        bool getSyncState();
+
         void startRendering();
         void finishRendering();
 
@@ -49,7 +52,10 @@ namespace WNE
         }
 
     protected:
+        uint32 width = 0,
+               height = 0;
         uint32_t currentFrame = 0;
+        bool isImmidiateSwap = false;
 
         VulkanInstanceExtensions *vulkanInstanceExtensions = nullptr;
 

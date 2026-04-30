@@ -8,33 +8,36 @@ void *RendererVulkanNT::getFrameData()
     return instance->getCurrentFrame();
 }
 
+void RendererVulkanNT::setSyncState(bool syncEnabled)
+{
+    instance->setSyncState(syncEnabled);
+}
+
+bool RendererVulkanNT::getSyncState()
+{
+    return instance->getSyncState();
+}
+
 void RendererVulkanNT::render()
 {
-    if (instance)
+    instance->startRendering();
+    for (const auto &scene : scenes)
     {
-        instance->startRendering();
-        for (const auto & scene : scenes){
-            scene->render(this);
-        }
-        instance->finishRendering();
+        scene->render(this);
     }
+    instance->finishRendering();
 }
 
 void RendererVulkanNT::changeWindowSize(uint32 width, uint32 height)
 {
-    if (instance)
-    {
-        instance->changeSize(width, height);
-    }
+
+    instance->changeSize(width, height);
 }
 
 std::shared_ptr<Mesh> RendererVulkanNT::createMesh(std::shared_ptr<Model> model)
 {
-    if (instance)
-    {
-        return VulkanMesh::create(model, instance->getVulkanDevice());
-    }
-    return nullptr;
+
+    return VulkanMesh::create(model, instance->getVulkanDevice());
 }
 
 bool RendererVulkanNT::setup(void *hWnd, uint32 width, uint32 height)

@@ -34,11 +34,6 @@ std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, Vul
 
 bool VulkanMesh::setup(std::vector<VertexColored> &verticies)
 {
-    for (const auto &p : verticies)
-    {
-        std::cout << p.pos.x << " " << p.pos.y << std::endl;
-    }
-
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = sizeof(VertexColored) * verticies.size();

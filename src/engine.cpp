@@ -1,6 +1,8 @@
 #include "engine.h"
 #include "features/os/window.h"
 #include <algorithm>
+#include <cmath>
+#include <iostream>
 
 using namespace WNE;
 
@@ -37,7 +39,7 @@ float Engine::update()
     auto now = std::chrono::high_resolution_clock::now();
     auto deltaUs = std::chrono::duration_cast<std::chrono::microseconds>(now - timePoint).count();
     timePoint = now;
-    float delta = (float)deltaUs / 1000000.0f;
+    float delta = std::min((float)deltaUs / 1000000.0f, 0.2f);
 
     for (auto &it : windows)
     {
@@ -47,6 +49,15 @@ float Engine::update()
     for (auto &it : windows)
     {
         it->render();
+    }
+
+    fpsCounter += delta;
+    framesCounter++;
+    if (fpsCounter > 1.0f)
+    {
+        std::cout << "FPS " << framesCounter << std::endl;
+        fpsCounter -= 1.0f;
+        framesCounter = 0;
     }
 
     return delta;
