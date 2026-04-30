@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "features/os/window.h"
-#include "utils/api.h"
+#include "core/api.h"
 #include <chrono>
 
 namespace WNE

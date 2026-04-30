@@ -3,6 +3,8 @@
 #include "vulkan/vulkan.h"
 #include <iostream>
 
+using namespace WNE;
+
 bool VulkanQueueFamilies::setup(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
     VkBool32 presentSupport = false;

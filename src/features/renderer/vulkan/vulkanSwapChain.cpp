@@ -3,6 +3,8 @@
 #include "vulkan/vulkan.h"
 #include <iostream>
 
+using namespace WNE;
+
 struct SwapChainSupportDetails
 {
     VkSurfaceCapabilitiesKHR capabilities;

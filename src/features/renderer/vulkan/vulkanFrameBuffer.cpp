@@ -11,6 +11,8 @@ That means that we have to create a framebuffer for all of the images in the swa
 #include "vulkan/vulkan.h"
 #include <iostream>
 
+using namespace WNE;
+
 VulkanFrameBuffer::VulkanFrameBuffer(VkDevice device)
 {
     this->device = device;

@@ -2,6 +2,8 @@
 #include "vulkan/vulkan.h"
 #include <cstring>
 
+using namespace WNE;
+
 VulkanDeviceExtensions::VulkanDeviceExtensions(VkPhysicalDevice device)
 {
     uint32_t extensionCount;

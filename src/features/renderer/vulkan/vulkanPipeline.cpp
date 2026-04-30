@@ -4,6 +4,8 @@
 #include <vector>
 #include <iostream>
 
+using namespace WNE;
+
 VulkanPipeline::~VulkanPipeline()
 {
     if (graphicsPipeline)

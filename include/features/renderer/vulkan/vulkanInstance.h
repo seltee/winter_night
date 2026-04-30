@@ -11,6 +11,7 @@
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
 #include "features/renderer/vulkan/vulkanFrame.h"
+#include "core/core.h"
 
 #define VULKAN_INSTANCE_REQUIRED_EXTENSIONS 2
 
@@ -23,9 +24,9 @@ namespace WNE
     public:
         ~VulkanInstance();
 
-        bool initNT(void *hWnd, int width, int height);
-        bool init(int width, int height, VkSurfaceKHR surface);
-        void changeSize(int width, int height);
+        bool initNT(void *hWnd, uint32 width, uint32 height);
+        bool init(uint32 width, uint32 height, VkSurfaceKHR surface);
+        void changeSize(uint32 width, uint32 height);
         void render();
 
     protected:

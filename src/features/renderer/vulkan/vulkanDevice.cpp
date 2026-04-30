@@ -4,6 +4,8 @@
 #include "vulkan/vulkan.h"
 #include <iostream>
 
+using namespace WNE;
+
 typedef struct VulkanDeviceInfo
 {
     VkPhysicalDevice device;

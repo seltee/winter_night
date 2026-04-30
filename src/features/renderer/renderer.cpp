@@ -1,6 +1,8 @@
 #include "features/renderer/renderer.h"
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 
+using namespace WNE;
+
 Renderer::~Renderer()
 {
 }
@@ -9,11 +11,16 @@ void Renderer::render()
 {
 }
 
-void Renderer::changeWindowSize(int width, int height)
+void Renderer::changeWindowSize(uint32 width, uint32 height)
 {
 }
 
-Renderer *Renderer::createRendererNT(void *hWnd, int width, int height)
+ModelRender *Renderer::createFromModel(Model *model)
+{
+    return nullptr;
+}
+
+Renderer *Renderer::createRendererNT(void *hWnd, uint32 width, uint32 height)
 {
     RendererVulkanNT *rendererVulkan = new RendererVulkanNT();
     rendererVulkan->setHWND(hWnd);
@@ -25,7 +32,7 @@ Renderer *Renderer::createRendererNT(void *hWnd, int width, int height)
     return nullptr;
 }
 
-bool Renderer::setup(int width, int height)
+bool Renderer::setup(uint32 width, uint32 height)
 {
     return false;
 }

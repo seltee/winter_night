@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <iostream>
 
+using namespace WNE;
+
 bool _checkDeviceExtensionSupport(VkPhysicalDevice device);
 
 VulkanInstance::~VulkanInstance()
@@ -35,7 +37,7 @@ VulkanInstance::~VulkanInstance()
         delete frameBuffer;
 }
 
-bool VulkanInstance::initNT(void *hWnd, int width, int height)
+bool VulkanInstance::initNT(void *hWnd, uint32 width, uint32 height)
 {
     if (!initInstance())
     {
@@ -60,7 +62,7 @@ bool VulkanInstance::initNT(void *hWnd, int width, int height)
     return init(width, height, surface);
 }
 
-bool VulkanInstance::init(int width, int height, VkSurfaceKHR surface)
+bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
 {
     this->surface = surface;
 
@@ -133,7 +135,7 @@ bool VulkanInstance::init(int width, int height, VkSurfaceKHR surface)
     return true;
 }
 
-void VulkanInstance::changeSize(int width, int height)
+void VulkanInstance::changeSize(uint32 width, uint32 height)
 {
     VkPhysicalDevice physicalDevice = vDevice->getPhysicalDevice();
     VkDevice device = vDevice->getDevice();

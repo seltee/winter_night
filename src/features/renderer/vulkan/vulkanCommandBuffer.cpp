@@ -11,6 +11,8 @@ In addition, this allows command recording to happen in multiple threads if so d
 #include "vulkan/vulkan.h"
 #include <iostream>
 
+using namespace WNE;
+
 VulkanCommandBuffer::VulkanCommandBuffer(VkDevice device,
                                          VkPhysicalDevice physicalDevice,
                                          VulkanRenderPass *renderPass,

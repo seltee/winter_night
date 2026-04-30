@@ -3,6 +3,8 @@
 #include "vulkan/vulkan.h"
 #include <string.h>
 
+using namespace WNE;
+
 VulkanInstanceExtensions::VulkanInstanceExtensions()
 {
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
