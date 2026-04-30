@@ -47,17 +47,21 @@ bool VulkanFrame::setup(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBu
     return true;
 }
 
-void VulkanFrame::render(VulkanPipeline *pipeline, VkQueue graphicsQueue, VkQueue presentQueue)
+void VulkanFrame::startFrame(VulkanPipeline *pipeline)
 {
     vkWaitForFences(device, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
     vkResetFences(device, 1, &inFlightFence);
 
-    uint32_t imageIndex;
     vkAcquireNextImageKHR(device, swapChain->getSwapChain(), UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 
     commandBuffer->resetBuffer();
     commandBuffer->recordCommandBuffer(imageIndex);
     commandBuffer->bindPipeline(pipeline);
+}
+
+void VulkanFrame::finishFrame(VkQueue graphicsQueue, VkQueue presentQueue)
+{
+
     commandBuffer->endRenderPass();
 
     VkSubmitInfo submitInfo{};

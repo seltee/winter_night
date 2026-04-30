@@ -38,6 +38,11 @@ namespace WNE
 
         virtual void close();
 
+        inline Renderer *getRenderer()
+        {
+            return renderer.get();
+        }
+
         inline int getWidth()
         {
             return width;

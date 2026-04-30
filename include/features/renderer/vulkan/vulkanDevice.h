@@ -12,7 +12,9 @@ namespace WNE
     public:
         VulkanDevice(VkInstance instance, VkSurfaceKHR surface);
         ~VulkanDevice();
+
         bool setup();
+        int64 findMemoryType(uint32 typeFilter, uint64 properties) noexcept;
 
         inline VkDevice getDevice()
         {

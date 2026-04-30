@@ -15,7 +15,17 @@ void Renderer::changeWindowSize(uint32 width, uint32 height)
 {
 }
 
-ModelRender *Renderer::createFromModel(Model *model)
+std::shared_ptr<Mesh> Renderer::createMesh(std::shared_ptr<Model> model)
 {
     return nullptr;
+}
+
+void *Renderer::getFrameData()
+{
+    return nullptr;
+}
+
+void Renderer::addScene(std::shared_ptr<Scene> scene)
+{
+    scenes.push_back(std::move(scene));
 }

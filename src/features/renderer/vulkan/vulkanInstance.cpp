@@ -165,9 +165,14 @@ void VulkanInstance::changeSize(uint32 width, uint32 height)
     }
 }
 
-void VulkanInstance::render()
+void VulkanInstance::startRendering()
 {
-    frames[currentFrame]->render(pipeline.get(), graphicsQueue, presentQueue);
+    frames[currentFrame]->startFrame(pipeline.get());
+}
+
+void VulkanInstance::finishRendering()
+{
+    frames[currentFrame]->finishFrame(graphicsQueue, presentQueue);
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 

@@ -8,6 +8,21 @@ int main()
     if (!window)
         return 1;
 
+    auto renderer = window->getRenderer();
+
+    const std::vector<VertexColored> vertices = {
+        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {0.0f, 0.0f, 0.0f}},
+    };
+
+    auto scene = WNE::Scene::create();
+    renderer->addScene(scene);
+    auto model = WNE::Model::createFromData(vertices);
+    auto mesh = renderer->createMesh(model);
+    auto object = WNE::ObjectMesh::create(mesh);
+    scene->addObject(object);
+
     while (!window->isCloseRequested())
     {
         WNE::Engine::getInstance()->update();

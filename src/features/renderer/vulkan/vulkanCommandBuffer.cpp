@@ -116,7 +116,6 @@ void VulkanCommandBuffer::bindPipeline(VulkanPipeline *vulkanPipeline)
 
 void VulkanCommandBuffer::endRenderPass()
 {
-    vkCmdDraw(commandBuffer, 3, 1, 0, 0);
     vkCmdEndRenderPass(commandBuffer);
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
     {

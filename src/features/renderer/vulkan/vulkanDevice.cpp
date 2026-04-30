@@ -99,6 +99,23 @@ bool VulkanDevice::setup()
     return true;
 }
 
+int64 VulkanDevice::findMemoryType(uint32 typeFilter, uint64 properties) noexcept
+{
+    VkMemoryPropertyFlags flags = (VkMemoryPropertyFlags)properties;
+    VkPhysicalDeviceMemoryProperties memProperties;
+    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+
+    for (uint32 i = 0; i < memProperties.memoryTypeCount; i++)
+    {
+        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & flags) == flags)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 int _getDeviceScore(VkPhysicalDevice device)
 {
     int score = 0;

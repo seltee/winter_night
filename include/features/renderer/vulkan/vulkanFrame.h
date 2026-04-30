@@ -15,7 +15,14 @@ namespace WNE
         VulkanFrame(VulkanDevice *vDevice, VulkanSwapChain *swapChain);
         ~VulkanFrame();
         bool setup(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffer);
-        void render(VulkanPipeline *pipeline, VkQueue graphicsQueue, VkQueue presentQueue);
+
+        void startFrame(VulkanPipeline *pipeline);
+        void finishFrame(VkQueue graphicsQueue, VkQueue presentQueue);
+
+        inline VulkanCommandBuffer *getCommandBuffer()
+        {
+            return commandBuffer;
+        }
 
     protected:
         VulkanSwapChain *swapChain = nullptr;
@@ -26,5 +33,7 @@ namespace WNE
         VkDevice device;
         VkPhysicalDevice physicalDevice;
         VkSurfaceKHR surface;
+
+        uint32 imageIndex = 0;
     };
 }

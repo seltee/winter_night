@@ -1,4 +1,5 @@
 #pragma once
+#include "core/core.h"
 
 typedef struct VkInstance_T *VkInstance;
 typedef struct VkPhysicalDevice_T *VkPhysicalDevice;
@@ -15,6 +16,8 @@ typedef struct VkFramebuffer_T *VkFramebuffer;
 typedef struct VkCommandPool_T *VkCommandPool;
 typedef struct VkCommandBuffer_T *VkCommandBuffer;
 typedef struct VkSemaphore_T *VkSemaphore;
+typedef struct VkBuffer_T *VkBuffer;
+typedef struct VkDeviceMemory_T *VkDeviceMemory;
 typedef struct VkFence_T *VkFence;
 typedef struct VkExtent2D VkExtent2D;
 typedef struct VkShaderModule_T *VkShaderModule;

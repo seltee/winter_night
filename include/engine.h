@@ -1,8 +1,12 @@
 #pragma once
 #include <vector>
-#include "features/os/window.h"
-#include "core/api.h"
 #include <chrono>
+#include "features/os/window.h"
+#include "features/data/model.h"
+#include "features/scene/scene.h"
+#include "features/scene/object.h"
+#include "features/scene/objectMesh.h"
+#include "core/api.h"
 
 namespace WNE
 {
@@ -21,6 +25,5 @@ namespace WNE
         void unregisterWindow(Window *window);
 
         float update();
-        void render();
     };
 }

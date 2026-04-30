@@ -34,7 +34,19 @@ namespace WNE
         ~VulkanInstance();
 
         void changeSize(uint32 width, uint32 height);
-        void render();
+
+        void startRendering();
+        void finishRendering();
+
+        VulkanDevice *getVulkanDevice()
+        {
+            return vDevice.get();
+        }
+
+        VulkanFrame *getCurrentFrame()
+        {
+            return frames[currentFrame].get();
+        }
 
     protected:
         uint32_t currentFrame = 0;

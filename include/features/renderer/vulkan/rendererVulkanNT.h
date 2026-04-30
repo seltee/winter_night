@@ -6,7 +6,7 @@
 
 namespace WNE
 {
-    class RendererVulkanNT : public Renderer
+    class WNE_API RendererVulkanNT : public Renderer
     {
     public:
         static std::unique_ptr<RendererVulkanNT> create(void *hwnd, uint32 w, uint32 h)
@@ -16,10 +16,12 @@ namespace WNE
                 return nullptr;
             return instance;
         }
+        void *getFrameData() override final;
 
         void render() override final;
+
         void changeWindowSize(uint32 width, uint32 height) override final;
-        ModelRender *createFromModel(Model *model) override final;
+        std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model) override final;
 
     protected:
         RendererVulkanNT() = default;

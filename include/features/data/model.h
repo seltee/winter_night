@@ -1,30 +1,47 @@
+/*
+    Model holds raw object data in Ram
+*/
+
 #pragma once
+#include <vector>
+#include <memory>
 #include "core/glm/glm.hpp"
 #include "core/api.h"
 #include "core/data.h"
-#include <vector>
 
-enum class ModelDataType
+namespace WNE
 {
-    VertexColored
-};
+    enum class ModelDataType
+    {
+        VertexColored
+    };
 
-union ModelData
-{
-    std::vector<VertexColored> *vertexColored;
-};
+    union ModelData
+    {
+        std::vector<VertexColored> *vertexColored;
+    };
 
-class WNE_API Model
-{
-protected:
-    Model(ModelData data, ModelDataType type);
-    virtual ~Model();
+    class WNE_API Model
+    {
+    protected:
+        ModelData data;
+        ModelDataType dataType;
 
-    ModelData data;
-    ModelDataType dataType;
+    public:
+        Model(ModelData data, ModelDataType type);
+        ~Model();
 
-public:
-    static Model *createFromData(std::vector<VertexColored> &vertexColored);
+        static std::shared_ptr<Model> createFromData(const std::vector<VertexColored> &vertexColored);
 
-    virtual void destroy();
-};
+        ModelDataType getDataType()
+        {
+            return dataType;
+        }
+
+        std::vector<VertexColored> &getAsVertexColored()
+        {
+            return *data.vertexColored;
+        }
+    };
+
+}
