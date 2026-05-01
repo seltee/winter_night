@@ -18,7 +18,7 @@
 
 #define VULKAN_INSTANCE_REQUIRED_EXTENSIONS 2
 
-namespace WNE
+namespace wne
 {
     const int MAX_FRAMES_IN_FLIGHT = 2;
 

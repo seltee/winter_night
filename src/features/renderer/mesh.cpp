@@ -1,6 +1,6 @@
 #include "features/renderer/mesh.h"
 
-using namespace WNE;
+using namespace wne;
 
 void Mesh::render(void *frameRenderData)
 {

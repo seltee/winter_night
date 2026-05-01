@@ -3,7 +3,7 @@
 #include "vulkan/vulkan.h"
 #include <string.h>
 
-using namespace WNE;
+using namespace wne;
 
 VulkanInstanceExtensions::VulkanInstanceExtensions()
 {

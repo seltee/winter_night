@@ -3,7 +3,7 @@
 
 class HWND__;
 
-namespace WNE
+namespace wne
 {
     class WNE_API WindowNT : public Window
     {

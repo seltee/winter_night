@@ -4,7 +4,7 @@
 #include "features/renderer/vulkan/vulkanDeviceExtensions.h"
 #include <vector>
 
-namespace WNE
+namespace wne
 {
     class VulkanSwapChain
     {

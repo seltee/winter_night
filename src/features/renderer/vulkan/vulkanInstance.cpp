@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <iostream>
 
-using namespace WNE;
+using namespace wne;
 
 bool _checkDeviceExtensionSupport(VkPhysicalDevice device);
 

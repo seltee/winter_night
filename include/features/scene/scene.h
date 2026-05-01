@@ -7,7 +7,7 @@
 #include "core/core.h"
 #include "core/api.h"
 
-namespace WNE
+namespace wne
 {
     class Renderer;
 

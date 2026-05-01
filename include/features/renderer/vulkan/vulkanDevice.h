@@ -5,7 +5,7 @@
 
 #define VULKAN_DEVICE_REQUIRED_EXTENSIONS 1
 
-namespace WNE
+namespace wne
 {
     class VulkanDevice
     {

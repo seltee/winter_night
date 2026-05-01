@@ -2,7 +2,7 @@
 #include "vulkan/vulkan.h"
 #include <cstring>
 
-using namespace WNE;
+using namespace wne;
 
 VulkanDeviceExtensions::VulkanDeviceExtensions(VkPhysicalDevice device)
 {

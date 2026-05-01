@@ -3,7 +3,7 @@
 
 int main()
 {
-    auto window = WNE::Window::create(1920, 1080);
+    auto window = wne::Window::create(1920, 1080);
 
     if (!window)
         return 1;
@@ -17,16 +17,16 @@ int main()
         {{-0.5f, 0.5f}, {0.0f, 0.0f, 0.0f}},
     };
 
-    auto scene = WNE::Scene::create();
+    auto scene = wne::Scene::create();
     renderer->addScene(scene);
-    auto model = WNE::Model::createFromData(vertices);
+    auto model = wne::Model::createFromData(vertices);
     auto mesh = renderer->createMesh(model);
-    auto object = WNE::ObjectMesh::create(mesh);
+    auto object = wne::ObjectMesh::create(mesh);
     scene->addObject(object);
 
     while (!window->isCloseRequested())
     {
-        WNE::Engine::getInstance()->update();
+        wne::Engine::getInstance()->update();
     }
 
     return 0;

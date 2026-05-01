@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iostream>
 
-using namespace WNE;
+using namespace wne;
 
 Engine *Engine::instance = nullptr;
 

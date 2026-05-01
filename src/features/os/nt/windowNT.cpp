@@ -3,9 +3,9 @@
 #include <windows.h>
 #include <iostream>
 
-using namespace WNE;
+using namespace wne;
 
-#define CLASS_NAME L"WNE Window Class"
+#define CLASS_NAME L"wne Window Class"
 
 typedef BOOL(WINAPI *SetProcessDPIAwareFunc)();
 

@@ -9,7 +9,7 @@
 #include "core/api.h"
 #include "core/data.h"
 
-namespace WNE
+namespace wne
 {
     enum class ModelDataType
     {

@@ -5,7 +5,7 @@
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanPipeline.h"
 
-namespace WNE
+namespace wne
 {
     class VulkanCommandPool
     {

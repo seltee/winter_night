@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-namespace WNE
+namespace wne
 {
     class VulkanMesh : public Mesh
     {

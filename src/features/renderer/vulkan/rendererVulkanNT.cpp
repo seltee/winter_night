@@ -1,7 +1,7 @@
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 #include "features/renderer/vulkan/vulkanMesh.h"
 
-using namespace WNE;
+using namespace wne;
 
 void *RendererVulkanNT::getFrameData()
 {

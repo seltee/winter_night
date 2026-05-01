@@ -1,7 +1,7 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
 
-namespace WNE
+namespace wne
 {
     class VulkanRenderPass
     {

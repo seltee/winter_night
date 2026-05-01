@@ -6,7 +6,7 @@
 #include <vector>
 #include <iostream>
 
-using namespace WNE;
+using namespace wne;
 
 VulkanPipeline::~VulkanPipeline()
 {

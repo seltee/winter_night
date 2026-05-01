@@ -7,7 +7,7 @@
 #include "features/renderer/vulkan/vulkanCommandPool.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
 
-namespace WNE
+namespace wne
 {
     class VulkanCommandBuffer
     {

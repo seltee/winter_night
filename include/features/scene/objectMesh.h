@@ -4,7 +4,7 @@
 #include "core/api.h"
 #include <memory>
 
-namespace WNE
+namespace wne
 {
     class WNE_API ObjectMesh : public Object
     {

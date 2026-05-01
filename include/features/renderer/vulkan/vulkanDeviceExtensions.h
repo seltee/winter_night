@@ -3,7 +3,7 @@
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include <vector>
 
-namespace WNE
+namespace wne
 {
     class WNE_API VulkanDeviceExtensions
     {

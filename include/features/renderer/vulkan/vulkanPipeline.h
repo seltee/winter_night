@@ -3,7 +3,7 @@
 #include "features/renderer/vulkan/vulkanShader.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 
-namespace WNE
+namespace wne
 {
     class VulkanPipeline
     {

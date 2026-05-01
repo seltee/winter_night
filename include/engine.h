@@ -8,7 +8,7 @@
 #include "features/scene/objectMesh.h"
 #include "core/api.h"
 
-namespace WNE
+namespace wne
 {
     class WNE_API Engine
     {

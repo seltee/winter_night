@@ -1,7 +1,7 @@
 #include "features/scene/objectMesh.h"
 #include "features/renderer/renderer.h"
 
-using namespace WNE;
+using namespace wne;
 
 ObjectMesh::ObjectMesh(std::shared_ptr<Mesh> mesh)
 {

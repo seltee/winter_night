@@ -4,7 +4,7 @@
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include <vector>
 
-namespace WNE
+namespace wne
 {
     class VulkanFrameBuffer
     {

@@ -3,7 +3,7 @@
 #include "features/renderer/vulkan/vulkanDevice.h"
 #include "features/renderer/vulkan/vulkanCommandPool.h"
 
-namespace WNE
+namespace wne
 {
     class VulkanUtils
     {

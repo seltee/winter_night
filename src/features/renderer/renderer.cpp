@@ -1,7 +1,7 @@
 #include "features/renderer/renderer.h"
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 
-using namespace WNE;
+using namespace wne;
 
 Renderer::~Renderer()
 {

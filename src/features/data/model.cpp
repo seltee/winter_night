@@ -1,7 +1,7 @@
 #include "features/data/model.h"
 #include <iostream>
 
-using namespace WNE;
+using namespace wne;
 
 Model::Model(ModelData data, ModelDataType type)
 {

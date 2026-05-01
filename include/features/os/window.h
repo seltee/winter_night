@@ -3,7 +3,7 @@
 #include "features/renderer/renderer.h"
 #include <memory>
 
-namespace WNE
+namespace wne
 {
     enum class WindowType
     {

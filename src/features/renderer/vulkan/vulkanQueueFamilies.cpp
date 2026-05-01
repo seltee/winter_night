@@ -3,7 +3,7 @@
 #include "vulkan/vulkan.h"
 #include <iostream>
 
-using namespace WNE;
+using namespace wne;
 
 bool VulkanQueueFamilies::setup(VkPhysicalDevice device, VkSurfaceKHR surface)
 {

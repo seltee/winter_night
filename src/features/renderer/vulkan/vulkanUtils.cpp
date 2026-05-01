@@ -2,7 +2,7 @@
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 
-using namespace WNE;
+using namespace wne;
 
 VulkanUtils::VulkanUtils(VulkanDevice *vulkanDevice, VulkanCommandPool *vulkanCommandPool, VkQueue graphicsQueue, VkQueue presentQueue)
 {

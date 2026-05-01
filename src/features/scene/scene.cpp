@@ -1,7 +1,7 @@
 #include "features/scene/scene.h"
 #include "features/renderer/renderer.h"
 
-using namespace WNE;
+using namespace wne;
 
 std::shared_ptr<Scene> Scene::create()
 {

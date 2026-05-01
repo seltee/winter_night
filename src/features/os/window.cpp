@@ -2,7 +2,7 @@
 #include "features/os/nt/windowNT.h"
 #include "engine.h"
 
-using namespace WNE;
+using namespace wne;
 
 Window::Window()
 {

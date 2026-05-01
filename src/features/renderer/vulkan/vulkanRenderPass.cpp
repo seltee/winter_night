@@ -3,7 +3,7 @@
 #include "vulkan/vulkan.h"
 #include <iostream>
 
-using namespace WNE;
+using namespace wne;
 
 VulkanRenderPass::VulkanRenderPass()
 {

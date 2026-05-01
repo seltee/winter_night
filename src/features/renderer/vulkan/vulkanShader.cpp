@@ -6,7 +6,7 @@
 #include <fstream>
 #include <vector>
 
-using namespace WNE;
+using namespace wne;
 
 VulkanShader::VulkanShader()
 {

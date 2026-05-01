@@ -7,7 +7,7 @@
 #include <iostream>
 #include <cstdint>
 
-namespace WNE
+namespace wne
 {
     class VulkanQueueFamilies
     {

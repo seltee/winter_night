@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-namespace WNE
+namespace wne
 {
     class VulkanShader
     {

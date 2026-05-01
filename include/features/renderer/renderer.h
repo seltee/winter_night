@@ -5,7 +5,7 @@
 #include "core/core.h"
 #include <vector>
 
-namespace WNE
+namespace wne
 {
     class WNE_API Renderer
     {

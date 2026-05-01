@@ -1,6 +1,6 @@
 #pragma once
 
-namespace WNE
+namespace wne
 {
     class Mesh
     {

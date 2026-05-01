@@ -2,7 +2,7 @@
 #include "core/api.h"
 #include <vector>
 
-namespace WNE
+namespace wne
 {
     class WNE_API VulkanInstanceExtensions
     {
