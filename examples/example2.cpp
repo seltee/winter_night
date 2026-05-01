@@ -4,6 +4,7 @@
 
 // Iterations
 constexpr int iterations = 1'000'000'000; // 1kkk
+constexpr int iterationsLow = 10'000'000; // 10kk
 
 // Prevent optimization
 template <typename T>
@@ -16,20 +17,38 @@ void benchDotVec2();
 void benchDotVec3();
 void benchDotVec4();
 void benchCross();
+void benchMult3x3(wne::Matrix3x3 ma, wne::Matrix3x3 mb);
+void benchMult4x4(wne::Matrix4x4 ma, wne::Matrix4x4 mb);
 
 int main()
 {
     std::cout << "Math tests" << std::endl;
-    wne::Vector3 v3a(4.0f, 2.0f, 1.0f);
-    wne::Vector3 v3b(5.0f, 1.0f, 0.0f);
-    wne::Vector3 v3c(2.0f, -1.0f, -1.0f);
 
     // Dot benches
     benchDotVec2();
     benchDotVec3();
     benchDotVec4();
     benchCross();
-
+    benchMult3x3(
+        wne::Matrix3x3(
+            1, 0, 2,
+            4, 3, 1,
+            8, 5, 4),
+        wne::Matrix3x3(
+            1, 2, 0,
+            1, 3, 1,
+            2, 1, 2));
+    benchMult4x4(
+        wne::Matrix4x4(
+            1, 0, 2, 1,
+            4, 3, 1, 7,
+            8, 5, 4, 2,
+            1, 3, 0, 2),
+        wne::Matrix4x4(
+            1, 2, 0, 5,
+            1, 3, 1, 4,
+            2, 1, 2, 3,
+            3, 2, 1, 0));
     return 0;
 }
 
@@ -121,5 +140,39 @@ void benchCross()
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
         std::cout << "wne cross: " << diff.count() << " s\n";
+    }
+}
+
+void benchMult3x3(wne::Matrix3x3 ma, wne::Matrix3x3 mb)
+{
+    std::cout << "Mul Matrix 3x3 bench" << std::endl;
+    {
+        wne::Matrix3x3 result;
+        auto start = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i < iterationsLow; ++i)
+        {
+            result = ma * mb;
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        doNotOptimize(result);
+        std::chrono::duration<double> diff = end - start;
+        std::cout << "Mul Matrix 3x3: " << diff.count() << " s\n";
+    }
+}
+
+void benchMult4x4(wne::Matrix4x4 ma, wne::Matrix4x4 mb)
+{
+    std::cout << "Mul Matrix 4x4 bench" << std::endl;
+    {
+        wne::Matrix4x4 result;
+        auto start = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i < iterationsLow; ++i)
+        {
+            result = ma * mb;
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        doNotOptimize(result);
+        std::chrono::duration<double> diff = end - start;
+        std::cout << "Mul Matrix 4x4: " << diff.count() << " s\n";
     }
 }

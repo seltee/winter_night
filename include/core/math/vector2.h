@@ -16,8 +16,8 @@ namespace wne
         };
 
         // initialization
-        Vector2(const float x, const float y) : x(x), y(y) {}
-        Vector2(const float d) : x(d), y(d) {}
+        Vector2(float x, float y) : x(x), y(y) {}
+        Vector2(float d) : x(d), y(d) {}
         Vector2() : x(0.0f), y(0.0f) {}
 
         // operators
@@ -26,6 +26,16 @@ namespace wne
             this->x += rhs.x;
             this->y += rhs.y;
             return *this;
+        }
+
+        float &operator[](int index)
+        {
+            return (&x)[index];
+        }
+
+        const float &operator[](int index) const
+        {
+            return (&x)[index];
         }
     };
 

@@ -24,8 +24,8 @@ namespace wne
         };
 
         // initialization
-        Vector4(const float x, const float y, const float z, const float w) : x(x), y(y), z(z), w(w) {}
-        Vector4(const float d) : x(d), y(d), z(d), w(d) {}
+        Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+        Vector4(float d) : x(d), y(d), z(d), w(d) {}
         Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
 
         // operators
@@ -36,6 +36,16 @@ namespace wne
             this->z += rhs.z;
             this->w += rhs.w;
             return *this;
+        }
+
+        float &operator[](int index)
+        {
+            return (&x)[index];
+        }
+
+        const float &operator[](int index) const
+        {
+            return (&x)[index];
         }
     };
 
