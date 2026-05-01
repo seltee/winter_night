@@ -19,25 +19,80 @@ VulkanMesh::~VulkanMesh()
         vkDestroyBuffer(vulkanDevice->getDevice(), vertexBuffer, nullptr);
     if (vertexBufferMemory)
         vkFreeMemory(vulkanDevice->getDevice(), vertexBufferMemory, nullptr);
+    if (indexBuffer)
+        vkDestroyBuffer(vulkanDevice->getDevice(), indexBuffer, nullptr);
+    if (indexBufferMemory)
+        vkFreeMemory(vulkanDevice->getDevice(), indexBufferMemory, nullptr);
 }
 
 std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, VulkanUtils *vulkanUtils)
 {
     auto mesh = std::make_shared<VulkanMesh>(vulkanUtils);
-    if (model->getDataType() == ModelDataType::VertexColored)
+    if (model->getDataType() == ModelDataType::VertexColoredInd16 || model->getDataType() == ModelDataType::VertexColoredInd32)
     {
-        if (mesh->setup(model->getAsVertexColored()))
-            return mesh;
+        if (model->is32bitIndicides())
+        {
+            if (mesh->setup(model->getAsVertexColored(), model->getAsIndex32()))
+                return mesh;
+        }
+        else
+        {
+            if (mesh->setup(model->getAsVertexColored(), model->getAsIndex16()))
+                return mesh;
+        }
         return nullptr;
     }
     return nullptr;
 }
 
-bool VulkanMesh::setup(std::vector<VertexColored> &verticies)
+bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint16> &indexData)
+{
+    uint64 bufferSize = sizeof(VertexColored) * vertexData.size();
+    if (!allocateVertexBuffer(bufferSize, vertexData.data()))
+        return false;
+
+    uint64 indexBufferSize = sizeof(uint16) * indexData.size();
+    if (!allocateIndexBuffer(indexBufferSize, indexData.data()))
+        return false;
+
+    amountOfVerticies = (uint32)vertexData.size();
+    amountOfIndices = (uint32)indexData.size();
+    amountOfPolygons = amountOfIndices / 3;
+    return true;
+}
+
+bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint32> &indexData)
+{
+    uint64 vertexBufferSize = sizeof(VertexColored) * vertexData.size();
+    if (!allocateVertexBuffer(vertexBufferSize, vertexData.data()))
+        return false;
+
+    uint64 indexBufferSize = sizeof(uint32) * indexData.size();
+    if (!allocateIndexBuffer(indexBufferSize, indexData.data()))
+        return false;
+
+    amountOfVerticies = (uint32)vertexData.size();
+    amountOfIndices = (uint32)indexData.size();
+    amountOfPolygons = amountOfIndices / 3;
+    return true;
+}
+
+void VulkanMesh::render(void *frameRenderData)
+{
+    VulkanFrame *vFrame = reinterpret_cast<VulkanFrame *>(frameRenderData);
+    VkBuffer vertexBuffers[] = {vertexBuffer};
+    VkDeviceSize offsets[] = {0};
+    auto commandBuffer = vFrame->getCommandBuffer()->getCommandBuffer();
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+    vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+    // vkCmdDraw(commandBuffer, amountOfVerticies, 1, 0, 0);
+    vkCmdDrawIndexed(commandBuffer, amountOfIndices, 1, 0, 0, 0);
+}
+
+bool VulkanMesh::allocateVertexBuffer(uint64 bufferSize, void *data)
 {
     // todo don't allocate so many buffers
-    uint64 bufferSize = sizeof(VertexColored) * verticies.size();
-
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
     if (!vulkanUtils->createBuffer(
@@ -53,7 +108,7 @@ bool VulkanMesh::setup(std::vector<VertexColored> &verticies)
 
     void *mappedMemory;
     vkMapMemory(vulkanDevice->getDevice(), stagingBufferMemory, 0, bufferSize, 0, &mappedMemory);
-    memcpy(mappedMemory, verticies.data(), (size_t)bufferSize);
+    memcpy(mappedMemory, data, (size_t)bufferSize);
     vkUnmapMemory(vulkanDevice->getDevice(), stagingBufferMemory);
 
     if (!vulkanUtils->createBuffer(
@@ -63,7 +118,7 @@ bool VulkanMesh::setup(std::vector<VertexColored> &verticies)
             vertexBuffer,
             vertexBufferMemory))
     {
-        std::cout << "Error creating local GPU buffer" << std::endl;
+        std::cout << "Error creating local GPU vertex buffer" << std::endl;
         return false;
     }
 
@@ -72,17 +127,34 @@ bool VulkanMesh::setup(std::vector<VertexColored> &verticies)
     vkDestroyBuffer(vulkanDevice->getDevice(), stagingBuffer, nullptr);
     vkFreeMemory(vulkanDevice->getDevice(), stagingBufferMemory, nullptr);
 
-    amountOfVerticies = (uint32)verticies.size();
     return true;
 }
 
-void VulkanMesh::render(void *frameRenderData)
+bool VulkanMesh::allocateIndexBuffer(uint64 bufferSize, void *data)
 {
-    VulkanFrame *vFrame = reinterpret_cast<VulkanFrame *>(frameRenderData);
-    VkBuffer vertexBuffers[] = {vertexBuffer};
-    VkDeviceSize offsets[] = {0};
-    auto commandBuffer = vFrame->getCommandBuffer()->getCommandBuffer();
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    vulkanUtils->createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
-    vkCmdDraw(commandBuffer, amountOfVerticies, 1, 0, 0);
+    void *mappedMemory;
+    vkMapMemory(vulkanDevice->getDevice(), stagingBufferMemory, 0, bufferSize, 0, &mappedMemory);
+    memcpy(mappedMemory, data, (size_t)bufferSize);
+    vkUnmapMemory(vulkanDevice->getDevice(), stagingBufferMemory);
+
+    if (!vulkanUtils->createBuffer(
+            bufferSize,
+            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            indexBuffer,
+            indexBufferMemory))
+    {
+        std::cout << "Error creating local GPU index buffer" << std::endl;
+        return false;
+    }
+
+    vulkanUtils->copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+
+    vkDestroyBuffer(vulkanDevice->getDevice(), stagingBuffer, nullptr);
+    vkFreeMemory(vulkanDevice->getDevice(), stagingBufferMemory, nullptr);
+
+    return true;
 }

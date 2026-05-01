@@ -7,39 +7,63 @@
 #include <memory>
 #include "core/api.h"
 #include "core/data.h"
+#include "core/core.h"
 
 namespace wne
 {
     enum class ModelDataType
     {
-        VertexColored
+        VertexColoredInd16,
+        VertexColoredInd32
     };
 
-    union ModelData
+    union ModelVertexData
     {
         std::vector<VertexColored> *vertexColored;
+    };
+    union ModelIndexData
+    {
+        std::vector<uint16> *ind16;
+        std::vector<uint32> *ind32;
     };
 
     class WNE_API Model
     {
     protected:
-        ModelData data;
+        ModelVertexData vertexData;
+        ModelIndexData indexData;
         ModelDataType dataType;
 
     public:
-        Model(ModelData data, ModelDataType type);
+        Model(ModelVertexData vertexData, ModelIndexData indexData, ModelDataType type);
         ~Model();
 
-        static std::shared_ptr<Model> createFromData(const std::vector<VertexColored> &vertexColored);
+        static std::shared_ptr<Model> createFromData(const std::vector<VertexColored> &vertexColored, const std::vector<uint16> &indices);
+        static std::shared_ptr<Model> createFromData(const std::vector<VertexColored> &vertexColored, const std::vector<uint32> &indices);
 
-        ModelDataType getDataType()
+        inline bool is32bitIndicides()
+        {
+            return dataType == ModelDataType::VertexColoredInd32;
+        }
+
+        inline ModelDataType getDataType()
         {
             return dataType;
         }
 
-        std::vector<VertexColored> &getAsVertexColored()
+        inline std::vector<VertexColored> &getAsVertexColored()
         {
-            return *data.vertexColored;
+            return *vertexData.vertexColored;
+        }
+
+        inline std::vector<uint16> &getAsIndex16()
+        {
+            return *indexData.ind16;
+        }
+
+        inline std::vector<uint32> &getAsIndex32()
+        {
+            return *indexData.ind32;
         }
     };
 
