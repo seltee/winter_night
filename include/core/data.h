@@ -1,7 +1,11 @@
 #pragma once
-#include "core/glm/glm.hpp"
+#include "core/math.h"
 
-struct VertexColored {
-    glm::vec2 pos;
-    glm::vec3 color;
-};
+namespace wne
+{
+    struct VertexColored
+    {
+        Vector2 pos;
+        Vector3 color;
+    };
+}

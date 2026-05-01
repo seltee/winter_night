@@ -5,7 +5,6 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "core/glm/glm.hpp"
 #include "core/api.h"
 #include "core/data.h"
 

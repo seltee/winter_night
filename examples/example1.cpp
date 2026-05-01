@@ -11,7 +11,7 @@ int main()
     auto renderer = window->getRenderer();
     renderer->setSyncState(false);
 
-    const std::vector<VertexColored> vertices = {
+    const std::vector<wne::VertexColored> vertices = {
         {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
         {{0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}},
         {{-0.5f, 0.5f}, {0.0f, 0.0f, 0.0f}},

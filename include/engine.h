@@ -7,6 +7,7 @@
 #include "features/scene/object.h"
 #include "features/scene/objectMesh.h"
 #include "core/api.h"
+#include "core/math.h"
 
 namespace wne
 {
