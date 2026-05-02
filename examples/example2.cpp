@@ -19,6 +19,10 @@ void benchDotVec4();
 void benchCross();
 void benchMult3x3(wne::Matrix3x3 ma, wne::Matrix3x3 mb);
 void benchMult4x4(wne::Matrix4x4 ma, wne::Matrix4x4 mb);
+void benchDet3x3(wne::Matrix3x3 m);
+void benchDet4x4(wne::Matrix4x4 m);
+void benchInverse3x3(wne::Matrix3x3 m);
+void benchInverse4x4(wne::Matrix4x4 m);
 
 int main()
 {
@@ -49,6 +53,27 @@ int main()
             1, 3, 1, 4,
             2, 1, 2, 3,
             3, 2, 1, 0));
+    benchDet3x3(
+        wne::Matrix3x3(
+            1, 0, 2,
+            4, 3, 1,
+            8, 5, 4));
+    benchDet4x4(
+        wne::Matrix4x4(
+            1, 2, 0, 5,
+            1, 3, 1, 4,
+            2, 1, 2, 3,
+            3, 2, 1, 0));
+    benchInverse3x3(wne::Matrix3x3(
+        1, 0, 2,
+        4, 3, 1,
+        8, 5, 4));
+    benchInverse4x4(wne::Matrix4x4(
+        1, 2, 0, 5,
+        1, 3, 1, 4,
+        2, 1, 2, 3,
+        3, 2, 1, 0));
+
     return 0;
 }
 
@@ -139,7 +164,7 @@ void benchCross()
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "wne cross: " << diff.count() << " s\n";
+        std::cout << "Result: " << diff.count() << " s\n";
     }
 }
 
@@ -156,7 +181,7 @@ void benchMult3x3(wne::Matrix3x3 ma, wne::Matrix3x3 mb)
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "Mul Matrix 3x3: " << diff.count() << " s\n";
+        std::cout << "Result: " << diff.count() << " s\n";
     }
 }
 
@@ -173,6 +198,74 @@ void benchMult4x4(wne::Matrix4x4 ma, wne::Matrix4x4 mb)
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "Mul Matrix 4x4: " << diff.count() << " s\n";
+        std::cout << "Result: " << diff.count() << " s\n";
+    }
+}
+
+void benchDet3x3(wne::Matrix3x3 m)
+{
+    std::cout << "Det Matrix 3x3 bench" << std::endl;
+    {
+        float result;
+        auto start = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i < iterationsLow; ++i)
+        {
+            result += wne::determinant(m);
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        doNotOptimize(result);
+        std::chrono::duration<double> diff = end - start;
+        std::cout << "Result: " << diff.count() << " s\n";
+    }
+}
+
+void benchDet4x4(wne::Matrix4x4 m)
+{
+    std::cout << "Det Matrix 4x4 bench" << std::endl;
+    {
+        float result;
+        auto start = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i < iterationsLow; ++i)
+        {
+            result += wne::determinant(m);
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        doNotOptimize(result);
+        std::chrono::duration<double> diff = end - start;
+        std::cout << "Result: " << diff.count() << " s\n";
+    }
+}
+
+void benchInverse3x3(wne::Matrix3x3 m)
+{
+    std::cout << "Inverse Matrix 3x3 bench" << std::endl;
+    {
+        auto start = std::chrono::high_resolution_clock::now();
+        wne::Matrix3x3 result = wne::Matrix3x3::identity();
+        for (int i = 0; i < iterationsLow; ++i)
+        {
+            result = result * wne::inverse(m);
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        doNotOptimize(result);
+        std::chrono::duration<double> diff = end - start;
+        std::cout << "Result: " << diff.count() << " s\n";
+    }
+}
+
+void benchInverse4x4(wne::Matrix4x4 m)
+{
+    std::cout << "Inverse Matrix 4x4 bench" << std::endl;
+    {
+        wne::Matrix4x4 result = wne::Matrix4x4::identity();
+        auto start = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i < iterationsLow; ++i)
+        {
+            result = result * wne::inverse(m);
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        doNotOptimize(result);
+        std::chrono::duration<double> diff = end - start;
+        std::cout << "Result: " << diff.count() << " s\n";
     }
 }
