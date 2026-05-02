@@ -42,6 +42,10 @@ void Renderer::setModelMatrix(Matrix4x4 &model)
 {
 }
 
+void Renderer::setViewProjectionMatrix(Matrix4x4 &VP)
+{
+}
+
 void Renderer::addScene(std::shared_ptr<Scene> scene)
 {
     scenes.push_back(std::move(scene));

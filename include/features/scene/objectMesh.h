@@ -18,7 +18,6 @@ namespace wne
 
     protected:
         std::shared_ptr<Mesh> mesh;
-        Matrix4x4 mModel;
 
         float r = 0.0f;
     };

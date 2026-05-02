@@ -21,7 +21,8 @@ namespace wne
         void setSyncState(bool syncEnabled) override final;
         bool getSyncState() override final;
 
-        void setModelMatrix(Matrix4x4 &model) override final;
+        void setModelMatrix(Matrix4x4 &mModel) override final;
+        void setViewProjectionMatrix(Matrix4x4 &mVP) override final;
 
         void update(float delta) override final;
         void render() override final;
@@ -36,5 +37,6 @@ namespace wne
 
         void *hWnd = nullptr;
         std::unique_ptr<VulkanInstance> instance;
+        Matrix4x4 mVP = Matrix4x4::identity();
     };
 }

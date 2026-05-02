@@ -10,3 +10,13 @@ void Object::update(float delta)
 void Object::render(Renderer *renderer)
 {
 }
+
+const Matrix4x4 &Object::getModelMatrix()
+{
+    return mModel;
+}
+
+Matrix4x4 Object::getInvModelMatrix()
+{
+    return inverse(mModel);
+}

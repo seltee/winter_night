@@ -30,6 +30,6 @@ namespace wne
 {
     struct UniformBufferObject
     {
-        Matrix4x4 mvp;
+        alignas(16) Matrix4x4 mvp;
     };
 };

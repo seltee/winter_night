@@ -1,4 +1,5 @@
 #include "features/camera/cameraOrtho.h"
+#include <iostream>
 
 using namespace wne;
 
@@ -13,12 +14,37 @@ CameraOrtho::CameraOrtho(uint32 width, uint32 height)
 {
     this->width = width;
     this->height = height;
+    update();
 }
 
 CameraOrtho::CameraOrtho(std::shared_ptr<Window> window)
 {
-    this->window = window;
+    this->window = std::move(window);
     update();
+}
+
+std::shared_ptr<CameraOrtho> CameraOrtho::create(uint32 width, uint32 height)
+{
+    return std::make_shared<CameraOrtho>(width, height);
+}
+
+std::shared_ptr<CameraOrtho> CameraOrtho::create(std::shared_ptr<Window> window)
+{
+    return std::make_shared<CameraOrtho>(window);
+}
+
+std::shared_ptr<CameraOrtho> CameraOrtho::createHeightBased(std::shared_ptr<Window> window, float fixedHeight)
+{
+    std::shared_ptr<CameraOrtho> camera = std::make_shared<CameraOrtho>(window);
+    camera->setBase(CameraOrtho::Base::Height, fixedHeight);
+    return camera;
+}
+
+std::shared_ptr<CameraOrtho> CameraOrtho::createWidthBased(std::shared_ptr<Window> window, float fixedWidth)
+{
+    std::shared_ptr<CameraOrtho> camera = std::make_shared<CameraOrtho>(window);
+    camera->setBase(CameraOrtho::Base::Width, fixedWidth);
+    return camera;
 }
 
 // will automatically update size of orthographics projection upon update
@@ -35,7 +61,7 @@ void CameraOrtho::setSize(uint32 width, uint32 height)
     {
         this->width = width;
         this->height = height;
-        updateMatrix();
+        update();
     }
 }
 
@@ -44,26 +70,44 @@ void CameraOrtho::update()
 {
     if (window)
     {
-        if (width != window->getWidth() || height != window->getHeight())
+        uint32 newWidth, newHeight;
+        if (base == CameraOrtho::Base::Width)
         {
-            width = window->getWidth();
-            height = window->getHeight();
+            float aspect = (float)window->getWidth() / (float)window->getHeight();
+            newWidth = static_cast<uint32>(baseValue);
+            newHeight = static_cast<uint32>(baseValue * aspect);
+        }
+        if (base == CameraOrtho::Base::Height)
+        {
+            float aspect = (float)window->getWidth() / (float)window->getHeight();
+            newWidth = static_cast<uint32>(baseValue * aspect);
+            newHeight = static_cast<uint32>(baseValue);
+        }
+        else
+        {
+            newWidth = window->getWidth();
+            newHeight = window->getHeight();
+        }
+
+        if (width != newWidth || height != newHeight)
+        {
+            width = newWidth;
+            height = newHeight;
             updateMatrix();
         }
+    }
+    else
+    {
+        updateMatrix();
     }
 }
 
 void CameraOrtho::updateMatrix()
 {
-    int right = width / 2;
-    int left = -right;
-    int bottom = height / 2;
-    int top = -bottom;
-    mProjection[0][0] = 2.0f / (right - left);
-    mProjection[1][1] = 2.0f / (top - bottom);
-    mProjection[2][2] = -2.0f / (far - near);
-    mProjection[0][3] = -(right + left) / (right - left);
-    mProjection[1][3] = -(top + bottom) / (top - bottom);
-    mProjection[2][3] = -(far + near) / (far - near);
-    mProjection[3][3] = 1.0f;
+    float right = (float)width / 2.0f;
+    float left = -right;
+    float bottom = -(float)height / 2.0f;
+    float top = -bottom;
+
+    mProjection = makeOrthographicProjectionMatrix(left, right, top, bottom, near, far);
 }

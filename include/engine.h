@@ -6,6 +6,9 @@
 #include "features/scene/scene.h"
 #include "features/scene/object.h"
 #include "features/scene/objectMesh.h"
+#include "features/scene/objectCamera.h"
+#include "features/camera/cameraOrtho.h"
+#include "features/camera/cameraPerspective.h"
 #include "core/api.h"
 #include "core/math.h"
 

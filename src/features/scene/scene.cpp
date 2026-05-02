@@ -18,6 +18,8 @@ void Scene::update(float delta)
 
 void Scene::render(Renderer *renderer)
 {
+    Matrix4x4 mVP = objectCamera ? objectCamera->getProjectionMatrix() * objectCamera->getInvModelMatrix() : Matrix4x4::identity();
+    renderer->setViewProjectionMatrix(mVP);
     for (const auto &object : objects)
     {
         object->render(renderer);
@@ -27,4 +29,9 @@ void Scene::render(Renderer *renderer)
 void Scene::addObject(std::shared_ptr<Object> object)
 {
     objects.emplace_back(std::move(object));
+}
+
+void Scene::setCamera(std::shared_ptr<ObjectCamera> objectCamera)
+{
+    this->objectCamera = std::move(objectCamera);
 }

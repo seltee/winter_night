@@ -18,9 +18,15 @@ bool RendererVulkanNT::getSyncState()
     return instance->getSyncState();
 }
 
-void RendererVulkanNT::setModelMatrix(Matrix4x4 &model)
+void RendererVulkanNT::setModelMatrix(Matrix4x4 &mModel)
 {
-    instance->setMVPMatrix(model);
+    Matrix4x4 mMVP = mVP * mModel;
+    instance->setMVPMatrix(mMVP);
+}
+
+void RendererVulkanNT::setViewProjectionMatrix(Matrix4x4 &mVP)
+{
+    this->mVP = mVP;
 }
 
 void RendererVulkanNT::update(float delta)

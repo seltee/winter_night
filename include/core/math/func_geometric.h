@@ -27,4 +27,22 @@ namespace wne
             v1.z * v2.x - v1.x * v2.z,
             v1.x * v2.y - v1.y * v2.x);
     }
+
+    inline Matrix4x4 makePerspectiveProjectionMatrix(float aspectRatio, float fov, float nearPlane, float farPlane)
+    {
+        return Matrix4x4(
+            1.0f / (aspectRatio * tanf(fov / 2.0f)), 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f / tanf(fov / 2.0f), 0.0f, 0.0f,
+            0.0f, 0.0f, -(farPlane + nearPlane) / (farPlane - nearPlane), 0.0f,
+            0.0f, 0.0f, -1.0f, 0.0f);
+    }
+
+    inline Matrix4x4 makeOrthographicProjectionMatrix(float left, float right, float top, float bottom, float near, float far)
+    {
+        return Matrix4x4(
+            2.0f / (right - left), 0.0f, 0.0f, -(right + left) / (right - left),
+            0.0f, 2.0f / (top - bottom), 0.0f, -(top + bottom) / (top - bottom),
+            0.0f, 0.0f, -1.0f / (far - near), -near / (far - near),
+            0.0f, 0.0f, 0.0f, 1.0f);
+    }
 };

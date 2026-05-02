@@ -6,3 +6,7 @@ const Matrix4x4 &Camera::getProjectionMatrix()
 {
     return mProjection;
 }
+
+void Camera::update()
+{
+}

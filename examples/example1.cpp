@@ -12,10 +12,10 @@ int main()
     renderer->setSyncState(false);
 
     const std::vector<wne::VertexColored> vertices = {
-        {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-        {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
+        {{-50.0f, -50.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+        {{50.0f, -50.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+        {{50.0f, 50.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+        {{-50.0f, 50.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
 
     const std::vector<uint16> indices = {
         0, 1, 2, 2, 3, 0};
@@ -24,8 +24,12 @@ int main()
     renderer->addScene(scene);
     auto model = wne::Model::createFromData(vertices, indices);
     auto mesh = renderer->createMesh(model);
-    auto object = wne::ObjectMesh::create(mesh);
-    scene->addObject(object);
+    auto objectMesh = wne::ObjectMesh::create(mesh);
+    scene->addObject(objectMesh);
+    auto camera = wne::CameraOrtho::createHeightBased(window, 240.0f);
+    auto objectCamera = wne::ObjectCamera::create(camera);
+    scene->addObject(objectCamera);
+    scene->setCamera(objectCamera);
 
     while (!window->isCloseRequested())
     {

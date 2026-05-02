@@ -23,6 +23,7 @@ namespace wne
         virtual bool getSyncState();
 
         virtual void setModelMatrix(Matrix4x4 &model);
+        virtual void setViewProjectionMatrix(Matrix4x4 &VP);
 
         void addScene(std::shared_ptr<Scene> scene);
     protected:
