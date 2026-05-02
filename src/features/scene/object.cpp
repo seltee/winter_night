@@ -3,6 +3,10 @@
 
 using namespace wne;
 
+void Object::update(float delta)
+{
+}
+
 void Object::render(Renderer *renderer)
 {
 }

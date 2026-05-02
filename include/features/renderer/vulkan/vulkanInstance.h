@@ -13,6 +13,9 @@
 #include "features/renderer/vulkan/vulkanDevice.h"
 #include "features/renderer/vulkan/vulkanFrame.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
+#include "features/renderer/vulkan/vulkanDescriptorLayout.h"
+#include "features/renderer/vulkan/vulkanDescriptorPool.h"
+#include "features/renderer/vulkan/vulkanDescriptorSets.h"
 #include "core/core.h"
 #include <memory>
 
@@ -42,6 +45,7 @@ namespace wne
 
         void startRendering();
         void finishRendering();
+        void setMVPMatrix(Matrix4x4 &mMVP);
 
         VulkanUtils *getVulkanUtils()
         {
@@ -79,6 +83,9 @@ namespace wne
         std::unique_ptr<VulkanCommandPool> commandPool = nullptr;
         std::unique_ptr<VulkanDevice> vulkanDevice = nullptr;
         std::unique_ptr<VulkanUtils> utils = nullptr;
+        std::unique_ptr<VulkanDescriptorLayout> vulkanDescriptorLayout = nullptr;
+        std::unique_ptr<VulkanDescriptorPool> vulkanDescriptorPool = nullptr;
+        std::unique_ptr<VulkanDescriptorSets> vulkanDescriptorSets = nullptr;
         std::vector<std::unique_ptr<VulkanFrame>> frames;
 
         const char *const instanceExtNames[VULKAN_INSTANCE_REQUIRED_EXTENSIONS] = {

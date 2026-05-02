@@ -1,7 +1,6 @@
 #pragma once
 #include "vector3.h"
 #include <cstring>
-#include <iostream>
 #include <cmath>
 
 namespace wne
@@ -51,7 +50,7 @@ namespace wne
         }
     };
 
-    Matrix3x3 operator*(const Matrix3x3 &lhs, const Matrix3x3 &rhs) noexcept
+    inline Matrix3x3 operator*(const Matrix3x3 &lhs, const Matrix3x3 &rhs) noexcept
     {
         return Matrix3x3(
             lhs[0][0] * rhs[0][0] + lhs[1][0] * rhs[0][1] + lhs[2][0] * rhs[0][2],
@@ -74,7 +73,7 @@ namespace wne
                m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
     }
 
-    Matrix3x3 inverse(const Matrix3x3 &m) noexcept
+    inline Matrix3x3 inverse(const Matrix3x3 &m) noexcept
     {
         float det = determinant(m);
 

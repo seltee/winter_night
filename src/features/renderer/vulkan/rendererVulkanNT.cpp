@@ -18,6 +18,19 @@ bool RendererVulkanNT::getSyncState()
     return instance->getSyncState();
 }
 
+void RendererVulkanNT::setModelMatrix(Matrix4x4 &model)
+{
+    instance->setMVPMatrix(model);
+}
+
+void RendererVulkanNT::update(float delta)
+{
+    for (const auto &scene : scenes)
+    {
+        scene->update(delta);
+    }
+}
+
 void RendererVulkanNT::render()
 {
     instance->startRendering();
@@ -30,7 +43,6 @@ void RendererVulkanNT::render()
 
 void RendererVulkanNT::changeWindowSize(uint32 width, uint32 height)
 {
-
     instance->changeSize(width, height);
 }
 

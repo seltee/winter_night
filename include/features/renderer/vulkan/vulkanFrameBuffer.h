@@ -1,11 +1,12 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
-#include "features/renderer/vulkan/vulkanRenderPass.h"
-#include "features/renderer/vulkan/vulkanSwapChain.h"
 #include <vector>
 
 namespace wne
 {
+    class VulkanSwapChain;
+    class VulkanRenderPass;
+
     class VulkanFrameBuffer
     {
     public:

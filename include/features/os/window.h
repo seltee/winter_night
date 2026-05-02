@@ -16,7 +16,7 @@ namespace wne
     class WNE_API Window
     {
     protected:
-        int width, height;
+        uint width, height;
         WindowType windowType;
         bool focused = false;
         bool closeRequested = false;
@@ -27,10 +27,10 @@ namespace wne
     public:
         virtual ~Window();
 
-        static std::unique_ptr<Window> create(int width, int height);
-        static std::unique_ptr<Window> createFullscreen(int width, int height);
-        static std::unique_ptr<Window> createBorderless(int width, int height);
-        static std::unique_ptr<Window> createResizable(int width, int height);
+        static std::shared_ptr<Window> create(uint width, uint height);
+        static std::shared_ptr<Window> createFullscreen(uint width, uint height);
+        static std::shared_ptr<Window> createBorderless(uint width, uint height);
+        static std::shared_ptr<Window> createResizable(uint width, uint height);
 
         virtual void update(float delta);
         virtual void render();
@@ -43,12 +43,12 @@ namespace wne
             return renderer.get();
         }
 
-        inline int getWidth()
+        inline uint getWidth()
         {
             return width;
         }
 
-        inline int getHeight()
+        inline uint getHeight()
         {
             return height;
         }

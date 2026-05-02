@@ -16,6 +16,7 @@ namespace wne
     public:
         static std::shared_ptr<Scene> create();
 
+        void update(float delta);
         void render(Renderer *renderer);
 
         void addObject(std::shared_ptr<Object> object);

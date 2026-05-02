@@ -15,33 +15,33 @@ Window::~Window()
     Engine::getInstance()->unregisterWindow(this);
 }
 
-std::unique_ptr<Window> Window::create(int width, int height)
+std::shared_ptr<Window> Window::create(uint width, uint height)
 {
-    std::unique_ptr<WindowNT> window = std::make_unique<WindowNT>();
+    std::shared_ptr<WindowNT> window = std::make_shared<WindowNT>();
     if (window->setup(width, height, WindowType::Windowed))
         return window;
     return nullptr;
 }
 
-std::unique_ptr<Window> Window::createFullscreen(int width, int height)
+std::shared_ptr<Window> Window::createFullscreen(uint width, uint height)
 {
-    std::unique_ptr<WindowNT> window = std::make_unique<WindowNT>();
+    std::shared_ptr<WindowNT> window = std::make_shared<WindowNT>();
     if (window->setup(width, height, WindowType::Fullscreen))
         return window;
     return nullptr;
 }
 
-std::unique_ptr<Window> Window::createBorderless(int width, int height)
+std::shared_ptr<Window> Window::createBorderless(uint width, uint height)
 {
-    std::unique_ptr<WindowNT> window = std::make_unique<WindowNT>();
+    std::shared_ptr<WindowNT> window = std::make_shared<WindowNT>();
     if (window->setup(width, height, WindowType::Borderless))
         return window;
     return nullptr;
 }
 
-std::unique_ptr<Window> Window::createResizable(int width, int height)
+std::shared_ptr<Window> Window::createResizable(uint width, uint height)
 {
-    std::unique_ptr<WindowNT> window = std::make_unique<WindowNT>();
+    std::shared_ptr<WindowNT> window = std::make_shared<WindowNT>();
     if (window->setup(width, height, WindowType::Resizable))
         return window;
     return nullptr;

@@ -1,7 +1,5 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
-#include "features/renderer/vulkan/vulkanShader.h"
-#include "features/renderer/vulkan/vulkanRenderPass.h"
 
 #define VULKAN_DEVICE_REQUIRED_EXTENSIONS 1
 

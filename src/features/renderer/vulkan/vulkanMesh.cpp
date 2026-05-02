@@ -86,7 +86,6 @@ void VulkanMesh::render(void *frameRenderData)
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
     vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
-    // vkCmdDraw(commandBuffer, amountOfVerticies, 1, 0, 0);
     vkCmdDrawIndexed(commandBuffer, amountOfIndices, 1, 0, 0, 0);
 }
 

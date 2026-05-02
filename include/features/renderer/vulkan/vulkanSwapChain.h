@@ -1,7 +1,5 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
-#include "features/renderer/vulkan/vulkanQueueFamilies.h"
-#include "features/renderer/vulkan/vulkanDeviceExtensions.h"
 #include <vector>
 
 namespace wne

@@ -1,14 +1,14 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
-#include "features/renderer/vulkan/vulkanQueueFamilies.h"
-#include "features/renderer/vulkan/vulkanRenderPass.h"
-#include "features/renderer/vulkan/vulkanFrameBuffer.h"
-#include "features/renderer/vulkan/vulkanPipeline.h"
-#include "features/renderer/vulkan/vulkanCommandPool.h"
-#include "features/renderer/vulkan/vulkanDevice.h"
 
 namespace wne
 {
+    class VulkanDevice;
+    class VulkanRenderPass;
+    class VulkanFrameBuffer;
+    class VulkanCommandPool;
+    class VulkanPipeline;
+
     class VulkanCommandBuffer
     {
     public:

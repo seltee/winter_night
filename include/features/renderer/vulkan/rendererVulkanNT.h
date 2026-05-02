@@ -21,6 +21,9 @@ namespace wne
         void setSyncState(bool syncEnabled) override final;
         bool getSyncState() override final;
 
+        void setModelMatrix(Matrix4x4 &model) override final;
+
+        void update(float delta) override final;
         void render() override final;
 
         void changeWindowSize(uint32 width, uint32 height) override final;

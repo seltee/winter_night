@@ -7,6 +7,8 @@ That means that we have to create a framebuffer for all of the images in the swa
 === */
 
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
+#include "features/renderer/vulkan/vulkanRenderPass.h"
+#include "features/renderer/vulkan/vulkanSwapChain.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <iostream>

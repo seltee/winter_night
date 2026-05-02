@@ -5,7 +5,7 @@ namespace wne
 {
     struct VertexColored
     {
-        Vector2 pos;
+        Vector3 pos;
         Vector3 color;
     };
 }

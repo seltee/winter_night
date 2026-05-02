@@ -1,4 +1,6 @@
 #include "features/renderer/vulkan/vulkanSwapChain.h"
+#include "features/renderer/vulkan/vulkanQueueFamilies.h"
+#include "features/renderer/vulkan/vulkanDeviceExtensions.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <iostream>

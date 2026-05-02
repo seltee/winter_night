@@ -1,5 +1,6 @@
 #pragma once
 #include "core/core.h"
+#include "core/math.h"
 
 typedef struct VkInstance_T *VkInstance;
 typedef struct VkPhysicalDevice_T *VkPhysicalDevice;
@@ -19,5 +20,16 @@ typedef struct VkSemaphore_T *VkSemaphore;
 typedef struct VkBuffer_T *VkBuffer;
 typedef struct VkDeviceMemory_T *VkDeviceMemory;
 typedef struct VkFence_T *VkFence;
+typedef struct VkDescriptorSetLayout_T *VkDescriptorSetLayout;
+typedef struct VkDescriptorPool_T *VkDescriptorPool;
+typedef struct VkDescriptorSet_T *VkDescriptorSet;
 typedef struct VkExtent2D VkExtent2D;
 typedef struct VkShaderModule_T *VkShaderModule;
+
+namespace wne
+{
+    struct UniformBufferObject
+    {
+        Matrix4x4 mvp;
+    };
+};

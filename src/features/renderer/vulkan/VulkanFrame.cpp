@@ -1,6 +1,14 @@
 #include "features/renderer/vulkan/vulkanFrame.h"
+#include "features/renderer/vulkan/vulkanCommandBuffer.h"
+#include "features/renderer/vulkan/vulkanDevice.h"
+#include "features/renderer/vulkan/vulkanRenderPass.h"
+#include "features/renderer/vulkan/vulkanFrameBuffer.h"
+#include "features/renderer/vulkan/vulkanSwapChain.h"
+#include "features/renderer/vulkan/vulkanUtils.h"
+#include "features/renderer/vulkan/vulkanPipeline.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
+#include <iostream>
 
 using namespace wne;
 
@@ -21,9 +29,13 @@ VulkanFrame::~VulkanFrame()
         vkDestroySemaphore(device, renderFinishedSemaphore, nullptr);
     if (inFlightFence)
         vkDestroyFence(device, inFlightFence, nullptr);
+    if (uniformBuffer)
+        vkDestroyBuffer(device, uniformBuffer, nullptr);
+    if (uniformBuffersMemory)
+        vkFreeMemory(device, uniformBuffersMemory, nullptr);
 }
 
-bool VulkanFrame::setup(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffer, VulkanCommandPool *commandPool)
+bool VulkanFrame::setup(VkDescriptorSet vkDescriptorSet, VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffer, VulkanCommandPool *commandPool, VulkanUtils *vulkanUtils)
 {
     commandBuffer = new VulkanCommandBuffer(vulkanDevice, renderPass, frameBuffer, swapChain->getExtent(), commandPool);
     if (!commandBuffer->setup(surface))
@@ -44,6 +56,29 @@ bool VulkanFrame::setup(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBu
         std::cout << "failed to create semaphores!" << std::endl;
         return false;
     }
+
+    // create uniform buffer to pass parameters of the shader
+    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+    vulkanUtils->createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBuffersMemory);
+    vkMapMemory(device, uniformBuffersMemory, 0, bufferSize, 0, &uniformBuffersMapped);
+
+    VkDescriptorBufferInfo bufferInfo{};
+    bufferInfo.buffer = uniformBuffer;
+    bufferInfo.offset = 0;
+    bufferInfo.range = sizeof(UniformBufferObject);
+
+    VkWriteDescriptorSet descriptorWrite{};
+    descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    descriptorWrite.dstSet = vkDescriptorSet;
+    descriptorWrite.dstBinding = 0;
+    descriptorWrite.dstArrayElement = 0;
+    descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    descriptorWrite.descriptorCount = 1;
+    descriptorWrite.pBufferInfo = &bufferInfo;
+    descriptorWrite.pImageInfo = nullptr;       // Optional
+    descriptorWrite.pTexelBufferView = nullptr; // Optional
+
+    vkUpdateDescriptorSets(vulkanDevice->getDevice(), 1, &descriptorWrite, 0, nullptr);
 
     return true;
 }
@@ -84,7 +119,9 @@ void VulkanFrame::finishFrame(VkQueue graphicsQueue, VkQueue presentQueue)
 
     if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFence) != VK_SUCCESS)
     {
-        throw std::runtime_error("failed to submit draw command buffer!");
+        // todo handle this error
+        std::cout << "failed to submit draw command buffer!" << std::endl;
+        return;
     }
 
     VkPresentInfoKHR presentInfo{};
@@ -99,4 +136,9 @@ void VulkanFrame::finishFrame(VkQueue graphicsQueue, VkQueue presentQueue)
     presentInfo.pResults = nullptr; // Optional
 
     vkQueuePresentKHR(presentQueue, &presentInfo);
+}
+
+void VulkanFrame::updateUniformBuffer(UniformBufferObject &uniformBufferObject)
+{
+    memcpy(uniformBuffersMapped, &uniformBufferObject, sizeof(UniformBufferObject));
 }

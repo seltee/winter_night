@@ -3,6 +3,7 @@
 #include "features/renderer/mesh.h"
 #include "features/scene/scene.h"
 #include "core/core.h"
+#include "core/math.h"
 #include <vector>
 
 namespace wne
@@ -11,6 +12,7 @@ namespace wne
     {
     public:
         virtual ~Renderer();
+        virtual void update(float delta);
         virtual void render();
 
         virtual void changeWindowSize(uint32 width, uint32 height);
@@ -19,6 +21,8 @@ namespace wne
 
         virtual void setSyncState(bool syncEnabled);
         virtual bool getSyncState();
+
+        virtual void setModelMatrix(Matrix4x4 &model);
 
         void addScene(std::shared_ptr<Scene> scene);
     protected:

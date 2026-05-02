@@ -7,6 +7,10 @@ Renderer::~Renderer()
 {
 }
 
+void Renderer::update(float delta)
+{
+}
+
 void Renderer::render()
 {
 }
@@ -32,6 +36,10 @@ void Renderer::setSyncState(bool syncEnabled)
 bool Renderer::getSyncState()
 {
     return false;
+}
+
+void Renderer::setModelMatrix(Matrix4x4 &model)
+{
 }
 
 void Renderer::addScene(std::shared_ptr<Scene> scene)

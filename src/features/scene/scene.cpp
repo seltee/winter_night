@@ -8,6 +8,14 @@ std::shared_ptr<Scene> Scene::create()
     return std::make_shared<Scene>();
 }
 
+void Scene::update(float delta)
+{
+    for (const auto &object : objects)
+    {
+        object->update(delta);
+    }
+}
+
 void Scene::render(Renderer *renderer)
 {
     for (const auto &object : objects)

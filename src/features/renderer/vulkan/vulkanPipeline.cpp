@@ -1,4 +1,7 @@
 #include "features/renderer/vulkan/vulkanPipeline.h"
+#include "features/renderer/vulkan/vulkanShader.h"
+#include "features/renderer/vulkan/vulkanRenderPass.h"
+#include "features/renderer/vulkan/vulkanDescriptorLayout.h"
 #include "core/data.h"
 
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -16,7 +19,14 @@ VulkanPipeline::~VulkanPipeline()
         vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 }
 
-bool VulkanPipeline::setup(int width, int height, VkExtent2D *swapChainExtent, VkDevice device, VulkanRenderPass *renderPass, VulkanShader *shader)
+bool VulkanPipeline::setup(
+    uint width,
+    uint height,
+    VkExtent2D *swapChainExtent,
+    VkDevice device,
+    VulkanRenderPass *renderPass,
+    VulkanShader *shader,
+    VulkanDescriptorLayout *vulkanDescriptorLayout)
 {
     this->device = device;
 
@@ -121,10 +131,8 @@ bool VulkanPipeline::setup(int width, int height, VkExtent2D *swapChainExtent, V
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0;            // Optional
-    pipelineLayoutInfo.pSetLayouts = nullptr;         // Optional
-    pipelineLayoutInfo.pushConstantRangeCount = 0;    // Optional
-    pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = vulkanDescriptorLayout->getDescriptorLayout();
 
     if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
     {

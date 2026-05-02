@@ -1,5 +1,6 @@
 #pragma once
 #include "vector4.h"
+#include <cstring>
 #include <cmath>
 
 namespace wne
@@ -33,6 +34,33 @@ namespace wne
                 0.0f, 0.0f, 0.0f, 1.0f);
         }
 
+        static Matrix4x4 rotationX(float value)
+        {
+            return Matrix4x4(
+                1.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, cosf(value), -sinf(value), 0.0f,
+                0.0f, sinf(value), cosf(value), 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+        static Matrix4x4 rotationY(float value)
+        {
+            return Matrix4x4(
+                cosf(value), 0.0f, sinf(value), 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f,
+                -sinf(value), 0.0f, cosf(value), 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+        static Matrix4x4 rotationZ(float value)
+        {
+            return Matrix4x4(
+                cosf(value), -sinf(value), 0.0f, 0.0f,
+                sinf(value), cosf(value), 0.0f, 0.0f,
+                0.0f, 0.0f, 1.0f, 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f);
+        }
+
         // operators
         Matrix4x4 &operator=(const Matrix4x4 &other)
         {
@@ -51,7 +79,7 @@ namespace wne
         }
     };
 
-    Matrix4x4 operator*(const Matrix4x4 &lhs, const Matrix4x4 &rhs)
+    inline Matrix4x4 operator*(const Matrix4x4 &lhs, const Matrix4x4 &rhs)
     {
         return Matrix4x4(
             lhs[0][0] * rhs[0][0] + lhs[1][0] * rhs[0][1] + lhs[2][0] * rhs[0][2] + lhs[3][0] * rhs[0][3],
@@ -110,7 +138,7 @@ namespace wne
                m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
     }
 
-    Matrix4x4 inverse(const Matrix4x4 &m) noexcept
+    inline Matrix4x4 inverse(const Matrix4x4 &m) noexcept
     {
         float inv[16];
 

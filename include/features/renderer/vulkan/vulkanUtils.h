@@ -1,10 +1,11 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
-#include "features/renderer/vulkan/vulkanDevice.h"
-#include "features/renderer/vulkan/vulkanCommandPool.h"
 
 namespace wne
 {
+    class VulkanDevice;
+    class VulkanCommandPool;
+
     class VulkanUtils
     {
     public:

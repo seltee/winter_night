@@ -84,8 +84,15 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
         std::cout << "Unable to create command pool" << std::endl;
         throw std::runtime_error("failed to create command pool");
     }
-    
+
     utils = std::make_unique<VulkanUtils>(vulkanDevice.get(), commandPool.get(), graphicsQueue, presentQueue);
+
+    vulkanDescriptorPool = std::make_unique<VulkanDescriptorPool>(vulkanDevice.get());
+    if (!vulkanDescriptorPool->setup(MAX_FRAMES_IN_FLIGHT))
+    {
+        std::cout << "Unable to create descriptor pool" << std::endl;
+        return false;
+    }
 
     swapChain = std::make_unique<VulkanSwapChain>(device);
     if (!swapChain->setup(width, height, physicalDevice, surface, !isImmidiateSwap))
@@ -108,8 +115,15 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
         return false;
     }
 
+    vulkanDescriptorLayout = std::make_unique<VulkanDescriptorLayout>(vulkanDevice.get());
+    if (!vulkanDescriptorLayout->setup())
+    {
+        std::cout << "Unable to create vulkan descriptor layout" << std::endl;
+        return false;
+    }
+
     pipeline = std::make_unique<VulkanPipeline>();
-    if (!pipeline->setup(width, height, swapChain->getExtent(), device, renderPass.get(), defaultShader.get()))
+    if (!pipeline->setup(width, height, swapChain->getExtent(), device, renderPass.get(), defaultShader.get(), vulkanDescriptorLayout.get()))
     {
         std::cout << "Unable to create vulkan pipeline" << std::endl;
         return false;
@@ -122,10 +136,17 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
         return false;
     }
 
+    vulkanDescriptorSets = std::make_unique<VulkanDescriptorSets>(vulkanDevice.get());
+    if (!vulkanDescriptorSets->setup(MAX_FRAMES_IN_FLIGHT, vulkanDescriptorPool.get(), vulkanDescriptorLayout.get()))
+    {
+        std::cout << "Unable to create descriptor sets" << std::endl;
+        return false;
+    }
+
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
         auto frame = std::make_unique<VulkanFrame>(vulkanDevice.get(), swapChain.get());
-        if (!frame->setup(renderPass.get(), frameBuffer.get(), commandPool.get()))
+        if (!frame->setup(vulkanDescriptorSets->getDescriptorSet(i), renderPass.get(), frameBuffer.get(), commandPool.get(), utils.get()))
         {
             std::cout << "Unable to create frame " << i << std::endl;
             return false;
@@ -154,7 +175,7 @@ void VulkanInstance::changeSize(uint32 width, uint32 height)
     }
 
     pipeline = std::make_unique<VulkanPipeline>();
-    if (!pipeline->setup(width, height, swapChain->getExtent(), device, renderPass.get(), defaultShader.get()))
+    if (!pipeline->setup(width, height, swapChain->getExtent(), device, renderPass.get(), defaultShader.get(), vulkanDescriptorLayout.get()))
     {
         std::cout << "Unable to create vulkan pipeline" << std::endl;
         throw std::runtime_error("failed to recreate pipeline");
@@ -171,7 +192,7 @@ void VulkanInstance::changeSize(uint32 width, uint32 height)
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
         auto frame = std::make_unique<VulkanFrame>(vulkanDevice.get(), swapChain.get());
-        if (!frame->setup(renderPass.get(), frameBuffer.get(), commandPool.get()))
+        if (!frame->setup(vulkanDescriptorSets->getDescriptorSet(i), renderPass.get(), frameBuffer.get(), commandPool.get(), utils.get()))
         {
             std::cout << "Unable to create frame " << i << std::endl;
             throw std::runtime_error("failed to recreate frame");
@@ -194,12 +215,27 @@ bool VulkanInstance::getSyncState()
 void VulkanInstance::startRendering()
 {
     frames[currentFrame]->startFrame(pipeline.get());
+    auto desc = vulkanDescriptorSets->getDescriptorSet(currentFrame);
+    vkCmdBindDescriptorSets(
+        frames[currentFrame]->getCommandBuffer()->getCommandBuffer(),
+        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        pipeline->getPipelineLayout(),
+        0, 1,
+        &desc,
+        0, nullptr);
 }
 
 void VulkanInstance::finishRendering()
 {
     frames[currentFrame]->finishFrame(graphicsQueue, presentQueue);
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+void VulkanInstance::setMVPMatrix(Matrix4x4 &mMVP)
+{
+    UniformBufferObject object;
+    object.mvp = mMVP;
+    frames[currentFrame]->updateUniformBuffer(object);
 }
 
 bool VulkanInstance::initInstance()

@@ -11,12 +11,12 @@ typedef BOOL(WINAPI *SetProcessDPIAwareFunc)();
 
 LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-bool WindowNT::setup(int width, int height, WindowType type)
+bool WindowNT::setup(uint width, uint height, WindowType type)
 {
     setProcessDPIAware();
 
-    int displayWidth = GetSystemMetrics(SM_CXSCREEN);
-    int displayHeight = GetSystemMetrics(SM_CYSCREEN);
+    uint displayWidth = GetSystemMetrics(SM_CXSCREEN);
+    uint displayHeight = GetSystemMetrics(SM_CYSCREEN);
     if (type == WindowType::Borderless)
     {
         width = displayWidth;
@@ -102,6 +102,7 @@ void WindowNT::update(float delta)
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+    renderer->update(delta);
 }
 
 void WindowNT::render()

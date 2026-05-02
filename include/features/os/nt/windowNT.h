@@ -8,7 +8,7 @@ namespace wne
     class WNE_API WindowNT : public Window
     {
     public:
-        bool setup(int width, int height, WindowType type);
+        bool setup(uint width, uint height, WindowType type);
 
         void update(float delta) override final;
         void render() override final;
