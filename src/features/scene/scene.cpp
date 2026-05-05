@@ -10,28 +10,28 @@ std::shared_ptr<Scene> Scene::create()
 
 void Scene::update(float delta)
 {
-    for (const auto &object : objects)
+    for (const auto &actor : actors)
     {
-        object->update(delta);
+        actor->update(delta);
     }
 }
 
 void Scene::render(Renderer *renderer)
 {
-    Matrix4x4 mVP = objectCamera ? objectCamera->getProjectionMatrix() * objectCamera->getInvModelMatrix() : Matrix4x4::identity();
+    Matrix4x4 mVP = actorCamera ? actorCamera->getProjectionMatrix() * actorCamera->getInvModelMatrix() : Matrix4x4::identity();
     renderer->setViewProjectionMatrix(mVP);
-    for (const auto &object : objects)
+    for (const auto &object : actors)
     {
         object->render(renderer);
     }
 }
 
-void Scene::addObject(std::shared_ptr<Object> object)
+void Scene::addActor(std::shared_ptr<Actor> actor)
 {
-    objects.emplace_back(std::move(object));
+    actors.emplace_back(std::move(actor));
 }
 
-void Scene::setCamera(std::shared_ptr<ObjectCamera> objectCamera)
+void Scene::setCamera(std::shared_ptr<ActorCamera> actorCamera)
 {
-    this->objectCamera = std::move(objectCamera);
+    this->actorCamera = std::move(actorCamera);
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "features/scene/object.h"
+#include "features/scene/actor.h"
 #include "features/camera/camera.h"
 #include "core/api.h"
 #include "core/math.h"
@@ -8,11 +9,11 @@
 
 namespace wne
 {
-    class WNE_API ObjectCamera : public Object
+    class WNE_API ActorCamera : public Actor
     {
     public:
-        ObjectCamera(std::shared_ptr<Camera> camera);
-        static std::shared_ptr<ObjectCamera> create(std::shared_ptr<Camera> camera);
+        ActorCamera(std::shared_ptr<Camera> camera);
+        static std::shared_ptr<ActorCamera> create(std::shared_ptr<Camera> camera);
 
         void update(float delta) override final;
 

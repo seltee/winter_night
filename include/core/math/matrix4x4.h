@@ -1,4 +1,5 @@
 #pragma once
+#include "vector3.h"
 #include "vector4.h"
 #include <cstring>
 #include <cmath>
@@ -34,30 +35,105 @@ namespace wne
                 0.0f, 0.0f, 0.0f, 1.0f);
         }
 
-        static Matrix4x4 rotationX(float value)
+        static Matrix4x4 translation(float x, float y, float z)
         {
             return Matrix4x4(
+                1.0f, 0.0f, 0.0f, x,
+                0.0f, 1.0f, 0.0f, y,
+                0.0f, 0.0f, 1.0f, z,
+                0.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+        static Matrix4x4 translation(Vector3 v)
+        {
+            return Matrix4x4(
+                1.0f, 0.0f, 0.0f, v.x,
+                0.0f, 1.0f, 0.0f, v.y,
+                0.0f, 0.0f, 1.0f, v.z,
+                0.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+        static Matrix4x4 translation(Vector4 v)
+        {
+            return Matrix4x4(
+                1.0f, 0.0f, 0.0f, v.x / v.w,
+                0.0f, 1.0f, 0.0f, v.y / v.w,
+                0.0f, 0.0f, 1.0f, v.z / v.w,
+                0.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+        static Matrix4x4 rotationX(float value)
+        {
+            float valSin = sinf(value);
+            float valCos = cosf(value);
+            return Matrix4x4(
                 1.0f, 0.0f, 0.0f, 0.0f,
-                0.0f, cosf(value), -sinf(value), 0.0f,
-                0.0f, sinf(value), cosf(value), 0.0f,
+                0.0f, valCos, -valSin, 0.0f,
+                0.0f, valSin, valCos, 0.0f,
                 0.0f, 0.0f, 0.0f, 1.0f);
         }
 
         static Matrix4x4 rotationY(float value)
         {
+            float valSin = sinf(value);
+            float valCos = cosf(value);
             return Matrix4x4(
-                cosf(value), 0.0f, sinf(value), 0.0f,
+                valCos, 0.0f, valSin, 0.0f,
                 0.0f, 1.0f, 0.0f, 0.0f,
-                -sinf(value), 0.0f, cosf(value), 0.0f,
+                -valSin, 0.0f, valCos, 0.0f,
                 0.0f, 0.0f, 0.0f, 1.0f);
         }
 
         static Matrix4x4 rotationZ(float value)
         {
+            float valSin = sinf(value);
+            float valCos = cosf(value);
             return Matrix4x4(
-                cosf(value), -sinf(value), 0.0f, 0.0f,
-                sinf(value), cosf(value), 0.0f, 0.0f,
+                valCos, -valSin, 0.0f, 0.0f,
+                valSin, valCos, 0.0f, 0.0f,
                 0.0f, 0.0f, 1.0f, 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+        static Matrix4x4 scale(const Vector3 &scale)
+        {
+            return Matrix4x4(
+                scale.x, 0.0f, 0.0f, 0.0f,
+                0.0f, scale.y, 0.0f, 0.0f,
+                0.0f, 0.0f, scale.z, 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+        static Matrix4x4 scale(float scaleX, float scaleY, float scaleZ)
+        {
+            return Matrix4x4(
+                scaleX, 0.0f, 0.0f, 0.0f,
+                0.0f, scaleY, 0.0f, 0.0f,
+                0.0f, 0.0f, scaleZ, 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+        static Matrix4x4 scale(float uniformScale)
+        {
+            return scale(uniformScale, uniformScale, uniformScale);
+        }
+
+        static Matrix4x4 rotationAxis(float value, Vector3 axis)
+        {
+            float valSin = sinf(value);
+            float valCos = cosf(value);
+            float d = 1.0f - valCos;
+            float x = axis.x * d;
+            float y = axis.y * d;
+            float z = axis.z * d;
+            float axay = x * axis.y;
+            float axaz = x * axis.z;
+            float ayaz = y * axis.z;
+
+            return Matrix4x4(
+                valCos + x * axis.x, axay - valSin * axis.z, axaz + valSin * axis.y, 0.0f,
+                axay + valSin * axis.z, valCos + y * axis.y, ayaz - valSin * axis.x, 0.0f,
+                axaz - valSin * axis.y, ayaz + valSin * axis.x, valCos + z * axis.z, 0.0f,
                 0.0f, 0.0f, 0.0f, 1.0f);
         }
 

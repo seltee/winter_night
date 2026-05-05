@@ -2,7 +2,8 @@
 #include <memory>
 #include <vector>
 #include "features/scene/object.h"
-#include "features/scene/objectCamera.h"
+#include "features/scene/actor.h"
+#include "features/scene/actorCamera.h"
 #include "core/api.h"
 #include "core/data.h"
 #include "core/core.h"
@@ -20,11 +21,11 @@ namespace wne
         void update(float delta);
         void render(Renderer *renderer);
 
-        void addObject(std::shared_ptr<Object> object);
-        void setCamera(std::shared_ptr<ObjectCamera> objectCamera);
+        void addActor(std::shared_ptr<Actor> actor);
+        void setCamera(std::shared_ptr<ActorCamera> actorCamera);
 
     protected:
-        std::vector<std::shared_ptr<Object>> objects;
-        std::shared_ptr<ObjectCamera> objectCamera;
+        std::vector<std::shared_ptr<Actor>> actors;
+        std::shared_ptr<ActorCamera> actorCamera;
     };
 };

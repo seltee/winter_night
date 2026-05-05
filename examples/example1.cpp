@@ -24,16 +24,22 @@ int main()
     renderer->addScene(scene);
     auto model = wne::Model::createFromData(vertices, indices);
     auto mesh = renderer->createMesh(model);
-    auto objectMesh = wne::ObjectMesh::create(mesh);
-    scene->addObject(objectMesh);
+    auto actorMesh = wne::ActorMesh::create(mesh);
+    scene->addActor(actorMesh);
     auto camera = wne::CameraOrtho::createHeightBased(window, 240.0f);
-    auto objectCamera = wne::ObjectCamera::create(camera);
-    scene->addObject(objectCamera);
-    scene->setCamera(objectCamera);
+    auto actorCamera = wne::ActorCamera::create(camera);
+    scene->addActor(actorCamera);
+    scene->setCamera(actorCamera);
 
+    float translate = 0.0f;
     while (!window->isCloseRequested())
     {
-        wne::Engine::getInstance()->update();
+        float delta = wne::Engine::getInstance()->update();
+        translate += delta * 2.0f;
+        actorMesh->setPosition(sinf(translate) * 80.0f, 0.0f, 0.0f);
+        actorMesh->setRotation(0.0f, 0.0f, translate * 0.1f);
+        float scale = sinf(translate * 0.4f) * 0.2f + 0.8f;
+        actorMesh->setScale(scale, scale, 1.0f);
     }
 
     return 0;

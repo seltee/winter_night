@@ -32,6 +32,54 @@ namespace wne
                 0.0f, 0.0f, 1.0f);
         }
 
+        static Matrix3x3 rotationX(float value)
+        {
+            float valSin = sinf(value);
+            float valCos = cosf(value);
+            return Matrix3x3(
+                1.0f, 0.0f, 0.0f,
+                0.0f, valCos, -valSin,
+                0.0f, valSin, valCos);
+        }
+
+        static Matrix3x3 rotationY(float value)
+        {
+            float valSin = sinf(value);
+            float valCos = cosf(value);
+            return Matrix3x3(
+                valCos, 0.0f, valSin,
+                0.0f, 1.0f, 0.0f,
+                -valSin, 0.0f, valCos);
+        }
+
+        static Matrix3x3 rotationZ(float value)
+        {
+            float valSin = sinf(value);
+            float valCos = cosf(value);
+            return Matrix3x3(
+                valCos, -valSin, 0.0f,
+                valSin, valCos, 0.0f,
+                0.0f, 0.0f, 1.0f);
+        }
+
+        static Matrix3x3 rotationAxis(float value, Vector3 axis)
+        {
+            float valSin = sinf(value);
+            float valCos = cosf(value);
+            float d = 1.0f - valCos;
+            float x = axis.x * d;
+            float y = axis.y * d;
+            float z = axis.z * d;
+            float axay = x * axis.y;
+            float axaz = x * axis.z;
+            float ayaz = y * axis.z;
+
+            return Matrix3x3(
+                valCos + x * axis.x, axay - valSin * axis.z, axaz + valSin * axis.y,
+                axay + valSin * axis.z, valCos + y * axis.y, ayaz - valSin * axis.x,
+                axaz - valSin * axis.y, ayaz + valSin * axis.x, valCos + z * axis.z);
+        }
+
         // operators
         Matrix3x3 &operator=(const Matrix3x3 &other)
         {

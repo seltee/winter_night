@@ -38,7 +38,7 @@ bool Renderer::getSyncState()
     return false;
 }
 
-void Renderer::setModelMatrix(Matrix4x4 &model)
+void Renderer::setModelMatrix(const Matrix4x4 &model)
 {
 }
 

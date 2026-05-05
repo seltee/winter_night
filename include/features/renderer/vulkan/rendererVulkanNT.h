@@ -21,7 +21,7 @@ namespace wne
         void setSyncState(bool syncEnabled) override final;
         bool getSyncState() override final;
 
-        void setModelMatrix(Matrix4x4 &mModel) override final;
+        void setModelMatrix(const Matrix4x4 &mModel) override final;
         void setViewProjectionMatrix(Matrix4x4 &mVP) override final;
 
         void update(float delta) override final;
