@@ -26,7 +26,6 @@ namespace wne
         VkDeviceMemory stagingBufferMemory = nullptr;
         VkImage textureImage = nullptr;
         VkDeviceMemory textureImageMemory = nullptr;
-        VkSampler textureSampler = nullptr;
         VulkanUtils *vulkanUtils = nullptr;
         std::unique_ptr<VulkanImageView> vulkanImageView;
     };

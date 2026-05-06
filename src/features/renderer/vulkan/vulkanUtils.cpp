@@ -1,15 +1,18 @@
 #include "features/renderer/vulkan/vulkanUtils.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
 #include "features/renderer/vulkan/vulkanCommandPool.h"
+#include "features/renderer/vulkan/vulkanSampler.h"
+#include "features/renderer/vulkan/vulkanDescriptorPool.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <iostream>
 
 using namespace wne;
 
-VulkanUtils::VulkanUtils(VulkanDevice *vulkanDevice, VulkanCommandPool *vulkanCommandPool, VkQueue graphicsQueue, VkQueue presentQueue)
+VulkanUtils::VulkanUtils(VulkanDevice *vulkanDevice, VulkanCommandPool *vulkanCommandPool, VulkanPipeline *vulkanPipeline, VkQueue graphicsQueue, VkQueue presentQueue)
 {
     this->vulkanDevice = vulkanDevice;
+    this->vulkanPipeline = vulkanPipeline;
     this->device = vulkanDevice->getDevice();
     this->physicalDevice = vulkanDevice->getPhysicalDevice();
     this->vulkanCommandPool = vulkanCommandPool;
@@ -23,6 +26,25 @@ VulkanUtils::VulkanUtils(VulkanDevice *vulkanDevice, VulkanCommandPool *vulkanCo
 
 VulkanUtils::~VulkanUtils()
 {
+}
+
+bool VulkanUtils::setup()
+{
+    vulkanSampler = std::make_unique<VulkanSampler>(this);
+    if (!vulkanSampler->setup())
+    {
+        std::cout << "Unable to create sampler" << std::endl;
+        return false;
+    }
+
+    vulkanDescriptorPool = std::make_unique<VulkanDescriptorPool>(vulkanDevice);
+    if (!vulkanDescriptorPool->setup(1))
+    {
+        std::cout << "Unable to create descriptor pool" << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
 int64 VulkanUtils::findMemoryType(uint32 typeFilter, uint64 properties) noexcept
@@ -145,6 +167,7 @@ void VulkanUtils::transitionImageLayout(VkImage image, uint64 format, uint64 old
 
 void VulkanUtils::copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width, uint32 height)
 {
+    std::cout << "ST" << std::endl;
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkBufferImageCopy region{};
@@ -163,6 +186,7 @@ void VulkanUtils::copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width
         height,
         1};
 
+    std::cout << "TES" << std::endl;
     vkCmdCopyBufferToImage(
         commandBuffer,
         buffer,
@@ -170,8 +194,10 @@ void VulkanUtils::copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         1,
         &region);
+    std::cout << "BBB" << std::endl;
 
     endSingleTimeCommands(commandBuffer);
+    std::cout << "E" << std::endl;
 }
 
 VkCommandBuffer VulkanUtils::beginSingleTimeCommands()

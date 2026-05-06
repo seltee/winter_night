@@ -15,7 +15,8 @@
 #include "features/renderer/vulkan/vulkanUtils.h"
 #include "features/renderer/vulkan/vulkanDescriptorLayout.h"
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
-#include "features/renderer/vulkan/vulkanDescriptorSets.h"
+#include "features/renderer/vulkan/vulkanDescriptorSet.h"
+#include "features/renderer/vulkan/vulkanSampler.h"
 #include "core/core.h"
 #include <memory>
 
@@ -45,11 +46,10 @@ namespace wne
 
         void startRendering();
         void finishRendering();
-        void setMVPMatrix(Matrix4x4 &mMVP);
 
         VulkanUtils *getVulkanUtils()
         {
-            return utils.get();
+            return vulkanUtils.get();
         }
 
         VulkanDevice *getVulkanDevice()
@@ -76,16 +76,15 @@ namespace wne
         VkQueue presentQueue = nullptr;
 
         std::unique_ptr<VulkanShader> defaultShader = nullptr;
-        std::unique_ptr<VulkanPipeline> pipeline = nullptr;
+        std::unique_ptr<VulkanPipeline> vulkanPipeline = nullptr;
         std::unique_ptr<VulkanRenderPass> renderPass = nullptr;
         std::unique_ptr<VulkanFrameBuffer> frameBuffer = nullptr;
         std::unique_ptr<VulkanSwapChain> swapChain = nullptr;
         std::unique_ptr<VulkanCommandPool> commandPool = nullptr;
         std::unique_ptr<VulkanDevice> vulkanDevice = nullptr;
-        std::unique_ptr<VulkanUtils> utils = nullptr;
+        std::unique_ptr<VulkanUtils> vulkanUtils = nullptr;
         std::unique_ptr<VulkanDescriptorLayout> vulkanDescriptorLayout = nullptr;
-        std::unique_ptr<VulkanDescriptorPool> vulkanDescriptorPool = nullptr;
-        std::unique_ptr<VulkanDescriptorSets> vulkanDescriptorSets = nullptr;
+        std::unique_ptr<VulkanDescriptorSet> vulkanDescriptorSet = nullptr;
         std::vector<std::unique_ptr<VulkanFrame>> frames;
 
         const char *const instanceExtNames[VULKAN_INSTANCE_REQUIRED_EXTENSIONS] = {

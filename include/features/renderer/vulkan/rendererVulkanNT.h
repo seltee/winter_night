@@ -21,15 +21,13 @@ namespace wne
         void setSyncState(bool syncEnabled) override final;
         bool getSyncState() override final;
 
-        void setModelMatrix(const Matrix4x4 &mModel) override final;
-        void setViewProjectionMatrix(Matrix4x4 &mVP) override final;
-
         void update(float delta) override final;
         void render() override final;
 
         void changeWindowSize(uint32 width, uint32 height) override final;
         std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model) override final;
         std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image) override final;
+        std::shared_ptr<Material> createFlatMaterial(std::shared_ptr<Texture> texture) override final;
 
     protected:
         RendererVulkanNT() = default;
@@ -38,6 +36,5 @@ namespace wne
 
         void *hWnd = nullptr;
         std::unique_ptr<VulkanInstance> instance;
-        Matrix4x4 mVP = Matrix4x4::identity();
     };
 }

@@ -1,10 +1,11 @@
 #pragma once
 #include <memory>
 #include "core/core.h"
+#include "core/api.h"
 
 namespace wne
 {
-    class Image
+    class WNE_API Image
     {
     public:
         using ImageDataPtr = std::shared_ptr<uint8>;

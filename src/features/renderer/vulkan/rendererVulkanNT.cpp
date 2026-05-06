@@ -1,6 +1,7 @@
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 #include "features/renderer/vulkan/vulkanMesh.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
+#include "features/renderer/vulkan/vulkanMaterial.h"
 
 using namespace wne;
 
@@ -17,17 +18,6 @@ void RendererVulkanNT::setSyncState(bool syncEnabled)
 bool RendererVulkanNT::getSyncState()
 {
     return instance->getSyncState();
-}
-
-void RendererVulkanNT::setModelMatrix(const Matrix4x4 &mModel)
-{
-    Matrix4x4 mMVP = mVP * mModel;
-    instance->setMVPMatrix(mMVP);
-}
-
-void RendererVulkanNT::setViewProjectionMatrix(Matrix4x4 &mVP)
-{
-    this->mVP = mVP;
 }
 
 void RendererVulkanNT::update(float delta)
@@ -61,6 +51,11 @@ std::shared_ptr<Mesh> RendererVulkanNT::createMesh(std::shared_ptr<Model> model)
 std::shared_ptr<Texture> RendererVulkanNT::createTexture(std::shared_ptr<Image> image)
 {
     return VulkanTexture::create(image, instance->getVulkanUtils());
+}
+
+std::shared_ptr<Material> RendererVulkanNT::createFlatMaterial(std::shared_ptr<Texture> texture)
+{
+    return VulkanMaterial::createFlat(instance->getVulkanUtils(), texture);
 }
 
 bool RendererVulkanNT::setup(void *hWnd, uint32 width, uint32 height)

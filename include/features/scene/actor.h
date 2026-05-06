@@ -7,7 +7,7 @@ namespace wne
 {
     class Renderer;
 
-    class Actor : public Object
+    class WNE_API Actor : public Object
     {
     public:
         Actor();

@@ -1,5 +1,6 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
+#include "features/renderer/vulkan/vulkanSampler.h"
 #include <vector>
 
 namespace wne
@@ -18,12 +19,14 @@ namespace wne
     public:
         VulkanFrame(VulkanDevice *vulkanDevice, VulkanSwapChain *swapChain);
         ~VulkanFrame();
-        bool setup(VkDescriptorSet vkDescriptorSet, VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffer, VulkanCommandPool *commandPool, VulkanUtils *vulkanUtils);
+        bool setup(
+            VulkanRenderPass *renderPass,
+            VulkanFrameBuffer *frameBuffer,
+            VulkanCommandPool *commandPool,
+            VulkanUtils *vulkanUtils);
 
         void startFrame(VulkanPipeline *pipeline);
         void finishFrame(VkQueue graphicsQueue, VkQueue presentQueue);
-
-        void updateUniformBuffer(UniformBufferObject &uniformBufferObject);
 
         inline VulkanCommandBuffer *getCommandBuffer()
         {
@@ -37,10 +40,6 @@ namespace wne
         VkDevice device = nullptr;
         VkPhysicalDevice physicalDevice = nullptr;
         VkSurfaceKHR surface = nullptr;
-
-        VkBuffer uniformBuffer = nullptr;
-        VkDeviceMemory uniformBuffersMemory = nullptr;
-        void *uniformBuffersMapped = nullptr;
 
         VulkanSwapChain *swapChain = nullptr;
         VulkanCommandBuffer *commandBuffer = nullptr;

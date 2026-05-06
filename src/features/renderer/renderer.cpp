@@ -29,6 +29,11 @@ std::shared_ptr<Texture> Renderer::createTexture(std::shared_ptr<Image> image)
     return nullptr;
 }
 
+std::shared_ptr<Material> Renderer::createFlatMaterial(std::shared_ptr<Texture> texture)
+{
+    return nullptr;
+}
+
 void *Renderer::getFrameData()
 {
     return nullptr;
@@ -41,14 +46,6 @@ void Renderer::setSyncState(bool syncEnabled)
 bool Renderer::getSyncState()
 {
     return false;
-}
-
-void Renderer::setModelMatrix(const Matrix4x4 &model)
-{
-}
-
-void Renderer::setViewProjectionMatrix(Matrix4x4 &VP)
-{
 }
 
 void Renderer::addScene(std::shared_ptr<Scene> scene)

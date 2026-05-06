@@ -20,14 +20,23 @@ int main()
     const std::vector<uint16> indices = {
         0, 1, 2, 2, 3, 0};
 
+    // scene
     auto scene = wne::Scene::create();
     renderer->addScene(scene);
+
+    // actor with mesh
     auto model = wne::Model::createFromData(vertices, indices);
     auto mesh = renderer->createMesh(model);
-    auto actorMesh = wne::ActorMesh::create(mesh);
-    scene->addActor(actorMesh);
     // auto image = wne::Image::create("./ex.png");
+    // std::cout << "Image loaded" << std::endl;
     // auto texture = renderer->createTexture(image);
+    // std::cout << "Texture made" << std::endl;
+    auto material = renderer->createFlatMaterial(nullptr);
+    auto actorMesh = wne::ActorMesh::create(mesh);
+    actorMesh->setMaterial(material);
+    scene->addActor(actorMesh);
+
+    // camera
     auto camera = wne::CameraOrtho::createHeightBased(window, 240.0f);
     auto actorCamera = wne::ActorCamera::create(camera);
     scene->addActor(actorCamera);

@@ -27,10 +27,3 @@ typedef struct VkSampler_T *VkSampler;
 typedef struct VkExtent2D VkExtent2D;
 typedef struct VkShaderModule_T *VkShaderModule;
 
-namespace wne
-{
-    struct UniformBufferObject
-    {
-        alignas(16) Matrix4x4 mvp;
-    };
-};
