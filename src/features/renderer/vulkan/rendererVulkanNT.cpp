@@ -1,5 +1,6 @@
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 #include "features/renderer/vulkan/vulkanMesh.h"
+#include "features/renderer/vulkan/vulkanTexture.h"
 
 using namespace wne;
 
@@ -55,6 +56,11 @@ void RendererVulkanNT::changeWindowSize(uint32 width, uint32 height)
 std::shared_ptr<Mesh> RendererVulkanNT::createMesh(std::shared_ptr<Model> model)
 {
     return VulkanMesh::create(model, instance->getVulkanUtils());
+}
+
+std::shared_ptr<Texture> RendererVulkanNT::createTexture(std::shared_ptr<Image> image)
+{
+    return VulkanTexture::create(image, instance->getVulkanUtils());
 }
 
 bool RendererVulkanNT::setup(void *hWnd, uint32 width, uint32 height)

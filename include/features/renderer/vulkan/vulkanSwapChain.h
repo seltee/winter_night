@@ -1,15 +1,19 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
+#include "features/renderer/vulkan/vulkanImageView.h"
+#include "features/renderer/vulkan/vulkanDevice.h"
+#include <memory>
 #include <vector>
 
 namespace wne
 {
+
     class VulkanSwapChain
     {
     public:
-        VulkanSwapChain(VkDevice device);
+        VulkanSwapChain(VulkanDevice *vulkanDevice);
         ~VulkanSwapChain();
-        bool setup(int width, int height, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, bool isImmidiateSwap);
+        bool setup(int width, int height, VkSurfaceKHR surface, bool isImmidiateSwap);
 
         inline unsigned int getImageFormat()
         {
@@ -21,7 +25,7 @@ namespace wne
             return swapChainExtent;
         }
 
-        inline std::vector<VkImageView> *getImageViews()
+        inline std::vector<std::unique_ptr<VulkanImageView>> *getImageViews()
         {
             return &swapChainImageViews;
         }
@@ -34,29 +38,25 @@ namespace wne
         static bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface);
 
     protected:
-        std::vector<VkImageView> swapChainImageViews;
+        VulkanDevice *vulkanDevice;
+        std::vector<std::unique_ptr<VulkanImageView>> swapChainImageViews;
         VkSwapchainKHR swapChain = nullptr;
         unsigned int swapChainImageFormat;
         VkExtent2D *swapChainExtent;
-        VkDevice device;
 
         VkSwapchainKHR createSwapChain(
-            VkPhysicalDevice physicalDevice,
-            VkDevice device,
             VkSurfaceKHR surface,
             int nWindowWidth,
             int nWindowHeight,
             unsigned int *swapChainImageFormat,
             VkExtent2D *swapChainExtent,
-            unsigned int *punImageCount, 
+            unsigned int *punImageCount,
             bool isImmidiateSwap);
 
         bool createSwapChainImages(
-            VkDevice device,
             VkSwapchainKHR swapChain,
             unsigned int unImageCount,
             int swapChainImageFormat,
-            std::vector<VkImage> *swapChainImages,
-            std::vector<VkImageView> *swapChainImageViews);
+            std::vector<VkImage> *swapChainImages);
     };
 }

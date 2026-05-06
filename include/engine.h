@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include <chrono>
+#include "core/api.h"
+#include "core/math.h"
 #include "features/os/window.h"
 #include "features/data/model.h"
 #include "features/scene/scene.h"
@@ -10,8 +12,7 @@
 #include "features/scene/actorMesh.h"
 #include "features/camera/cameraOrtho.h"
 #include "features/camera/cameraPerspective.h"
-#include "core/api.h"
-#include "core/math.h"
+#include "features/data/image.h"
 
 namespace wne
 {

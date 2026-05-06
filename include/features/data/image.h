@@ -1,0 +1,35 @@
+#pragma once
+#include <memory>
+#include "core/core.h"
+
+namespace wne
+{
+    class Image
+    {
+    public:
+        using ImageDataPtr = std::shared_ptr<uint8>;
+        Image(ImageDataPtr imageData, uint32 width, uint32 height, uint32 bytesPerPixel);
+
+        static std::shared_ptr<Image> create(const std::string &path);
+
+        inline uint8 *getImageData()
+        {
+            return imageData.get();
+        }
+
+        inline uint16 getWidth()
+        {
+            return width;
+        }
+
+        inline uint16 getHeight()
+        {
+            return height;
+        }
+
+    protected:
+        ImageDataPtr imageData;
+        uint32 width, height, bytesPerPixel;
+    };
+
+};

@@ -30,7 +30,7 @@ VulkanFrameBuffer::~VulkanFrameBuffer()
 
 bool VulkanFrameBuffer::setup(VulkanSwapChain *swapChain, VulkanRenderPass *renderPass)
 {
-    std::vector<VkImageView> *swapChainImageViews = swapChain->getImageViews();
+    auto swapChainImageViews = swapChain->getImageViews();
     VkExtent2D *swapChainExtent = swapChain->getExtent();
 
     swapChainFrameBuffers.resize(swapChainImageViews->size());
@@ -38,7 +38,7 @@ bool VulkanFrameBuffer::setup(VulkanSwapChain *swapChain, VulkanRenderPass *rend
     for (size_t i = 0; i < swapChainImageViews->size(); i++)
     {
         VkImageView attachments[] = {
-            (*swapChainImageViews)[i]};
+            (swapChainImageViews->at(i)->getImageView())};
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;

@@ -23,6 +23,7 @@ typedef struct VkFence_T *VkFence;
 typedef struct VkDescriptorSetLayout_T *VkDescriptorSetLayout;
 typedef struct VkDescriptorPool_T *VkDescriptorPool;
 typedef struct VkDescriptorSet_T *VkDescriptorSet;
+typedef struct VkSampler_T *VkSampler;
 typedef struct VkExtent2D VkExtent2D;
 typedef struct VkShaderModule_T *VkShaderModule;
 

@@ -13,9 +13,6 @@ namespace wne
 
         bool setup();
 
-        bool createBuffer(uint64 size, uint32 usage, uint32 properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
-        bool copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint64 size);
-
         inline VkDevice getDevice()
         {
             return device;

@@ -94,8 +94,8 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
         return false;
     }
 
-    swapChain = std::make_unique<VulkanSwapChain>(device);
-    if (!swapChain->setup(width, height, physicalDevice, surface, !isImmidiateSwap))
+    swapChain = std::make_unique<VulkanSwapChain>(vulkanDevice.get());
+    if (!swapChain->setup(width, height, surface, !isImmidiateSwap))
     {
         std::cout << "Unable to create swap chain" << std::endl;
         return false;
@@ -162,13 +162,12 @@ void VulkanInstance::changeSize(uint32 width, uint32 height)
     this->width = width;
     this->height = height;
 
-    VkPhysicalDevice physicalDevice = vulkanDevice->getPhysicalDevice();
     VkDevice device = vulkanDevice->getDevice();
 
     vkDeviceWaitIdle(device);
 
-    swapChain = std::make_unique<VulkanSwapChain>(device);
-    if (!swapChain->setup(width, height, physicalDevice, surface, !isImmidiateSwap))
+    swapChain = std::make_unique<VulkanSwapChain>(vulkanDevice.get());
+    if (!swapChain->setup(width, height, surface, !isImmidiateSwap))
     {
         std::cout << "Unable to create swap chain" << std::endl;
         throw std::runtime_error("failed to recreate swap chain");

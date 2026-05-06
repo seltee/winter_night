@@ -20,25 +20,25 @@ VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &ava
 VkExtent2D _chooseSwapExtent(int screenWidth, int screenHeight);
 bool _checkDeviceExtensionSupport(VkPhysicalDevice device);
 
-VulkanSwapChain::VulkanSwapChain(VkDevice device)
+VulkanSwapChain::VulkanSwapChain(VulkanDevice *vulkanDevice)
 {
-    this->device = device;
+    this->vulkanDevice = vulkanDevice;
 }
 
 VulkanSwapChain::~VulkanSwapChain()
 {
-    for (auto imageView : swapChainImageViews)
-        vkDestroyImageView(device, imageView, nullptr);
     if (swapChain)
-        vkDestroySwapchainKHR(device, swapChain, nullptr);
+        vkDestroySwapchainKHR(vulkanDevice->getDevice(), swapChain, nullptr);
 }
 
-bool VulkanSwapChain::setup(int width, int height, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, bool isImmidiateSwap)
+bool VulkanSwapChain::setup(int width, int height, VkSurfaceKHR surface, bool isImmidiateSwap)
 {
+    auto device = vulkanDevice->getDevice();
+
     swapChainExtent = new VkExtent2D();
     unsigned int unImageCount;
 
-    swapChain = createSwapChain(physicalDevice, device, surface, width, height, &swapChainImageFormat, swapChainExtent, &unImageCount, isImmidiateSwap);
+    swapChain = createSwapChain(surface, width, height, &swapChainImageFormat, swapChainExtent, &unImageCount, isImmidiateSwap);
     if (!swapChain)
     {
         std::cout << "Unable to create swap chain" << std::endl;
@@ -50,7 +50,7 @@ bool VulkanSwapChain::setup(int width, int height, VkPhysicalDevice physicalDevi
     swapChainImages.resize(unImageCount);
     vkGetSwapchainImagesKHR(device, swapChain, &unImageCount, swapChainImages.data());
 
-    if (!createSwapChainImages(device, swapChain, unImageCount, (VkFormat)swapChainImageFormat, &swapChainImages, &swapChainImageViews))
+    if (!createSwapChainImages(swapChain, unImageCount, (VkFormat)swapChainImageFormat, &swapChainImages))
     {
         std::cout << "Unable to create swap chain images" << std::endl;
         return false;
@@ -60,8 +60,6 @@ bool VulkanSwapChain::setup(int width, int height, VkPhysicalDevice physicalDevi
 }
 
 VkSwapchainKHR VulkanSwapChain::createSwapChain(
-    VkPhysicalDevice physicalDevice,
-    VkDevice device,
     VkSurfaceKHR surface,
     int nWindowWidth,
     int nWindowHeight,
@@ -70,6 +68,8 @@ VkSwapchainKHR VulkanSwapChain::createSwapChain(
     unsigned int *punImageCount,
     bool isImmidiateSwap)
 {
+    auto physicalDevice = vulkanDevice->getPhysicalDevice();
+    auto device = vulkanDevice->getDevice();
     SwapChainSupportDetails swapChainSupport = _querySwapChainSupport(physicalDevice, surface);
 
     VkSurfaceFormatKHR surfaceFormat = _chooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -127,37 +127,26 @@ VkSwapchainKHR VulkanSwapChain::createSwapChain(
 }
 
 bool VulkanSwapChain::createSwapChainImages(
-    VkDevice device,
     VkSwapchainKHR swapChain,
     unsigned int unImageCount,
     int swapChainImageFormat,
-    std::vector<VkImage> *swapChainImages,
-    std::vector<VkImageView> *swapChainImageViews)
+    std::vector<VkImage> *swapChainImages)
 {
+    auto device = vulkanDevice->getDevice();
 
     vkGetSwapchainImagesKHR(device, swapChain, &unImageCount, nullptr);
     swapChainImages->resize(unImageCount);
     vkGetSwapchainImagesKHR(device, swapChain, &unImageCount, swapChainImages->data());
-    swapChainImageViews->resize(swapChainImages->size());
-    for (size_t i = 0; i < swapChainImages->size(); i++)
-    {
-        VkImageViewCreateInfo viewCreateInfo{};
-        viewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        viewCreateInfo.image = (*swapChainImages)[i];
-        viewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        viewCreateInfo.format = (VkFormat)swapChainImageFormat;
-        viewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-        viewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-        viewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-        viewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-        viewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        viewCreateInfo.subresourceRange.baseMipLevel = 0;
-        viewCreateInfo.subresourceRange.levelCount = 1;
-        viewCreateInfo.subresourceRange.baseArrayLayer = 0;
-        viewCreateInfo.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(device, &viewCreateInfo, nullptr, &(*swapChainImageViews)[i]) != VK_SUCCESS)
+    for (size_t i = 0; i < unImageCount; i++)
+    {
+        auto vulkanImagePtr = std::make_unique<VulkanImageView>(vulkanDevice);
+        if (!vulkanImagePtr->setup(swapChainImages->at(i), swapChainImageFormat))
+        {
+            std::cout << "Unable to create swap chain image" << std::endl;
             return false;
+        }
+        swapChainImageViews.emplace_back(std::move(vulkanImagePtr));
     }
 
     return true;

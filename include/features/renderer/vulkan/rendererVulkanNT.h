@@ -29,6 +29,7 @@ namespace wne
 
         void changeWindowSize(uint32 width, uint32 height) override final;
         std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model) override final;
+        std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image) override final;
 
     protected:
         RendererVulkanNT() = default;

@@ -26,6 +26,8 @@ int main()
     auto mesh = renderer->createMesh(model);
     auto actorMesh = wne::ActorMesh::create(mesh);
     scene->addActor(actorMesh);
+    // auto image = wne::Image::create("./ex.png");
+    // auto texture = renderer->createTexture(image);
     auto camera = wne::CameraOrtho::createHeightBased(window, 240.0f);
     auto actorCamera = wne::ActorCamera::create(camera);
     scene->addActor(actorCamera);
