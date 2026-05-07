@@ -21,7 +21,7 @@ namespace wne
         void setRelatedWindow(std::shared_ptr<Window> window);
 
         // updates if window is set
-        void update();
+        void update() override final;
 
         void updateMatrix();
 

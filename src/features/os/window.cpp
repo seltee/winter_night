@@ -1,6 +1,7 @@
 #include "features/os/window.h"
 #include "features/os/nt/windowNT.h"
 #include "engine.h"
+#include <iostream>
 
 using namespace wne;
 
@@ -61,4 +62,73 @@ void Window::updateWindowSize()
 
 void Window::close()
 {
+}
+
+std::shared_ptr<WindowEvents> Window::subscribe()
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    if (subscribersAmount >= MAX_SUBSCIRBERS)
+        return nullptr;
+
+    std::shared_ptr sub = std::make_shared<WindowEvents>();
+    subscribers[subscribersAmount] = sub;
+    subscribersAmount++;
+    return sub;
+}
+
+void Window::emitEventKey(bool isDown, uint16 keyCode)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    for (int i = 0; i < subscribersAmount;)
+    {
+        auto subscriber = subscribers[i].lock();
+        if (subscriber)
+        {
+            subscriber->pushEventKey(isDown, keyCode);
+            i++;
+        }
+        else
+        {
+            subscribersAmount--;
+            subscribers[i] = subscribers[subscribersAmount];
+        }
+    }
+}
+
+void Window::emitEventMouseMove(int16 shiftX, int16 shiftY)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    for (int i = 0; i < subscribersAmount;)
+    {
+        auto subscriber = subscribers[i].lock();
+        if (subscriber)
+        {
+            subscriber->pushEventMouseMove(shiftX, shiftY);
+            i++;
+        }
+        else
+        {
+            subscribersAmount--;
+            subscribers[i] = subscribers[subscribersAmount];
+        }
+    }
+}
+
+void Window::emitEventMouseClick(bool isDown, uint16 mouseButton)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    for (int i = 0; i < subscribersAmount;)
+    {
+        auto subscriber = subscribers[i].lock();
+        if (subscriber)
+        {
+            subscriber->pushEventMouseClick(isDown, mouseButton);
+            i++;
+        }
+        else
+        {
+            subscribersAmount--;
+            subscribers[i] = subscribers[subscribersAmount];
+        }
+    }
 }

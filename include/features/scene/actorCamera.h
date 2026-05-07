@@ -15,7 +15,7 @@ namespace wne
         ActorCamera(std::shared_ptr<Camera> camera);
         static std::shared_ptr<ActorCamera> create(std::shared_ptr<Camera> camera);
 
-        void update(float delta) override final;
+        void update(float delta) override;
 
         const Matrix4x4 &getProjectionMatrix()
         {

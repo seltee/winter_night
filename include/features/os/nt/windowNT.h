@@ -8,6 +8,9 @@ namespace wne
     class WNE_API WindowNT : public Window
     {
     public:
+        uint16 mousePositionX = 0;
+        uint16 mousePositionY = 0;
+
         bool setup(uint width, uint height, WindowType type);
 
         void update(float delta) override final;

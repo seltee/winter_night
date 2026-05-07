@@ -3,7 +3,7 @@
 
 int main()
 {
-    auto window = wne::Window::create(320, 240);
+    auto window = wne::Window::create(2560, 1440);
 
     if (!window)
         return 1;
@@ -20,12 +20,12 @@ int main()
     */
 
     const std::vector<wne::VertexTextured> vertices = {
-        {{-50.0f, -50.0f, 0.0f}, {0.0f, 0.0f}},
-        {{50.0f, -50.0f, 0.0f}, {1.0f, 0.0f}},
-        {{50.0f, 50.0f, 0.0f}, {1.0f, 1.0f}},
-        {{-50.0f, 50.0f, 0.0f}, {0.0f, 1.0f}}};
+        {{-5.0f, -5.0f, 0.0f}, {0.0f, 0.0f}},
+        {{5.0f, -5.0f, 0.0f}, {1.0f, 0.0f}},
+        {{5.0f, 5.0f, 0.0f}, {1.0f, 1.0f}},
+        {{-5.0f, 5.0f, 0.0f}, {0.0f, 1.0f}}};
 
-    const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
+    const std::vector<uint16_t> indices = {0, 2, 1, 2, 3, 0};
 
     // scene
     auto scene = wne::Scene::create();
@@ -41,9 +41,19 @@ int main()
     actorMesh->setMaterial(material);
     scene->addActor(actorMesh);
 
+    auto actorMesh2 = wne::ActorMesh::create(mesh);
+    actorMesh2->setMaterial(material);
+    scene->addActor(actorMesh2);
+    actorMesh2->setPosition(8.0f, 8.0f, 8.0f);
+
+    auto actorMesh3 = wne::ActorMesh::create(mesh);
+    actorMesh3->setMaterial(material);
+    scene->addActor(actorMesh3);
+    actorMesh3->setPosition(-8.0f, 8.0f, 8.0f);
+
     // camera
-    auto camera = wne::CameraOrtho::createHeightBased(window, 240.0f);
-    auto actorCamera = wne::ActorCamera::create(camera);
+    auto camera = wne::CameraPerspective::create(window);
+    auto actorCamera = wne::ActorCameraFlying::create(camera, window);
     scene->addActor(actorCamera);
     scene->setCamera(actorCamera);
 
@@ -52,7 +62,7 @@ int main()
     {
         float delta = wne::Engine::getInstance()->update();
         translate += delta * 2.0f;
-        actorCamera->setPosition(sinf(translate) * 80.0f, 0.0f, 0.0f);
+        actorMesh->setPosition(0.0f, 0.0f, 1.0f);
         actorMesh->setRotation(0.0f, 0.0f, translate * 0.1f);
         float scale = sinf(translate * 0.4f) * 0.2f + 0.8f;
         actorMesh->setScale(scale, scale, 1.0f);

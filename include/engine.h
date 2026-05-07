@@ -9,6 +9,7 @@
 #include "features/scene/object.h"
 #include "features/scene/actor.h"
 #include "features/scene/actorCamera.h"
+#include "features/scene/actorCameraFlying.h"
 #include "features/scene/actorMesh.h"
 #include "features/camera/cameraOrtho.h"
 #include "features/camera/cameraPerspective.h"

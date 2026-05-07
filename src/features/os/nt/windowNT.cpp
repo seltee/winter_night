@@ -186,7 +186,7 @@ float WindowNT::getAdditionalWindowHeight()
 LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     WindowNT *window = (WindowNT *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-
+    int16 mousePositionX, mousePositionY;
     if (message == WM_CREATE)
     {
         CREATESTRUCT *CreateStruct = (CREATESTRUCT *)lParam;
@@ -209,9 +209,11 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         break;
 
     case WM_KEYDOWN:
+        window->emitEventKey(true, wParam);
         break;
 
     case WM_KEYUP:
+        window->emitEventKey(false, wParam);
         break;
 
         // case WM_SETCURSOR:
@@ -223,31 +225,38 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         //}
 
     case WM_MOUSEMOVE:
-
+        mousePositionX = (int16)(lParam & 0xffff);
+        mousePositionY = (int16)(lParam >> 16);
+        if (window->mousePositionX != 0 && window->mousePositionY != 0)
+        {
+            window->emitEventMouseMove((int16)(lParam & 0xffff) - window->mousePositionX, (int16)(lParam >> 16) - window->mousePositionY);
+        }
+        window->mousePositionX = mousePositionX;
+        window->mousePositionY = mousePositionY;
         break;
 
     case WM_LBUTTONDOWN:
-
+        window->emitEventMouseClick(true, 0);
         break;
 
     case WM_LBUTTONUP:
-
+        window->emitEventMouseClick(false, 0);
         break;
 
     case WM_RBUTTONDOWN:
-
+        window->emitEventMouseClick(true, 1);
         break;
 
     case WM_RBUTTONUP:
-
+        window->emitEventMouseClick(false, 1);
         break;
 
     case WM_MBUTTONDOWN:
-
+        window->emitEventMouseClick(true, 2);
         break;
 
     case WM_MBUTTONUP:
-
+        window->emitEventMouseClick(true, 2);
         break;
 
     case WM_MOUSEWHEEL:

@@ -1,4 +1,5 @@
 #include "features/camera/cameraPerspective.h"
+#include <iostream>
 
 using namespace wne;
 
@@ -8,6 +9,7 @@ CameraPerspective::CameraPerspective()
 
 CameraPerspective::CameraPerspective(std::shared_ptr<Window> window)
 {
+    this->window = window;
 }
 
 std::shared_ptr<CameraPerspective> CameraPerspective::create()

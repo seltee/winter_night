@@ -24,12 +24,43 @@ namespace wne
         Vector3(float d) : x(d), y(d), z(d) {}
         Vector3() : x(0.0f), y(0.0f), z(0.0f) {}
 
+        static Vector3 right()
+        {
+            return Vector3(1.0f, 0.0f, 0.0f);
+        }
+
+        static Vector3 up()
+        {
+            return Vector3(0.0f, 1.0f, 0.0f);
+        }
+
+        static Vector3 forward()
+        {
+            return Vector3(0.0f, 0.0f, 1.0f);
+        }
+
         // operators
         inline Vector3 &operator+=(const Vector3 &rhs)
         {
             this->x += rhs.x;
             this->y += rhs.y;
             this->z += rhs.z;
+            return *this;
+        }
+
+        inline Vector3 &operator-=(const Vector3 &rhs)
+        {
+            this->x -= rhs.x;
+            this->y -= rhs.y;
+            this->z -= rhs.z;
+            return *this;
+        }
+
+        inline Vector3 &operator*(const float &rhs)
+        {
+            this->x *= rhs;
+            this->y *= rhs;
+            this->z *= rhs;
             return *this;
         }
 
@@ -44,8 +75,9 @@ namespace wne
         }
     };
 
-    inline Vector3 operator+(const Vector3 &lhs, const Vector3 &rhs)
+    inline Vector3 operator+(const Vector3 &lhs, const Vector3 &rhs) noexcept
     {
         return Vector3(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
     }
+
 };

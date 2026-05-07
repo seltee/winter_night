@@ -1,7 +1,10 @@
 #pragma once
 #include "core/api.h"
 #include "features/renderer/renderer.h"
+#include "features/os/windowEvents.h"
 #include <memory>
+#include <vector>
+#include <mutex>
 
 namespace wne
 {
@@ -16,11 +19,17 @@ namespace wne
     class WNE_API Window
     {
     protected:
+        const static int MAX_SUBSCIRBERS = 100;
+
         uint width, height;
         WindowType windowType;
         bool focused = false;
         bool closeRequested = false;
         std::unique_ptr<Renderer> renderer;
+        std::mutex mutex;
+
+        std::weak_ptr<WindowEvents> subscribers[MAX_SUBSCIRBERS];
+        int subscribersAmount = 0;
 
         Window();
 
@@ -37,6 +46,11 @@ namespace wne
         virtual void updateWindowSize();
 
         virtual void close();
+
+        std::shared_ptr<WindowEvents> subscribe();
+        void emitEventKey(bool isDown, uint16 keyCode);
+        void emitEventMouseMove(int16 shiftX, int16 shiftY);
+        void emitEventMouseClick(bool isDown, uint16 mouseButton);
 
         inline Renderer *getRenderer()
         {
@@ -68,5 +82,4 @@ namespace wne
             return closeRequested;
         }
     };
-
-}
+};
