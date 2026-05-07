@@ -3,16 +3,21 @@
 #include "features/renderer/vulkan/vulkanCommandPool.h"
 #include "features/renderer/vulkan/vulkanSampler.h"
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
+#include "features/renderer/vulkan/vulkanSwapChain.h"
+#include "features/renderer/vulkan/vulkanRenderPass.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <iostream>
 
 using namespace wne;
 
-VulkanUtils::VulkanUtils(VulkanDevice *vulkanDevice, VulkanCommandPool *vulkanCommandPool, VulkanPipeline *vulkanPipeline, VkQueue graphicsQueue, VkQueue presentQueue)
+VulkanUtils::VulkanUtils(
+    VulkanDevice *vulkanDevice,
+    VulkanCommandPool *vulkanCommandPool,
+    VkQueue graphicsQueue,
+    VkQueue presentQueue)
 {
     this->vulkanDevice = vulkanDevice;
-    this->vulkanPipeline = vulkanPipeline;
     this->device = vulkanDevice->getDevice();
     this->physicalDevice = vulkanDevice->getPhysicalDevice();
     this->vulkanCommandPool = vulkanCommandPool;
@@ -38,7 +43,7 @@ bool VulkanUtils::setup()
     }
 
     vulkanDescriptorPool = std::make_unique<VulkanDescriptorPool>(vulkanDevice);
-    if (!vulkanDescriptorPool->setup(1))
+    if (!vulkanDescriptorPool->setup())
     {
         std::cout << "Unable to create descriptor pool" << std::endl;
         return false;
@@ -104,6 +109,22 @@ bool VulkanUtils::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint64 size
     copyRegion.size = size;
     vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
+    VkBufferMemoryBarrier barrier{};
+    barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT | VK_ACCESS_INDEX_READ_BIT;
+    barrier.buffer = dstBuffer;
+    barrier.offset = 0;
+    barrier.size = size;
+
+    vkCmdPipelineBarrier(commandBuffer,
+                         VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+                         0,
+                         0, nullptr,
+                         1, &barrier,
+                         0, nullptr);
+
     endSingleTimeCommands(commandBuffer);
     return true;
 }
@@ -126,9 +147,6 @@ void VulkanUtils::transitionImageLayout(VkImage image, uint64 format, uint64 old
     barrier.subresourceRange.levelCount = 1;
     barrier.subresourceRange.baseArrayLayer = 0;
     barrier.subresourceRange.layerCount = 1;
-
-    barrier.srcAccessMask = 0; // TODO
-    barrier.dstAccessMask = 0; // TODO
 
     VkPipelineStageFlags sourceStage;
     VkPipelineStageFlags destinationStage;
@@ -156,7 +174,7 @@ void VulkanUtils::transitionImageLayout(VkImage image, uint64 format, uint64 old
 
     vkCmdPipelineBarrier(
         commandBuffer,
-        0 /* TODO */, 0 /* TODO */,
+        sourceStage, destinationStage,
         0,
         0, nullptr,
         0, nullptr,
@@ -167,7 +185,6 @@ void VulkanUtils::transitionImageLayout(VkImage image, uint64 format, uint64 old
 
 void VulkanUtils::copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width, uint32 height)
 {
-    std::cout << "ST" << std::endl;
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkBufferImageCopy region{};
@@ -186,7 +203,6 @@ void VulkanUtils::copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width
         height,
         1};
 
-    std::cout << "TES" << std::endl;
     vkCmdCopyBufferToImage(
         commandBuffer,
         buffer,
@@ -194,10 +210,49 @@ void VulkanUtils::copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         1,
         &region);
-    std::cout << "BBB" << std::endl;
 
     endSingleTimeCommands(commandBuffer);
-    std::cout << "E" << std::endl;
+}
+
+void VulkanUtils::destroyPipelines()
+{
+    if (vulkanPipelineColored)
+        vulkanPipelineColored.reset();
+    if (vulkanPipelineTextured)
+        vulkanPipelineTextured.reset();
+}
+
+bool VulkanUtils::rebuildPipelines(
+    uint32 width, uint32 height,
+    VulkanSwapChain *vulkanSwapChain,
+    VulkanRenderPass *vulkanRenderPass)
+{
+    VkDevice device = vulkanDevice->getDevice();
+
+    vkDeviceWaitIdle(device);
+    destroyPipelines();
+    vkDeviceWaitIdle(device);
+
+    vulkanPipelineColored = std::make_unique<VulkanPipelineColored>(vulkanDevice);
+    if (!vulkanPipelineColored->setup(
+            width, height,
+            vulkanSwapChain->getExtent(),
+            vulkanRenderPass))
+    {
+        std::cout << "Unable to create vulkan colored pipeline" << std::endl;
+        return false;
+    }
+
+    vulkanPipelineTextured = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
+    if (!vulkanPipelineTextured->setup(
+            width, height,
+            vulkanSwapChain->getExtent(),
+            vulkanRenderPass))
+    {
+        std::cout << "Unable to create vulkan textured pipeline" << std::endl;
+        return false;
+    }
+    return true;
 }
 
 VkCommandBuffer VulkanUtils::beginSingleTimeCommands()

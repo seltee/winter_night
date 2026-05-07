@@ -10,7 +10,7 @@ In addition, this allows command recording to happen in multiple threads if so d
 #include "features/renderer/vulkan/vulkanQueueFamilies.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
-#include "features/renderer/vulkan/vulkanPipeline.h"
+#include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
 #include "features/renderer/vulkan/vulkanCommandPool.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
 #define VK_USE_PLATFORM_WIN32_KHR

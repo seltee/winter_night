@@ -1,9 +1,17 @@
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 #include "features/renderer/vulkan/vulkanMesh.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
-#include "features/renderer/vulkan/vulkanMaterial.h"
+#include "features/renderer/vulkan/materials/vulkanMaterial.h"
 
 using namespace wne;
+
+std::unique_ptr<RendererVulkanNT> RendererVulkanNT::create(void *hwnd)
+{
+    auto instance = std::unique_ptr<RendererVulkanNT>(new RendererVulkanNT());
+    if (!instance->setup(hwnd))
+        return nullptr;
+    return instance;
+}
 
 void *RendererVulkanNT::getFrameData()
 {
@@ -40,7 +48,7 @@ void RendererVulkanNT::render()
 
 void RendererVulkanNT::changeWindowSize(uint32 width, uint32 height)
 {
-    instance->changeSize(width, height);
+    instance->changeSize();
 }
 
 std::shared_ptr<Mesh> RendererVulkanNT::createMesh(std::shared_ptr<Model> model)
@@ -58,9 +66,9 @@ std::shared_ptr<Material> RendererVulkanNT::createFlatMaterial(std::shared_ptr<T
     return VulkanMaterial::createFlat(instance->getVulkanUtils(), texture);
 }
 
-bool RendererVulkanNT::setup(void *hWnd, uint32 width, uint32 height)
+bool RendererVulkanNT::setup(void *hWnd)
 {
-    instance = VulkanInstance::create(hWnd, width, height);
+    instance = VulkanInstance::create(hWnd);
     if (!instance)
     {
         return false;

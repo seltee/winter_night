@@ -74,7 +74,7 @@ bool WindowNT::setup(uint width, uint height, WindowType type)
         return false;
     }
 
-    renderer = RendererVulkanNT::create(hWnd, width, height);
+    renderer = RendererVulkanNT::create(hWnd);
     if (!renderer)
     {
         CloseWindow(hWnd);

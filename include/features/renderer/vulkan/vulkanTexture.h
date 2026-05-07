@@ -7,6 +7,7 @@
 #include "features/renderer/vulkan/vulkanImageView.h"
 
 #include "core/core.h"
+#include <iostream>
 
 namespace wne
 {
@@ -15,11 +16,16 @@ namespace wne
     public:
         VulkanTexture(VulkanUtils *vulkanUtils);
         ~VulkanTexture();
-        bool setup(void *data, uint32 width, uint32 height);
+        bool setup(void *pixels, uint32 width, uint32 height);
 
         static std::shared_ptr<VulkanTexture> create(std::shared_ptr<Image> image, VulkanUtils *vulkanUtils);
 
         void bind() override final;
+
+        inline VulkanImageView *getImageView()
+        {
+            return vulkanImageView.get();
+        }
 
     protected:
         VkBuffer stagingBuffer = nullptr;

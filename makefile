@@ -27,7 +27,7 @@ EXOBJ  = objects/examples
 SHADER_OUTPUT_DIR := $(BINDIR)/shaders
 
 # Source and object files
-SOURCES := $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/**/*.cpp) $(wildcard $(SRCDIR)/**/**/*.cpp) $(wildcard $(SRCDIR)/**/**/**/*.cpp)
+SOURCES := $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/**/*.cpp) $(wildcard $(SRCDIR)/**/**/*.cpp) $(wildcard $(SRCDIR)/**/**/**/*.cpp) $(wildcard $(SRCDIR)/**/**/**/**/*.cpp)
 OBJ_FILES := $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES)) $(STEAM_WRAPPER)
 
 # Shaders

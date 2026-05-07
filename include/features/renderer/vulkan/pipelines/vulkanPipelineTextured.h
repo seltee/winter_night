@@ -1,25 +1,31 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
+#include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
+#include <memory>
+
 #include "core/core.h"
+#include "core/api.h"
 
 namespace wne
 {
     class VulkanShader;
     class VulkanDescriptorLayout;
     class VulkanRenderPass;
+    class VulkanDevice;
 
-    class VulkanPipeline
+    class WNE_API VulkanPipelineTextured : public VulkanPipeline
     {
     public:
-        ~VulkanPipeline();
+        VulkanPipelineTextured(VulkanDevice *vulkanDevice);
+        ~VulkanPipelineTextured();
+
         bool setup(
             uint width,
             uint height,
             VkExtent2D *swapChainExtent,
-            VkDevice device,
-            VulkanRenderPass *renderPass,
-            VulkanShader *shader,
-            VulkanDescriptorLayout *vulkanDescriptorLayout);
+            VulkanRenderPass *renderPass);
+
+        VkDescriptorSetLayout getDescriptorSetLayout() override final;
 
         inline const VkPipeline getGraphicsPipeline()
         {
@@ -32,8 +38,7 @@ namespace wne
         }
 
     protected:
-        VkPipelineLayout pipelineLayout = nullptr;
-        VkPipeline graphicsPipeline = nullptr;
-        VkDevice device = nullptr;
+        VkDescriptorSetLayout descriptorSetLayout = nullptr;
+        std::unique_ptr<VulkanShader> shader;
     };
 }

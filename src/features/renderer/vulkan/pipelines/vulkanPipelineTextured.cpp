@@ -1,10 +1,9 @@
-#include "features/renderer/vulkan/vulkanPipeline.h"
+#include "features/renderer/vulkan/pipelines/vulkanPipelineTextured.h"
 #include "features/renderer/vulkan/vulkanShader.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanDescriptorLayout.h"
-#include "features/renderer/vulkan/vulkanMaterial.h"
+#include "features/renderer/vulkan/materials/vulkanMaterial.h"
 #include "core/data.h"
-
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <vector>
@@ -12,40 +11,68 @@
 
 using namespace wne;
 
-VulkanPipeline::~VulkanPipeline()
+VulkanPipelineTextured::VulkanPipelineTextured(VulkanDevice *vulkanDevice) : VulkanPipeline(vulkanDevice)
 {
-    if (graphicsPipeline)
-        vkDestroyPipeline(device, graphicsPipeline, nullptr);
-    if (pipelineLayout)
-        vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 }
 
-bool VulkanPipeline::setup(
+VulkanPipelineTextured::~VulkanPipelineTextured()
+{
+    auto device = vulkanDevice->getDevice();
+    if (descriptorSetLayout)
+    {
+        vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+        descriptorSetLayout = nullptr;
+    }
+}
+
+bool VulkanPipelineTextured::setup(
     uint width,
     uint height,
     VkExtent2D *swapChainExtent,
-    VkDevice device,
-    VulkanRenderPass *renderPass,
-    VulkanShader *shader,
-    VulkanDescriptorLayout *vulkanDescriptorLayout)
+    VulkanRenderPass *renderPass)
 {
-    this->device = device;
+    auto device = vulkanDevice->getDevice();
+
+    shader = std::make_unique<VulkanShader>();
+    if (!shader->makeFromFiles("./shaders/shaderTextured.vert.spv", "./shaders/shaderTextured.frag.spv", device))
+    {
+        std::cout << "Unable to compile textured shader" << std::endl;
+        return false;
+    }
+
+    VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+    samplerLayoutBinding.binding = 0;
+    samplerLayoutBinding.descriptorCount = 1;
+    samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    samplerLayoutBinding.pImmutableSamplers = nullptr;
+    samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+    VkDescriptorSetLayoutCreateInfo layoutInfo{};
+    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfo.bindingCount = 1;
+    layoutInfo.pBindings = &samplerLayoutBinding;
+
+    if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
+    {
+        std::cout << "failed to create descriptor set layout!" << std::endl;
+        return false;
+    }
 
     VkVertexInputBindingDescription bindingDescription{};
     bindingDescription.binding = 0;
-    bindingDescription.stride = sizeof(VertexColored);
+    bindingDescription.stride = sizeof(VertexTextured);
     bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
     VkVertexInputAttributeDescription attributeDescriptions[2];
     attributeDescriptions[0].binding = 0;
     attributeDescriptions[0].location = 0;
-    attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-    attributeDescriptions[0].offset = offsetof(VertexColored, pos);
+    attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[0].offset = offsetof(VertexTextured, pos);
 
     attributeDescriptions[1].binding = 0;
     attributeDescriptions[1].location = 1;
-    attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-    attributeDescriptions[1].offset = offsetof(VertexColored, color);
+    attributeDescriptions[1].format = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[1].offset = offsetof(VertexTextured, uv);
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -59,17 +86,18 @@ bool VulkanPipeline::setup(
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
+    VkExtent2D extent = *swapChainExtent;
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)width;
-    viewport.height = (float)height;
+    viewport.width = (float)extent.width;
+    viewport.height = (float)extent.height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor{};
     scissor.offset = {0, 0};
-    scissor.extent = *swapChainExtent;
+    scissor.extent = extent;
 
     std::vector<VkDynamicState> dynamicStates = {
         VK_DYNAMIC_STATE_VIEWPORT,
@@ -138,7 +166,7 @@ bool VulkanPipeline::setup(
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1;
-    pipelineLayoutInfo.pSetLayouts = vulkanDescriptorLayout->getDescriptorLayout();
+    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
     pipelineLayoutInfo.pushConstantRangeCount = 1;
     pipelineLayoutInfo.pPushConstantRanges = &pushRange;
 
@@ -171,6 +199,11 @@ bool VulkanPipeline::setup(
         std::cout << "Unable to create graphics pipeline" << std::endl;
         return false;
     }
-
     return true;
+}
+
+VkDescriptorSetLayout VulkanPipelineTextured::getDescriptorSetLayout()
+{
+    std::cout << "Get layout" << std::endl;
+    return descriptorSetLayout;
 }

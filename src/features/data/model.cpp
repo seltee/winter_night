@@ -10,6 +10,10 @@ Model::Model(ModelVertexData vertexData, ModelIndexData indexData, ModelDataType
     {
         this->vertexData.vertexColored = vertexData.vertexColored;
     }
+    else if (type == ModelDataType::VertexTexturedInd16 || type == ModelDataType::VertexTexturedInd32)
+    {
+        this->vertexData.vertexTextured = vertexData.vertexTextured;
+    }
     if (is32bitIndicides())
         this->indexData.ind32 = indexData.ind32;
     else
@@ -21,6 +25,10 @@ Model::~Model()
     if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
     {
         delete vertexData.vertexColored;
+    }
+    else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
+    {
+        delete vertexData.vertexTextured;
     }
     if (is32bitIndicides())
     {
@@ -48,4 +56,22 @@ std::shared_ptr<Model> Model::createFromData(const std::vector<VertexColored> &v
     ModelIndexData indexData;
     indexData.ind32 = new std::vector<uint32>(indices);
     return std::make_shared<Model>(vertexData, indexData, ModelDataType::VertexColoredInd32);
+}
+
+std::shared_ptr<Model> Model::createFromData(const std::vector<VertexTextured> &vertexTextured, const std::vector<uint16> &indices)
+{
+    ModelVertexData vertexData;
+    vertexData.vertexTextured = new std::vector<VertexTextured>(vertexTextured);
+    ModelIndexData indexData;
+    indexData.ind16 = new std::vector<uint16>(indices);
+    return std::make_shared<Model>(vertexData, indexData, ModelDataType::VertexTexturedInd16);
+}
+
+std::shared_ptr<Model> Model::createFromData(const std::vector<VertexTextured> &vertexTextured, const std::vector<uint32> &indices)
+{
+    ModelVertexData vertexData;
+    vertexData.vertexTextured = new std::vector<VertexTextured>(vertexTextured);
+    ModelIndexData indexData;
+    indexData.ind32 = new std::vector<uint32>(indices);
+    return std::make_shared<Model>(vertexData, indexData, ModelDataType::VertexTexturedInd32);
 }

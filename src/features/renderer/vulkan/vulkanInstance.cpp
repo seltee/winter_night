@@ -26,7 +26,15 @@ VulkanInstance::~VulkanInstance()
         delete vulkanInstanceExtensions;
 }
 
-bool VulkanInstance::initNT(void *hWnd, uint32 width, uint32 height)
+std::unique_ptr<VulkanInstance> VulkanInstance::create(void *hwnd)
+{
+    auto instance = std::unique_ptr<VulkanInstance>(new VulkanInstance());
+    if (!instance->initNT(hwnd))
+        return nullptr;
+    return instance;
+}
+
+bool VulkanInstance::initNT(void *hWnd)
 {
     if (!initInstance())
     {
@@ -48,14 +56,12 @@ bool VulkanInstance::initNT(void *hWnd, uint32 width, uint32 height)
         return false;
     }
 
-    return init(width, height, surface);
+    return init(surface);
 }
 
-bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
+bool VulkanInstance::init(VkSurfaceKHR surface)
 {
     // get rid of throw
-    this->width = width;
-    this->height = height;
     this->surface = surface;
 
     vulkanDevice = std::make_unique<VulkanDevice>(instance, surface);
@@ -67,6 +73,11 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
     }
     VkPhysicalDevice physicalDevice = vulkanDevice->getPhysicalDevice();
     VkDevice device = vulkanDevice->getDevice();
+
+    VkSurfaceCapabilitiesKHR caps;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &caps);
+    width = caps.currentExtent.width;
+    height = caps.currentExtent.height;
 
     VulkanQueueFamilies vulkanQueueFamilies;
     if (!vulkanQueueFamilies.setup(physicalDevice, surface))
@@ -81,8 +92,8 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
     commandPool = std::make_unique<VulkanCommandPool>(device, physicalDevice);
     if (!commandPool->setup(surface))
     {
-        std::cout << "Unable to create command pool" << std::endl;
-        throw std::runtime_error("failed to create command pool");
+        std::cout << "failed to create command pool" << std::endl;
+        return false;
     }
 
     swapChain = std::make_unique<VulkanSwapChain>(vulkanDevice.get());
@@ -99,33 +110,17 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
         return false;
     }
 
-    defaultShader = std::make_unique<VulkanShader>();
-    if (!defaultShader->makeFromFiles("./shaders/shader.vert.spv", "./shaders/shader.frag.spv", device))
-    {
-        std::cout << "Unable to compule default shader" << std::endl;
-        return false;
-    }
-
-    vulkanDescriptorLayout = std::make_unique<VulkanDescriptorLayout>(vulkanDevice.get());
-    if (!vulkanDescriptorLayout->setup())
-    {
-        std::cout << "Unable to create vulkan descriptor layout" << std::endl;
-        return false;
-    }
-
-    vulkanPipeline = std::make_unique<VulkanPipeline>();
-    if (!vulkanPipeline->setup(width, height, swapChain->getExtent(), device, renderPass.get(), defaultShader.get(), vulkanDescriptorLayout.get()))
-    {
-        std::cout << "Unable to create vulkan pipeline" << std::endl;
-        return false;
-    }
-
-    vulkanUtils = std::make_unique<VulkanUtils>(vulkanDevice.get(), commandPool.get(), vulkanPipeline.get(), graphicsQueue, presentQueue);
+    vulkanUtils = std::make_unique<VulkanUtils>(
+        vulkanDevice.get(),
+        commandPool.get(),
+        graphicsQueue,
+        presentQueue);
     if (!vulkanUtils->setup())
     {
         std::cout << "Unable to create utils" << std::endl;
         return false;
     }
+    vulkanUtils->rebuildPipelines(width, height, swapChain.get(), renderPass.get());
 
     frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameBuffer->setup(swapChain.get(), renderPass.get()))
@@ -148,14 +143,22 @@ bool VulkanInstance::init(uint32 width, uint32 height, VkSurfaceKHR surface)
     return true;
 }
 
-void VulkanInstance::changeSize(uint32 width, uint32 height)
+void VulkanInstance::changeSize()
 {
-    this->width = width;
-    this->height = height;
-
     VkDevice device = vulkanDevice->getDevice();
 
     vkDeviceWaitIdle(device);
+    frames.clear();
+    frameBuffer.reset();
+    vulkanUtils->destroyPipelines();
+    swapChain.reset();
+    renderPass.reset();
+    vkDeviceWaitIdle(device);
+
+    VkSurfaceCapabilitiesKHR caps{};
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkanDevice->getPhysicalDevice(), surface, &caps);
+    width = caps.currentExtent.width;
+    height = caps.currentExtent.height;
 
     swapChain = std::make_unique<VulkanSwapChain>(vulkanDevice.get());
     if (!swapChain->setup(width, height, surface, !isImmidiateSwap))
@@ -164,13 +167,14 @@ void VulkanInstance::changeSize(uint32 width, uint32 height)
         throw std::runtime_error("failed to recreate swap chain");
     }
 
-    vulkanPipeline = std::make_unique<VulkanPipeline>();
-    if (!vulkanPipeline->setup(width, height, swapChain->getExtent(), device, renderPass.get(), defaultShader.get(), vulkanDescriptorLayout.get()))
+    renderPass = std::make_unique<VulkanRenderPass>();
+    if (!renderPass->setup(swapChain->getImageFormat(), device))
     {
-        std::cout << "Unable to create vulkan pipeline" << std::endl;
-        throw std::runtime_error("failed to recreate pipeline");
+        std::cout << "Unable to create render pass" << std::endl;
+        throw std::runtime_error("failed to recreate render pass");
     }
-    vulkanUtils->setVulkanPipeline(vulkanPipeline.get());
+
+    vulkanUtils->rebuildPipelines(width, height, swapChain.get(), renderPass.get());
 
     frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameBuffer->setup(swapChain.get(), renderPass.get()))
@@ -179,7 +183,6 @@ void VulkanInstance::changeSize(uint32 width, uint32 height)
         throw std::runtime_error("failed to recreate swap chain");
     }
 
-    frames.clear();
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
         auto frame = std::make_unique<VulkanFrame>(vulkanDevice.get(), swapChain.get());
@@ -195,7 +198,7 @@ void VulkanInstance::changeSize(uint32 width, uint32 height)
 void VulkanInstance::setSyncState(bool syncEnabled)
 {
     isImmidiateSwap = syncEnabled;
-    changeSize(width, height);
+    changeSize();
 }
 
 bool VulkanInstance::getSyncState()
@@ -205,8 +208,11 @@ bool VulkanInstance::getSyncState()
 
 void VulkanInstance::startRendering()
 {
-    frames[currentFrame]->startFrame(vulkanPipeline.get());
-    vulkanUtils->setCurrentCommandBuffer(frames[currentFrame]->getCommandBuffer()->getCommandBuffer());
+    frames[currentFrame]->startFrame();
+    vulkanUtils->setCurrentCommandBuffer(frames[currentFrame]->getCommandBuffer());
+
+    // todo move to mesh
+    // frames[currentFrame]->getCommandBuffer()->bindPipeline(vulkanUtils->getPipelineColored());
 }
 
 void VulkanInstance::finishRendering()
@@ -237,6 +243,13 @@ bool VulkanInstance::initInstance()
     createInfo.pApplicationInfo = &appInfo;
     createInfo.enabledExtensionCount = VULKAN_INSTANCE_REQUIRED_EXTENSIONS;
     createInfo.ppEnabledExtensionNames = instanceExtNames;
+
+    const std::vector<const char *> validationLayers = {
+        "VK_LAYER_KHRONOS_validation"};
+    createInfo.enabledLayerCount =
+        static_cast<uint32_t>(validationLayers.size());
+    createInfo.ppEnabledLayerNames =
+        validationLayers.data();
 
     VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
     if (result != VK_SUCCESS)

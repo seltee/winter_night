@@ -9,13 +9,7 @@ namespace wne
     class WNE_API RendererVulkanNT : public Renderer
     {
     public:
-        static std::unique_ptr<RendererVulkanNT> create(void *hwnd, uint32 w, uint32 h)
-        {
-            auto instance = std::unique_ptr<RendererVulkanNT>(new RendererVulkanNT());
-            if (!instance->setup(hwnd, w, h))
-                return nullptr;
-            return instance;
-        }
+        static std::unique_ptr<RendererVulkanNT> create(void *hwnd);
         void *getFrameData() override final;
 
         void setSyncState(bool syncEnabled) override final;
@@ -32,7 +26,7 @@ namespace wne
     protected:
         RendererVulkanNT() = default;
 
-        bool setup(void *hWnd, uint32 width, uint32 height);
+        bool setup(void *hWnd);
 
         void *hWnd = nullptr;
         std::unique_ptr<VulkanInstance> instance;

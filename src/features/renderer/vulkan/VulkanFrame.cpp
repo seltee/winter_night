@@ -5,7 +5,6 @@
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
-#include "features/renderer/vulkan/vulkanPipeline.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <iostream>
@@ -61,7 +60,7 @@ bool VulkanFrame::setup(
     return true;
 }
 
-void VulkanFrame::startFrame(VulkanPipeline *pipeline)
+void VulkanFrame::startFrame()
 {
     vkWaitForFences(device, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
     vkResetFences(device, 1, &inFlightFence);
@@ -70,7 +69,6 @@ void VulkanFrame::startFrame(VulkanPipeline *pipeline)
 
     commandBuffer->resetBuffer();
     commandBuffer->recordCommandBuffer(imageIndex);
-    commandBuffer->bindPipeline(pipeline);
 }
 
 void VulkanFrame::finishFrame(VkQueue graphicsQueue, VkQueue presentQueue)

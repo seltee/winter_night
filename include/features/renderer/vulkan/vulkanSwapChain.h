@@ -7,6 +7,11 @@
 
 namespace wne
 {
+    typedef struct Extent
+    {
+        uint32 width;
+        uint32 height;
+    } Extent;
 
     class VulkanSwapChain
     {
@@ -22,7 +27,7 @@ namespace wne
 
         inline VkExtent2D *getExtent()
         {
-            return swapChainExtent;
+            return (VkExtent2D*)&swapChainExtent;
         }
 
         inline std::vector<std::unique_ptr<VulkanImageView>> *getImageViews()
@@ -42,14 +47,13 @@ namespace wne
         std::vector<std::unique_ptr<VulkanImageView>> swapChainImageViews;
         VkSwapchainKHR swapChain = nullptr;
         unsigned int swapChainImageFormat;
-        VkExtent2D *swapChainExtent;
+        Extent swapChainExtent{};
 
         VkSwapchainKHR createSwapChain(
             VkSurfaceKHR surface,
             int nWindowWidth,
             int nWindowHeight,
             unsigned int *swapChainImageFormat,
-            VkExtent2D *swapChainExtent,
             unsigned int *punImageCount,
             bool isImmidiateSwap);
 

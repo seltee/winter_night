@@ -11,7 +11,6 @@ namespace wne
     class VulkanFrameBuffer;
     class VulkanCommandPool;
     class VulkanUtils;
-    class VulkanPipeline;
     class VulkanCommandBuffer;
 
     class VulkanFrame
@@ -25,7 +24,7 @@ namespace wne
             VulkanCommandPool *commandPool,
             VulkanUtils *vulkanUtils);
 
-        void startFrame(VulkanPipeline *pipeline);
+        void startFrame();
         void finishFrame(VkQueue graphicsQueue, VkQueue presentQueue);
 
         inline VulkanCommandBuffer *getCommandBuffer()

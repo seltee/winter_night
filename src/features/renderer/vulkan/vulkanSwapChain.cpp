@@ -35,10 +35,9 @@ bool VulkanSwapChain::setup(int width, int height, VkSurfaceKHR surface, bool is
 {
     auto device = vulkanDevice->getDevice();
 
-    swapChainExtent = new VkExtent2D();
     unsigned int unImageCount;
 
-    swapChain = createSwapChain(surface, width, height, &swapChainImageFormat, swapChainExtent, &unImageCount, isImmidiateSwap);
+    swapChain = createSwapChain(surface, width, height, &swapChainImageFormat, &unImageCount, isImmidiateSwap);
     if (!swapChain)
     {
         std::cout << "Unable to create swap chain" << std::endl;
@@ -64,7 +63,6 @@ VkSwapchainKHR VulkanSwapChain::createSwapChain(
     int nWindowWidth,
     int nWindowHeight,
     unsigned int *swapChainImageFormat,
-    VkExtent2D *swapChainExtent,
     unsigned int *punImageCount,
     bool isImmidiateSwap)
 {
@@ -121,7 +119,7 @@ VkSwapchainKHR VulkanSwapChain::createSwapChain(
     if (result != VK_SUCCESS)
         return nullptr;
     *swapChainImageFormat = surfaceFormat.format;
-    *swapChainExtent = extent;
+    memcpy(&swapChainExtent, &extent, sizeof(extent));
     *punImageCount = unImageCount;
     return swapChain;
 }

@@ -13,13 +13,17 @@ namespace wne
 {
     enum class ModelDataType
     {
+        Unknown,
         VertexColoredInd16,
-        VertexColoredInd32
+        VertexColoredInd32,
+        VertexTexturedInd16,
+        VertexTexturedInd32
     };
 
     union ModelVertexData
     {
         std::vector<VertexColored> *vertexColored;
+        std::vector<VertexTextured> *vertexTextured;
     };
     union ModelIndexData
     {
@@ -40,10 +44,12 @@ namespace wne
 
         static std::shared_ptr<Model> createFromData(const std::vector<VertexColored> &vertexColored, const std::vector<uint16> &indices);
         static std::shared_ptr<Model> createFromData(const std::vector<VertexColored> &vertexColored, const std::vector<uint32> &indices);
+        static std::shared_ptr<Model> createFromData(const std::vector<VertexTextured> &vertexTextured, const std::vector<uint16> &indices);
+        static std::shared_ptr<Model> createFromData(const std::vector<VertexTextured> &vertexTextured, const std::vector<uint32> &indices);
 
         inline bool is32bitIndicides()
         {
-            return dataType == ModelDataType::VertexColoredInd32;
+            return dataType == ModelDataType::VertexColoredInd32 || dataType == ModelDataType::VertexTexturedInd32;
         }
 
         inline ModelDataType getDataType()
@@ -54,6 +60,11 @@ namespace wne
         inline std::vector<VertexColored> &getAsVertexColored()
         {
             return *vertexData.vertexColored;
+        }
+
+        inline std::vector<VertexTextured> &getAsVertexTextured()
+        {
+            return *vertexData.vertexTextured;
         }
 
         inline std::vector<uint16> &getAsIndex16()

@@ -13,9 +13,9 @@ namespace wne
         ~VulkanDescriptorLayout();
         bool setup();
 
-        const inline VkDescriptorSetLayout *getDescriptorLayout()
+        inline VkDescriptorSetLayout getDescriptorLayout()
         {
-            return &descriptorSetLayout;
+            return descriptorSetLayout;
         }
 
     protected:

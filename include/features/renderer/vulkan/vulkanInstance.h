@@ -6,7 +6,6 @@
 #include "features/renderer/vulkan/vulkanInstanceExtensions.h"
 #include "features/renderer/vulkan/vulkanDeviceExtensions.h"
 #include "features/renderer/vulkan/vulkanShader.h"
-#include "features/renderer/vulkan/vulkanPipeline.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanSwapChain.h"
@@ -15,8 +14,9 @@
 #include "features/renderer/vulkan/vulkanUtils.h"
 #include "features/renderer/vulkan/vulkanDescriptorLayout.h"
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
-#include "features/renderer/vulkan/vulkanDescriptorSet.h"
 #include "features/renderer/vulkan/vulkanSampler.h"
+#include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
+#include "features/renderer/vulkan/pipelines/vulkanPipelineColored.h"
 #include "core/core.h"
 #include <memory>
 
@@ -29,17 +29,10 @@ namespace wne
     class WNE_API VulkanInstance
     {
     public:
-        static std::unique_ptr<VulkanInstance> create(void *hwnd, uint32 w, uint32 h)
-        {
-            auto instance = std::unique_ptr<VulkanInstance>(new VulkanInstance());
-            if (!instance->initNT(hwnd, w, h))
-                return nullptr;
-            return instance;
-        }
-
         ~VulkanInstance();
+        static std::unique_ptr<VulkanInstance> create(void *hwnd);
 
-        void changeSize(uint32 width, uint32 height);
+        void changeSize();
 
         void setSyncState(bool syncEnabled);
         bool getSyncState();
@@ -75,16 +68,12 @@ namespace wne
         VkQueue graphicsQueue = nullptr;
         VkQueue presentQueue = nullptr;
 
-        std::unique_ptr<VulkanShader> defaultShader = nullptr;
-        std::unique_ptr<VulkanPipeline> vulkanPipeline = nullptr;
         std::unique_ptr<VulkanRenderPass> renderPass = nullptr;
         std::unique_ptr<VulkanFrameBuffer> frameBuffer = nullptr;
         std::unique_ptr<VulkanSwapChain> swapChain = nullptr;
         std::unique_ptr<VulkanCommandPool> commandPool = nullptr;
         std::unique_ptr<VulkanDevice> vulkanDevice = nullptr;
         std::unique_ptr<VulkanUtils> vulkanUtils = nullptr;
-        std::unique_ptr<VulkanDescriptorLayout> vulkanDescriptorLayout = nullptr;
-        std::unique_ptr<VulkanDescriptorSet> vulkanDescriptorSet = nullptr;
         std::vector<std::unique_ptr<VulkanFrame>> frames;
 
         const char *const instanceExtNames[VULKAN_INSTANCE_REQUIRED_EXTENSIONS] = {
@@ -92,8 +81,8 @@ namespace wne
             "VK_KHR_win32_surface"};
 
         VulkanInstance() = default;
-        bool initNT(void *hWnd, uint32 width, uint32 height);
-        bool init(uint32 width, uint32 height, VkSurfaceKHR surface);
+        bool initNT(void *hWnd);
+        bool init(VkSurfaceKHR surface);
         bool initInstance();
     };
 }

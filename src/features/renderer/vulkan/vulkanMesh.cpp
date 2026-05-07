@@ -42,6 +42,21 @@ std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, Vul
         }
         return nullptr;
     }
+    else if (model->getDataType() == ModelDataType::VertexTexturedInd16 || model->getDataType() == ModelDataType::VertexTexturedInd32)
+    {
+        if (model->is32bitIndicides())
+        {
+            if (mesh->setup(model->getAsVertexTextured(), model->getAsIndex32()))
+                return mesh;
+        }
+        else
+        {
+            if (mesh->setup(model->getAsVertexTextured(), model->getAsIndex16()))
+                return mesh;
+        }
+        return nullptr;
+    }
+
     return nullptr;
 }
 
@@ -58,6 +73,8 @@ bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint1
     amountOfVerticies = (uint32)vertexData.size();
     amountOfIndices = (uint32)indexData.size();
     amountOfPolygons = amountOfIndices / 3;
+    dataType = ModelDataType::VertexColoredInd16;
+    vulkanIndexType = VK_INDEX_TYPE_UINT16;
     return true;
 }
 
@@ -74,6 +91,44 @@ bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint3
     amountOfVerticies = (uint32)vertexData.size();
     amountOfIndices = (uint32)indexData.size();
     amountOfPolygons = amountOfIndices / 3;
+    dataType = ModelDataType::VertexColoredInd32;
+    vulkanIndexType = VK_INDEX_TYPE_UINT32;
+    return true;
+}
+
+bool VulkanMesh::setup(std::vector<VertexTextured> &vertexData, std::vector<uint16> &indexData)
+{
+    uint64 bufferSize = sizeof(VertexTextured) * vertexData.size();
+    if (!allocateVertexBuffer(bufferSize, vertexData.data()))
+        return false;
+
+    uint64 indexBufferSize = sizeof(uint16) * indexData.size();
+    if (!allocateIndexBuffer(indexBufferSize, indexData.data()))
+        return false;
+
+    amountOfVerticies = (uint32)vertexData.size();
+    amountOfIndices = (uint32)indexData.size();
+    amountOfPolygons = amountOfIndices / 3;
+    dataType = ModelDataType::VertexTexturedInd16;
+    vulkanIndexType = VK_INDEX_TYPE_UINT16;
+    return true;
+}
+
+bool VulkanMesh::setup(std::vector<VertexTextured> &vertexData, std::vector<uint32> &indexData)
+{
+    uint64 bufferSize = sizeof(VertexTextured) * vertexData.size();
+    if (!allocateVertexBuffer(bufferSize, vertexData.data()))
+        return false;
+
+    uint64 indexBufferSize = sizeof(uint32) * indexData.size();
+    if (!allocateIndexBuffer(indexBufferSize, indexData.data()))
+        return false;
+
+    amountOfVerticies = (uint32)vertexData.size();
+    amountOfIndices = (uint32)indexData.size();
+    amountOfPolygons = amountOfIndices / 3;
+    dataType = ModelDataType::VertexTexturedInd32;
+    vulkanIndexType = VK_INDEX_TYPE_UINT32;
     return true;
 }
 
@@ -83,9 +138,9 @@ void VulkanMesh::render(void *frameRenderData)
     VkBuffer vertexBuffers[] = {vertexBuffer};
     VkDeviceSize offsets[] = {0};
     auto commandBuffer = vFrame->getCommandBuffer()->getCommandBuffer();
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+    vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, (VkIndexType)vulkanIndexType);
     vkCmdDrawIndexed(commandBuffer, amountOfIndices, 1, 0, 0, 0);
 }
 
@@ -96,7 +151,7 @@ bool VulkanMesh::allocateVertexBuffer(uint64 bufferSize, void *data)
     VkDeviceMemory stagingBufferMemory;
     if (!vulkanUtils->createBuffer(
             bufferSize,
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             stagingBuffer,
             stagingBufferMemory))
@@ -133,7 +188,12 @@ bool VulkanMesh::allocateIndexBuffer(uint64 bufferSize, void *data)
 {
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
-    vulkanUtils->createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+    vulkanUtils->createBuffer(
+        bufferSize,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        stagingBuffer,
+        stagingBufferMemory);
 
     void *mappedMemory;
     vkMapMemory(vulkanDevice->getDevice(), stagingBufferMemory, 0, bufferSize, 0, &mappedMemory);

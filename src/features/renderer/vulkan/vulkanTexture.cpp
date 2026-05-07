@@ -20,9 +20,18 @@ VulkanTexture::~VulkanTexture()
         vkFreeMemory(device, textureImageMemory, nullptr);
 }
 
-bool VulkanTexture::setup(void *data, uint32 width, uint32 height)
+bool VulkanTexture::setup(void *pixels, uint32 width, uint32 height)
 {
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
+    uint64 imageSize = width * height * 4;
+    vulkanUtils->createBuffer(
+        imageSize,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        stagingBuffer,
+        stagingBufferMemory);
+    void *bufferData;
+    vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &bufferData);
+    memcpy(bufferData, pixels, static_cast<size_t>(imageSize));
 
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -67,6 +76,7 @@ bool VulkanTexture::setup(void *data, uint32 width, uint32 height)
 
     vulkanUtils->transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
+    vkUnmapMemory(device, stagingBufferMemory);
     vkDestroyBuffer(device, stagingBuffer, nullptr);
     vkFreeMemory(device, stagingBufferMemory, nullptr);
 
@@ -82,7 +92,7 @@ bool VulkanTexture::setup(void *data, uint32 width, uint32 height)
 std::shared_ptr<VulkanTexture> VulkanTexture::create(std::shared_ptr<Image> image, VulkanUtils *vulkanUtils)
 {
     auto texture = std::make_shared<VulkanTexture>(vulkanUtils);
-    if (texture->setup(image->getImageData(), image->getWidth(), image->getHeight()))
+    if (!texture->setup(image->getImageData(), image->getWidth(), image->getHeight()))
     {
         std::cout << "failed to make texture" << std::endl;
         return nullptr;

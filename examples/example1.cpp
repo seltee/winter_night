@@ -11,14 +11,22 @@ int main()
     auto renderer = window->getRenderer();
     renderer->setSyncState(false);
 
+    /*
     const std::vector<wne::VertexColored> vertices = {
         {{-50.0f, -50.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
         {{50.0f, -50.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
         {{50.0f, 50.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
         {{-50.0f, 50.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
+    */
 
-    const std::vector<uint16> indices = {
-        0, 1, 2, 2, 3, 0};
+    const std::vector<wne::VertexTextured> vertices = {
+        {{-50.0f, -50.0f, 0.0f}, {0.0f, 0.0f}},
+        {{50.0f, -50.0f, 0.0f}, {1.0f, 0.0f}},
+        {{50.0f, 50.0f, 0.0f}, {1.0f, 1.0f}},
+        {{-50.0f, 50.0f, 0.0f}, {0.0f, 1.0f}}};
+
+const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
+
 
     // scene
     auto scene = wne::Scene::create();
@@ -27,11 +35,9 @@ int main()
     // actor with mesh
     auto model = wne::Model::createFromData(vertices, indices);
     auto mesh = renderer->createMesh(model);
-    // auto image = wne::Image::create("./ex.png");
-    // std::cout << "Image loaded" << std::endl;
-    // auto texture = renderer->createTexture(image);
-    // std::cout << "Texture made" << std::endl;
-    auto material = renderer->createFlatMaterial(nullptr);
+    auto image = wne::Image::create("./ex.png");
+    auto texture = renderer->createTexture(image);
+    auto material = renderer->createFlatMaterial(texture);
     auto actorMesh = wne::ActorMesh::create(mesh);
     actorMesh->setMaterial(material);
     scene->addActor(actorMesh);

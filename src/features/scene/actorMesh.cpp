@@ -23,6 +23,6 @@ void ActorMesh::render(Renderer *renderer)
 {
     if (!material)
         return;
-    material->bind(renderer->getViewProjectionMatrix() * getModelMatrix());
+    material->bind(renderer->getViewProjectionMatrix() * getModelMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }

@@ -20,6 +20,8 @@ namespace wne
 
         bool setup(std::vector<VertexColored> &vertexData, std::vector<uint16> &indexData);
         bool setup(std::vector<VertexColored> &vertexData, std::vector<uint32> &indexData);
+        bool setup(std::vector<VertexTextured> &vertexData, std::vector<uint16> &indexData);
+        bool setup(std::vector<VertexTextured> &vertexData, std::vector<uint32> &indexData);
 
         void render(void *frameRenderData) override final;
 
@@ -51,5 +53,7 @@ namespace wne
         VkDeviceMemory vertexBufferMemory = nullptr;
         VkBuffer indexBuffer = nullptr;
         VkDeviceMemory indexBufferMemory = nullptr;
+
+        uint64 vulkanIndexType = 0;
     };
 }

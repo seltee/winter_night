@@ -10,7 +10,7 @@ namespace wne
     public:
         VulkanDescriptorPool(VulkanDevice *vulkanDevice);
         ~VulkanDescriptorPool();
-        bool setup(int maxFrames);
+        bool setup();
 
         inline VkDescriptorPool getDescriptorPool()
         {
