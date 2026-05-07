@@ -30,5 +30,5 @@ const Matrix4x4 &Actor::getModelMatrix()
 
 Matrix4x4 Actor::getInvModelMatrix()
 {
-    return inverse(mModel);
+    return inverse(getModelMatrix());
 }

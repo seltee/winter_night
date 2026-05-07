@@ -52,7 +52,7 @@ int main()
     {
         float delta = wne::Engine::getInstance()->update();
         translate += delta * 2.0f;
-        actorMesh->setPosition(sinf(translate) * 80.0f, 0.0f, 0.0f);
+        actorCamera->setPosition(sinf(translate) * 80.0f, 0.0f, 0.0f);
         actorMesh->setRotation(0.0f, 0.0f, translate * 0.1f);
         float scale = sinf(translate * 0.4f) * 0.2f + 0.8f;
         actorMesh->setScale(scale, scale, 1.0f);
