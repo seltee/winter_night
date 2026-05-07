@@ -234,20 +234,14 @@ bool VulkanUtils::rebuildPipelines(
     vkDeviceWaitIdle(device);
 
     vulkanPipelineColored = std::make_unique<VulkanPipelineColored>(vulkanDevice);
-    if (!vulkanPipelineColored->setup(
-            width, height,
-            vulkanSwapChain->getExtent(),
-            vulkanRenderPass))
+    if (!vulkanPipelineColored->setup(vulkanSwapChain->getExtent(), vulkanRenderPass))
     {
         std::cout << "Unable to create vulkan colored pipeline" << std::endl;
         return false;
     }
 
     vulkanPipelineTextured = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    if (!vulkanPipelineTextured->setup(
-            width, height,
-            vulkanSwapChain->getExtent(),
-            vulkanRenderPass))
+    if (!vulkanPipelineTextured->setup(vulkanSwapChain->getExtent(), vulkanRenderPass))
     {
         std::cout << "Unable to create vulkan textured pipeline" << std::endl;
         return false;

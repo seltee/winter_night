@@ -150,9 +150,8 @@ void VulkanInstance::changeSize()
     vkDeviceWaitIdle(device);
     frames.clear();
     frameBuffer.reset();
-    vulkanUtils->destroyPipelines();
+    // vulkanUtils->destroyPipelines();
     swapChain.reset();
-    renderPass.reset();
     vkDeviceWaitIdle(device);
 
     VkSurfaceCapabilitiesKHR caps{};
@@ -167,14 +166,8 @@ void VulkanInstance::changeSize()
         throw std::runtime_error("failed to recreate swap chain");
     }
 
-    renderPass = std::make_unique<VulkanRenderPass>();
-    if (!renderPass->setup(swapChain->getImageFormat(), device))
-    {
-        std::cout << "Unable to create render pass" << std::endl;
-        throw std::runtime_error("failed to recreate render pass");
-    }
-
-    vulkanUtils->rebuildPipelines(width, height, swapChain.get(), renderPass.get());
+    // todo fix pipeline recreation
+    // vulkanUtils->rebuildPipelines(width, height, swapChain.get(), renderPass.get());
 
     frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameBuffer->setup(swapChain.get(), renderPass.get()))

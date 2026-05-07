@@ -19,11 +19,7 @@ namespace wne
         VulkanPipelineTextured(VulkanDevice *vulkanDevice);
         ~VulkanPipelineTextured();
 
-        bool setup(
-            uint width,
-            uint height,
-            VkExtent2D *swapChainExtent,
-            VulkanRenderPass *renderPass);
+        bool setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass);
 
         VkDescriptorSetLayout getDescriptorSetLayout() override final;
 

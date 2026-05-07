@@ -3,7 +3,7 @@
 
 int main()
 {
-    auto window = wne::Window::create(1920, 1080);
+    auto window = wne::Window::create(320, 240);
 
     if (!window)
         return 1;
@@ -25,8 +25,7 @@ int main()
         {{50.0f, 50.0f, 0.0f}, {1.0f, 1.0f}},
         {{-50.0f, 50.0f, 0.0f}, {0.0f, 1.0f}}};
 
-const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
-
+    const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 
     // scene
     auto scene = wne::Scene::create();

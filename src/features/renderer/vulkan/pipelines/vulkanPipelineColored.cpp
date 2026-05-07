@@ -15,8 +15,11 @@ VulkanPipelineColored::VulkanPipelineColored(VulkanDevice *vulkanDevice) : Vulka
 {
 }
 
-bool VulkanPipelineColored::setup(uint width, uint height, VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass)
+bool VulkanPipelineColored::setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass)
 {
+    uint32 width = swapChainExtent->width;
+    uint32 height = swapChainExtent->height;
+
     auto device = vulkanDevice->getDevice();
 
     shader = std::make_unique<VulkanShader>();

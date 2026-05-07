@@ -25,12 +25,11 @@ VulkanPipelineTextured::~VulkanPipelineTextured()
     }
 }
 
-bool VulkanPipelineTextured::setup(
-    uint width,
-    uint height,
-    VkExtent2D *swapChainExtent,
-    VulkanRenderPass *renderPass)
+bool VulkanPipelineTextured::setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass)
 {
+    uint32 width = swapChainExtent->width;
+    uint32 height = swapChainExtent->height;
+
     auto device = vulkanDevice->getDevice();
 
     shader = std::make_unique<VulkanShader>();
@@ -194,11 +193,13 @@ bool VulkanPipelineTextured::setup(
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1;              // Optional
 
+    std::cout << "Create textured pipeline" << std::endl;
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
     {
         std::cout << "Unable to create graphics pipeline" << std::endl;
         return false;
     }
+    std::cout << "Created" << std::endl;
     return true;
 }
 

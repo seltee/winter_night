@@ -17,11 +17,7 @@ namespace wne
     public:
         VulkanPipelineColored(VulkanDevice *vulkanDevice);
 
-        bool setup(
-            uint width,
-            uint height,
-            VkExtent2D *swapChainExtent,
-            VulkanRenderPass *renderPass);
+        bool setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass);
 
     protected:
         std::unique_ptr<VulkanShader> shader;
