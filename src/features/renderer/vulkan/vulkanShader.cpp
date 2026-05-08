@@ -18,6 +18,8 @@ VulkanShader::~VulkanShader()
         vkDestroyShaderModule(device, vertShaderModule, nullptr);
     if (fragShaderModule)
         vkDestroyShaderModule(device, fragShaderModule, nullptr);
+    if (shaderStages)
+        delete[] shaderStages;
 }
 
 bool VulkanShader::makeFromFiles(const std::string &vertFilePath, const std::string &fragFilePath, VkDevice device)
@@ -39,20 +41,20 @@ bool VulkanShader::makeFromFiles(const std::string &vertFilePath, const std::str
     vertShaderModule = createShaderModule(vertData, device);
     fragShaderModule = createShaderModule(fragData, device);
 
-    VkPipelineShaderStageCreateInfo *createInfo = new VkPipelineShaderStageCreateInfo[2];
+    shaderStages = new VkPipelineShaderStageCreateInfo[2];
+    memset(shaderStages, 0, sizeof(VkPipelineShaderStageCreateInfo) * 2);
+
     // stage 1 - vertex
-    createInfo[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    createInfo[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-    createInfo[0].module = vertShaderModule;
-    createInfo[0].pName = "main";
+    shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shaderStages[0].module = vertShaderModule;
+    shaderStages[0].pName = "main";
 
     // stage 2 - fragment
-    createInfo[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    createInfo[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    createInfo[1].module = fragShaderModule;
-    createInfo[1].pName = "main";
-
-    shaderStages = createInfo;
+    shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    shaderStages[1].module = fragShaderModule;
+    shaderStages[1].pName = "main";
 
     return true;
 }

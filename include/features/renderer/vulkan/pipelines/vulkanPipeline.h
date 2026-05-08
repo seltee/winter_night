@@ -14,23 +14,11 @@ namespace wne
     public:
         virtual ~VulkanPipeline();
         virtual VkDescriptorSetLayout getDescriptorSetLayout();
-
-        inline const VkPipeline getGraphicsPipeline()
-        {
-            return graphicsPipeline;
-        }
-
-        inline const VkPipelineLayout getPipelineLayout()
-        {
-            return pipelineLayout;
-        }
+        virtual VkPipeline getGraphicsPipeline();
+        virtual VkPipelineLayout getPipelineLayout();
 
     protected:
         VulkanPipeline(VulkanDevice *vulkanDevice);
-
         VulkanDevice *vulkanDevice;
-
-        VkPipelineLayout pipelineLayout = nullptr;
-        VkPipeline graphicsPipeline = nullptr;
     };
 }

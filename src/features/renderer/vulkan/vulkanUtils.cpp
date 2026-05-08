@@ -241,10 +241,7 @@ void VulkanUtils::destroyPipelines()
         vulkanPipelineTextured.reset();
 }
 
-bool VulkanUtils::rebuildPipelines(
-    uint32 width, uint32 height,
-    VulkanSwapChain *vulkanSwapChain,
-    VulkanRenderPass *vulkanRenderPass)
+bool VulkanUtils::rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass)
 {
     VkDevice device = vulkanDevice->getDevice();
 
@@ -265,6 +262,7 @@ bool VulkanUtils::rebuildPipelines(
         std::cout << "Unable to create vulkan textured pipeline" << std::endl;
         return false;
     }
+
     return true;
 }
 

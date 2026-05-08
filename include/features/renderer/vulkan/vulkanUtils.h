@@ -41,9 +41,7 @@ namespace wne
         void transitionImageLayout(VkImage image, uint64 format, uint64 oldLayout, uint64 newLayout);
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width, uint32 height);
         void destroyPipelines();
-        bool rebuildPipelines(uint32 width, uint32 height,
-                              VulkanSwapChain *vulkanSwapChain,
-                              VulkanRenderPass *vulkanRenderPass);
+        bool rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass);
 
         bool createImage(
             uint16 width,

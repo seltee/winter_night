@@ -15,6 +15,31 @@ VulkanPipelineColored::VulkanPipelineColored(VulkanDevice *vulkanDevice) : Vulka
 {
 }
 
+VulkanPipelineColored::~VulkanPipelineColored()
+{
+    auto device = vulkanDevice->getDevice();
+    if (graphicsPipeline)
+    {
+        vkDestroyPipeline(device, graphicsPipeline, nullptr);
+        graphicsPipeline = nullptr;
+    }
+    if (pipelineLayout)
+    {
+        vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+        pipelineLayout = nullptr;
+    }
+}
+
+VkPipeline VulkanPipelineColored::getGraphicsPipeline()
+{
+    return graphicsPipeline;
+}
+
+VkPipelineLayout VulkanPipelineColored::getPipelineLayout()
+{
+    return pipelineLayout;
+}
+
 bool VulkanPipelineColored::setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass)
 {
     uint32 width = swapChainExtent->width;
@@ -161,7 +186,7 @@ bool VulkanPipelineColored::setup(VkExtent2D *swapChainExtent, VulkanRenderPass 
     VkGraphicsPipelineCreateInfo pipelineInfo{};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = 2;
-    pipelineInfo.pStages = (VkPipelineShaderStageCreateInfo *)shader->getShaderStages();
+    pipelineInfo.pStages = shader->getShaderStages();
     pipelineInfo.pVertexInputState = &vertexInputInfo;
     pipelineInfo.pInputAssemblyState = &inputAssembly;
     pipelineInfo.pViewportState = &viewportState;
@@ -182,10 +207,14 @@ bool VulkanPipelineColored::setup(VkExtent2D *swapChainExtent, VulkanRenderPass 
         return false;
     }
 
+    vkDeviceWaitIdle(device);
+
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
     {
         std::cout << "Unable to create graphics pipeline" << std::endl;
         return false;
     }
+    if (graphicsPipeline == VK_NULL_HANDLE)
+        std::cout << "Pipeline is null!" << std::endl;
     return true;
 }

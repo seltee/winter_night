@@ -18,23 +18,17 @@ namespace wne
     public:
         VulkanPipelineTextured(VulkanDevice *vulkanDevice);
         ~VulkanPipelineTextured();
+        VkPipeline getGraphicsPipeline() override final;
+        VkPipelineLayout getPipelineLayout() override final;
 
         bool setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass);
 
         VkDescriptorSetLayout getDescriptorSetLayout() override final;
 
-        inline const VkPipeline getGraphicsPipeline()
-        {
-            return graphicsPipeline;
-        }
-
-        inline const VkPipelineLayout getPipelineLayout()
-        {
-            return pipelineLayout;
-        }
-
     protected:
         VkDescriptorSetLayout descriptorSetLayout = nullptr;
         std::unique_ptr<VulkanShader> shader;
+        VkPipelineLayout pipelineLayout = nullptr;
+        VkPipeline graphicsPipeline = nullptr;
     };
 }

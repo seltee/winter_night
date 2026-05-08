@@ -121,7 +121,7 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
         return false;
     }
 
-    vulkanUtils->rebuildPipelines(width, height, swapChain.get(), renderPass.get());
+    vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get());
 
     frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameBuffer->setup(swapChain.get(), renderPass.get()))
@@ -176,7 +176,7 @@ void VulkanInstance::changeSize()
     }
 
     // todo fix pipeline recreation
-    vulkanUtils->rebuildPipelines(width, height, swapChain.get(), renderPass.get());
+    vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get());
 
     frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameBuffer->setup(swapChain.get(), renderPass.get()))

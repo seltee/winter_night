@@ -26,6 +26,7 @@ typedef struct VkDescriptorSet_T *VkDescriptorSet;
 typedef struct VkSampler_T *VkSampler;
 typedef struct VkExtent2D VkExtent2D;
 typedef struct VkShaderModule_T *VkShaderModule;
+typedef struct VkPipelineShaderStageCreateInfo VkPipelineShaderStageCreateInfo;
 
 using VulkanFormat = uint64;
 using VulkanImageTiling = uint64;

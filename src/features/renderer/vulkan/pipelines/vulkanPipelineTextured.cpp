@@ -18,11 +18,31 @@ VulkanPipelineTextured::VulkanPipelineTextured(VulkanDevice *vulkanDevice) : Vul
 VulkanPipelineTextured::~VulkanPipelineTextured()
 {
     auto device = vulkanDevice->getDevice();
+    if (graphicsPipeline)
+    {
+        vkDestroyPipeline(device, graphicsPipeline, nullptr);
+        graphicsPipeline = nullptr;
+    }
+    if (pipelineLayout)
+    {
+        vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+        pipelineLayout = nullptr;
+    }
     if (descriptorSetLayout)
     {
         vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
         descriptorSetLayout = nullptr;
     }
+}
+
+VkPipeline VulkanPipelineTextured::getGraphicsPipeline()
+{
+    return graphicsPipeline;
+}
+
+VkPipelineLayout VulkanPipelineTextured::getPipelineLayout()
+{
+    return pipelineLayout;
 }
 
 bool VulkanPipelineTextured::setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass)
@@ -202,13 +222,16 @@ bool VulkanPipelineTextured::setup(VkExtent2D *swapChainExtent, VulkanRenderPass
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1;              // Optional
 
-    std::cout << "Create textured pipeline" << std::endl;
+    vkDeviceWaitIdle(device);
+
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
     {
         std::cout << "Unable to create graphics pipeline" << std::endl;
         return false;
     }
-    std::cout << "Created" << std::endl;
+    if (graphicsPipeline == VK_NULL_HANDLE)
+        std::cout << "Pipeline is null!" << std::endl;
+
     return true;
 }
 

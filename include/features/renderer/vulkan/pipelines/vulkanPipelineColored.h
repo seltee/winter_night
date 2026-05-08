@@ -16,10 +16,15 @@ namespace wne
     {
     public:
         VulkanPipelineColored(VulkanDevice *vulkanDevice);
+        ~VulkanPipelineColored();
+        VkPipeline getGraphicsPipeline() override final;
+        VkPipelineLayout getPipelineLayout() override final;
 
         bool setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass);
 
     protected:
         std::unique_ptr<VulkanShader> shader;
+        VkPipelineLayout pipelineLayout = nullptr;
+        VkPipeline graphicsPipeline = nullptr;
     };
 }

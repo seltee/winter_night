@@ -19,20 +19,18 @@ VulkanPipeline::VulkanPipeline(VulkanDevice *vulkanDevice)
 
 VulkanPipeline::~VulkanPipeline()
 {
-    auto device = vulkanDevice->getDevice();
-    if (graphicsPipeline)
-    {
-        vkDestroyPipeline(device, graphicsPipeline, nullptr);
-        graphicsPipeline = nullptr;
-    }
-    if (pipelineLayout)
-    {
-        vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-        pipelineLayout = nullptr;
-    }
 }
 
 VkDescriptorSetLayout VulkanPipeline::getDescriptorSetLayout()
+{
+    return nullptr;
+}
+VkPipeline VulkanPipeline::getGraphicsPipeline()
+{
+    return nullptr;
+}
+
+VkPipelineLayout VulkanPipeline::getPipelineLayout()
 {
     return nullptr;
 }
