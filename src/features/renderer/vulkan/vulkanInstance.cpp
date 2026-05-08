@@ -103,13 +103,6 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
         return false;
     }
 
-    renderPass = std::make_unique<VulkanRenderPass>();
-    if (!renderPass->setup(swapChain->getImageFormat(), device))
-    {
-        std::cout << "Unable to create render pass" << std::endl;
-        return false;
-    }
-
     vulkanUtils = std::make_unique<VulkanUtils>(
         vulkanDevice.get(),
         commandPool.get(),
@@ -120,6 +113,14 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
         std::cout << "Unable to create utils" << std::endl;
         return false;
     }
+
+    renderPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
+    if (!renderPass->setup(width, height, swapChain->getImageFormat()))
+    {
+        std::cout << "Unable to create render pass" << std::endl;
+        return false;
+    }
+
     vulkanUtils->rebuildPipelines(width, height, swapChain.get(), renderPass.get());
 
     frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
@@ -150,7 +151,8 @@ void VulkanInstance::changeSize()
     vkDeviceWaitIdle(device);
     frames.clear();
     frameBuffer.reset();
-    // vulkanUtils->destroyPipelines();
+    vulkanUtils->destroyPipelines();
+    renderPass.reset();
     swapChain.reset();
     vkDeviceWaitIdle(device);
 
@@ -166,8 +168,15 @@ void VulkanInstance::changeSize()
         throw std::runtime_error("failed to recreate swap chain");
     }
 
+    renderPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
+    if (!renderPass->setup(width, height, swapChain->getImageFormat()))
+    {
+        std::cout << "Unable to create render pass" << std::endl;
+        throw std::runtime_error("failed to recreate render pass");
+    }
+
     // todo fix pipeline recreation
-    // vulkanUtils->rebuildPipelines(width, height, swapChain.get(), renderPass.get());
+    vulkanUtils->rebuildPipelines(width, height, swapChain.get(), renderPass.get());
 
     frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameBuffer->setup(swapChain.get(), renderPass.get()))

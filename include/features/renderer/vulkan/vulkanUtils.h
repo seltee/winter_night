@@ -34,6 +34,8 @@ namespace wne
         bool setup();
 
         int64 findMemoryType(uint32 typeFilter, uint64 properties) noexcept;
+        VulkanFormat findSupportedFormat(const std::vector<VulkanFormat> &candidates, VulkanImageTiling tiling, VulkanFormatFeatureFlags features) noexcept;
+
         bool createBuffer(uint64 size, uint32 usage, uint32 properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
         bool copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint64 size);
         void transitionImageLayout(VkImage image, uint64 format, uint64 oldLayout, uint64 newLayout);
@@ -42,6 +44,18 @@ namespace wne
         bool rebuildPipelines(uint32 width, uint32 height,
                               VulkanSwapChain *vulkanSwapChain,
                               VulkanRenderPass *vulkanRenderPass);
+
+        bool createImage(
+            uint16 width,
+            uint16 height,
+            VulkanFormat format,
+            VulkanImageTiling tiling,
+            VulkanImageUsageFlags usage,
+            VulkanMemoryPropertyFlagBits memoryFlags,
+            VkImage *pImage,
+            VkDeviceMemory *pMemory);
+
+        bool createImageView(VkImage image, VulkanFormat format, VulkanImageAspectFlags aspectFlags, VkImageView *imageView);
 
         inline VulkanDevice *getVulkanDevice()
         {

@@ -15,6 +15,7 @@
 #include "features/renderer/vulkan/vulkanDescriptorLayout.h"
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
 #include "features/renderer/vulkan/vulkanSampler.h"
+#include "features/renderer/vulkan/vulkanDepthBuffer.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipelineColored.h"
 #include "core/core.h"

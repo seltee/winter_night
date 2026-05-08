@@ -27,3 +27,10 @@ typedef struct VkSampler_T *VkSampler;
 typedef struct VkExtent2D VkExtent2D;
 typedef struct VkShaderModule_T *VkShaderModule;
 
+using VulkanFormat = uint64;
+using VulkanImageTiling = uint64;
+using VulkanFormatFeatureFlags = uint64;
+using VulkanImageUsageFlags = uint64;
+using VulkanMemoryPropertyFlagBits = uint64;
+using VulkanImageAspectFlags = uint64;
+

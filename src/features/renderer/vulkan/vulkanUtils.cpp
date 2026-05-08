@@ -69,6 +69,25 @@ int64 VulkanUtils::findMemoryType(uint32 typeFilter, uint64 properties) noexcept
     return -1;
 }
 
+VulkanFormat VulkanUtils::findSupportedFormat(const std::vector<VulkanFormat> &candidates, VulkanImageTiling tiling, VulkanFormatFeatureFlags features) noexcept
+{
+    for (auto format : candidates)
+    {
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(physicalDevice, (VkFormat)format, &props);
+
+        if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
+        {
+            return format;
+        }
+        else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
+        {
+            return format;
+        }
+    }
+    return VkFormat::VK_FORMAT_UNDEFINED;
+}
+
 bool VulkanUtils::createBuffer(uint64 size, uint32 usage, uint32 properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory)
 {
     VkBufferCreateInfo bufferInfo{};
@@ -244,6 +263,78 @@ bool VulkanUtils::rebuildPipelines(
     if (!vulkanPipelineTextured->setup(vulkanSwapChain->getExtent(), vulkanRenderPass))
     {
         std::cout << "Unable to create vulkan textured pipeline" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool VulkanUtils::createImage(
+    uint16 width,
+    uint16 height,
+    VulkanFormat format,
+    VulkanImageTiling tiling,
+    VulkanImageUsageFlags usage,
+    VulkanMemoryPropertyFlagBits memoryFlags,
+    VkImage *pImage,
+    VkDeviceMemory *pMemory)
+{
+    VkImageCreateInfo imageInfo{};
+    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width = width;
+    imageInfo.extent.height = height;
+    imageInfo.extent.depth = 1;
+    imageInfo.mipLevels = 1;
+    imageInfo.arrayLayers = 1;
+    imageInfo.format = (VkFormat)format;
+    imageInfo.tiling = (VkImageTiling)tiling;
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.usage = usage;
+    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.flags = 0; // Optional
+
+    if (vkCreateImage(device, &imageInfo, nullptr, pImage) != VK_SUCCESS)
+    {
+        std::cout << "failed to create image" << std::endl;
+        return false;
+    }
+
+    VkMemoryRequirements memRequirements;
+    vkGetImageMemoryRequirements(device, *pImage, &memRequirements);
+
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, memoryFlags);
+
+    if (vkAllocateMemory(device, &allocInfo, nullptr, pMemory) != VK_SUCCESS)
+    {
+        vkDestroyImage(device, *pImage, nullptr);
+        std::cout << "failed to allocate image memory" << std::endl;
+        return false;
+    }
+
+    vkBindImageMemory(device, *pImage, *pMemory, 0);
+    return true;
+}
+
+bool VulkanUtils::createImageView(VkImage image, VulkanFormat format, VulkanImageAspectFlags aspectFlags, VkImageView *imageView)
+{
+    VkImageViewCreateInfo viewInfo{};
+    viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewInfo.image = image;
+    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewInfo.format = (VkFormat)format;
+    viewInfo.subresourceRange.aspectMask = aspectFlags;
+    viewInfo.subresourceRange.baseMipLevel = 0;
+    viewInfo.subresourceRange.levelCount = 1;
+    viewInfo.subresourceRange.baseArrayLayer = 0;
+    viewInfo.subresourceRange.layerCount = 1;
+
+    if (vkCreateImageView(vulkanDevice->getDevice(), &viewInfo, nullptr, imageView) != VK_SUCCESS)
+    {
+        std::cout << "failed to create image view" << std::endl;
         return false;
     }
     return true;

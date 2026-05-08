@@ -9,9 +9,11 @@ That means that we have to create a framebuffer for all of the images in the swa
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanSwapChain.h"
+#include "features/renderer/vulkan/vulkanDepthBuffer.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <iostream>
+#include <array>
 
 using namespace wne;
 
@@ -37,14 +39,15 @@ bool VulkanFrameBuffer::setup(VulkanSwapChain *swapChain, VulkanRenderPass *rend
 
     for (size_t i = 0; i < swapChainImageViews->size(); i++)
     {
-        VkImageView attachments[] = {
-            (swapChainImageViews->at(i)->getImageView())};
+        std::array<VkImageView, 2> attachments = {
+            swapChainImageViews->at(i)->getImageView(),
+            renderPass->getDepthBuffer()->getDepthImageView()};
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         framebufferInfo.renderPass = renderPass->getRenderPass();
-        framebufferInfo.attachmentCount = 1;
-        framebufferInfo.pAttachments = attachments;
+        framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        framebufferInfo.pAttachments = attachments.data();
         framebufferInfo.width = swapChainExtent->width;
         framebufferInfo.height = swapChainExtent->height;
         framebufferInfo.layers = 1;
