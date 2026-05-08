@@ -14,6 +14,7 @@
 #include "features/camera/cameraOrtho.h"
 #include "features/camera/cameraPerspective.h"
 #include "features/data/image.h"
+#include "utils/primitives.h"
 
 namespace wne
 {

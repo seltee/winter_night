@@ -61,7 +61,7 @@ void ActorCameraFlying::update(float delta)
         if (event.type == WindowEvents::WindowEventType::MOUSE_MOVE)
         {
             yaw += (float)event.mouseMove.shiftX * 0.009f;    // left/right
-            pitch += (float)event.mouseMove.shiftY * -0.009f; // up/down
+            pitch += (float)event.mouseMove.shiftY * 0.009f; // up/down
 
             yaw = wrap2Pi(yaw);
 

@@ -37,6 +37,14 @@ namespace wne
         return {q.x / norm, q.y / norm, q.z / norm, q.w / norm};
     }
 
+    inline Vector3 normalize(const Vector3 &vec)
+    {
+        float norm = std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+        if (norm < 1e-12)
+            return {1.0, 0.0, 0.0};
+        return {vec.x / norm, vec.y / norm, vec.z / norm};
+    }
+
     inline float wrap2Pi(float angle)
     {
         angle = std::fmod(angle, PI2);
@@ -52,7 +60,7 @@ namespace wne
 
         return Matrix4x4(
             f / aspectRatio, 0.0f, 0.0f, 0.0f,
-            0.0f, f, 0.0f, 0.0f,
+            0.0f, -f, 0.0f, 0.0f,
             0.0f, 0.0f, farPlane / nf, -nearPlane * farPlane / nf,
             0.0f, 0.0f, 1.0f, 0.0f);
     }

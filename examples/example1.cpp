@@ -20,36 +20,55 @@ int main()
     */
 
     const std::vector<wne::VertexTextured> vertices = {
-        {{-5.0f, -5.0f, 0.0f}, {0.0f, 0.0f}},
-        {{5.0f, -5.0f, 0.0f}, {1.0f, 0.0f}},
-        {{5.0f, 5.0f, 0.0f}, {1.0f, 1.0f}},
-        {{-5.0f, 5.0f, 0.0f}, {0.0f, 1.0f}}};
+        {{-5.0f, -5.0f, 0.0f}, {0.0f, 1.0f}},
+        {{5.0f, -5.0f, 0.0f}, {1.0f, 1.0f}},
+        {{5.0f, 5.0f, 0.0f}, {1.0f, 0.0f}},
+        {{-5.0f, 5.0f, 0.0f}, {0.0f, 0.0f}}};
 
-    const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
+    const std::vector<uint16_t> indices = {0, 2, 1, 3, 2, 0};
 
     // scene
     auto scene = wne::Scene::create();
     renderer->addScene(scene);
 
+    // images
+    auto imageEx = wne::Image::create("./ex.png");
+    auto textureEx = renderer->createTexture(imageEx);
+    auto materialEx = renderer->createFlatMaterial(textureEx);
+    auto imageBox = wne::Image::create("./box.png");
+    auto textureBox = renderer->createTexture(imageBox);
+    auto materialBox = renderer->createFlatMaterial(textureBox);
+
     // actor with mesh
     auto model = wne::Model::createFromData(vertices, indices);
     auto mesh = renderer->createMesh(model);
-    auto image = wne::Image::create("./ex.png");
-    auto texture = renderer->createTexture(image);
-    auto material = renderer->createFlatMaterial(texture);
     auto actorMesh = wne::ActorMesh::create(mesh);
-    actorMesh->setMaterial(material);
+    actorMesh->setMaterial(materialEx);
     scene->addActor(actorMesh);
 
     auto actorMesh2 = wne::ActorMesh::create(mesh);
-    actorMesh2->setMaterial(material);
+    actorMesh2->setMaterial(materialEx);
     scene->addActor(actorMesh2);
     actorMesh2->setPosition(8.0f, 8.0f, 8.0f);
 
     auto actorMesh3 = wne::ActorMesh::create(mesh);
-    actorMesh3->setMaterial(material);
+    actorMesh3->setMaterial(materialEx);
     scene->addActor(actorMesh3);
     actorMesh3->setPosition(-8.0f, 8.0f, 8.0f);
+
+    auto plainModel = wne::Primitives::createPlain(4.0f, wne::normalize(wne::Vector3(-1.0f, 1.0f, -1.0f)));
+    auto plainMesh = renderer->createMesh(plainModel);
+    auto actorPlain = wne::ActorMesh::create(plainMesh);
+    actorPlain->setMaterial(materialBox);
+    scene->addActor(actorPlain);
+    actorPlain->setPosition(12.0f, -4.0f, 4.0f);
+
+    auto boxModel = wne::Primitives::createBox(4.0f);
+    auto boxMesh = renderer->createMesh(boxModel);
+    auto actorBox = wne::ActorMesh::create(boxMesh);
+    actorBox->setMaterial(materialBox);
+    scene->addActor(actorBox);
+    actorBox->setPosition(-12.0f, -4.0f, 4.0f);
 
     // camera
     auto camera = wne::CameraPerspective::create(window);
