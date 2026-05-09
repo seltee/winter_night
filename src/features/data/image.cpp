@@ -30,3 +30,34 @@ std::shared_ptr<Image> Image::create(const std::string &path)
         (uint32)height,
         4);
 }
+
+float Image::getAvarage(float x, float y, float pickRadius)
+{
+    int pickPixelsHalfX = (int)((float)width * pickRadius) / 2;
+    int pickPixelsHalfY = (int)((float)height * pickRadius) / 2;
+    int middleX = (int)((float)width * x);
+    int middleY = (int)((float)width * y);
+
+    int xFrom = std::max((middleX - pickPixelsHalfX), 0);
+    int xTo = std::min((middleX + pickPixelsHalfX), (int)width);
+    int yFrom = std::max((middleY - pickPixelsHalfY), 0);
+    int yTo = std::min((middleY + pickPixelsHalfY), (int)height);
+
+    uint8 *data = imageData.get();
+    int amountOfPixels = (xTo - xFrom) * (yTo - yFrom);
+    float pixelAccMul = 1.0f / (float)amountOfPixels;
+    float acc = 0.0f;
+    uint8 pixel;
+
+    for (int y = yFrom; y < yTo; y++)
+    {
+        int yShift = y * width;
+        for (int x = xFrom; x < xTo; x++)
+        {
+            pixel = std::max(std::max(data[(yShift + x) * 4], data[(yShift + x) * 4]), data[(yShift + x) * 4]);
+            acc += (float)pixel / 255.0f * pixelAccMul;
+        }
+    }
+
+    return acc;
+}

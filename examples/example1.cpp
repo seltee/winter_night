@@ -70,6 +70,10 @@ int main()
     scene->addActor(actorBox);
     actorBox->setPosition(-12.0f, -4.0f, 4.0f);
 
+    auto actorTerrain = wne::ActorTerrain::createFromImage(100, 80.0f, 10.0f, imageBox, renderer);
+    actorTerrain->setMaterial(materialBox);
+    scene->addActor(actorTerrain);
+
     // camera
     auto camera = wne::CameraPerspective::create(window);
     auto actorCamera = wne::ActorCameraFlying::create(camera, window);

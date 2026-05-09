@@ -13,6 +13,9 @@ namespace wne
 
         static std::shared_ptr<Image> create(const std::string &path);
 
+        // 0-1 coordinate, combines color by max + nearby pixels through average
+        float getAvarage(float x, float y, float pickRadius);
+
         inline uint8 *getImageData()
         {
             return imageData.get();
