@@ -25,6 +25,7 @@ namespace wne
 
         // initialization
         Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+        Vector4(Vector3 vec3, float w) : x(vec3.x), y(vec3.y), z(vec3.z), w(w) {}
         Vector4(float d) : x(d), y(d), z(d), w(d) {}
         Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
 

@@ -237,6 +237,5 @@ bool VulkanPipelineTextured::setup(VkExtent2D *swapChainExtent, VulkanRenderPass
 
 VkDescriptorSetLayout VulkanPipelineTextured::getDescriptorSetLayout()
 {
-    std::cout << "Get layout" << std::endl;
     return descriptorSetLayout;
 }

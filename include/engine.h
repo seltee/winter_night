@@ -14,6 +14,7 @@
 #include "features/scene/actorTerrain.h"
 #include "features/camera/cameraOrtho.h"
 #include "features/camera/cameraPerspective.h"
+#include "features/loaders/loader3d.h"
 #include "features/data/image.h"
 #include "utils/primitives.h"
 

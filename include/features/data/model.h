@@ -41,7 +41,9 @@ namespace wne
     public:
         Model(ModelVertexData vertexData, ModelIndexData indexData, ModelDataType type);
         ~Model();
+        bool append(Model *model, Matrix4x4 &transformation);
 
+        static std::shared_ptr<Model> create(ModelDataType type);
         static std::shared_ptr<Model> createFromData(const std::vector<VertexColored> &vertexColored, const std::vector<uint16> &indices);
         static std::shared_ptr<Model> createFromData(const std::vector<VertexColored> &vertexColored, const std::vector<uint32> &indices);
         static std::shared_ptr<Model> createFromData(const std::vector<VertexTextured> &vertexTextured, const std::vector<uint16> &indices);
