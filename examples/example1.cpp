@@ -84,7 +84,7 @@ int main()
     auto actorLoadedBox = wne::ActorMesh::create(actorLoadedMesh);
     actorLoadedBox->setMaterial(materialMetalBox);
     scene->addActor(actorLoadedBox);
-    actorLoadedBox->setPosition(10.0f, 8.0f, 6.0f);
+    actorLoadedBox->setPosition(10.0f, 8.0f, 4.0f);
 
     // camera
     auto camera = wne::CameraPerspective::create(window);

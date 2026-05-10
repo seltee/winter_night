@@ -40,14 +40,13 @@ FBXGeometry::FBXGeometry(FBXNode &node)
 
 void FBXGeometry::getData(std::vector<VertexTextured> &vertexTexturedData, std::vector<uint32> &indicesData)
 {
-
     std::vector<Point> listIndicesAccumulator;
     std::vector<Point> listIndices;
 
     for (uint32 i = 0; i < polygonIndicies.size(); i++)
     {
         int32 index = polygonIndicies[i];
-        int32 uvIndex = UVIndicies[i];
+        int32 uvIndex = (i < UVIndicies.size()) ? UVIndicies[i] : -1;
 
         if (index < 0)
         {
@@ -67,8 +66,8 @@ void FBXGeometry::getData(std::vector<VertexTextured> &vertexTexturedData, std::
     {
         uint32 index = (uint32)listIndices[i].index;
         int32 uvIndex = listIndices[i].uvIndex;
-        Vector3 &vertex = vertices[index];
-        Vector2 &uv = UVs[uvIndex];
+        Vector3 vertex = vertices[index];
+        Vector2 uv = (uvIndex >= 0) ? UVs[uvIndex] : Vector2(0, 0);
 
         uint32 newIndex = getIndexByTrait(vertexTexturedData, vertex, uv);
         indicesData.push_back(newIndex);
