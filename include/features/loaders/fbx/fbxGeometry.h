@@ -22,24 +22,27 @@ namespace wne
             uint32 number;
             int32 index;
             int32 uvIndex;
+            int32 normalIndex;
         };
 
         std::vector<Point> breakPoints(std::vector<Point> points);
         // adds vertex if doesn't exist
-        uint32 getIndexByTrait(std::vector<VertexTextured> &vertexTexturedData, Vector3 &vertex, Vector2 &uv);
+        uint32 getIndexByTrait(std::vector<VertexTextured> &vertexTexturedData, Vector3 &vertex, Vector2 &uv, Vector3 &normal);
 
         void provideVertices(double *list, uint64 countOfDoubles);
         void providePolygonIndices(int32 *list, uint64 countOfIndicies);
         void provideUVsData(double *list, uint64 countOfDoubles);
         void provideUVIndices(int32 *list, uint64 countOfIndicies);
         void provideNormals(double *list, uint64 countOfDoubles);
+        void provideNormalIndices(int32 *list, uint64 countOfIndicies);
 
         uint64 id;
 
         std::vector<Vector3> vertices;
-        std::vector<int32> polygonIndicies;
+        std::vector<int32> polygonIndices;
         std::vector<Vector3> normals;
+        std::vector<uint32> normalIndices;
         std::vector<Vector2> UVs;
-        std::vector<uint32> UVIndicies;
+        std::vector<uint32> UVIndices;
     };
 };

@@ -32,9 +32,20 @@ FBXGeometry::FBXGeometry(FBXNode &node)
 
     if (elementNormalsNode)
     {
-        FBXNode *normals = elementNormalsNode->findNode("Normals");
-        if (normals && normals->hasProperties())
-            provideNormals(normals->getArrayDouble(0), normals->getElementCount(0));
+        /*
+        std::cout << "Normals" << std::endl;
+        for (auto &node : elementNormalsNode->getChildren())
+            std::cout << node->getName() << std::endl;
+        */
+
+        FBXNode *normalsNode = elementNormalsNode->findNode("Normals");
+        FBXNode *normalIndicesNode = elementNormalsNode->findNode("NormalsIndex");
+
+        if (normalsNode && normalsNode->hasProperties())
+            provideNormals(normalsNode->getArrayDouble(0), normalsNode->getElementCount(0));
+
+        if (normalIndicesNode && normalIndicesNode->hasProperties())
+            provideNormalIndices(normalIndicesNode->getArrayIntegers(0), normalIndicesNode->getElementCount(0));
     }
 }
 
@@ -43,22 +54,23 @@ void FBXGeometry::getData(std::vector<VertexTextured> &vertexTexturedData, std::
     std::vector<Point> listIndicesAccumulator;
     std::vector<Point> listIndices;
 
-    for (uint32 i = 0; i < polygonIndicies.size(); i++)
+    for (uint32 i = 0; i < polygonIndices.size(); i++)
     {
-        int32 index = polygonIndicies[i];
-        int32 uvIndex = (i < UVIndicies.size()) ? UVIndicies[i] : -1;
+        int32 index = polygonIndices[i];
+        int32 uvIndex = (i < UVIndices.size()) ? UVIndices[i] : -1;
+        int32 normalIndex = (i < normalIndices.size()) ? normalIndices[i] : -1;
 
         if (index < 0)
         {
             index = ~index;
-            listIndicesAccumulator.push_back({i, index, uvIndex});
+            listIndicesAccumulator.push_back({i, index, uvIndex, normalIndex});
             auto list = breakPoints(listIndicesAccumulator);
             listIndices.insert(listIndices.end(), list.begin(), list.end());
             listIndicesAccumulator.clear();
         }
         else
         {
-            listIndicesAccumulator.push_back({i, index, uvIndex});
+            listIndicesAccumulator.push_back({i, index, uvIndex, normalIndex});
         }
     }
 
@@ -66,10 +78,13 @@ void FBXGeometry::getData(std::vector<VertexTextured> &vertexTexturedData, std::
     {
         uint32 index = (uint32)listIndices[i].index;
         int32 uvIndex = listIndices[i].uvIndex;
+        int32 normalIndex = (uint32)listIndices[i].normalIndex;
+
         Vector3 vertex = vertices[index];
         Vector2 uv = (uvIndex >= 0) ? UVs[uvIndex] : Vector2(0, 0);
+        Vector3 normal = (normalIndex >= 0) ? normals[normalIndex] : Vector3(0, 0, 1.0f);
 
-        uint32 newIndex = getIndexByTrait(vertexTexturedData, vertex, uv);
+        uint32 newIndex = getIndexByTrait(vertexTexturedData, vertex, uv, normal);
         indicesData.push_back(newIndex);
     }
 }
@@ -93,7 +108,7 @@ std::vector<FBXGeometry::Point> FBXGeometry::breakPoints(std::vector<Point> poin
     return out;
 }
 
-uint32 FBXGeometry::getIndexByTrait(std::vector<VertexTextured> &vertexTexturedData, Vector3 &vertex, Vector2 &uv)
+uint32 FBXGeometry::getIndexByTrait(std::vector<VertexTextured> &vertexTexturedData, Vector3 &vertex, Vector2 &uv, Vector3 &normal)
 {
     for (uint32 i = 0; i < vertexTexturedData.size(); i++)
     {
@@ -101,12 +116,15 @@ uint32 FBXGeometry::getIndexByTrait(std::vector<VertexTextured> &vertexTexturedD
             vertexTexturedData[i].pos.y == vertex.y &&
             vertexTexturedData[i].pos.z == vertex.z &&
             vertexTexturedData[i].uv.x == uv.x &&
-            vertexTexturedData[i].uv.y == uv.y)
+            vertexTexturedData[i].uv.y == uv.y &&
+            vertexTexturedData[i].normal.x == normal.x &&
+            vertexTexturedData[i].normal.y == normal.y &&
+            vertexTexturedData[i].normal.z == normal.z)
         {
             return i;
         }
     }
-    vertexTexturedData.push_back({vertex, uv});
+    vertexTexturedData.push_back({vertex, uv, normal});
     return vertexTexturedData.size() - 1;
 }
 
@@ -124,8 +142,8 @@ void FBXGeometry::provideVertices(double *list, uint64 countOfDoubles)
 
 void FBXGeometry::providePolygonIndices(int32 *list, uint64 countOfIndicies)
 {
-    polygonIndicies.resize(countOfIndicies);
-    memcpy(polygonIndicies.data(), list, countOfIndicies * sizeof(int32));
+    polygonIndices.resize(countOfIndicies);
+    memcpy(polygonIndices.data(), list, countOfIndicies * sizeof(int32));
 }
 
 void FBXGeometry::provideUVsData(double *list, uint64 countOfDoubles)
@@ -142,8 +160,8 @@ void FBXGeometry::provideUVsData(double *list, uint64 countOfDoubles)
 
 void FBXGeometry::provideUVIndices(int32 *list, uint64 countOfIndicies)
 {
-    UVIndicies.resize(countOfIndicies);
-    memcpy(UVIndicies.data(), list, countOfIndicies * sizeof(int32));
+    UVIndices.resize(countOfIndicies);
+    memcpy(UVIndices.data(), list, countOfIndicies * sizeof(int32));
 }
 
 void FBXGeometry::provideNormals(double *list, uint64 countOfDoubles)
@@ -156,4 +174,10 @@ void FBXGeometry::provideNormals(double *list, uint64 countOfDoubles)
         uint32 s = i * 3;
         normals.push_back(normalize(Vector3((float)list[s], (float)list[s + 1], (float)list[s + 2])));
     }
+}
+
+void FBXGeometry::provideNormalIndices(int32 *list, uint64 countOfIndicies)
+{
+    normalIndices.resize(countOfIndicies);
+    memcpy(normalIndices.data(), list, countOfIndicies * sizeof(int32));
 }

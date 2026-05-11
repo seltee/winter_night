@@ -80,7 +80,9 @@ void ActorTerrain::updateMesh()
             shiftZ = (float)iz * partSize;
             vertices.push_back(
                 {{startX + shiftX * size, heights[iz * resolution + ix], startZ + shiftZ * size},
-                 {shiftX, shiftZ}});
+                 {shiftX, shiftZ},
+                 {0, 1.0f, 0}
+                });
         }
     }
 

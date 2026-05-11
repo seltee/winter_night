@@ -45,6 +45,8 @@ bool Model::append(Model *model, Matrix4x4 &transformation)
     if (model->getDataType() != dataType)
         return false;
 
+    Matrix3x3 normalMatrix = inverse(Matrix3x3(transformation));
+
     uint32 indexShift = 0;
     if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
     {
@@ -52,8 +54,12 @@ bool Model::append(Model *model, Matrix4x4 &transformation)
         for (auto &vertex : model->getAsVertexColored())
         {
             Vector4 vec = transformation * Vector4(vertex.pos, 1.0f);
+            Vector3 normal = normalize(normalMatrix * vertex.normal);
+
             vertexData.vertexColored->emplace_back(
-                VertexColored({{vec.x / vec.w, vec.y / vec.w, vec.z / vec.w}, {vertex.color.r, vertex.color.g, vertex.color.b}}));
+                VertexColored({{vec.x / vec.w, vec.y / vec.w, vec.z / vec.w},
+                               {vertex.color.r, vertex.color.g, vertex.color.b},
+                               normal}));
         }
     }
     else if (dataType == ModelDataType::VertexTexturedInd32 || dataType == ModelDataType::VertexTexturedInd16)
@@ -62,8 +68,12 @@ bool Model::append(Model *model, Matrix4x4 &transformation)
         for (auto &vertex : model->getAsVertexTextured())
         {
             Vector4 vec = transformation * Vector4(vertex.pos, 1.0f);
+            Vector3 normal = normalize(normalMatrix * vertex.normal);
+
             vertexData.vertexTextured->emplace_back(
-                VertexTextured({{vec.x / vec.w, vec.y / vec.w, vec.z / vec.w}, {vertex.uv.x, vertex.uv.y}}));
+                VertexTextured({{vec.x / vec.w, vec.y / vec.w, vec.z / vec.w},
+                                {vertex.uv.x, vertex.uv.y},
+                                normal}));
         }
     }
 

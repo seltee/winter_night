@@ -11,19 +11,11 @@ int main()
     auto renderer = window->getRenderer();
     renderer->setSyncState(false);
 
-    /*
-    const std::vector<wne::VertexColored> vertices = {
-        {{-50.0f, -50.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-        {{50.0f, -50.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-        {{50.0f, 50.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-        {{-50.0f, 50.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
-    */
-
     const std::vector<wne::VertexTextured> vertices = {
-        {{-5.0f, -5.0f, 0.0f}, {0.0f, 1.0f}},
-        {{5.0f, -5.0f, 0.0f}, {1.0f, 1.0f}},
-        {{5.0f, 5.0f, 0.0f}, {1.0f, 0.0f}},
-        {{-5.0f, 5.0f, 0.0f}, {0.0f, 0.0f}}};
+        {{-5.0f, -5.0f, 0.0f}, {0.0f, 1.0f}, {0, 0, -1.0f}},
+        {{5.0f, -5.0f, 0.0f}, {1.0f, 1.0f}, {0, 0, -1.0f}},
+        {{5.0f, 5.0f, 0.0f}, {1.0f, 0.0f}, {0, 0, -1.0f}},
+        {{-5.0f, 5.0f, 0.0f}, {0.0f, 0.0f}, {0, 0, -1.0f}}};
 
     const std::vector<uint16_t> indices = {0, 2, 1, 3, 2, 0};
 

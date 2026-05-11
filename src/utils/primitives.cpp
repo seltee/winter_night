@@ -18,12 +18,12 @@ std::shared_ptr<Model> Primitives::createPlain(float halfSize, const Vector3 &no
     Vector3 zAxis = normalize(cross(normal, xAxis));
 
     const std::vector<wne::VertexTextured> vertices = {
-        {xAxis * -halfSize + zAxis * -halfSize, {0.0f, 1.0f}},
-        {xAxis * halfSize + zAxis * -halfSize, {1.0f, 1.0f}},
-        {xAxis * halfSize + zAxis * halfSize, {1.0f, 0.0f}},
-        {xAxis * -halfSize + zAxis * halfSize, {0.0f, 0.0f}}};
+        {xAxis * -halfSize + zAxis * -halfSize, {0.0f, 1.0f}, normal},
+        {xAxis * halfSize + zAxis * -halfSize, {1.0f, 1.0f}, normal},
+        {xAxis * halfSize + zAxis * halfSize, {1.0f, 0.0f}, normal},
+        {xAxis * -halfSize + zAxis * halfSize, {0.0f, 0.0f}, normal}};
 
-    const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
+    const std::vector<uint16_t> indices = {0, 1, 2, 3, 2, 0};
 
     return Model::createFromData(vertices, indices);
 }
@@ -40,35 +40,35 @@ std::shared_ptr<Model> Primitives::createBox(const Vector3 &size)
     float z = size.z;
 
     const std::vector<wne::VertexTextured> vertices = {
-        {{x, y, -z}, {1.0f, 0.0f}},
-        {{x, y, z}, {1.0f, 1.0f}},
-        {{x, -y, z}, {0.0f, 1.0f}},
-        {{x, -y, -z}, {0.0f, 0.0f}},
+        {{x, y, -z}, {1.0f, 0.0f}, {1.0f, 0, 0}},
+        {{x, y, z}, {1.0f, 1.0f}, {1.0f, 0, 0}},
+        {{x, -y, z}, {0.0f, 1.0f}, {1.0f, 0, 0}},
+        {{x, -y, -z}, {0.0f, 0.0f}, {1.0f, 0, 0}},
 
-        {{-x, y, -z}, {0.0f, 0.0f}},
-        {{-x, y, z}, {0.0f, 1.0f}},
-        {{-x, -y, z}, {1.0f, 1.0f}},
-        {{-x, -y, -z}, {1.0f, 0.0f}},
+        {{-x, y, -z}, {0.0f, 0.0f}, {-1.0f, 0, 0}},
+        {{-x, y, z}, {0.0f, 1.0f}, {-1.0f, 0, 0}},
+        {{-x, -y, z}, {1.0f, 1.0f}, {-1.0f, 0, 0}},
+        {{-x, -y, -z}, {1.0f, 0.0f}, {-1.0f, 0, 0}},
 
-        {{-x, -y, -z}, {0.0f, 0.0f}},
-        {{-x, y, -z}, {0.0f, 1.0f}},
-        {{x, y, -z}, {1.0f, 1.0f}},
-        {{x, -y, -z}, {1.0f, 0.0f}},
+        {{-x, -y, -z}, {0.0f, 0.0f}, {0, 0, -1.0f}},
+        {{-x, y, -z}, {0.0f, 1.0f}, {0, 0, -1.0f}},
+        {{x, y, -z}, {1.0f, 1.0f}, {0, 0, -1.0f}},
+        {{x, -y, -z}, {1.0f, 0.0f}, {0, 0, -1.0f}},
 
-        {{-x, -y, z}, {1.0f, 0.0f}},
-        {{-x, y, z}, {1.0f, 1.0f}},
-        {{x, y, z}, {0.0f, 1.0f}},
-        {{x, -y, z}, {0.0f, 0.0f}},
+        {{-x, -y, z}, {1.0f, 0.0f}, {0, 0, 1.0f}},
+        {{-x, y, z}, {1.0f, 1.0f}, {0, 0, 1.0f}},
+        {{x, y, z}, {0.0f, 1.0f}, {0, 0, 1.0f}},
+        {{x, -y, z}, {0.0f, 0.0f}, {0, 0, 1.0f}},
 
-        {{-x, y, -z}, {1.0f, 0.0f}},
-        {{-x, y, z}, {1.0f, 1.0f}},
-        {{x, y, z}, {0.0f, 1.0f}},
-        {{x, y, -z}, {0.0f, 0.0f}},
+        {{-x, y, -z}, {1.0f, 0.0f}, {0, 1.0f, 0}},
+        {{-x, y, z}, {1.0f, 1.0f}, {0, 1.0f, 0}},
+        {{x, y, z}, {0.0f, 1.0f}, {0, 1.0f, 0}},
+        {{x, y, -z}, {0.0f, 0.0f}, {0, 1.0f, 0}},
 
-        {{-x, -y, -z}, {1.0f, 0.0f}},
-        {{-x, -y, z}, {1.0f, 1.0f}},
-        {{x, -y, z}, {0.0f, 1.0f}},
-        {{x, -y, -z}, {0.0f, 0.0f}}};
+        {{-x, -y, -z}, {1.0f, 0.0f}, {0, -1.0f, 0}},
+        {{-x, -y, z}, {1.0f, 1.0f}, {0, -1.0f, 0}},
+        {{x, -y, z}, {0.0f, 1.0f}, {0, -1.0f, 0}},
+        {{x, -y, -z}, {0.0f, 0.0f}, {0, -1.0f, 0}}};
 
     const std::vector<uint16_t> indices = {
         0, 1, 2, 2, 3, 0,

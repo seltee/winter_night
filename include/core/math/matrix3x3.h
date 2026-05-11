@@ -5,6 +5,8 @@
 
 namespace wne
 {
+    class Matrix4x4;
+
     class Matrix3x3
     {
     public:
@@ -23,6 +25,8 @@ namespace wne
         // column-major vectors
         Matrix3x3(Vector3 &v0, Vector3 &v1, Vector3 &v2)
             : m{v0, v1, v2} {}
+
+        Matrix3x3(Matrix4x4 &m4x4);
 
         static Matrix3x3 identity()
         {
@@ -114,6 +118,14 @@ namespace wne
             lhs[0][2] * rhs[2][0] + lhs[1][2] * rhs[2][1] + lhs[2][2] * rhs[2][2]);
     }
 
+    inline Vector3 operator*(const Matrix3x3 &lhs, const Vector3 &rhs)
+    {
+        return Vector3(
+            lhs[0][0] * rhs.x + lhs[1][0] * rhs.y + lhs[2][0] * rhs.z,
+            lhs[0][1] * rhs.x + lhs[1][1] * rhs.y + lhs[2][1] * rhs.z,
+            lhs[0][2] * rhs.x + lhs[1][2] * rhs.y + lhs[2][2] * rhs.z);
+    }
+
     inline float determinant(const Matrix3x3 &m) noexcept
     {
         return m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
@@ -147,5 +159,13 @@ namespace wne
             (m[0][1] * m[1][2] - m[0][2] * m[1][1]) * invDet,
             (m[1][0] * m[0][2] - m[0][0] * m[1][2]) * invDet,
             (m[0][0] * m[1][1] - m[1][0] * m[0][1]) * invDet);
+    }
+
+    inline Matrix3x3 transpose(const Matrix3x3 &m) noexcept
+    {
+        return Matrix3x3(
+            m[0][0], m[0][1], m[0][2],
+            m[1][0], m[1][1], m[1][2],
+            m[2][0], m[2][1], m[2][2]);
     }
 };
