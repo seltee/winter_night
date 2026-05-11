@@ -93,6 +93,8 @@ int main()
         actorMesh->setRotation(0.0f, 0.0f, translate * 0.1f);
         float scale = sinf(translate * 0.4f) * 0.2f + 0.8f;
         actorMesh->setScale(scale, scale, 1.0f);
+
+        actorLoadedBox->setRotation(0, translate * 0.1f, 0);
     }
 
     return 0;

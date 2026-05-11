@@ -45,7 +45,7 @@ bool Model::append(Model *model, Matrix4x4 &transformation)
     if (model->getDataType() != dataType)
         return false;
 
-    Matrix3x3 normalMatrix = inverse(Matrix3x3(transformation));
+    Matrix3x3 normalMatrix = transpose(inverse(Matrix3x3(transformation)));
 
     uint32 indexShift = 0;
     if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)

@@ -22,14 +22,14 @@ std::shared_ptr<Material> VulkanMaterial::createFlat(VulkanUtils *vulkanUtils, s
     return material;
 }
 
-void VulkanMaterial::bind(const Matrix4x4 &mMVP, ModelDataType dataType)
+void VulkanMaterial::bind(const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType)
 {
     if (dataType == ModelDataType::Unknown)
         return;
 
     selectPipeline(dataType);
     selectDescriptor(dataType);
-    setMVP(mMVP);
+    setPCData(mMVP, mNormal);
 }
 
 void VulkanMaterial::selectPipeline(ModelDataType dataType)
@@ -40,6 +40,6 @@ void VulkanMaterial::selectDescriptor(ModelDataType dataType)
 {
 }
 
-void VulkanMaterial::setMVP(const Matrix4x4 &mMVP)
+void VulkanMaterial::setPCData(const Matrix4x4 &mMVP, const Matrix3x3 &mNormal)
 {
 }

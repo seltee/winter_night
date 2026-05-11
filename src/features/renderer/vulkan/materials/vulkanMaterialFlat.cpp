@@ -47,13 +47,14 @@ void VulkanMaterialFlat::selectDescriptor(ModelDataType dataType)
     }
 }
 
-void VulkanMaterialFlat::setMVP(const Matrix4x4 &mMVP)
+void VulkanMaterialFlat::setPCData(const Matrix4x4 &mMVP, const Matrix3x3 &mNormal)
 {
     auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
     auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
 
     PushConstantObject pco;
     pco.mvp = mMVP;
+    pco.mNormal = Matrix4x4(mNormal);
 
     vkCmdPushConstants(
         commandBuffer,

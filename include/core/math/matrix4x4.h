@@ -6,6 +6,8 @@
 
 namespace wne
 {
+    class Matrix3x3;
+
     class Matrix4x4
     {
     public:
@@ -25,6 +27,7 @@ namespace wne
         // column-major vectors
         Matrix4x4(Vector4 &v0, Vector4 &v1, Vector4 &v2, Vector4 &v3)
             : m{v0, v1, v2, v3} {}
+        Matrix4x4(Matrix3x3 m3x3);
 
         static Matrix4x4 identity()
         {

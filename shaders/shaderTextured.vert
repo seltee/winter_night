@@ -9,10 +9,13 @@ layout(location = 1) out vec3 normal;
 
 layout(push_constant) uniform PushConstants {
     mat4 mvp;
+    mat4 mNormal;
 } pushConstants;
 
 void main() {
     gl_Position = pushConstants.mvp * vec4(inPosition, 1.0);
     UV = inUV;
-    normal = inNormal;
+    normal = normalize(
+        (pushConstants.mNormal * vec4(inNormal, 0.0)).xyz
+    );
 }

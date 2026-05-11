@@ -10,6 +10,7 @@ namespace wne
     struct PushConstantObject
     {
         alignas(16) Matrix4x4 mvp;
+        alignas(16) Matrix4x4 mNormal;
     };
 
     struct VulkanMaterialDescription;
@@ -20,11 +21,11 @@ namespace wne
 
         static std::shared_ptr<Material> createFlat(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture);
 
-        void bind(const Matrix4x4 &mMVP, ModelDataType dataType) override final;
+        void bind(const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
 
         virtual void selectPipeline(ModelDataType dataType);
         virtual void selectDescriptor(ModelDataType dataType);
-        virtual void setMVP(const Matrix4x4 &mMVP);
+        virtual void setPCData(const Matrix4x4 &mMVP, const Matrix3x3 &mNormal);
 
     protected:
         VulkanUtils *vulkanUtils = nullptr;

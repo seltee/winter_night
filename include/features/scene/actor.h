@@ -15,6 +15,7 @@ namespace wne
         virtual void update(float delta);
         virtual void render(Renderer *renderer);
         virtual const Matrix4x4 &getModelMatrix();
+        virtual const Matrix3x3 &getNormalMatrix();
         virtual Matrix4x4 getInvModelMatrix();
 
         inline void setPosition(float x, float y, float z)
@@ -70,10 +71,12 @@ namespace wne
 
     protected:
         bool isDirtyFlag = true;
+        bool isDirtyNormalsFlag = true;
         Quat rotation = Quat();
         Vector3 position = Vector3(0, 0, 0);
         Vector3 scale = Vector3(1.0f, 1.0f, 1.0f);
 
         Matrix4x4 mModel = Matrix4x4::identity();
+        Matrix3x3 mNormal = Matrix3x3::identity();
     };
 };

@@ -76,13 +76,22 @@ void ActorTerrain::updateMesh()
     {
         for (int ix = 0; ix < resolution; ix++)
         {
+            Vector3 normal(0, 1.0f, 0);
+            if (iz > 0 && iz < resolution - 1 && ix > 0 && ix < resolution - 1)
+            {
+                float hL = heights[iz * resolution + ix - 1];
+                float hR = heights[iz * resolution + ix + 1];
+                float hD = heights[(iz - 1) * resolution + ix];
+                float hU = heights[(iz + 1) * resolution + ix];
+                normal = normalize(Vector3(hL - hR, 1.0f, hD - hU));
+            }
+
             shiftX = (float)ix * partSize;
             shiftZ = (float)iz * partSize;
             vertices.push_back(
                 {{startX + shiftX * size, heights[iz * resolution + ix], startZ + shiftZ * size},
                  {shiftX, shiftZ},
-                 {0, 1.0f, 0}
-                });
+                 normal});
         }
     }
 
@@ -114,6 +123,6 @@ void ActorTerrain::render(Renderer *renderer)
 {
     if (!material || !mesh)
         return;
-    material->bind(renderer->getViewProjectionMatrix() * getModelMatrix(), mesh->getDataType());
+    material->bind(renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }

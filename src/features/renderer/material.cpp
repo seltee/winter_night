@@ -6,6 +6,6 @@ void Material::rebuild()
 {
 }
 
-void Material::bind(const Matrix4x4 &mMVP, ModelDataType dataType)
+void Material::bind(const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType)
 {
 }
