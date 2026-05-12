@@ -1,6 +1,8 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
+#include "features/renderer/vulkan/vulkanDescriptorPool.h"
+#include "features/renderer/vulkan/vulkanObjectBuffers.h"
 #include <memory>
 
 #include "core/core.h"
@@ -11,6 +13,7 @@ namespace wne
     class VulkanShader;
     class VulkanRenderPass;
     class VulkanDevice;
+    class VulkanObjectBuffers;
 
     class WNE_API VulkanPipelineColored : public VulkanPipeline
     {
@@ -19,12 +22,24 @@ namespace wne
         ~VulkanPipelineColored();
         VkPipeline getGraphicsPipeline() override final;
         VkPipelineLayout getPipelineLayout() override final;
+        VkDescriptorSetLayout getDescriptorSetLayoutPipeline() override final;
+        VkDescriptorSet getDescriptorSet() override final;
 
-        bool setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass);
+        bool setup(
+            VkExtent2D *swapChainExtent,
+            VulkanRenderPass *renderPass,
+            VulkanDescriptorPool *vulkanDescriptorPool,
+            VulkanObjectBuffers *vulkanObjectBuffers);
+        void updateDescriptorSet(VulkanObjectBuffers *vulkanObjectBuffers);
 
     protected:
+        bool createLayouts();
+
+        VkDescriptorSetLayout descriptorSetLayoutPipeline = nullptr;
+
         std::unique_ptr<VulkanShader> shader;
         VkPipelineLayout pipelineLayout = nullptr;
         VkPipeline graphicsPipeline = nullptr;
+        VkDescriptorSet descriptorSet = nullptr;
     };
 }

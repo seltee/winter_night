@@ -1,6 +1,8 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
+#include "features/renderer/vulkan/vulkanDescriptorPool.h"
+#include "features/renderer/vulkan/vulkanObjectBuffers.h"
 #include <memory>
 
 #include "core/core.h"
@@ -21,14 +23,25 @@ namespace wne
         VkPipeline getGraphicsPipeline() override final;
         VkPipelineLayout getPipelineLayout() override final;
 
-        bool setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass);
+        bool setup(
+            VkExtent2D *swapChainExtent,
+            VulkanRenderPass *renderPass,
+            VulkanDescriptorPool *vulkanDescriptorPool,
+            VulkanObjectBuffers *vulkanObjectBuffers);
+        void updateDescriptorSet(VulkanObjectBuffers *vulkanObjectBuffers);
 
-        VkDescriptorSetLayout getDescriptorSetLayout() override final;
+        VkDescriptorSetLayout getDescriptorSetLayoutPipeline() override final;
+        VkDescriptorSetLayout getDescriptorSetLayoutSampler() override final;
+        VkDescriptorSet getDescriptorSet() override final;
 
     protected:
-        VkDescriptorSetLayout descriptorSetLayout = nullptr;
+        bool createLayouts();
+
+        VkDescriptorSetLayout descriptorSetLayoutPipeline = nullptr;
+        VkDescriptorSetLayout descriptorSetLayoutSampler = nullptr;
         std::unique_ptr<VulkanShader> shader;
         VkPipelineLayout pipelineLayout = nullptr;
         VkPipeline graphicsPipeline = nullptr;
+        VkDescriptorSet descriptorSet = nullptr;
     };
 }

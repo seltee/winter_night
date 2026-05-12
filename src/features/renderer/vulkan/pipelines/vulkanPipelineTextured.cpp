@@ -8,6 +8,7 @@
 #include "vulkan/vulkan.h"
 #include <vector>
 #include <iostream>
+#include <array>
 
 using namespace wne;
 
@@ -28,10 +29,15 @@ VulkanPipelineTextured::~VulkanPipelineTextured()
         vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
         pipelineLayout = nullptr;
     }
-    if (descriptorSetLayout)
+    if (descriptorSetLayoutPipeline)
     {
-        vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-        descriptorSetLayout = nullptr;
+        vkDestroyDescriptorSetLayout(device, descriptorSetLayoutPipeline, nullptr);
+        descriptorSetLayoutPipeline = nullptr;
+    }
+    if (descriptorSetLayoutSampler)
+    {
+        vkDestroyDescriptorSetLayout(device, descriptorSetLayoutSampler, nullptr);
+        descriptorSetLayoutSampler = nullptr;
     }
 }
 
@@ -45,7 +51,11 @@ VkPipelineLayout VulkanPipelineTextured::getPipelineLayout()
     return pipelineLayout;
 }
 
-bool VulkanPipelineTextured::setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass)
+bool VulkanPipelineTextured::setup(
+    VkExtent2D *swapChainExtent,
+    VulkanRenderPass *renderPass,
+    VulkanDescriptorPool *vulkanDescriptorPool,
+    VulkanObjectBuffers *vulkanObjectBuffers)
 {
     auto device = vulkanDevice->getDevice();
 
@@ -56,21 +66,9 @@ bool VulkanPipelineTextured::setup(VkExtent2D *swapChainExtent, VulkanRenderPass
         return false;
     }
 
-    VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-    samplerLayoutBinding.binding = 0;
-    samplerLayoutBinding.descriptorCount = 1;
-    samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    samplerLayoutBinding.pImmutableSamplers = nullptr;
-    samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    VkDescriptorSetLayoutCreateInfo layoutInfo{};
-    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfo.bindingCount = 1;
-    layoutInfo.pBindings = &samplerLayoutBinding;
-
-    if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
+    if (!createLayouts())
     {
-        std::cout << "failed to create descriptor set layout!" << std::endl;
+        std::cout << "Unable to create layouts" << std::endl;
         return false;
     }
 
@@ -89,7 +87,7 @@ bool VulkanPipelineTextured::setup(VkExtent2D *swapChainExtent, VulkanRenderPass
     attributeDescriptions[1].location = 1;
     attributeDescriptions[1].format = VK_FORMAT_R32G32_SFLOAT;
     attributeDescriptions[1].offset = offsetof(VertexTextured, uv);
-    
+
     attributeDescriptions[2].binding = 0;
     attributeDescriptions[2].location = 2;
     attributeDescriptions[2].format = VK_FORMAT_R32G32B32_SFLOAT;
@@ -184,10 +182,12 @@ bool VulkanPipelineTextured::setup(VkExtent2D *swapChainExtent, VulkanRenderPass
     pushRange.offset = 0;
     pushRange.size = sizeof(PushConstantObject);
 
+    VkDescriptorSetLayout layouts[2] = {descriptorSetLayoutPipeline, descriptorSetLayoutSampler};
+
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 1;
-    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
+    pipelineLayoutInfo.setLayoutCount = 2;
+    pipelineLayoutInfo.pSetLayouts = layouts;
     pipelineLayoutInfo.pushConstantRangeCount = 1;
     pipelineLayoutInfo.pPushConstantRanges = &pushRange;
 
@@ -196,6 +196,19 @@ bool VulkanPipelineTextured::setup(VkExtent2D *swapChainExtent, VulkanRenderPass
         std::cout << "unable to create pipeline layout" << std::endl;
         return false;
     }
+
+    VkDescriptorSetAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = vulkanDescriptorPool->getDescriptorPool();
+    allocInfo.descriptorSetCount = 1;
+    allocInfo.pSetLayouts = layouts;
+
+    if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)
+    {
+        std::cout << "unable to create descriptor set" << std::endl;
+        return false;
+    }
+    updateDescriptorSet(vulkanObjectBuffers);
 
     VkPipelineDepthStencilStateCreateInfo depthStencil{};
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
@@ -240,7 +253,121 @@ bool VulkanPipelineTextured::setup(VkExtent2D *swapChainExtent, VulkanRenderPass
     return true;
 }
 
-VkDescriptorSetLayout VulkanPipelineTextured::getDescriptorSetLayout()
+void VulkanPipelineTextured::updateDescriptorSet(VulkanObjectBuffers *vulkanObjectBuffers)
 {
-    return descriptorSetLayout;
+    auto device = vulkanDevice->getDevice();
+
+    VkDescriptorBufferInfo bufferModelInfo{};
+    bufferModelInfo.buffer = vulkanObjectBuffers->getModelMatricesBuffer();
+    bufferModelInfo.offset = 0;
+    bufferModelInfo.range = vulkanObjectBuffers->getBufferSize();
+
+    VkDescriptorBufferInfo bufferMVPInfo{};
+    bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer();
+    bufferMVPInfo.offset = 0;
+    bufferMVPInfo.range = vulkanObjectBuffers->getBufferSize();
+
+    VkDescriptorBufferInfo bufferNormalInfo{};
+    bufferNormalInfo.buffer = vulkanObjectBuffers->getNormalMatricesBuffer();
+    bufferNormalInfo.offset = 0;
+    bufferNormalInfo.range = vulkanObjectBuffers->getBufferSize();
+
+    std::array<VkWriteDescriptorSet, 3> writes{};
+    writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[0].dstSet = descriptorSet;
+    writes[0].dstBinding = 0;
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[0].descriptorCount = 1;
+    writes[0].pBufferInfo = &bufferModelInfo;
+
+    writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[1].dstSet = descriptorSet;
+    writes[1].dstBinding = 1;
+    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[1].descriptorCount = 1;
+    writes[1].pBufferInfo = &bufferMVPInfo;
+
+    writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[2].dstSet = descriptorSet;
+    writes[2].dstBinding = 2;
+    writes[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[2].descriptorCount = 1;
+    writes[2].pBufferInfo = &bufferNormalInfo;
+
+    vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
+}
+
+VkDescriptorSetLayout VulkanPipelineTextured::getDescriptorSetLayoutPipeline()
+{
+    return descriptorSetLayoutPipeline;
+}
+
+VkDescriptorSetLayout VulkanPipelineTextured::getDescriptorSetLayoutSampler()
+{
+    return descriptorSetLayoutSampler;
+}
+
+VkDescriptorSet VulkanPipelineTextured::getDescriptorSet()
+{
+    return descriptorSet;
+}
+
+bool VulkanPipelineTextured::createLayouts()
+{
+    // pipeline layout
+    VkDescriptorSetLayoutBinding pipelineBinding[3]{};
+
+    // model matrices
+    pipelineBinding[0].binding = 0;
+    pipelineBinding[0].descriptorCount = 1;
+    pipelineBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[0].pImmutableSamplers = nullptr;
+    pipelineBinding[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    // mvp matrices
+    pipelineBinding[1].binding = 1;
+    pipelineBinding[1].descriptorCount = 1;
+    pipelineBinding[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[1].pImmutableSamplers = nullptr;
+    pipelineBinding[1].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    // normal transform matrices
+    pipelineBinding[2].binding = 2;
+    pipelineBinding[2].descriptorCount = 1;
+    pipelineBinding[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[2].pImmutableSamplers = nullptr;
+    pipelineBinding[2].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    VkDescriptorSetLayoutCreateInfo layoutInfoPipeline{};
+    layoutInfoPipeline.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfoPipeline.bindingCount = 3;
+    layoutInfoPipeline.pBindings = pipelineBinding;
+
+    if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayoutPipeline) != VK_SUCCESS)
+    {
+        std::cout << "failed to create descriptor set layout!" << std::endl;
+        return false;
+    }
+
+    // texture layout
+    VkDescriptorSetLayoutBinding samplerBinding[1]{};
+
+    // texture sampler
+    samplerBinding[0].binding = 0;
+    samplerBinding[0].descriptorCount = 1;
+    samplerBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    samplerBinding[0].pImmutableSamplers = nullptr;
+    samplerBinding[0].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+    VkDescriptorSetLayoutCreateInfo layoutInfoSampler{};
+    layoutInfoSampler.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfoSampler.bindingCount = 1;
+    layoutInfoSampler.pBindings = samplerBinding;
+
+    if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoSampler, nullptr, &descriptorSetLayoutSampler) != VK_SUCCESS)
+    {
+        std::cout << "failed to create descriptor set layout!" << std::endl;
+        return false;
+    }
+    return true;
 }

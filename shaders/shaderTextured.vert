@@ -8,14 +8,25 @@ layout(location = 0) out vec2 UV;
 layout(location = 1) out vec3 normal;
 
 layout(push_constant) uniform PushConstants {
-    mat4 mvp;
-    mat4 mNormal;
-} pushConstants;
+    uint objectId;
+} objectData;
+
+layout(set = 0, binding = 0) uniform BufferObjects {
+     mat4 matrix[256];
+} mModels;
+
+layout(set = 0, binding = 1) uniform BufferMVPs {
+     mat4 matrix[256];
+} mMVPs;
+
+layout(set = 0, binding = 2) uniform BufferNormals {
+     mat4 matrix[256];
+} mNormals;
 
 void main() {
-    gl_Position = pushConstants.mvp * vec4(inPosition, 1.0);
+    gl_Position = mMVPs.matrix[objectData.objectId] * vec4(inPosition, 1.0);
     UV = inUV;
     normal = normalize(
-        (pushConstants.mNormal * vec4(inNormal, 0.0)).xyz
+        (mNormals.matrix[objectData.objectId] * vec4(inNormal, 0.0)).xyz
     );
 }

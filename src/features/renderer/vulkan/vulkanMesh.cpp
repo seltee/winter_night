@@ -1,6 +1,8 @@
 #include "features/renderer/vulkan/vulkanMesh.h"
 #include "features/renderer/vulkan/vulkanCommandBuffer.h"
 #include "features/renderer/vulkan/vulkanFrame.h"
+#include "features/renderer/vulkan/vulkanUtils.h"
+#include "features/renderer/vulkan/vulkanObjectBuffers.h"
 #include <iostream>
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
@@ -11,6 +13,7 @@ VulkanMesh::VulkanMesh(VulkanUtils *vulkanUtils)
 {
     this->vulkanUtils = vulkanUtils;
     this->vulkanDevice = vulkanUtils->getVulkanDevice();
+    objectId = vulkanUtils->getObjectBuffers()->getNewObjectId();
 }
 
 VulkanMesh::~VulkanMesh()
@@ -23,6 +26,7 @@ VulkanMesh::~VulkanMesh()
         vkDestroyBuffer(vulkanDevice->getDevice(), indexBuffer, nullptr);
     if (indexBufferMemory)
         vkFreeMemory(vulkanDevice->getDevice(), indexBufferMemory, nullptr);
+    vulkanUtils->getObjectBuffers()->freeObjectId(objectId);
 }
 
 std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, VulkanUtils *vulkanUtils)

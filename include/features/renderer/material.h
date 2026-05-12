@@ -11,6 +11,6 @@ namespace wne
     {
     public:
         virtual void rebuild();
-        virtual void bind(const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
+        virtual void bind(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
     };
 };

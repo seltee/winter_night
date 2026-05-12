@@ -13,9 +13,11 @@ namespace wne
     {
     public:
         virtual ~VulkanPipeline();
-        virtual VkDescriptorSetLayout getDescriptorSetLayout();
         virtual VkPipeline getGraphicsPipeline();
         virtual VkPipelineLayout getPipelineLayout();
+        virtual VkDescriptorSetLayout getDescriptorSetLayoutPipeline();
+        virtual VkDescriptorSetLayout getDescriptorSetLayoutSampler();
+        virtual VkDescriptorSet getDescriptorSet();
 
     protected:
         VulkanPipeline(VulkanDevice *vulkanDevice);

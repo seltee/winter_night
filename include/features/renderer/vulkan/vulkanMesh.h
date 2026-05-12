@@ -1,7 +1,6 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
-#include "features/renderer/vulkan/vulkanUtils.h"
 #include "features/renderer/mesh.h"
 #include "features/data/model.h"
 #include "core/core.h"
@@ -10,6 +9,9 @@
 
 namespace wne
 {
+    class VulkanObjectBuffers;
+    class VulkanUtils;
+
     class VulkanMesh : public Mesh
     {
     public:

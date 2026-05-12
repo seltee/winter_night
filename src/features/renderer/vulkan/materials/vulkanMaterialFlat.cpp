@@ -30,31 +30,20 @@ void VulkanMaterialFlat::selectDescriptor(ModelDataType dataType)
     {
         auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
         auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
-        auto descriptorSet = getDescriptorSetFlatTextured();
 
-        if (descriptorSet)
-        {
-            vkCmdBindDescriptorSets(
-                commandBuffer,
-                VK_PIPELINE_BIND_POINT_GRAPHICS,
-                pipelineLayout,
-                0,
-                1,
-                &descriptorSet,
-                0,
-                nullptr);
-        }
+        VkDescriptorSet sets[2] = {vulkanUtils->getCurrentPipeline()->getDescriptorSet(), getDescriptorSetFlatTextured()};
+        if (sets[0] && sets[1])
+            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 2, sets, 0, nullptr);
     }
 }
 
-void VulkanMaterialFlat::setPCData(const Matrix4x4 &mMVP, const Matrix3x3 &mNormal)
+void VulkanMaterialFlat::setPCData(uint64 objectId)
 {
     auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
     auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
 
     PushConstantObject pco;
-    pco.mvp = mMVP;
-    pco.mNormal = Matrix4x4(mNormal);
+    pco.objectId = objectId;
 
     vkCmdPushConstants(
         commandBuffer,
@@ -77,7 +66,7 @@ VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
     auto pipeline = vulkanUtils->getCurrentPipeline();
 
-    auto descriptorSetLayout = pipeline->getDescriptorSetLayout();
+    auto descriptorSetLayout = pipeline->getDescriptorSetLayoutSampler();
     if (!descriptorSetLayout)
         return nullptr;
 

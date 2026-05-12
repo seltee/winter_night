@@ -23,6 +23,9 @@ void ActorMesh::render(Renderer *renderer)
 {
     if (!material)
         return;
-    material->bind(renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    uint64 objectId = mesh->getObjectId();
+    if (objectId == 0xffffffff)
+        return;
+    material->bind(objectId, renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }

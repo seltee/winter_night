@@ -14,7 +14,13 @@ namespace wne
             return dataType;
         }
 
+        inline uint64 getObjectId()
+        {
+            return objectId;
+        }
+
     protected:
         ModelDataType dataType = ModelDataType::Unknown;
+        uint64 objectId = 0xffffffff;
     };
 }

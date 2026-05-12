@@ -8,6 +8,7 @@
 #include "vulkan/vulkan.h"
 #include <vector>
 #include <iostream>
+#include <array>
 
 using namespace wne;
 
@@ -40,7 +41,21 @@ VkPipelineLayout VulkanPipelineColored::getPipelineLayout()
     return pipelineLayout;
 }
 
-bool VulkanPipelineColored::setup(VkExtent2D *swapChainExtent, VulkanRenderPass *renderPass)
+VkDescriptorSetLayout VulkanPipelineColored::getDescriptorSetLayoutPipeline()
+{
+    return descriptorSetLayoutPipeline;
+}
+
+VkDescriptorSet VulkanPipelineColored::getDescriptorSet()
+{
+    return descriptorSet;
+}
+
+bool VulkanPipelineColored::setup(
+    VkExtent2D *swapChainExtent,
+    VulkanRenderPass *renderPass,
+    VulkanDescriptorPool *vulkanDescriptorPool,
+    VulkanObjectBuffers *vulkanObjectBuffers)
 {
     uint32 width = swapChainExtent->width;
     uint32 height = swapChainExtent->height;
@@ -51,6 +66,12 @@ bool VulkanPipelineColored::setup(VkExtent2D *swapChainExtent, VulkanRenderPass 
     if (!shader->makeFromFiles("./shaders/shaderColored.vert.spv", "./shaders/shaderColored.frag.spv", device))
     {
         std::cout << "Unable to compile colored shader" << std::endl;
+        return false;
+    }
+
+    if (!createLayouts())
+    {
+        std::cout << "Unable to create layouts" << std::endl;
         return false;
     }
 
@@ -163,10 +184,25 @@ bool VulkanPipelineColored::setup(VkExtent2D *swapChainExtent, VulkanRenderPass 
     pushRange.offset = 0;
     pushRange.size = sizeof(PushConstantObject);
 
+    VkDescriptorSetLayout layouts[1] = {descriptorSetLayoutPipeline};
+
+    VkDescriptorSetAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = vulkanDescriptorPool->getDescriptorPool();
+    allocInfo.descriptorSetCount = 1;
+    allocInfo.pSetLayouts = layouts;
+
+    if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)
+    {
+        std::cout << "unable to create descriptor set" << std::endl;
+        return false;
+    }
+    updateDescriptorSet(vulkanObjectBuffers);
+
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0;
-    pipelineLayoutInfo.pSetLayouts = nullptr;
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = layouts;
     pipelineLayoutInfo.pushConstantRangeCount = 1;
     pipelineLayoutInfo.pPushConstantRanges = &pushRange;
 
@@ -221,5 +257,88 @@ bool VulkanPipelineColored::setup(VkExtent2D *swapChainExtent, VulkanRenderPass 
     }
     if (graphicsPipeline == VK_NULL_HANDLE)
         std::cout << "Pipeline is null!" << std::endl;
+    return true;
+}
+
+void VulkanPipelineColored::updateDescriptorSet(VulkanObjectBuffers *vulkanObjectBuffers)
+{
+    auto device = vulkanDevice->getDevice();
+
+    VkDescriptorBufferInfo bufferModelInfo{};
+    bufferModelInfo.buffer = vulkanObjectBuffers->getModelMatricesBuffer();
+    bufferModelInfo.offset = 0;
+    bufferModelInfo.range = vulkanObjectBuffers->getBufferSize();
+
+    VkDescriptorBufferInfo bufferMVPInfo{};
+    bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer();
+    bufferMVPInfo.offset = 0;
+    bufferMVPInfo.range = vulkanObjectBuffers->getBufferSize();
+
+    VkDescriptorBufferInfo bufferNormalInfo{};
+    bufferNormalInfo.buffer = vulkanObjectBuffers->getNormalMatricesBuffer();
+    bufferNormalInfo.offset = 0;
+    bufferNormalInfo.range = vulkanObjectBuffers->getBufferSize();
+
+    std::array<VkWriteDescriptorSet, 3> writes{};
+    writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[0].dstSet = descriptorSet;
+    writes[0].dstBinding = 0;
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[0].descriptorCount = 1;
+    writes[0].pBufferInfo = &bufferModelInfo;
+
+    writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[1].dstSet = descriptorSet;
+    writes[1].dstBinding = 1;
+    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[1].descriptorCount = 1;
+    writes[1].pBufferInfo = &bufferMVPInfo;
+
+    writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[2].dstSet = descriptorSet;
+    writes[2].dstBinding = 2;
+    writes[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[2].descriptorCount = 1;
+    writes[2].pBufferInfo = &bufferNormalInfo;
+
+    vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
+}
+
+bool VulkanPipelineColored::createLayouts()
+{
+    // pipeline layout
+    VkDescriptorSetLayoutBinding pipelineBinding[3]{};
+
+    // model matrices
+    pipelineBinding[0].binding = 0;
+    pipelineBinding[0].descriptorCount = 1;
+    pipelineBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[0].pImmutableSamplers = nullptr;
+    pipelineBinding[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    // mvp matrices
+    pipelineBinding[1].binding = 1;
+    pipelineBinding[1].descriptorCount = 1;
+    pipelineBinding[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[1].pImmutableSamplers = nullptr;
+    pipelineBinding[1].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    // normal transform matrices
+    pipelineBinding[2].binding = 2;
+    pipelineBinding[2].descriptorCount = 1;
+    pipelineBinding[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[2].pImmutableSamplers = nullptr;
+    pipelineBinding[2].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    VkDescriptorSetLayoutCreateInfo layoutInfoPipeline{};
+    layoutInfoPipeline.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfoPipeline.bindingCount = 3;
+    layoutInfoPipeline.pBindings = pipelineBinding;
+
+    if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayoutPipeline) != VK_SUCCESS)
+    {
+        std::cout << "failed to create descriptor set layout!" << std::endl;
+        return false;
+    }
     return true;
 }

@@ -21,6 +21,7 @@ namespace wne
     class VulkanDescriptorLayout;
     class VulkanSwapChain;
     class VulkanRenderPass;
+    class VulkanObjectBuffers;
 
     class VulkanUtils
     {
@@ -63,6 +64,10 @@ namespace wne
         inline VulkanCommandPool *getVulkanCommandPool()
         {
             return vulkanCommandPool;
+        }
+
+        inline VulkanObjectBuffers *getObjectBuffers(){
+            return vulkanObjectBuffers.get();
         }
 
         inline bool isAnisotropySupported()
@@ -127,6 +132,7 @@ namespace wne
 
     protected:
         std::unique_ptr<VulkanDescriptorPool> vulkanDescriptorPool;
+        std::unique_ptr<VulkanObjectBuffers> vulkanObjectBuffers;
         std::unique_ptr<VulkanSampler> vulkanSampler;
 
         // pipelines
