@@ -71,6 +71,17 @@ bool VulkanObjectBuffers::setup()
     }
     vkMapMemory(device, bufferNormalMatricesMemory, 0, size, 0, (void **)&bufferNormalMatricesMapped);
 
+    if (!vulkanUtils->createBuffer(
+            sizeof(GlobalData),
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            bufferGlobalData,
+            bufferGlobalDataMemory))
+    {
+        return false;
+    }
+    vkMapMemory(device, bufferGlobalDataMemory, 0, sizeof(GlobalData), 0, (void **)&bufferGlobalDataMapped);
+
     return true;
 }
 
@@ -92,4 +103,9 @@ void VulkanObjectBuffers::freeObjectId(uint32 objectId)
 {
     if (objectId < AMOUNT_OF_OBJECTS)
         bufferOccupied[objectId] = 0;
+}
+
+void VulkanObjectBuffers::setAmbientColor(Vector4 &ambientColor)
+{
+    bufferGlobalDataMapped->ambientLightColor = ambientColor;
 }

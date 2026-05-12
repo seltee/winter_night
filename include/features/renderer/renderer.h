@@ -24,6 +24,7 @@ namespace wne
         virtual std::shared_ptr<Material> createFlatMaterial(std::shared_ptr<Texture> texture);
 
         virtual void *getFrameData();
+        virtual void setAmbientColor(Vector4 &color);
 
         virtual void setSyncState(bool syncEnabled);
         virtual bool getSyncState();

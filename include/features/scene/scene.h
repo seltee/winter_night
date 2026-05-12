@@ -24,8 +24,25 @@ namespace wne
         void addActor(std::shared_ptr<Actor> actor);
         void setCamera(std::shared_ptr<ActorCamera> actorCamera);
 
+        inline void setAmbientLight(float r, float g, float b, float a = 1.0f)
+        {
+            ambientLightColor = Vector4(r, g, b, a);
+        }
+
+        inline void setAmbientLight(Vector4 color)
+        {
+            ambientLightColor = color;
+        }
+
+        inline Vector4 getAmbientLight()
+        {
+            return ambientLightColor;
+        }
+
     protected:
         std::vector<std::shared_ptr<Actor>> actors;
         std::shared_ptr<ActorCamera> actorCamera;
+
+        Vector4 ambientLightColor = {0.8f, 0.8f, 0.8f, 1.0f};
     };
 };

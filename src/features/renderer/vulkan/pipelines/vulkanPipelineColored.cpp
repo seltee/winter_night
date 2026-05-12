@@ -279,7 +279,12 @@ void VulkanPipelineColored::updateDescriptorSet(VulkanObjectBuffers *vulkanObjec
     bufferNormalInfo.offset = 0;
     bufferNormalInfo.range = vulkanObjectBuffers->getBufferSize();
 
-    std::array<VkWriteDescriptorSet, 3> writes{};
+    VkDescriptorBufferInfo bufferGlobalDataInfo{};
+    bufferGlobalDataInfo.buffer = vulkanObjectBuffers->getGlobalDataBuffer();
+    bufferGlobalDataInfo.offset = 0;
+    bufferGlobalDataInfo.range = vulkanObjectBuffers->getGlobalDataSize();
+
+    std::array<VkWriteDescriptorSet, 4> writes{};
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = descriptorSet;
     writes[0].dstBinding = 0;
@@ -301,13 +306,20 @@ void VulkanPipelineColored::updateDescriptorSet(VulkanObjectBuffers *vulkanObjec
     writes[2].descriptorCount = 1;
     writes[2].pBufferInfo = &bufferNormalInfo;
 
+    writes[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[3].dstSet = descriptorSet;
+    writes[3].dstBinding = 3;
+    writes[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[3].descriptorCount = 1;
+    writes[3].pBufferInfo = &bufferGlobalDataInfo;
+
     vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
 }
 
 bool VulkanPipelineColored::createLayouts()
 {
     // pipeline layout
-    VkDescriptorSetLayoutBinding pipelineBinding[3]{};
+    VkDescriptorSetLayoutBinding pipelineBinding[4]{};
 
     // model matrices
     pipelineBinding[0].binding = 0;
@@ -330,9 +342,16 @@ bool VulkanPipelineColored::createLayouts()
     pipelineBinding[2].pImmutableSamplers = nullptr;
     pipelineBinding[2].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
+    // global data
+    pipelineBinding[3].binding = 3;
+    pipelineBinding[3].descriptorCount = 1;
+    pipelineBinding[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[3].pImmutableSamplers = nullptr;
+    pipelineBinding[3].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+
     VkDescriptorSetLayoutCreateInfo layoutInfoPipeline{};
     layoutInfoPipeline.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfoPipeline.bindingCount = 3;
+    layoutInfoPipeline.bindingCount = 4;
     layoutInfoPipeline.pBindings = pipelineBinding;
 
     if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayoutPipeline) != VK_SUCCESS)

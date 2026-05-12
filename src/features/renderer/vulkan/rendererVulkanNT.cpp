@@ -18,6 +18,11 @@ void *RendererVulkanNT::getFrameData()
     return instance->getCurrentFrame();
 }
 
+void RendererVulkanNT::setAmbientColor(Vector4 &color)
+{
+    instance->getVulkanUtils()->getObjectBuffers()->setAmbientColor(color);
+}
+
 void RendererVulkanNT::setSyncState(bool syncEnabled)
 {
     instance->setSyncState(syncEnabled);

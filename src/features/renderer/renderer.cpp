@@ -39,6 +39,10 @@ void *Renderer::getFrameData()
     return nullptr;
 }
 
+void Renderer::setAmbientColor(Vector4 &color)
+{
+}
+
 void Renderer::setSyncState(bool syncEnabled)
 {
 }

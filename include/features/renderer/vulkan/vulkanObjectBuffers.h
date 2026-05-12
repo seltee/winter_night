@@ -10,6 +10,14 @@ namespace wne
     public:
         static const uint32 AMOUNT_OF_OBJECTS = 256;
 
+        struct GlobalData
+        {
+            Vector4 ambientLightColor;
+            Vector4 u1;
+            Vector4 u2;
+            Vector4 u3;
+        };
+
         VulkanObjectBuffers(VulkanUtils *vulkanUtils);
         ~VulkanObjectBuffers();
 
@@ -19,6 +27,8 @@ namespace wne
 
         uint32 getNewObjectId();
         void freeObjectId(uint32 objectId);
+
+        void setAmbientColor(Vector4 &ambientColor);
 
         VkBuffer getModelMatricesBuffer()
         {
@@ -35,9 +45,19 @@ namespace wne
             return bufferNormalMatrices;
         }
 
+        VkBuffer getGlobalDataBuffer()
+        {
+            return bufferGlobalData;
+        }
+
         constexpr uint64 getBufferSize()
         {
             return sizeof(Matrix4x4) * AMOUNT_OF_OBJECTS;
+        }
+
+        constexpr uint64 getGlobalDataSize()
+        {
+            return sizeof(GlobalData);
         }
 
     protected:
@@ -57,5 +77,9 @@ namespace wne
         VkBuffer bufferNormalMatrices = nullptr;
         VkDeviceMemory bufferNormalMatricesMemory = nullptr;
         Matrix4x4 *bufferNormalMatricesMapped = nullptr;
+
+        VkBuffer bufferGlobalData = nullptr;
+        VkDeviceMemory bufferGlobalDataMemory = nullptr;
+        GlobalData *bufferGlobalDataMapped = nullptr;
     };
 };

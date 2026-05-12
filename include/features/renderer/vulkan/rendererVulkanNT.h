@@ -11,6 +11,7 @@ namespace wne
     public:
         static std::unique_ptr<RendererVulkanNT> create(void *hwnd);
         void *getFrameData() override final;
+        void setAmbientColor(Vector4 &color) override final;
 
         void setSyncState(bool syncEnabled) override final;
         bool getSyncState() override final;

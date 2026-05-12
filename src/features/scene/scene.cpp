@@ -20,6 +20,8 @@ void Scene::render(Renderer *renderer)
 {
     Matrix4x4 mVP = actorCamera ? actorCamera->getProjectionMatrix() * actorCamera->getInvModelMatrix() : Matrix4x4::identity();
     renderer->setViewProjectionMatrix(mVP);
+    renderer->setAmbientColor(ambientLightColor);
+
     for (const auto &object : actors)
     {
         object->render(renderer);

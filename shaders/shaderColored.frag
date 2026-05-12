@@ -4,9 +4,13 @@ layout(location = 0) in vec3 fragColor;
 layout(location = 1) in vec3 normal;
 layout(location = 0) out vec4 outColor;
 
+layout(set = 0, binding = 3) uniform BufferGlobalData {
+     vec4 ambientColor;
+} globalData;
+
 void main() {
     vec3 lightDir = normalize(-vec3(1.0, -2.0, 0.8));
-    vec3 ambient = vec3(0.2, 0.2, 0.2);
+    vec3 ambient = globalData.ambientColor.xyz;
     vec3 lightColor = vec3(2.0, 2.0, 2.0);
 
     // Diffuse shading

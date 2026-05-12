@@ -22,6 +22,7 @@ int main()
     // scene
     auto scene = wne::Scene::create();
     renderer->addScene(scene);
+    scene->setAmbientLight(0.8f, 0.2f, 0.2f);
 
     // images
     auto imageEx = wne::Image::create("./ex.png");
