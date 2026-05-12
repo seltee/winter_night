@@ -6,6 +6,7 @@
 namespace wne
 {
     class Renderer;
+    class Scene;
 
     class WNE_API Actor : public Object
     {
@@ -17,6 +18,10 @@ namespace wne
         virtual const Matrix4x4 &getModelMatrix();
         virtual const Matrix3x3 &getNormalMatrix();
         virtual Matrix4x4 getInvModelMatrix();
+
+        void setScene(Scene *scene);
+
+        virtual void eventSetScene(Scene *oldScene, Scene *newScene);
 
         inline void setPosition(float x, float y, float z)
         {
@@ -78,5 +83,7 @@ namespace wne
 
         Matrix4x4 mModel = Matrix4x4::identity();
         Matrix3x3 mNormal = Matrix3x3::identity();
+
+        Scene *currentScene = nullptr;
     };
 };

@@ -56,3 +56,18 @@ void Renderer::addScene(std::shared_ptr<Scene> scene)
 {
     scenes.push_back(std::move(scene));
 }
+
+std::shared_ptr<Light> Renderer::createLightDirectional()
+{
+    return nullptr;
+}
+
+std::shared_ptr<Light> Renderer::createLightOmni()
+{
+    return nullptr;
+}
+
+std::shared_ptr<Light> Renderer::createLightSpot()
+{
+    return nullptr;
+}

@@ -178,7 +178,7 @@ bool VulkanPipelineTextured::setup(
     colorBlending.blendConstants[3] = 0.0f; // Optional
 
     VkPushConstantRange pushRange{};
-    pushRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    pushRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     pushRange.offset = 0;
     pushRange.size = sizeof(PushConstantObject);
 
@@ -260,24 +260,30 @@ void VulkanPipelineTextured::updateDescriptorSet(VulkanObjectBuffers *vulkanObje
     VkDescriptorBufferInfo bufferModelInfo{};
     bufferModelInfo.buffer = vulkanObjectBuffers->getModelMatricesBuffer();
     bufferModelInfo.offset = 0;
-    bufferModelInfo.range = vulkanObjectBuffers->getBufferSize();
+    bufferModelInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
     VkDescriptorBufferInfo bufferMVPInfo{};
     bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer();
     bufferMVPInfo.offset = 0;
-    bufferMVPInfo.range = vulkanObjectBuffers->getBufferSize();
+    bufferMVPInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
     VkDescriptorBufferInfo bufferNormalInfo{};
     bufferNormalInfo.buffer = vulkanObjectBuffers->getNormalMatricesBuffer();
     bufferNormalInfo.offset = 0;
-    bufferNormalInfo.range = vulkanObjectBuffers->getBufferSize();
+    bufferNormalInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
     VkDescriptorBufferInfo bufferGlobalDataInfo{};
     bufferGlobalDataInfo.buffer = vulkanObjectBuffers->getGlobalDataBuffer();
     bufferGlobalDataInfo.offset = 0;
     bufferGlobalDataInfo.range = vulkanObjectBuffers->getGlobalDataSize();
 
-    std::array<VkWriteDescriptorSet, 4> writes{};
+    VkDescriptorBufferInfo bufferLightsInfo{};
+    bufferLightsInfo.buffer = vulkanObjectBuffers->getLightsDataBuffer();
+    bufferLightsInfo.offset = 0;
+    bufferLightsInfo.range = vulkanObjectBuffers->getLightsBufferSize();
+    
+
+    std::array<VkWriteDescriptorSet, 5> writes{};
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = descriptorSet;
     writes[0].dstBinding = 0;
@@ -305,6 +311,13 @@ void VulkanPipelineTextured::updateDescriptorSet(VulkanObjectBuffers *vulkanObje
     writes[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     writes[3].descriptorCount = 1;
     writes[3].pBufferInfo = &bufferGlobalDataInfo;
+    
+    writes[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[4].dstSet = descriptorSet;
+    writes[4].dstBinding = 4;
+    writes[4].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[4].descriptorCount = 1;
+    writes[4].pBufferInfo = &bufferLightsInfo;
 
     vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
 }
@@ -327,7 +340,7 @@ VkDescriptorSet VulkanPipelineTextured::getDescriptorSet()
 bool VulkanPipelineTextured::createLayouts()
 {
     // pipeline layout
-    VkDescriptorSetLayoutBinding pipelineBinding[4]{};
+    VkDescriptorSetLayoutBinding pipelineBinding[5]{};
 
     // model matrices
     pipelineBinding[0].binding = 0;
@@ -357,9 +370,16 @@ bool VulkanPipelineTextured::createLayouts()
     pipelineBinding[3].pImmutableSamplers = nullptr;
     pipelineBinding[3].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 
+    // lights data
+    pipelineBinding[4].binding = 4;
+    pipelineBinding[4].descriptorCount = 1;
+    pipelineBinding[4].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[4].pImmutableSamplers = nullptr;
+    pipelineBinding[4].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+
     VkDescriptorSetLayoutCreateInfo layoutInfoPipeline{};
     layoutInfoPipeline.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfoPipeline.bindingCount = 4;
+    layoutInfoPipeline.bindingCount = 5;
     layoutInfoPipeline.pBindings = pipelineBinding;
 
     if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayoutPipeline) != VK_SUCCESS)

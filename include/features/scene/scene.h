@@ -4,6 +4,7 @@
 #include "features/scene/object.h"
 #include "features/scene/actor.h"
 #include "features/scene/actorCamera.h"
+#include "features/renderer/material.h"
 #include "core/api.h"
 #include "core/data.h"
 #include "core/core.h"
@@ -12,6 +13,7 @@
 namespace wne
 {
     class Renderer;
+    class Light;
 
     class WNE_API Scene
     {
@@ -23,6 +25,15 @@ namespace wne
 
         void addActor(std::shared_ptr<Actor> actor);
         void setCamera(std::shared_ptr<ActorCamera> actorCamera);
+
+        AffectingLights collectAffectingLights();
+
+        // called when actor with light added
+        // actor owns and removes light so it's ok to be just a pointer
+        void registerLight(Light *light);
+
+        // called when actor with light removed
+        void unregisterLight(Light *light);
 
         inline void setAmbientLight(float r, float g, float b, float a = 1.0f)
         {
@@ -41,6 +52,7 @@ namespace wne
 
     protected:
         std::vector<std::shared_ptr<Actor>> actors;
+        std::vector<Light *> lights;
         std::shared_ptr<ActorCamera> actorCamera;
 
         Vector4 ambientLightColor = {0.8f, 0.8f, 0.8f, 1.0f};

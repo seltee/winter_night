@@ -1,5 +1,7 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
+#include "features/scene/light.h"
+#include "core/core.h"
 
 namespace wne
 {
@@ -9,6 +11,7 @@ namespace wne
     {
     public:
         static const uint32 AMOUNT_OF_OBJECTS = 256;
+        static const uint32 AMOUNT_OF_LIGHTS = 128;
 
         struct GlobalData
         {
@@ -18,15 +21,25 @@ namespace wne
             Vector4 u3;
         };
 
+        struct LightData
+        {
+            Vector4 direction;
+            Vector4 color;
+            uint32 enableDirectional, enableOmni, enableSpot, pad1;
+        };
+
         VulkanObjectBuffers(VulkanUtils *vulkanUtils);
         ~VulkanObjectBuffers();
 
         void updateObjectData(uint32 objectId, const Matrix4x4 &mModel, const Matrix4x4 &mNormal, const Matrix4x4 &mMVP) noexcept;
+        void updateLightData(uint32 lightId, Light::Type type, const Vector4 &direction, const Vector4 &color);
 
         bool setup();
 
         uint32 getNewObjectId();
         void freeObjectId(uint32 objectId);
+        uint32 getNewLightId();
+        void freeLightId(uint32 lightId);
 
         void setAmbientColor(Vector4 &ambientColor);
 
@@ -50,7 +63,12 @@ namespace wne
             return bufferGlobalData;
         }
 
-        constexpr uint64 getBufferSize()
+        VkBuffer getLightsDataBuffer()
+        {
+            return bufferLightsData;
+        }
+
+        constexpr uint64 getMatrixBufferSize()
         {
             return sizeof(Matrix4x4) * AMOUNT_OF_OBJECTS;
         }
@@ -60,11 +78,19 @@ namespace wne
             return sizeof(GlobalData);
         }
 
+        constexpr uint64 getLightsBufferSize()
+        {
+            return sizeof(LightData) * AMOUNT_OF_LIGHTS;
+        }
+
     protected:
         VulkanUtils *vulkanUtils = nullptr;
 
-        uint32 searchIndex = 0;
-        uint8 bufferOccupied[AMOUNT_OF_OBJECTS];
+        uint32 searchObjectIndex = 0;
+        uint8 bufferObjectsOccupied[AMOUNT_OF_OBJECTS]{};
+
+        uint32 searchLightIndex = 0;
+        uint8 bufferLightsOccupied[AMOUNT_OF_LIGHTS]{};
 
         VkBuffer bufferModelMatrices = nullptr;
         VkDeviceMemory bufferModelMatricesMemory = nullptr;
@@ -81,5 +107,9 @@ namespace wne
         VkBuffer bufferGlobalData = nullptr;
         VkDeviceMemory bufferGlobalDataMemory = nullptr;
         GlobalData *bufferGlobalDataMapped = nullptr;
+
+        VkBuffer bufferLightsData = nullptr;
+        VkDeviceMemory bufferLightsDataMemory = nullptr;
+        LightData *bufferLightsDataMapped = nullptr;
     };
 };

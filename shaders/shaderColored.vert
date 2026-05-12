@@ -9,6 +9,8 @@ layout(location = 1) out vec3 normal;
 
 layout(push_constant) uniform PushConstants {
     uint objectId;
+    uint lightsAmount;
+    uint lightIds[12];
 } objectData;
 
 layout(set = 0, binding = 0) uniform BufferObjects {

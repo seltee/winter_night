@@ -1,5 +1,6 @@
 #include "features/scene/actor.h"
 #include "features/renderer/renderer.h"
+#include <memory>
 
 using namespace wne;
 
@@ -43,4 +44,15 @@ const Matrix3x3 &Actor::getNormalMatrix()
 Matrix4x4 Actor::getInvModelMatrix()
 {
     return inverse(getModelMatrix());
+}
+
+void Actor::setScene(Scene *scene)
+{
+    Scene *oldScene = this->currentScene;
+    this->currentScene = scene;
+    eventSetScene(oldScene, this->currentScene);
+}
+
+void Actor::eventSetScene(Scene *oldScene, Scene *newScene)
+{
 }

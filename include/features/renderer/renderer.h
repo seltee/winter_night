@@ -11,6 +11,8 @@
 
 namespace wne
 {
+    class Light;
+
     class WNE_API Renderer
     {
     public:
@@ -28,6 +30,10 @@ namespace wne
 
         virtual void setSyncState(bool syncEnabled);
         virtual bool getSyncState();
+
+        virtual std::shared_ptr<Light> createLightDirectional();
+        virtual std::shared_ptr<Light> createLightOmni();
+        virtual std::shared_ptr<Light> createLightSpot();
 
         inline const Matrix4x4 &getViewProjectionMatrix()
         {

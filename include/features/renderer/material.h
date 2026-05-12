@@ -7,10 +7,16 @@
 
 namespace wne
 {
+    struct AffectingLights
+    {
+        uint32 lightsAmount;
+        uint32 lightIds[12];
+    };
+
     class WNE_API Material
     {
     public:
         virtual void rebuild();
-        virtual void bind(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
+        virtual void bind(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
     };
 };

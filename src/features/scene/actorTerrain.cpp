@@ -121,11 +121,12 @@ void ActorTerrain::setMaterial(std::shared_ptr<Material> material)
 
 void ActorTerrain::render(Renderer *renderer)
 {
-    if (!material || !mesh)
+    if (!material || !mesh || !currentScene)
         return;
     uint64 objectId = mesh->getObjectId();
     if (objectId == 0xffffffff)
         return;
-    material->bind(objectId, renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    AffectingLights lights = currentScene->collectAffectingLights();
+    material->bind(objectId, lights, renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }

@@ -22,7 +22,7 @@ int main()
     // scene
     auto scene = wne::Scene::create();
     renderer->addScene(scene);
-    scene->setAmbientLight(0.8f, 0.2f, 0.2f);
+    scene->setAmbientLight(0.3f, 0.2f, 0.2f);
 
     // images
     auto imageEx = wne::Image::create("./ex.png");
@@ -79,6 +79,13 @@ int main()
     scene->addActor(actorLoadedBox);
     actorLoadedBox->setPosition(10.0f, 8.0f, 4.0f);
 
+    // light
+    auto sun = renderer->createLightDirectional();
+    sun->setDirection({-0.5, -0.5, -0.5});
+    sun->setColor({4.0f, 4.0f, 4.0f});
+    auto actorSun = wne::ActorLight::create(sun);
+    scene->addActor(actorSun);
+
     // camera
     auto camera = wne::CameraPerspective::create(window);
     auto actorCamera = wne::ActorCameraFlying::create(camera, window);
@@ -94,6 +101,8 @@ int main()
         actorMesh->setRotation(0.0f, 0.0f, translate * 0.1f);
         float scale = sinf(translate * 0.4f) * 0.2f + 0.8f;
         actorMesh->setScale(scale, scale, 1.0f);
+
+        sun->setDirection({sinf(translate * 0.5f), 1.6, cosf(translate * 0.5f)});
 
         actorLoadedBox->setRotation(0, translate * 0.1f, 0);
     }

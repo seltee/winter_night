@@ -12,6 +12,7 @@
 #include "features/scene/actorCameraFlying.h"
 #include "features/scene/actorMesh.h"
 #include "features/scene/actorTerrain.h"
+#include "features/scene/actorLight.h"
 #include "features/camera/cameraOrtho.h"
 #include "features/camera/cameraPerspective.h"
 #include "features/loaders/loader3d.h"

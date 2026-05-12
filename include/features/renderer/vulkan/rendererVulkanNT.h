@@ -24,6 +24,10 @@ namespace wne
         std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image) override final;
         std::shared_ptr<Material> createFlatMaterial(std::shared_ptr<Texture> texture) override final;
 
+        std::shared_ptr<Light> createLightDirectional() override final;
+        std::shared_ptr<Light> createLightOmni() override final;
+        std::shared_ptr<Light> createLightSpot() override final;
+
     protected:
         RendererVulkanNT() = default;
 

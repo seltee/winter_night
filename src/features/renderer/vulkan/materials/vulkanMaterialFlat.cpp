@@ -37,21 +37,22 @@ void VulkanMaterialFlat::selectDescriptor(ModelDataType dataType)
     }
 }
 
-void VulkanMaterialFlat::setPCData(uint64 objectId)
+void VulkanMaterialFlat::setPCData(uint64 objectId, const AffectingLights &lights)
 {
     auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
     auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
 
-    PushConstantObject pco;
+    PushConstantObject pco{};
     pco.objectId = objectId;
+    pco.lights = lights;
 
     vkCmdPushConstants(
         commandBuffer,
         pipelineLayout,
-        VK_SHADER_STAGE_VERTEX_BIT, // Stage flags
-        0,                          // Offset
-        sizeof(PushConstantObject), // Size
-        &pco                        // Data pointer
+        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, // Stage flags
+        0,                                                         // Offset
+        sizeof(PushConstantObject),                                // Size
+        &pco                                                       // Data pointer
     );
 }
 

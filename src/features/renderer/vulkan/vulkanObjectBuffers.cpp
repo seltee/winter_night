@@ -29,17 +29,33 @@ VulkanObjectBuffers::~VulkanObjectBuffers()
 
 void VulkanObjectBuffers::updateObjectData(uint32 objectId, const Matrix4x4 &mModel, const Matrix4x4 &mNormal, const Matrix4x4 &mMVP) noexcept
 {
-    bufferModelMatricesMapped[objectId] = mModel;
-    bufferMVPMatricesMapped[objectId] = mMVP;
-    bufferNormalMatricesMapped[objectId] = mNormal;
+    if (objectId < AMOUNT_OF_OBJECTS)
+    {
+        bufferModelMatricesMapped[objectId] = mModel;
+        bufferMVPMatricesMapped[objectId] = mMVP;
+        bufferNormalMatricesMapped[objectId] = mNormal;
+    }
+}
+
+void VulkanObjectBuffers::updateLightData(uint32 lightId, Light::Type type, const Vector4 &direction, const Vector4 &color)
+{
+    if (lightId < AMOUNT_OF_LIGHTS)
+    {
+        bufferLightsDataMapped[lightId].direction = direction;
+        bufferLightsDataMapped[lightId].color = color;
+        bufferLightsDataMapped[lightId].enableDirectional = type == Light::Type::Directional;
+        bufferLightsDataMapped[lightId].enableOmni = type == Light::Type::Omni;
+        bufferLightsDataMapped[lightId].enableSpot = type == Light::Type::Spot;
+    }
 }
 
 bool VulkanObjectBuffers::setup()
 {
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
-    uint64 size = sizeof(Matrix4x4) * AMOUNT_OF_OBJECTS;
+    uint64 matrixBufferSize = getMatrixBufferSize();
+    uint64 lightsBufferSize = getLightsBufferSize();
     if (!vulkanUtils->createBuffer(
-            size,
+            matrixBufferSize,
             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             bufferModelMatrices,
@@ -47,10 +63,10 @@ bool VulkanObjectBuffers::setup()
     {
         return false;
     }
-    vkMapMemory(device, bufferModelMatricesMemory, 0, size, 0, (void **)&bufferModelMatricesMapped);
+    vkMapMemory(device, bufferModelMatricesMemory, 0, matrixBufferSize, 0, (void **)&bufferModelMatricesMapped);
 
     if (!vulkanUtils->createBuffer(
-            size,
+            matrixBufferSize,
             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             bufferMVPMatrices,
@@ -58,10 +74,10 @@ bool VulkanObjectBuffers::setup()
     {
         return false;
     }
-    vkMapMemory(device, bufferMVPMatricesMemory, 0, size, 0, (void **)&bufferMVPMatricesMapped);
+    vkMapMemory(device, bufferMVPMatricesMemory, 0, matrixBufferSize, 0, (void **)&bufferMVPMatricesMapped);
 
     if (!vulkanUtils->createBuffer(
-            size,
+            matrixBufferSize,
             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             bufferNormalMatrices,
@@ -69,7 +85,7 @@ bool VulkanObjectBuffers::setup()
     {
         return false;
     }
-    vkMapMemory(device, bufferNormalMatricesMemory, 0, size, 0, (void **)&bufferNormalMatricesMapped);
+    vkMapMemory(device, bufferNormalMatricesMemory, 0, matrixBufferSize, 0, (void **)&bufferNormalMatricesMapped);
 
     if (!vulkanUtils->createBuffer(
             sizeof(GlobalData),
@@ -82,6 +98,17 @@ bool VulkanObjectBuffers::setup()
     }
     vkMapMemory(device, bufferGlobalDataMemory, 0, sizeof(GlobalData), 0, (void **)&bufferGlobalDataMapped);
 
+    if (!vulkanUtils->createBuffer(
+            lightsBufferSize,
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            bufferLightsData,
+            bufferLightsDataMemory))
+    {
+        return false;
+    }
+    vkMapMemory(device, bufferLightsDataMemory, 0, lightsBufferSize, 0, (void **)&bufferLightsDataMapped);
+
     return true;
 }
 
@@ -89,11 +116,11 @@ uint32 VulkanObjectBuffers::getNewObjectId()
 {
     for (uint32 i = 0; i < AMOUNT_OF_OBJECTS; i++)
     {
-        searchIndex = (searchIndex + 1) % AMOUNT_OF_OBJECTS;
-        if (bufferOccupied[searchIndex] == 0)
+        searchObjectIndex = (searchObjectIndex + 1) % AMOUNT_OF_OBJECTS;
+        if (bufferObjectsOccupied[searchObjectIndex] == 0)
         {
-            bufferOccupied[searchIndex] = 1;
-            return searchIndex;
+            bufferObjectsOccupied[searchObjectIndex] = 1;
+            return searchObjectIndex;
         }
     }
     return 0xffffffff;
@@ -102,10 +129,30 @@ uint32 VulkanObjectBuffers::getNewObjectId()
 void VulkanObjectBuffers::freeObjectId(uint32 objectId)
 {
     if (objectId < AMOUNT_OF_OBJECTS)
-        bufferOccupied[objectId] = 0;
+        bufferObjectsOccupied[objectId] = 0;
 }
 
 void VulkanObjectBuffers::setAmbientColor(Vector4 &ambientColor)
 {
     bufferGlobalDataMapped->ambientLightColor = ambientColor;
+}
+
+uint32 VulkanObjectBuffers::getNewLightId()
+{
+    for (uint32 i = 0; i < AMOUNT_OF_LIGHTS; i++)
+    {
+        searchLightIndex = (searchLightIndex + 1) % AMOUNT_OF_LIGHTS;
+        if (bufferLightsOccupied[searchLightIndex] == 0)
+        {
+            bufferLightsOccupied[searchLightIndex] = 1;
+            return searchLightIndex;
+        }
+    }
+    return 0xffffffff;
+}
+
+void VulkanObjectBuffers::freeLightId(uint32 lightId)
+{
+    if (lightId < AMOUNT_OF_LIGHTS)
+        bufferLightsOccupied[lightId] = 0;
 }

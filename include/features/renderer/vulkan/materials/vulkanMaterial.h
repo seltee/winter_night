@@ -10,6 +10,7 @@ namespace wne
     struct PushConstantObject
     {
         uint32 objectId;
+        AffectingLights lights;
     };
 
     struct VulkanMaterialDescription;
@@ -20,11 +21,11 @@ namespace wne
 
         static std::shared_ptr<Material> createFlat(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture);
 
-        void bind(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
+        void bind(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
 
         virtual void selectPipeline(ModelDataType dataType);
         virtual void selectDescriptor(ModelDataType dataType);
-        virtual void setPCData(uint64 objectId);
+        virtual void setPCData(uint64 objectId, const AffectingLights &lights);
 
     protected:
         VulkanUtils *vulkanUtils = nullptr;

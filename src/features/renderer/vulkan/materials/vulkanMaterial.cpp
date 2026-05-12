@@ -22,7 +22,7 @@ std::shared_ptr<Material> VulkanMaterial::createFlat(VulkanUtils *vulkanUtils, s
     return material;
 }
 
-void VulkanMaterial::bind(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType)
+void VulkanMaterial::bind(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType)
 {
     if (dataType == ModelDataType::Unknown)
         return;
@@ -31,7 +31,7 @@ void VulkanMaterial::bind(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x
     selectPipeline(dataType);
     selectDescriptor(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
-    setPCData(objectId);
+    setPCData(objectId, lights);
 }
 
 void VulkanMaterial::selectPipeline(ModelDataType dataType)
@@ -42,6 +42,6 @@ void VulkanMaterial::selectDescriptor(ModelDataType dataType)
 {
 }
 
-void VulkanMaterial::setPCData(uint64 objectId)
+void VulkanMaterial::setPCData(uint64 objectId, const AffectingLights &lights)
 {
 }

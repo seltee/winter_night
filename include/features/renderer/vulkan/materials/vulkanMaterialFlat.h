@@ -13,7 +13,7 @@ namespace wne
 
         void selectPipeline(ModelDataType dataType) override final;
         void selectDescriptor(ModelDataType dataType) override final;
-        void setPCData(uint64 objectId) override final;
+        void setPCData(uint64 objectId, const AffectingLights &lights) override final;
         void rebuild() override final;
 
         inline void setAlbedo(std::shared_ptr<Texture> texture)
