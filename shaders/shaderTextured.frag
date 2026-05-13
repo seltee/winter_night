@@ -24,8 +24,8 @@ struct LightData
     vec4 direction;
     vec4 color;
     float affectRadius;
-    float fPad1;
-    float fPad2;
+    float cutOff;
+    float outerCutOff;
     float fPad3;
     uint enableDirectional;
     uint enableOmni;
@@ -67,6 +67,25 @@ void main() {
             vec3 lightDir = normalize(lightPos - fragPos);
             float diff = max(dot(normal, lightDir), 0.0);
             light += diff * lightColor * attenuation;
+        }
+        if (lightData[id].enableSpot != 0)
+        {
+            vec3 lightPos = lightData[id].position.xyz;
+            vec3 lightColor = lightData[id].color.xyz;
+            float affectRadius = lightData[id].affectRadius;
+            float cutOff = lightData[id].cutOff;
+            float outerCutOff = lightData[id].outerCutOff;
+
+            vec3 lightDir = normalize(lightPos - fragPos);
+            float theta = dot(lightDir, lightData[id].direction.xyz);
+
+            float epsilon = cutOff - outerCutOff;
+            float intensity = clamp((theta - outerCutOff) / epsilon, 0.0, 1.0);
+
+            float dist = length(lightPos - fragPos.xyz);
+            float attenuation = clamp(1.0 - dist / affectRadius, 0.0, 1.0);
+            float diff = max(dot(normal, lightDir), 0.0);
+            light += diff * lightColor * attenuation * intensity;
         }
     }
 

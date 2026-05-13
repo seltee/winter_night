@@ -16,5 +16,13 @@ VulkanLight::~VulkanLight()
 
 void VulkanLight::prepareForRender()
 {
-    vulkanUtils->getObjectBuffers()->updateLightData(lightId, type, getAffectRadius(), position, getRealDirection(), color);
+    vulkanUtils->getObjectBuffers()->updateLightData(
+        lightId,
+        type,
+        affectRadius,
+        cutOff,
+        outerCutOff,
+        position,
+        realDirection,
+        color);
 }

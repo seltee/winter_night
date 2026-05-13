@@ -86,6 +86,14 @@ int main()
     auto actorSun = wne::ActorLight::create(sun);
     scene->addActor(actorSun);
 
+    auto spot = renderer->createLightSpot();
+    spot->setDirection({0, -1.0f, 0});
+    spot->setColor({2.0f, 2.0f, 5.0f});
+    spot->setAffectRadius(60.0f);
+    spot->setOuterCutOff(0.3f);
+    auto actorSpot = wne::ActorLight::create(spot);
+    scene->addActor(actorSpot);
+
     const int amountOfLights = 8;
     std::vector<std::shared_ptr<wne::ActorLight>> omniLights;
     for (int i = 0; i < amountOfLights; i++)
@@ -117,6 +125,8 @@ int main()
         sun->setDirection({sinf(translate * 0.5f), 1.6, cosf(translate * 0.5f)});
 
         actorLoadedBox->setRotation(0, translate * 0.1f, 0);
+
+        actorSpot->setPosition(sinf(-translate * 0.5f) * 25.0f, 12.0, cosf(-translate * 0.5f) * 25.0f);
 
         float step = 1.0f / (float)amountOfLights;
         for (uint i = 0; i < omniLights.size(); i++)

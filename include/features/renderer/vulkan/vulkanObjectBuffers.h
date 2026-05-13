@@ -26,7 +26,7 @@ namespace wne
             Vector4 position;
             Vector4 direction;
             Vector4 color;
-            float affectRadius, fPad1, fPad2, fPad3;
+            float affectRadius, cutOff, outerCutOff, fPad3;
             uint32 enableDirectional, enableOmni, enableSpot, pad1;
         };
 
@@ -43,6 +43,8 @@ namespace wne
             uint32 lightId,
             Light::Type type,
             float affectRadius,
+            float cutOff,
+            float outerCutOff,
             const Vector4 &position,
             const Vector4 &direction,
             const Vector4 &color);

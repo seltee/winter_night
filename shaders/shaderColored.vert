@@ -6,6 +6,7 @@ layout(location = 2) in vec3 inNormal;
 
 layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec3 normal;
+layout(location = 2) out vec3 position;
 
 layout(push_constant) uniform PushConstants {
     uint objectId;
@@ -27,6 +28,7 @@ layout(set = 0, binding = 2) uniform BufferNormals {
 
 
 void main() {
+    position = inPosition;
     gl_Position = mMVPs.matrix[objectData.objectId] * vec4(inPosition, 1.0);
     fragColor = inColor;
     normal = normalize(

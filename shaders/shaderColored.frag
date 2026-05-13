@@ -2,6 +2,8 @@
 
 layout(location = 0) in vec3 fragColor;
 layout(location = 1) in vec3 normal;
+layout(location = 2) in vec3 fragPos;
+
 layout(location = 0) out vec4 outColor;
 
 layout(push_constant) uniform PushConstants {
@@ -20,8 +22,8 @@ struct LightData
     vec4 direction;
     vec4 color;
     float affectRadius;
-    float fPad1;
-    float fPad2;
+    float cutOff;
+    float outerCutOff;
     float fPad3;
     uint enableDirectional;
     uint enableOmni;
@@ -43,12 +45,45 @@ void main() {
     // Diffuse shading
     for (uint i = 0; i < objectData.lightsAmount; i++)
     {
-        if (lightData[i].enableDirectional != 0)
+        uint id = objectData.lightIds[i];
+        if (lightData[id].enableDirectional != 0)
         {
-            vec3 lightDir = lightData[i].direction.xyz;
-            vec3 lightColor = lightData[i].color.xyz;
+            vec3 lightDir = lightData[id].direction.xyz;
+            vec3 lightColor = lightData[id].color.xyz;
+
             float diff = max(dot(normal, lightDir), 0.0);
             light += diff * lightColor;
+        }
+        if (lightData[id].enableOmni != 0)
+        {
+            vec3 lightPos = lightData[id].position.xyz;
+            vec3 lightColor = lightData[id].color.xyz;
+            float affectRadius = lightData[id].affectRadius;
+
+            float dist = length(lightPos - fragPos.xyz);
+            float attenuation = clamp(1.0 - dist / affectRadius, 0.0, 1.0);
+            vec3 lightDir = normalize(lightPos - fragPos);
+            float diff = max(dot(normal, lightDir), 0.0);
+            light += diff * lightColor * attenuation;
+        }
+        if (lightData[id].enableSpot != 0)
+        {
+            vec3 lightPos = lightData[id].position.xyz;
+            vec3 lightColor = lightData[id].color.xyz;
+            float affectRadius = lightData[id].affectRadius;
+            float cutOff = lightData[id].cutOff;
+            float outerCutOff = lightData[id].outerCutOff;
+
+            vec3 lightDir = normalize(lightPos - fragPos);
+            float theta = dot(lightDir, lightData[id].direction.xyz);
+
+            float epsilon = cutOff - outerCutOff;
+            float intensity = clamp((theta - outerCutOff) / epsilon, 0.0, 1.0);
+
+            float dist = length(lightPos - fragPos.xyz);
+            float attenuation = clamp(1.0 - dist / affectRadius, 0.0, 1.0);
+            float diff = max(dot(normal, lightDir), 0.0);
+            light += diff * lightColor * attenuation * intensity;
         }
     }
 

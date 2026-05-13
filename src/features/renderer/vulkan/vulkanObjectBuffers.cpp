@@ -41,6 +41,8 @@ void VulkanObjectBuffers::updateLightData(
     uint32 lightId,
     Light::Type type,
     float affectRadius,
+    float cutOff,
+    float outerCutOff,
     const Vector4 &position,
     const Vector4 &direction,
     const Vector4 &color)
@@ -48,6 +50,8 @@ void VulkanObjectBuffers::updateLightData(
     if (lightId < AMOUNT_OF_LIGHTS)
     {
         bufferLightsDataMapped[lightId].affectRadius = affectRadius;
+        bufferLightsDataMapped[lightId].cutOff = cutOff;
+        bufferLightsDataMapped[lightId].outerCutOff = outerCutOff;
         bufferLightsDataMapped[lightId].position = position;
         bufferLightsDataMapped[lightId].direction = direction;
         bufferLightsDataMapped[lightId].color = color;

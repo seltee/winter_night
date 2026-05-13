@@ -54,6 +54,26 @@ namespace wne
             return affectRadius;
         }
 
+        inline void setCutOff(float cutOff)
+        {
+            this->cutOff = cutOff;
+        }
+
+        inline float getCutOff()
+        {
+            return cutOff;
+        }
+        
+        inline void setOuterCutOff(float cutOff)
+        {
+            this->outerCutOff = cutOff;
+        }
+
+        inline float getOuterCutOff()
+        {
+            return outerCutOff;
+        }
+
         inline uint32 getLightId()
         {
             return lightId;
@@ -76,6 +96,8 @@ namespace wne
         Vector4 realDirection = {0, -1.0f, 0, 1.0f}; // calculated based on owner's transformation matrix
         Vector4 position = {0, 0, 0, 1.0f};          // calculated based on owner's transformation matrix
         float affectRadius = 1.0f;
+        float cutOff = 0.2f;
+        float outerCutOff = 0.5f;
 
         Vector4 color = {0.5f, 0.5f, 0.5f, 1.0f};
         uint32 lightId = 0xffffffff;
