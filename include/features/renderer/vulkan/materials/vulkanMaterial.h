@@ -21,9 +21,12 @@ namespace wne
 
         static std::shared_ptr<Material> createFlat(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture);
 
-        void bind(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
+        void bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
+        void bindColor(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
 
-        virtual void selectPipeline(ModelDataType dataType);
+        virtual void selectPipelineDepth(ModelDataType dataType);
+        virtual void selectPipelineColor(ModelDataType dataType);
+
         virtual void selectDescriptor(ModelDataType dataType);
         virtual void setPCData(uint64 objectId, const AffectingLights &lights);
 

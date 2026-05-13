@@ -29,7 +29,8 @@ namespace wne
             VkExtent2D *swapChainExtent,
             VulkanRenderPass *renderPass,
             VulkanDescriptorPool *vulkanDescriptorPool,
-            VulkanObjectBuffers *vulkanObjectBuffers);
+            VulkanObjectBuffers *vulkanObjectBuffers,
+            bool depthWriteStage);
         void updateDescriptorSet(VulkanObjectBuffers *vulkanObjectBuffers);
 
     protected:

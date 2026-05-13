@@ -56,6 +56,8 @@ bool VulkanUtils::setup()
         return false;
     }
 
+    vulkanPipelines = std::make_unique<VulkanPipelines>(vulkanDevice);
+
     return true;
 }
 
@@ -242,31 +244,18 @@ void VulkanUtils::copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width
 
 void VulkanUtils::destroyPipelines()
 {
-    if (vulkanPipelineColored)
-        vulkanPipelineColored.reset();
-    if (vulkanPipelineTextured)
-        vulkanPipelineTextured.reset();
+    vulkanPipelines->reset();
 }
 
 bool VulkanUtils::rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass)
 {
     VkDevice device = vulkanDevice->getDevice();
-
     vkDeviceWaitIdle(device);
     destroyPipelines();
     vkDeviceWaitIdle(device);
 
-    vulkanPipelineColored = std::make_unique<VulkanPipelineColored>(vulkanDevice);
-    if (!vulkanPipelineColored->setup(vulkanSwapChain->getExtent(), vulkanRenderPass, vulkanDescriptorPool.get(), vulkanObjectBuffers.get()))
+    if (!vulkanPipelines->build(vulkanSwapChain, vulkanRenderPass, vulkanDescriptorPool.get(), vulkanObjectBuffers.get()))
     {
-        std::cout << "Unable to create vulkan colored pipeline" << std::endl;
-        return false;
-    }
-
-    vulkanPipelineTextured = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    if (!vulkanPipelineTextured->setup(vulkanSwapChain->getExtent(), vulkanRenderPass, vulkanDescriptorPool.get(), vulkanObjectBuffers.get()))
-    {
-        std::cout << "Unable to create vulkan textured pipeline" << std::endl;
         return false;
     }
 

@@ -14,7 +14,13 @@ namespace wne
         Actor();
 
         virtual void update(float delta);
-        virtual void render(Renderer *renderer);
+
+        // build depth buffer
+        virtual void renderDepth(Renderer *renderer);
+
+        // render equal to depth buffer
+        virtual void renderColor(Renderer *renderer);
+
         virtual const Matrix4x4 &getModelMatrix();
         virtual const Matrix3x3 &getNormalMatrix();
         virtual Matrix4x4 getInvModelMatrix();

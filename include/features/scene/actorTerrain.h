@@ -27,7 +27,9 @@ namespace wne
         void updateMesh();
 
         void setMaterial(std::shared_ptr<Material> material);
-        void render(Renderer *renderer) override final;
+
+        void renderDepth(Renderer *renderer) override final;
+        void renderColor(Renderer *renderer) override final;
 
     protected:
         std::shared_ptr<Mesh> mesh;

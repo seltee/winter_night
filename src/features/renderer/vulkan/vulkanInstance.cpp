@@ -212,9 +212,6 @@ void VulkanInstance::startRendering()
 {
     frames[currentFrame]->startFrame();
     vulkanUtils->setCurrentCommandBuffer(frames[currentFrame]->getCommandBuffer());
-
-    // todo move to mesh
-    // frames[currentFrame]->getCommandBuffer()->bindPipeline(vulkanUtils->getPipelineColored());
 }
 
 void VulkanInstance::finishRendering()

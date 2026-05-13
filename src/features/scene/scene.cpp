@@ -2,6 +2,7 @@
 #include "features/renderer/renderer.h"
 #include "features/data/light.h"
 #include <algorithm>
+#include <iostream>
 
 using namespace wne;
 
@@ -12,13 +13,13 @@ std::shared_ptr<Scene> Scene::create()
 
 void Scene::update(float delta)
 {
-    for (const auto &light : lights)
-    {
-        light->prepareForRender();
-    }
     for (const auto &actor : actors)
     {
         actor->update(delta);
+    }
+    for (const auto &light : lights)
+    {
+        light->prepareForRender();
     }
 }
 
@@ -28,9 +29,16 @@ void Scene::render(Renderer *renderer)
     renderer->setViewProjectionMatrix(mVP);
     renderer->setAmbientColor(ambientLightColor);
 
+    // depth path
     for (const auto &object : actors)
     {
-        object->render(renderer);
+        object->renderDepth(renderer);
+    }
+
+    // color path
+    for (const auto &object : actors)
+    {
+        object->renderColor(renderer);
     }
 }
 

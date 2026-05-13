@@ -55,12 +55,14 @@ bool VulkanPipelineTextured::setup(
     VkExtent2D *swapChainExtent,
     VulkanRenderPass *renderPass,
     VulkanDescriptorPool *vulkanDescriptorPool,
-    VulkanObjectBuffers *vulkanObjectBuffers)
+    VulkanObjectBuffers *vulkanObjectBuffers,
+    bool depthWriteStage)
 {
     auto device = vulkanDevice->getDevice();
 
     shader = std::make_unique<VulkanShader>();
-    if (!shader->makeFromFiles("./shaders/shaderTextured.vert.spv", "./shaders/shaderTextured.frag.spv", device))
+    const char *fragmentShaderPath = depthWriteStage ? "./shaders/shaderDepth.frag.spv" : "./shaders/shaderTextured.frag.spv";
+    if (!shader->makeFromFiles("./shaders/shaderTextured.vert.spv", fragmentShaderPath, device))
     {
         std::cout << "Unable to compile textured shader" << std::endl;
         return false;
@@ -157,7 +159,7 @@ bool VulkanPipelineTextured::setup(
     multisampling.alphaToOneEnable = VK_FALSE;      // Optional
 
     VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-    colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    colorBlendAttachment.colorWriteMask = depthWriteStage ? 0 : VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     colorBlendAttachment.blendEnable = VK_FALSE;
     colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;  // Optional
     colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
@@ -213,8 +215,8 @@ bool VulkanPipelineTextured::setup(
     VkPipelineDepthStencilStateCreateInfo depthStencil{};
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     depthStencil.depthTestEnable = VK_TRUE;
-    depthStencil.depthWriteEnable = VK_TRUE;
-    depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+    depthStencil.depthWriteEnable = depthWriteStage ? VK_TRUE : VK_FALSE;
+    depthStencil.depthCompareOp = depthWriteStage ? VK_COMPARE_OP_LESS : VK_COMPARE_OP_EQUAL;
     depthStencil.depthBoundsTestEnable = VK_FALSE;
     depthStencil.minDepthBounds = 0.0f; // Optional
     depthStencil.maxDepthBounds = 1.0f; // Optional
@@ -281,7 +283,6 @@ void VulkanPipelineTextured::updateDescriptorSet(VulkanObjectBuffers *vulkanObje
     bufferLightsInfo.buffer = vulkanObjectBuffers->getLightsDataBuffer();
     bufferLightsInfo.offset = 0;
     bufferLightsInfo.range = vulkanObjectBuffers->getLightsBufferSize();
-    
 
     std::array<VkWriteDescriptorSet, 5> writes{};
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -311,7 +312,7 @@ void VulkanPipelineTextured::updateDescriptorSet(VulkanObjectBuffers *vulkanObje
     writes[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     writes[3].descriptorCount = 1;
     writes[3].pBufferInfo = &bufferGlobalDataInfo;
-    
+
     writes[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[4].dstSet = descriptorSet;
     writes[4].dstBinding = 4;

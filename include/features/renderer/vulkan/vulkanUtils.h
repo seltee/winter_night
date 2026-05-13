@@ -2,9 +2,7 @@
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
 #include "features/renderer/vulkan/vulkanCommandBuffer.h"
-#include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
-#include "features/renderer/vulkan/pipelines/vulkanPipelineColored.h"
-#include "features/renderer/vulkan/pipelines/vulkanPipelineTextured.h"
+#include "features/renderer/vulkan/vulkanPipelines.h"
 #include "features/renderer/vulkan/vulkanShader.h"
 #include "features/data/model.h"
 
@@ -66,7 +64,8 @@ namespace wne
             return vulkanCommandPool;
         }
 
-        inline VulkanObjectBuffers *getObjectBuffers(){
+        inline VulkanObjectBuffers *getObjectBuffers()
+        {
             return vulkanObjectBuffers.get();
         }
 
@@ -95,39 +94,17 @@ namespace wne
             return vulkanDescriptorPool.get();
         }
 
-        inline VulkanPipelineColored *getPipelineColored()
-        {
-            return vulkanPipelineColored.get();
-        }
-
-        inline VulkanPipeline *getPipelineTextured()
-        {
-            return vulkanPipelineTextured.get();
-        }
-
         inline VulkanPipeline *getCurrentPipeline()
         {
-            return currentPipeline;
+            return vulkanPipelines->getCurrentPipeline();
         }
 
-        inline void enablePipelineColored()
-        {
-            currentPipeline = vulkanPipelineColored.get();
-            currentCommandBuffer->bindPipeline(currentPipeline);
-        }
-
-        inline void enablePipelineTextured()
-        {
-            currentPipeline = vulkanPipelineTextured.get();
-            currentCommandBuffer->bindPipeline(currentPipeline);
-        }
-
-        inline void enablePipelineByType(ModelDataType dataType)
+        inline void enablePipelineByType(ModelDataType dataType, bool isDepthRendering)
         {
             if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
-                enablePipelineColored();
+                vulkanPipelines->enablePipelineColored(currentCommandBuffer, isDepthRendering);
             else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
-                enablePipelineTextured();
+                vulkanPipelines->enablePipelineTextured(currentCommandBuffer, isDepthRendering);
         }
 
     protected:
@@ -136,9 +113,7 @@ namespace wne
         std::unique_ptr<VulkanSampler> vulkanSampler;
 
         // pipelines
-        std::unique_ptr<VulkanPipelineColored> vulkanPipelineColored;
-        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTextured;
-        VulkanPipeline *currentPipeline = nullptr;
+        std::unique_ptr<VulkanPipelines> vulkanPipelines;
 
         VulkanDevice *vulkanDevice = nullptr;
         VulkanCommandPool *vulkanCommandPool = nullptr;

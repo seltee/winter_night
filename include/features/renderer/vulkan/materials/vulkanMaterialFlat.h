@@ -11,7 +11,8 @@ namespace wne
         VulkanMaterialFlat(VulkanUtils *vulkanUtils);
         ~VulkanMaterialFlat();
 
-        void selectPipeline(ModelDataType dataType) override final;
+        void selectPipelineDepth(ModelDataType dataType) override final;
+        void selectPipelineColor(ModelDataType dataType) override final;
         void selectDescriptor(ModelDataType dataType) override final;
         void setPCData(uint64 objectId, const AffectingLights &lights) override final;
         void rebuild() override final;

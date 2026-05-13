@@ -119,7 +119,18 @@ void ActorTerrain::setMaterial(std::shared_ptr<Material> material)
     this->material = material;
 }
 
-void ActorTerrain::render(Renderer *renderer)
+void ActorTerrain::renderDepth(Renderer *renderer)
+{
+    if (!material || !mesh || !currentScene)
+        return;
+    uint64 objectId = mesh->getObjectId();
+    if (objectId == 0xffffffff)
+        return;
+    material->bindDepth(objectId, renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    mesh->render(renderer->getFrameData());
+}
+
+void ActorTerrain::renderColor(Renderer *renderer)
 {
     if (!material || !mesh || !currentScene)
         return;
@@ -127,6 +138,6 @@ void ActorTerrain::render(Renderer *renderer)
     if (objectId == 0xffffffff)
         return;
     AffectingLights lights = currentScene->collectAffectingLights();
-    material->bind(objectId, lights, renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    material->bindColor(objectId, lights, renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }

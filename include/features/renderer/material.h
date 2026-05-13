@@ -17,6 +17,11 @@ namespace wne
     {
     public:
         virtual void rebuild();
-        virtual void bind(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
+
+        // bind for depth render
+        virtual void bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
+
+        // bind for color render
+        virtual void bindColor(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
     };
 };

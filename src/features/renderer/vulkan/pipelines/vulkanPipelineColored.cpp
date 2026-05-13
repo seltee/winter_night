@@ -55,7 +55,8 @@ bool VulkanPipelineColored::setup(
     VkExtent2D *swapChainExtent,
     VulkanRenderPass *renderPass,
     VulkanDescriptorPool *vulkanDescriptorPool,
-    VulkanObjectBuffers *vulkanObjectBuffers)
+    VulkanObjectBuffers *vulkanObjectBuffers,
+    bool depthWriteStage)
 {
     uint32 width = swapChainExtent->width;
     uint32 height = swapChainExtent->height;
@@ -63,7 +64,8 @@ bool VulkanPipelineColored::setup(
     auto device = vulkanDevice->getDevice();
 
     shader = std::make_unique<VulkanShader>();
-    if (!shader->makeFromFiles("./shaders/shaderColored.vert.spv", "./shaders/shaderColored.frag.spv", device))
+    const char *fragmentShaderPath = depthWriteStage ? "./shaders/shaderDepth.frag.spv" : "./shaders/shaderColored.frag.spv";
+    if (!shader->makeFromFiles("./shaders/shaderColored.vert.spv", fragmentShaderPath, device))
     {
         std::cout << "Unable to compile colored shader" << std::endl;
         return false;

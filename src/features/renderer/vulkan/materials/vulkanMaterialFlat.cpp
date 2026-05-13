@@ -16,9 +16,14 @@ VulkanMaterialFlat::~VulkanMaterialFlat()
 {
 }
 
-void VulkanMaterialFlat::selectPipeline(ModelDataType dataType)
+void VulkanMaterialFlat::selectPipelineDepth(ModelDataType dataType)
 {
-    vulkanUtils->enablePipelineByType(dataType);
+    vulkanUtils->enablePipelineByType(dataType, true);
+}
+
+void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType)
+{
+    vulkanUtils->enablePipelineByType(dataType, false);
 }
 
 void VulkanMaterialFlat::selectDescriptor(ModelDataType dataType)

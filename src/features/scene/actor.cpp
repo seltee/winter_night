@@ -13,7 +13,11 @@ void Actor::update(float delta)
 {
 }
 
-void Actor::render(Renderer *renderer)
+void Actor::renderDepth(Renderer *renderer)
+{
+}
+
+void Actor::renderColor(Renderer *renderer)
 {
 }
 
