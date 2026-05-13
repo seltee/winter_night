@@ -37,15 +37,23 @@ void VulkanObjectBuffers::updateObjectData(uint32 objectId, const Matrix4x4 &mMo
     }
 }
 
-void VulkanObjectBuffers::updateLightData(uint32 lightId, Light::Type type, const Vector4 &direction, const Vector4 &color)
+void VulkanObjectBuffers::updateLightData(
+    uint32 lightId,
+    Light::Type type,
+    float affectRadius,
+    const Vector4 &position,
+    const Vector4 &direction,
+    const Vector4 &color)
 {
     if (lightId < AMOUNT_OF_LIGHTS)
     {
+        bufferLightsDataMapped[lightId].affectRadius = affectRadius;
+        bufferLightsDataMapped[lightId].position = position;
         bufferLightsDataMapped[lightId].direction = direction;
         bufferLightsDataMapped[lightId].color = color;
-        bufferLightsDataMapped[lightId].enableDirectional = type == Light::Type::Directional;
-        bufferLightsDataMapped[lightId].enableOmni = type == Light::Type::Omni;
-        bufferLightsDataMapped[lightId].enableSpot = type == Light::Type::Spot;
+        bufferLightsDataMapped[lightId].enableDirectional = (type == Light::Type::Directional);
+        bufferLightsDataMapped[lightId].enableOmni = (type == Light::Type::Omni);
+        bufferLightsDataMapped[lightId].enableSpot = (type == Light::Type::Spot);
     }
 }
 

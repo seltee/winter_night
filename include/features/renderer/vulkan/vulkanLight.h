@@ -1,14 +1,14 @@
 #pragma once
-#include "features/scene/light.h"
+#include "features/data/light.h"
 
 namespace wne
 {
     class VulkanUtils;
-    class VulkanLightDirectional : public Light
+    class VulkanLight : public Light
     {
     public:
-        VulkanLightDirectional(VulkanUtils *vulkanUtils);
-        ~VulkanLightDirectional();
+        VulkanLight(VulkanUtils *vulkanUtils, Light::Type type);
+        ~VulkanLight();
 
         void prepareForRender() override final;
 

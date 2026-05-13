@@ -1,6 +1,6 @@
 #include "features/scene/scene.h"
 #include "features/renderer/renderer.h"
-#include "features/scene/light.h"
+#include "features/data/light.h"
 #include <algorithm>
 
 using namespace wne;

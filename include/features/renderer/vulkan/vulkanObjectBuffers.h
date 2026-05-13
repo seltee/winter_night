@@ -1,6 +1,6 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
-#include "features/scene/light.h"
+#include "features/data/light.h"
 #include "core/core.h"
 
 namespace wne
@@ -23,16 +23,29 @@ namespace wne
 
         struct LightData
         {
+            Vector4 position;
             Vector4 direction;
             Vector4 color;
+            float affectRadius, fPad1, fPad2, fPad3;
             uint32 enableDirectional, enableOmni, enableSpot, pad1;
         };
 
         VulkanObjectBuffers(VulkanUtils *vulkanUtils);
         ~VulkanObjectBuffers();
 
-        void updateObjectData(uint32 objectId, const Matrix4x4 &mModel, const Matrix4x4 &mNormal, const Matrix4x4 &mMVP) noexcept;
-        void updateLightData(uint32 lightId, Light::Type type, const Vector4 &direction, const Vector4 &color);
+        void updateObjectData(
+            uint32 objectId,
+            const Matrix4x4 &mModel,
+            const Matrix4x4 &mNormal,
+            const Matrix4x4 &mMVP) noexcept;
+
+        void updateLightData(
+            uint32 lightId,
+            Light::Type type,
+            float affectRadius,
+            const Vector4 &position,
+            const Vector4 &direction,
+            const Vector4 &color);
 
         bool setup();
 

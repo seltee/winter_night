@@ -2,9 +2,7 @@
 #include "features/renderer/vulkan/vulkanMesh.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
-#include "features/renderer/vulkan/lights/vulkanLightDirectional.h"
-#include "features/renderer/vulkan/lights/vulkanLightOmni.h"
-#include "features/renderer/vulkan/lights/vulkanLightSpot.h"
+#include "features/renderer/vulkan/vulkanLight.h"
 
 using namespace wne;
 
@@ -76,17 +74,17 @@ std::shared_ptr<Material> RendererVulkanNT::createFlatMaterial(std::shared_ptr<T
 
 std::shared_ptr<Light> RendererVulkanNT::createLightDirectional()
 {
-    return std::make_shared<VulkanLightDirectional>(instance->getVulkanUtils());
+    return std::make_shared<VulkanLight>(instance->getVulkanUtils(), Light::Type::Directional);
 }
 
 std::shared_ptr<Light> RendererVulkanNT::createLightOmni()
 {
-    return std::make_shared<VulkanLightOmni>(instance->getVulkanUtils());
+    return std::make_shared<VulkanLight>(instance->getVulkanUtils(), Light::Type::Omni);
 }
 
 std::shared_ptr<Light> RendererVulkanNT::createLightSpot()
 {
-    return std::make_shared<VulkanLightSpot>(instance->getVulkanUtils());
+    return std::make_shared<VulkanLight>(instance->getVulkanUtils(), Light::Type::Spot);
 }
 
 bool RendererVulkanNT::setup(void *hWnd)

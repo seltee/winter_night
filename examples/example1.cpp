@@ -86,6 +86,18 @@ int main()
     auto actorSun = wne::ActorLight::create(sun);
     scene->addActor(actorSun);
 
+    const int amountOfLights = 8;
+    std::vector<std::shared_ptr<wne::ActorLight>> omniLights;
+    for (int i = 0; i < amountOfLights; i++)
+    {
+        auto light = renderer->createLightOmni();
+        light->setColor({fRand(0.5f, 5.0f), fRand(0.5f, 5.0f), fRand(0.5f, 5.0f)});
+        light->setAffectRadius(10.0f);
+        auto actorLight = wne::ActorLight::create(light);
+        scene->addActor(actorLight);
+        omniLights.push_back(actorLight);
+    }
+
     // camera
     auto camera = wne::CameraPerspective::create(window);
     auto actorCamera = wne::ActorCameraFlying::create(camera, window);
@@ -105,6 +117,13 @@ int main()
         sun->setDirection({sinf(translate * 0.5f), 1.6, cosf(translate * 0.5f)});
 
         actorLoadedBox->setRotation(0, translate * 0.1f, 0);
+
+        float step = 1.0f / (float)amountOfLights;
+        for (uint i = 0; i < omniLights.size(); i++)
+        {
+            float angle = (float)i * step * PI2;
+            omniLights[i]->setPosition(sinf(angle + translate * 0.5f) * 40.0f, 6.0, cosf(angle + translate * 0.5f) * 40.0f);
+        }
     }
 
     return 0;

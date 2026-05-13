@@ -24,3 +24,8 @@ void ActorLight::eventSetScene(Scene *oldScene, Scene *newScene)
             newScene->registerLight(light.get());
     }
 }
+
+void ActorLight::update(float delta)
+{
+    light->updateTransformation(getModelMatrix());
+}

@@ -16,8 +16,13 @@ layout(set = 0, binding = 3) uniform BufferGlobalData {
 
 struct LightData
 {
+    vec4 position;
     vec4 direction;
     vec4 color;
+    float affectRadius;
+    float fPad1;
+    float fPad2;
+    float fPad3;
     uint enableDirectional;
     uint enableOmni;
     uint enableSpot;

@@ -8,3 +8,4 @@
 #include "core/math/quat.h"
 #include "core/math/constants.h"
 #include "core/math/func_geometric.h"
+#include "core/math/helpers.h"

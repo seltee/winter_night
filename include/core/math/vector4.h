@@ -1,4 +1,5 @@
 #pragma once
+#include "core/math/vector3.h"
 
 namespace wne
 {
@@ -30,6 +31,11 @@ namespace wne
         Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
 
         // operators
+        inline Vector3 xyz()
+        {
+            return Vector3(x, y, z);
+        }
+
         Vector4 &operator+=(const Vector4 &rhs)
         {
             this->x += rhs.x;
@@ -53,5 +59,20 @@ namespace wne
     inline Vector4 operator+(const Vector4 &lhs, const Vector4 &rhs)
     {
         return Vector4(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w);
+    }
+
+    inline Vector4 operator-(const Vector4 &lhs, const Vector4 &rhs)
+    {
+        return Vector4(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w);
+    }
+
+    inline Vector4 operator*(const Vector4 &lhs, const float &rhs)
+    {
+        return Vector4(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs, lhs.w * rhs);
+    }
+
+    inline Vector4 operator/(const Vector4 &lhs, const float &rhs)
+    {
+        return Vector4(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs, lhs.w / rhs);
     }
 };

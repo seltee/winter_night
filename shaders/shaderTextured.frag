@@ -4,6 +4,7 @@ layout(set = 1, binding = 0) uniform sampler2D texSampler;
 
 layout(location = 0) in vec2 UV;
 layout(location = 1) in vec3 normal;
+layout(location = 2) in vec3 fragPos;
 
 layout(location = 0) out vec4 outColor;
 
@@ -19,8 +20,13 @@ layout(set = 0, binding = 3) uniform BufferGlobalData {
 
 struct LightData
 {
+    vec4 position;
     vec4 direction;
     vec4 color;
+    float affectRadius;
+    float fPad1;
+    float fPad2;
+    float fPad3;
     uint enableDirectional;
     uint enableOmni;
     uint enableSpot;
@@ -46,8 +52,21 @@ void main() {
         {
             vec3 lightDir = lightData[id].direction.xyz;
             vec3 lightColor = lightData[id].color.xyz;
+
             float diff = max(dot(normal, lightDir), 0.0);
             light += diff * lightColor;
+        }
+        if (lightData[id].enableOmni != 0)
+        {
+            vec3 lightPos = lightData[id].position.xyz;
+            vec3 lightColor = lightData[id].color.xyz;
+            float affectRadius = lightData[id].affectRadius;
+
+            float dist = length(lightPos - fragPos.xyz);
+            float attenuation = clamp(1.0 - dist / affectRadius, 0.0, 1.0);
+            vec3 lightDir = normalize(lightPos - fragPos);
+            float diff = max(dot(normal, lightDir), 0.0);
+            light += diff * lightColor * attenuation;
         }
     }
 

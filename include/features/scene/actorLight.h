@@ -1,5 +1,5 @@
 #pragma once
-#include "features/scene/light.h"
+#include "features/data/light.h"
 #include "features/scene/actor.h"
 #include "core/api.h"
 #include "core/math.h"
@@ -14,6 +14,8 @@ namespace wne
         static std::shared_ptr<ActorLight> create(std::shared_ptr<Light> light);
 
         void eventSetScene(Scene *oldScene, Scene *newScene) override final;
+        
+        void update(float delta);
 
         inline std::shared_ptr<Light> getLight()
         {
