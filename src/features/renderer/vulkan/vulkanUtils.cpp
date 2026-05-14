@@ -247,14 +247,17 @@ void VulkanUtils::destroyPipelines()
     vulkanPipelines->reset();
 }
 
-bool VulkanUtils::rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass)
+bool VulkanUtils::rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass, VulkanDepthPass *vulkanDepthPass)
 {
+    this->vulkanRenderPass = vulkanRenderPass;
+    this->vulkanDepthPass = vulkanDepthPass;
+
     VkDevice device = vulkanDevice->getDevice();
     vkDeviceWaitIdle(device);
     destroyPipelines();
     vkDeviceWaitIdle(device);
 
-    if (!vulkanPipelines->build(vulkanSwapChain, vulkanRenderPass, vulkanDescriptorPool.get(), vulkanObjectBuffers.get()))
+    if (!vulkanPipelines->build(vulkanSwapChain, vulkanRenderPass, vulkanDepthPass, vulkanDescriptorPool.get(), vulkanObjectBuffers.get()))
     {
         return false;
     }

@@ -2,7 +2,8 @@
 #include "features/renderer/vulkan/vulkanMesh.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
-#include "features/renderer/vulkan/vulkanLight.h"
+#include "features/renderer/vulkan/lights/vulkanLight.h"
+#include "features/renderer/vulkan/lights/vulkanLightDirectional.h"
 
 using namespace wne;
 
@@ -46,9 +47,11 @@ void RendererVulkanNT::render()
 {
     instance->startRendering();
     for (const auto &scene : scenes)
-    {
+        scene->renderShadows(this);
+
+    instance->beginRenderPass();
+    for (const auto &scene : scenes)
         scene->render(this);
-    }
     instance->finishRendering();
 }
 
@@ -72,9 +75,9 @@ std::shared_ptr<Material> RendererVulkanNT::createFlatMaterial(std::shared_ptr<T
     return VulkanMaterial::createFlat(instance->getVulkanUtils(), texture);
 }
 
-std::shared_ptr<Light> RendererVulkanNT::createLightDirectional()
+std::shared_ptr<LightDirectional> RendererVulkanNT::createLightDirectional()
 {
-    return std::make_shared<VulkanLight>(instance->getVulkanUtils(), Light::Type::Directional);
+    return std::make_shared<VulkanLightDirectional>(instance->getVulkanUtils());
 }
 
 std::shared_ptr<Light> RendererVulkanNT::createLightOmni()

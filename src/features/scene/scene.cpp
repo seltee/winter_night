@@ -23,6 +23,15 @@ void Scene::update(float delta)
     }
 }
 
+void Scene::renderShadows(Renderer *renderer)
+{
+    if (actorCamera)
+    {
+        for (const auto &light : lights)
+            light->renderShadows(this, actorCamera.get());
+    }
+}
+
 void Scene::render(Renderer *renderer)
 {
     Matrix4x4 mVP = actorCamera ? actorCamera->getProjectionMatrix() * actorCamera->getInvModelMatrix() : Matrix4x4::identity();

@@ -14,16 +14,18 @@ VulkanDepthBuffer::~VulkanDepthBuffer()
 {
 }
 
-bool VulkanDepthBuffer::setup(uint16 width, uint16 height)
+bool VulkanDepthBuffer::setup(uint16 width, uint16 height, bool isSampled)
 {
-    format = findDepthFormat();
+    this->width = width;
+    this->height = height;
+    format = findDepthFormat(isSampled);
 
     if (!vulkanUtils->createImage(
             width,
             height,
             format,
             VK_IMAGE_TILING_OPTIMAL,
-            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | (isSampled ? VK_IMAGE_USAGE_SAMPLED_BIT : 0),
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
             &depthImage, &depthImageMemory))
     {
@@ -31,16 +33,18 @@ bool VulkanDepthBuffer::setup(uint16 width, uint16 height)
         return false;
     }
 
+    std::cout << "Created depth buffer " << width << " on " << height << std::endl;
+
     vulkanUtils->createImageView(depthImage, format, VK_IMAGE_ASPECT_DEPTH_BIT, &depthImageView);
     return true;
 }
 
-VulkanFormat VulkanDepthBuffer::findDepthFormat()
+VulkanFormat VulkanDepthBuffer::findDepthFormat(bool isSampled)
 {
     return vulkanUtils->findSupportedFormat(
         {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
         VK_IMAGE_TILING_OPTIMAL,
-        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | (isSampled ? VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT : 0));
 }
 
 bool VulkanDepthBuffer::hasStencilComponent(VulkanFormat format)

@@ -13,7 +13,10 @@ namespace wne
     public:
         VulkanDepthBuffer(VulkanUtils *vulkanUtils);
         ~VulkanDepthBuffer();
-        bool setup(uint16 width, uint16 height);
+
+        // width, height - resolution
+        // isSampled - will depth be used with sampler in shaders
+        bool setup(uint16 width, uint16 height, bool isSampled = false);
 
         inline VulkanFormat getFormat()
         {
@@ -30,7 +33,18 @@ namespace wne
             return depthImageView;
         }
 
+        inline uint16 getWidth()
+        {
+            return width;
+        }
+
+        inline uint16 getHeight()
+        {
+            return height;
+        }
+
     protected:
+        uint16 width = 0, height = 0;
         VulkanFormat format;
 
         VulkanUtils *vulkanUtils = nullptr;
@@ -39,7 +53,7 @@ namespace wne
         VkDeviceMemory depthImageMemory = nullptr;
         VkImageView depthImageView = nullptr;
 
-        VulkanFormat findDepthFormat();
+        VulkanFormat findDepthFormat(bool isSampled);
         bool hasStencilComponent(VulkanFormat format);
     };
 };

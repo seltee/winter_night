@@ -8,6 +8,7 @@ That means that we have to create a framebuffer for all of the images in the swa
 
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
+#include "features/renderer/vulkan/vulkanDepthPass.h"
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanDepthBuffer.h"
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -24,7 +25,7 @@ VulkanFrameBuffer::VulkanFrameBuffer(VkDevice device)
 
 VulkanFrameBuffer::~VulkanFrameBuffer()
 {
-    for (auto framebuffer : swapChainFrameBuffers)
+    for (auto framebuffer : frameBuffers)
     {
         vkDestroyFramebuffer(device, framebuffer, nullptr);
     }
@@ -35,7 +36,7 @@ bool VulkanFrameBuffer::setup(VulkanSwapChain *swapChain, VulkanRenderPass *rend
     auto swapChainImageViews = swapChain->getImageViews();
     VkExtent2D *swapChainExtent = swapChain->getExtent();
 
-    swapChainFrameBuffers.resize(swapChainImageViews->size());
+    frameBuffers.resize(swapChainImageViews->size());
 
     for (size_t i = 0; i < swapChainImageViews->size(); i++)
     {
@@ -52,11 +53,34 @@ bool VulkanFrameBuffer::setup(VulkanSwapChain *swapChain, VulkanRenderPass *rend
         framebufferInfo.height = swapChainExtent->height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFrameBuffers[i]) != VK_SUCCESS)
+        if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &frameBuffers[i]) != VK_SUCCESS)
         {
             std::cout << "Failed creating vulkan frame buffer" << std::endl;
             return false;
         }
     }
+    return true;
+}
+
+bool VulkanFrameBuffer::setup(VulkanDepthPass *depthPass)
+{
+    std::array<VkImageView, 1> attachments = {depthPass->getDepthBuffer()->getDepthImageView()};
+
+    VkFramebufferCreateInfo framebufferInfo{};
+    framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    framebufferInfo.renderPass = depthPass->getRenderPass();
+    framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+    framebufferInfo.pAttachments = attachments.data();
+    framebufferInfo.width = depthPass->getDepthBuffer()->getWidth();
+    framebufferInfo.height = depthPass->getDepthBuffer()->getHeight();
+    framebufferInfo.layers = 1;
+
+    frameBuffers.resize(1);
+    if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &frameBuffers[0]) != VK_SUCCESS)
+    {
+        std::cout << "Failed creating vulkan frame buffer" << std::endl;
+        return false;
+    }
+
     return true;
 }

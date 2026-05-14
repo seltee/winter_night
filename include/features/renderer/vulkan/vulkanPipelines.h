@@ -3,6 +3,7 @@
 #include "features/renderer/vulkan/vulkanDevice.h"
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
+#include "features/renderer/vulkan/vulkanDepthPass.h"
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
 #include "features/renderer/vulkan/vulkanObjectBuffers.h"
 #include "features/renderer/vulkan/vulkanCommandBuffer.h"
@@ -22,6 +23,7 @@ namespace wne
         bool build(
             VulkanSwapChain *vulkanSwapChain,
             VulkanRenderPass *vulkanRenderPass,
+            VulkanDepthPass *VulkanDepthPass,
             VulkanDescriptorPool *vulkanDescriptorPool,
             VulkanObjectBuffers *vulkanObjectBuffers);
 

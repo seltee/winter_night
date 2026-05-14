@@ -83,6 +83,7 @@ int main()
     auto sun = renderer->createLightDirectional();
     sun->setDirection({-0.5, -0.5, -0.5});
     sun->setColor({4.0f, 4.0f, 4.0f});
+    sun->enableShadows(1, 1024);
     auto actorSun = wne::ActorLight::create(sun);
     scene->addActor(actorSun);
 

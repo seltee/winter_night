@@ -121,7 +121,16 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
         return false;
     }
 
-    vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get());
+    std::cout << "DEPTH PASS" << std::endl;
+    depthPass = std::make_unique<VulkanDepthPass>(vulkanUtils.get());
+    if (!depthPass->setup(true))
+    {
+        std::cout << "Unable to create depth pass" << std::endl;
+        return false;
+    }
+    std::cout << "DONE" << std::endl;
+
+    vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get(), depthPass.get());
 
     frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameBuffer->setup(swapChain.get(), renderPass.get()))
@@ -133,7 +142,7 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
         auto frame = std::make_unique<VulkanFrame>(vulkanDevice.get(), swapChain.get());
-        if (!frame->setup(renderPass.get(), frameBuffer.get(), commandPool.get(), vulkanUtils.get()))
+        if (!frame->setup(commandPool.get(), vulkanUtils.get()))
         {
             std::cout << "Unable to create frame " << i << std::endl;
             return false;
@@ -153,6 +162,7 @@ void VulkanInstance::changeSize()
     frameBuffer.reset();
     vulkanUtils->destroyPipelines();
     renderPass.reset();
+    depthPass.reset();
     swapChain.reset();
     vkDeviceWaitIdle(device);
 
@@ -175,8 +185,16 @@ void VulkanInstance::changeSize()
         throw std::runtime_error("failed to recreate render pass");
     }
 
-    // todo fix pipeline recreation
-    vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get());
+    std::cout << "DEPTH PASS R" << std::endl;
+    depthPass = std::make_unique<VulkanDepthPass>(vulkanUtils.get());
+    if (!depthPass->setup(true))
+    {
+        std::cout << "Unable to create depth pass" << std::endl;
+        throw std::runtime_error("failed to recreate depth pass");
+    }
+    std::cout << "DONE R" << std::endl;
+
+    vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get(), depthPass.get());
 
     frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameBuffer->setup(swapChain.get(), renderPass.get()))
@@ -188,7 +206,7 @@ void VulkanInstance::changeSize()
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
         auto frame = std::make_unique<VulkanFrame>(vulkanDevice.get(), swapChain.get());
-        if (!frame->setup(renderPass.get(), frameBuffer.get(), commandPool.get(), vulkanUtils.get()))
+        if (!frame->setup(commandPool.get(), vulkanUtils.get()))
         {
             std::cout << "Unable to create frame " << i << std::endl;
             throw std::runtime_error("failed to recreate frame");
@@ -212,6 +230,11 @@ void VulkanInstance::startRendering()
 {
     frames[currentFrame]->startFrame();
     vulkanUtils->setCurrentCommandBuffer(frames[currentFrame]->getCommandBuffer());
+}
+
+void VulkanInstance::beginRenderPass()
+{
+    frames[currentFrame]->beginRenderPass(renderPass.get(), frameBuffer.get());
 }
 
 void VulkanInstance::finishRendering()

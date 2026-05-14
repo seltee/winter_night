@@ -12,6 +12,7 @@
 namespace wne
 {
     class Light;
+    class LightDirectional;
 
     class WNE_API Renderer
     {
@@ -31,7 +32,7 @@ namespace wne
         virtual void setSyncState(bool syncEnabled);
         virtual bool getSyncState();
 
-        virtual std::shared_ptr<Light> createLightDirectional();
+        virtual std::shared_ptr<LightDirectional> createLightDirectional();
         virtual std::shared_ptr<Light> createLightOmni();
         virtual std::shared_ptr<Light> createLightSpot();
 

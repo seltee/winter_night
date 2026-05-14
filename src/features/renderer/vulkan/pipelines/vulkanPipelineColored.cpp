@@ -52,15 +52,11 @@ VkDescriptorSet VulkanPipelineColored::getDescriptorSet()
 }
 
 bool VulkanPipelineColored::setup(
-    VkExtent2D *swapChainExtent,
     VulkanRenderPass *renderPass,
     VulkanDescriptorPool *vulkanDescriptorPool,
     VulkanObjectBuffers *vulkanObjectBuffers,
     bool depthWriteStage)
 {
-    uint32 width = swapChainExtent->width;
-    uint32 height = swapChainExtent->height;
-
     auto device = vulkanDevice->getDevice();
 
     shader = std::make_unique<VulkanShader>();
@@ -110,17 +106,18 @@ bool VulkanPipelineColored::setup(
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
+    VkExtent2D extent = {512, 512};
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)width;
-    viewport.height = (float)height;
+    viewport.width = (float)extent.width;
+    viewport.height = (float)extent.height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor{};
     scissor.offset = {0, 0};
-    scissor.extent = *swapChainExtent;
+    scissor.extent = extent;
 
     std::vector<VkDynamicState> dynamicStates = {
         VK_DYNAMIC_STATE_VIEWPORT,
@@ -243,12 +240,6 @@ bool VulkanPipelineColored::setup(
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1;              // Optional
-
-    if (width == 0 || height == 0)
-    {
-        std::cout << "ERROR: Zero extent passed to pipeline creation!\n";
-        return false;
-    }
 
     vkDeviceWaitIdle(device);
 

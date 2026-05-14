@@ -19,12 +19,11 @@ namespace wne
         VulkanFrame(VulkanDevice *vulkanDevice, VulkanSwapChain *swapChain);
         ~VulkanFrame();
         bool setup(
-            VulkanRenderPass *renderPass,
-            VulkanFrameBuffer *frameBuffer,
             VulkanCommandPool *commandPool,
             VulkanUtils *vulkanUtils);
 
         void startFrame();
+        void beginRenderPass(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffers);
         void finishFrame(VkQueue graphicsQueue, VkQueue presentQueue);
 
         inline VulkanCommandBuffer *getCommandBuffer()

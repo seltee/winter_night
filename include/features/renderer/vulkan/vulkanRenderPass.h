@@ -13,7 +13,7 @@ namespace wne
         VulkanRenderPass(VulkanUtils *vulkanUtils);
         ~VulkanRenderPass();
 
-        bool setup(uint16 width, uint16 height, VulkanFormat swapChainImageFormat);
+        bool setup(uint16 width, uint16 height, VulkanFormat imageFormat);
         inline VkRenderPass getRenderPass()
         {
             return renderPass;
@@ -24,7 +24,19 @@ namespace wne
             return vulkanDepthBuffer.get();
         }
 
+        inline uint16 getWidth()
+        {
+            return width;
+        }
+
+        inline uint16 getHeight()
+        {
+            return height;
+        }
+
     protected:
+        uint16 width = 0, height = 0;
+
         VkRenderPass renderPass = nullptr;
 
         VulkanUtils *vulkanUtils = nullptr;

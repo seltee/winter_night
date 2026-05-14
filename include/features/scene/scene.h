@@ -21,6 +21,7 @@ namespace wne
         static std::shared_ptr<Scene> create();
 
         void update(float delta);
+        void renderShadows(Renderer *renderer);
         void render(Renderer *renderer);
 
         void addActor(std::shared_ptr<Actor> actor);

@@ -21,8 +21,10 @@ VulkanRenderPass::~VulkanRenderPass()
         vkDestroyRenderPass(vulkanDevice->getDevice(), renderPass, nullptr);
 }
 
-bool VulkanRenderPass::setup(uint16 width, uint16 height, VulkanFormat swapChainImageFormat)
+bool VulkanRenderPass::setup(uint16 width, uint16 height, VulkanFormat imageFormat)
 {
+    this->width = width;
+    this->height = height;
 
     vulkanDepthBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils);
     if (!vulkanDepthBuffer->setup(width, height))
@@ -33,7 +35,7 @@ bool VulkanRenderPass::setup(uint16 width, uint16 height, VulkanFormat swapChain
 
     // color
     VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = (VkFormat)swapChainImageFormat;
+    colorAttachment.format = (VkFormat)imageFormat;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;

@@ -57,7 +57,7 @@ void Renderer::addScene(std::shared_ptr<Scene> scene)
     scenes.push_back(std::move(scene));
 }
 
-std::shared_ptr<Light> Renderer::createLightDirectional()
+std::shared_ptr<LightDirectional> Renderer::createLightDirectional()
 {
     return nullptr;
 }

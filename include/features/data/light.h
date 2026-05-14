@@ -5,6 +5,9 @@
 
 namespace wne
 {
+    class Scene;
+    class ActorCamera;
+
     class WNE_API Light
     {
     public:
@@ -17,6 +20,7 @@ namespace wne
         Light(Type type);
 
         virtual void updateTransformation(const Matrix4x4 &mModel);
+        virtual void renderShadows(Scene *scene, ActorCamera *camera);
         virtual void prepareForRender();
 
         inline void setColor(Vector3 color)
@@ -63,7 +67,7 @@ namespace wne
         {
             return cutOff;
         }
-        
+
         inline void setOuterCutOff(float cutOff)
         {
             this->outerCutOff = cutOff;

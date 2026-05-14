@@ -26,7 +26,6 @@ namespace wne
         VkDescriptorSet getDescriptorSet() override final;
 
         bool setup(
-            VkExtent2D *swapChainExtent,
             VulkanRenderPass *renderPass,
             VulkanDescriptorPool *vulkanDescriptorPool,
             VulkanObjectBuffers *vulkanObjectBuffers,

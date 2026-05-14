@@ -52,7 +52,6 @@ VkPipelineLayout VulkanPipelineTextured::getPipelineLayout()
 }
 
 bool VulkanPipelineTextured::setup(
-    VkExtent2D *swapChainExtent,
     VulkanRenderPass *renderPass,
     VulkanDescriptorPool *vulkanDescriptorPool,
     VulkanObjectBuffers *vulkanObjectBuffers,
@@ -107,7 +106,7 @@ bool VulkanPipelineTextured::setup(
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-    VkExtent2D extent = *swapChainExtent;
+    VkExtent2D extent = {512, 512};
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;

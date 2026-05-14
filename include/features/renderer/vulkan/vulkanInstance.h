@@ -7,6 +7,7 @@
 #include "features/renderer/vulkan/vulkanDeviceExtensions.h"
 #include "features/renderer/vulkan/vulkanShader.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
+#include "features/renderer/vulkan/vulkanDepthPass.h"
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
@@ -39,6 +40,7 @@ namespace wne
         bool getSyncState();
 
         void startRendering();
+        void beginRenderPass();
         void finishRendering();
 
         VulkanUtils *getVulkanUtils()
@@ -70,6 +72,7 @@ namespace wne
         VkQueue presentQueue = nullptr;
 
         std::unique_ptr<VulkanRenderPass> renderPass = nullptr;
+        std::unique_ptr<VulkanDepthPass> depthPass = nullptr;
         std::unique_ptr<VulkanFrameBuffer> frameBuffer = nullptr;
         std::unique_ptr<VulkanSwapChain> swapChain = nullptr;
         std::unique_ptr<VulkanCommandPool> commandPool = nullptr;

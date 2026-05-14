@@ -1,4 +1,4 @@
-#include "features/renderer/vulkan/vulkanLight.h"
+#include "features/renderer/vulkan/lights/vulkanLight.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
 
 using namespace wne;

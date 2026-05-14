@@ -32,12 +32,10 @@ VulkanFrame::~VulkanFrame()
 }
 
 bool VulkanFrame::setup(
-    VulkanRenderPass *renderPass,
-    VulkanFrameBuffer *frameBuffer,
     VulkanCommandPool *commandPool,
     VulkanUtils *vulkanUtils)
 {
-    commandBuffer = new VulkanCommandBuffer(vulkanDevice, renderPass, frameBuffer, swapChain->getExtent(), commandPool);
+    commandBuffer = new VulkanCommandBuffer(vulkanDevice, commandPool);
     if (!commandBuffer->setup(surface))
     {
         std::cout << "Unable to create vulkan command buffer" << std::endl;
@@ -68,13 +66,19 @@ void VulkanFrame::startFrame()
     vkAcquireNextImageKHR(device, swapChain->getSwapChain(), UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 
     commandBuffer->resetBuffer();
-    commandBuffer->recordCommandBuffer(imageIndex);
+    commandBuffer->recordCommandBuffer();
+}
+
+void VulkanFrame::beginRenderPass(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffers)
+{
+    commandBuffer->beginRenderPass(renderPass, frameBuffers->getFrameBuffers()[imageIndex]);
 }
 
 void VulkanFrame::finishFrame(VkQueue graphicsQueue, VkQueue presentQueue)
 {
     // get rid of throw
-    commandBuffer->endRenderPass();
+    commandBuffer->endPass();
+    commandBuffer->endCommandBuffer();
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

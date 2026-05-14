@@ -23,6 +23,7 @@ void VulkanPipelines::reset()
 bool VulkanPipelines::build(
     VulkanSwapChain *vulkanSwapChain,
     VulkanRenderPass *vulkanRenderPass,
+    VulkanDepthPass *VulkanDepthPass,
     VulkanDescriptorPool *vulkanDescriptorPool,
     VulkanObjectBuffers *vulkanObjectBuffers)
 {
@@ -31,17 +32,17 @@ bool VulkanPipelines::build(
     bool status = true;
     // depth pipelines
     vulkanPipelineColoredDepth = std::make_unique<VulkanPipelineColored>(vulkanDevice);
-    status &= vulkanPipelineColoredDepth->setup(vulkanSwapChain->getExtent(), vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, true);
+    status &= vulkanPipelineColoredDepth->setup(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, true);
 
     vulkanPipelineTexturedDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedDepth->setup(vulkanSwapChain->getExtent(), vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, true);
+    status &= vulkanPipelineTexturedDepth->setup(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, true);
 
     // color pipelines
     vulkanPipelineColoredColor = std::make_unique<VulkanPipelineColored>(vulkanDevice);
-    status &= vulkanPipelineColoredColor->setup(vulkanSwapChain->getExtent(), vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, false);
+    status &= vulkanPipelineColoredColor->setup(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, false);
 
     vulkanPipelineTexturedColor = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedColor->setup(vulkanSwapChain->getExtent(), vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, false);
+    status &= vulkanPipelineTexturedColor->setup(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, false);
 
     if (!status)
     {

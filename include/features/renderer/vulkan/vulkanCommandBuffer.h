@@ -5,6 +5,7 @@ namespace wne
 {
     class VulkanDevice;
     class VulkanRenderPass;
+    class VulkanDepthPass;
     class VulkanFrameBuffer;
     class VulkanCommandPool;
     class VulkanPipeline;
@@ -12,18 +13,18 @@ namespace wne
     class VulkanCommandBuffer
     {
     public:
-        VulkanCommandBuffer(VulkanDevice *vkDevice,
-                            VulkanRenderPass *renderPass,
-                            VulkanFrameBuffer *frameBuffer,
-                            VkExtent2D *swapChainExtent,
+        VulkanCommandBuffer(VulkanDevice *vulkanDevice,
                             VulkanCommandPool *commandPool);
         ~VulkanCommandBuffer();
 
         bool setup(VkSurfaceKHR surface);
 
-        void recordCommandBuffer(uint32_t imageIndex);
+        void recordCommandBuffer();
+        void beginRenderPass(VulkanRenderPass *renderPass, VkFramebuffer frameBuffer);
+        void beginDepthPass(VulkanDepthPass *depthPass, VkFramebuffer frameBuffer, uint16 width, uint16 height);
+        void endPass();
+        void endCommandBuffer();
         void bindPipeline(VulkanPipeline *vulkanPipeline);
-        void endRenderPass();
         void resetBuffer();
 
         inline VkCommandBuffer getCommandBuffer()
@@ -32,13 +33,12 @@ namespace wne
         }
 
     protected:
+        uint16 passWidth, passHeight;
+
         VkPhysicalDevice physicalDevice;
         VkDevice device;
-        VkExtent2D *swapChainExtent;
         VkCommandBuffer commandBuffer;
 
-        VulkanFrameBuffer *frameBuffer;
-        VulkanRenderPass *renderPass;
         VulkanCommandPool *commandPool;
     };
 }
