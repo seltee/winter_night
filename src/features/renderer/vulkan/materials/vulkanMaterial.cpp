@@ -46,7 +46,7 @@ void VulkanMaterial::bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Mat
     auto mModel = Matrix4x4::identity();
     AffectingLights lights{};
     selectPipelineDepth(dataType);
-    selectDescriptor(dataType);
+    selectDescriptorDepth(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
     setPCData(objectId, lights);
 }
@@ -58,7 +58,7 @@ void VulkanMaterial::bindColor(uint64 objectId, const AffectingLights &lights, c
 
     auto mModel = Matrix4x4::identity();
     selectPipelineColor(dataType);
-    selectDescriptor(dataType);
+    selectDescriptorColor(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
     setPCData(objectId, lights);
 }
@@ -71,7 +71,11 @@ void VulkanMaterial::selectPipelineColor(ModelDataType dataType)
 {
 }
 
-void VulkanMaterial::selectDescriptor(ModelDataType dataType)
+void VulkanMaterial::selectDescriptorColor(ModelDataType dataType)
+{
+}
+
+void VulkanMaterial::selectDescriptorDepth(ModelDataType dataType)
 {
 }
 

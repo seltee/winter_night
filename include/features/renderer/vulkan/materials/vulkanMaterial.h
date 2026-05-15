@@ -29,7 +29,8 @@ namespace wne
         virtual void selectPipelineDepth(ModelDataType dataType);
         virtual void selectPipelineColor(ModelDataType dataType);
 
-        virtual void selectDescriptor(ModelDataType dataType);
+        virtual void selectDescriptorColor(ModelDataType dataType);
+        virtual void selectDescriptorDepth(ModelDataType dataType);
         virtual void selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData);
         virtual void setPCData(uint64 objectId, const AffectingLights &lights);
 

@@ -78,18 +78,16 @@ VulkanFrameBuffer *VulkanLightCascadeData::getFrameBuffer(VulkanRenderPass *dept
 
 VkDescriptorSet VulkanLightCascadeData::getDescriptorSet(
     ModelDataType dataType,
-    VkDescriptorSetLayout layoutPipeline,
-    VkDescriptorSetLayout layoutSampler)
+    VkDescriptorSetLayout layoutPipeline)
 {
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
     VulkanDescriptorPool *vulkanDescriptorPool = vulkanUtils->getDescriptorPool();
-    VulkanObjectBuffers *vulkanObjectBuffers = vulkanUtils->getObjectBuffers();
     const uint matrixBufferSize = sizeof(Matrix4x4) * VulkanObjectBuffers::AMOUNT_OF_OBJECTS;
 
     if (descriptorSetTextured)
         return descriptorSetTextured;
 
-    VkDescriptorSetLayout layouts[2] = {layoutPipeline, layoutSampler};
+    VkDescriptorSetLayout layouts[1] = {layoutPipeline};
 
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -103,66 +101,19 @@ VkDescriptorSet VulkanLightCascadeData::getDescriptorSet(
         return nullptr;
     }
 
-    VkDescriptorBufferInfo bufferModelInfo{};
-    bufferModelInfo.buffer = objectBufferMVP;
-    bufferModelInfo.offset = 0;
-    bufferModelInfo.range = matrixBufferSize;
-
     VkDescriptorBufferInfo bufferMVPInfo{};
     bufferMVPInfo.buffer = objectBufferMVP;
     bufferMVPInfo.offset = 0;
     bufferMVPInfo.range = matrixBufferSize;
 
-    VkDescriptorBufferInfo bufferNormalInfo{};
-    bufferNormalInfo.buffer = objectBufferMVP;
-    bufferNormalInfo.offset = 0;
-    bufferNormalInfo.range = matrixBufferSize;
+    std::array<VkWriteDescriptorSet, 1> writes{};
 
-    VkDescriptorBufferInfo bufferGlobalDataInfo{};
-    bufferGlobalDataInfo.buffer = vulkanObjectBuffers->getGlobalDataBuffer();
-    bufferGlobalDataInfo.offset = 0;
-    bufferGlobalDataInfo.range = vulkanObjectBuffers->getGlobalDataSize();
-
-    VkDescriptorBufferInfo bufferLightsInfo{};
-    bufferLightsInfo.buffer = vulkanObjectBuffers->getLightsDataBuffer();
-    bufferLightsInfo.offset = 0;
-    bufferLightsInfo.range = vulkanObjectBuffers->getLightsBufferSize();
-
-    std::array<VkWriteDescriptorSet, 5> writes{};
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = descriptorSetTextured;
     writes[0].dstBinding = 0;
     writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     writes[0].descriptorCount = 1;
-    writes[0].pBufferInfo = &bufferModelInfo;
-
-    writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    writes[1].dstSet = descriptorSetTextured;
-    writes[1].dstBinding = 1;
-    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    writes[1].descriptorCount = 1;
-    writes[1].pBufferInfo = &bufferMVPInfo;
-
-    writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    writes[2].dstSet = descriptorSetTextured;
-    writes[2].dstBinding = 2;
-    writes[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    writes[2].descriptorCount = 1;
-    writes[2].pBufferInfo = &bufferNormalInfo;
-
-    writes[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    writes[3].dstSet = descriptorSetTextured;
-    writes[3].dstBinding = 3;
-    writes[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    writes[3].descriptorCount = 1;
-    writes[3].pBufferInfo = &bufferGlobalDataInfo;
-
-    writes[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    writes[4].dstSet = descriptorSetTextured;
-    writes[4].dstBinding = 4;
-    writes[4].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    writes[4].descriptorCount = 1;
-    writes[4].pBufferInfo = &bufferLightsInfo;
+    writes[0].pBufferInfo = &bufferMVPInfo;
 
     vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
 

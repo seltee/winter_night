@@ -33,8 +33,6 @@ bool VulkanDepthBuffer::setup(uint16 width, uint16 height, bool isSampled)
         return false;
     }
 
-    std::cout << "Created depth buffer " << width << " on " << height << std::endl;
-
     vulkanUtils->createImageView(depthImage, format, VK_IMAGE_ASPECT_DEPTH_BIT, &depthImageView);
     return true;
 }

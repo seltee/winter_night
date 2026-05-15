@@ -14,13 +14,13 @@ layout(push_constant) uniform PushConstants {
     uint lightIds[12];
 } objectData;
 
-layout(set = 0, binding = 0) uniform BufferObjects {
-     mat4 matrix[256];
-} mModels;
-
-layout(set = 0, binding = 1) uniform BufferMVPs {
+layout(set = 0, binding = 0) uniform BufferMVPs {
      mat4 matrix[256];
 } mMVPs;
+
+layout(set = 0, binding = 1) uniform BufferObjects {
+     mat4 matrix[256];
+} mModels;
 
 layout(set = 0, binding = 2) uniform BufferNormals {
      mat4 matrix[256];

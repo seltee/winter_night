@@ -29,16 +29,6 @@ VulkanPipelineTextured::~VulkanPipelineTextured()
         vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
         pipelineLayout = nullptr;
     }
-    if (descriptorSetLayoutPipeline)
-    {
-        vkDestroyDescriptorSetLayout(device, descriptorSetLayoutPipeline, nullptr);
-        descriptorSetLayoutPipeline = nullptr;
-    }
-    if (descriptorSetLayoutSampler)
-    {
-        vkDestroyDescriptorSetLayout(device, descriptorSetLayoutSampler, nullptr);
-        descriptorSetLayoutSampler = nullptr;
-    }
 }
 
 VkPipeline VulkanPipelineTextured::getGraphicsPipeline()
@@ -56,19 +46,27 @@ bool VulkanPipelineTextured::setupColor(
     VulkanDescriptorPool *vulkanDescriptorPool,
     VulkanObjectBuffers *vulkanObjectBuffers)
 {
-    if (!buildShader())
+    if (!buildShaderColor())
     {
         std::cout << "Unable to build shader" << std::endl;
         return false;
     }
 
-    if (!createLayouts())
+    descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutPipeline->setupTexturedColor())
     {
-        std::cout << "Unable to create layouts" << std::endl;
+        std::cout << "Unable to setup textured color pipeline" << std::endl;
         return false;
     }
 
-    if (!buildPipeline(2, true, false, renderPass, vulkanDescriptorPool, vulkanObjectBuffers))
+    descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutSampler->setupSampler())
+    {
+        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        return false;
+    }
+
+    if (!buildPipeline(2, true, false, true, renderPass, vulkanDescriptorPool, vulkanObjectBuffers))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -82,19 +80,20 @@ bool VulkanPipelineTextured::setupDepth(
     VulkanDescriptorPool *vulkanDescriptorPool,
     VulkanObjectBuffers *vulkanObjectBuffers)
 {
-    if (!buildShader())
+    if (!buildShaderDepth())
     {
         std::cout << "Unable to build shader" << std::endl;
         return false;
     }
 
-    if (!createLayouts())
+    descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutPipeline->setupTexturedDepth())
     {
-        std::cout << "Unable to create layouts" << std::endl;
+        std::cout << "Unable to setup textured depth pipeline" << std::endl;
         return false;
     }
 
-    if (!buildPipeline(1, false, true, depthPass, vulkanDescriptorPool, vulkanObjectBuffers))
+    if (!buildPipeline(1, false, true, false, depthPass, vulkanDescriptorPool, vulkanObjectBuffers))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -103,19 +102,19 @@ bool VulkanPipelineTextured::setupDepth(
     return true;
 }
 
-void VulkanPipelineTextured::updateDescriptorSet(VulkanObjectBuffers *vulkanObjectBuffers)
+void VulkanPipelineTextured::updateDescriptorSetColor(VulkanObjectBuffers *vulkanObjectBuffers)
 {
     auto device = vulkanDevice->getDevice();
-
-    VkDescriptorBufferInfo bufferModelInfo{};
-    bufferModelInfo.buffer = vulkanObjectBuffers->getModelMatricesBuffer();
-    bufferModelInfo.offset = 0;
-    bufferModelInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
     VkDescriptorBufferInfo bufferMVPInfo{};
     bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer();
     bufferMVPInfo.offset = 0;
     bufferMVPInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
+
+    VkDescriptorBufferInfo bufferModelInfo{};
+    bufferModelInfo.buffer = vulkanObjectBuffers->getModelMatricesBuffer();
+    bufferModelInfo.offset = 0;
+    bufferModelInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
     VkDescriptorBufferInfo bufferNormalInfo{};
     bufferNormalInfo.buffer = vulkanObjectBuffers->getNormalMatricesBuffer();
@@ -138,14 +137,14 @@ void VulkanPipelineTextured::updateDescriptorSet(VulkanObjectBuffers *vulkanObje
     writes[0].dstBinding = 0;
     writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     writes[0].descriptorCount = 1;
-    writes[0].pBufferInfo = &bufferModelInfo;
+    writes[0].pBufferInfo = &bufferMVPInfo;
 
     writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[1].dstSet = descriptorSet;
     writes[1].dstBinding = 1;
     writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     writes[1].descriptorCount = 1;
-    writes[1].pBufferInfo = &bufferMVPInfo;
+    writes[1].pBufferInfo = &bufferModelInfo;
 
     writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[2].dstSet = descriptorSet;
@@ -171,14 +170,34 @@ void VulkanPipelineTextured::updateDescriptorSet(VulkanObjectBuffers *vulkanObje
     vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
 }
 
+void VulkanPipelineTextured::updateDescriptorSetDepth(VulkanObjectBuffers *vulkanObjectBuffers)
+{
+    auto device = vulkanDevice->getDevice();
+
+    VkDescriptorBufferInfo bufferMVPInfo{};
+    bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer();
+    bufferMVPInfo.offset = 0;
+    bufferMVPInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
+
+    std::array<VkWriteDescriptorSet, 1> writes{};
+    writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[0].dstSet = descriptorSet;
+    writes[0].dstBinding = 0;
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[0].descriptorCount = 1;
+    writes[0].pBufferInfo = &bufferMVPInfo;
+
+    vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
+}
+
 VkDescriptorSetLayout VulkanPipelineTextured::getDescriptorSetLayoutPipeline()
 {
-    return descriptorSetLayoutPipeline;
+    return descriptorSetLayoutPipeline->getDescriptorSetLayout();
 }
 
 VkDescriptorSetLayout VulkanPipelineTextured::getDescriptorSetLayoutSampler()
 {
-    return descriptorSetLayoutSampler;
+    return descriptorSetLayoutSampler->getDescriptorSetLayout();
 }
 
 VkDescriptorSet VulkanPipelineTextured::getDescriptorSet()
@@ -186,7 +205,7 @@ VkDescriptorSet VulkanPipelineTextured::getDescriptorSet()
     return descriptorSet;
 }
 
-bool VulkanPipelineTextured::buildShader()
+bool VulkanPipelineTextured::buildShaderColor()
 {
     auto device = vulkanDevice->getDevice();
     shader = std::make_unique<VulkanShader>();
@@ -198,10 +217,23 @@ bool VulkanPipelineTextured::buildShader()
     return true;
 }
 
+bool VulkanPipelineTextured::buildShaderDepth()
+{
+    auto device = vulkanDevice->getDevice();
+    shader = std::make_unique<VulkanShader>();
+    if (!shader->makeFromFiles("./shaders/shaderTexturedDepth.vert.spv", "./shaders/shaderTexturedDepth.frag.spv", device))
+    {
+        std::cout << "Unable to compile textured shader" << std::endl;
+        return false;
+    }
+    return true;
+}
+
 bool VulkanPipelineTextured::buildPipeline(
     uint32 stageAmount,
     bool enableColorBlending,
     bool enableDepthWrite,
+    bool enableSampler,
     VulkanRenderPass *renderPass,
     VulkanDescriptorPool *vulkanDescriptorPool,
     VulkanObjectBuffers *vulkanObjectBuffers)
@@ -328,33 +360,68 @@ bool VulkanPipelineTextured::buildPipeline(
     pushRange.offset = 0;
     pushRange.size = sizeof(PushConstantObject);
 
-    VkDescriptorSetLayout layouts[2] = {descriptorSetLayoutPipeline, descriptorSetLayoutSampler};
-
-    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 2;
-    pipelineLayoutInfo.pSetLayouts = layouts;
-    pipelineLayoutInfo.pushConstantRangeCount = 1;
-    pipelineLayoutInfo.pPushConstantRanges = &pushRange;
-
-    if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
+    if (enableSampler)
     {
-        std::cout << "unable to create pipeline layout" << std::endl;
-        return false;
+        VkDescriptorSetLayout layouts[2] = {
+            descriptorSetLayoutPipeline->getDescriptorSetLayout(),
+            descriptorSetLayoutSampler->getDescriptorSetLayout()};
+
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutInfo.setLayoutCount = 2;
+        pipelineLayoutInfo.pSetLayouts = layouts;
+        pipelineLayoutInfo.pushConstantRangeCount = 1;
+        pipelineLayoutInfo.pPushConstantRanges = &pushRange;
+
+        if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
+        {
+            std::cout << "unable to create pipeline layout" << std::endl;
+            return false;
+        }
+
+        VkDescriptorSetAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        allocInfo.descriptorPool = vulkanDescriptorPool->getDescriptorPool();
+        allocInfo.descriptorSetCount = 1;
+        allocInfo.pSetLayouts = layouts;
+
+        if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)
+        {
+            std::cout << "unable to create descriptor set" << std::endl;
+            return false;
+        }
+        updateDescriptorSetColor(vulkanObjectBuffers);
     }
-
-    VkDescriptorSetAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    allocInfo.descriptorPool = vulkanDescriptorPool->getDescriptorPool();
-    allocInfo.descriptorSetCount = 1;
-    allocInfo.pSetLayouts = layouts;
-
-    if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)
+    else
     {
-        std::cout << "unable to create descriptor set" << std::endl;
-        return false;
+        VkDescriptorSetLayout layouts[1] = {descriptorSetLayoutPipeline->getDescriptorSetLayout()};
+
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutInfo.setLayoutCount = 1;
+        pipelineLayoutInfo.pSetLayouts = layouts;
+        pipelineLayoutInfo.pushConstantRangeCount = 1;
+        pipelineLayoutInfo.pPushConstantRanges = &pushRange;
+
+        if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
+        {
+            std::cout << "unable to create pipeline layout" << std::endl;
+            return false;
+        }
+
+        VkDescriptorSetAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        allocInfo.descriptorPool = vulkanDescriptorPool->getDescriptorPool();
+        allocInfo.descriptorSetCount = 1;
+        allocInfo.pSetLayouts = layouts;
+
+        if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)
+        {
+            std::cout << "unable to create descriptor set" << std::endl;
+            return false;
+        }
+        updateDescriptorSetDepth(vulkanObjectBuffers);
     }
-    updateDescriptorSet(vulkanObjectBuffers);
 
     VkPipelineDepthStencilStateCreateInfo depthStencil{};
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
@@ -393,79 +460,5 @@ bool VulkanPipelineTextured::buildPipeline(
     }
     if (graphicsPipeline == VK_NULL_HANDLE)
         std::cout << "Pipeline is null!" << std::endl;
-    return true;
-}
-
-bool VulkanPipelineTextured::createLayouts()
-{
-    // pipeline layout
-    VkDescriptorSetLayoutBinding pipelineBinding[5]{};
-
-    // model matrices
-    pipelineBinding[0].binding = 0;
-    pipelineBinding[0].descriptorCount = 1;
-    pipelineBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    pipelineBinding[0].pImmutableSamplers = nullptr;
-    pipelineBinding[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-    // mvp matrices
-    pipelineBinding[1].binding = 1;
-    pipelineBinding[1].descriptorCount = 1;
-    pipelineBinding[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    pipelineBinding[1].pImmutableSamplers = nullptr;
-    pipelineBinding[1].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-    // normal transform matrices
-    pipelineBinding[2].binding = 2;
-    pipelineBinding[2].descriptorCount = 1;
-    pipelineBinding[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    pipelineBinding[2].pImmutableSamplers = nullptr;
-    pipelineBinding[2].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-    // global data
-    pipelineBinding[3].binding = 3;
-    pipelineBinding[3].descriptorCount = 1;
-    pipelineBinding[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    pipelineBinding[3].pImmutableSamplers = nullptr;
-    pipelineBinding[3].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    // lights data
-    pipelineBinding[4].binding = 4;
-    pipelineBinding[4].descriptorCount = 1;
-    pipelineBinding[4].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    pipelineBinding[4].pImmutableSamplers = nullptr;
-    pipelineBinding[4].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    VkDescriptorSetLayoutCreateInfo layoutInfoPipeline{};
-    layoutInfoPipeline.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfoPipeline.bindingCount = 5;
-    layoutInfoPipeline.pBindings = pipelineBinding;
-
-    if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayoutPipeline) != VK_SUCCESS)
-    {
-        std::cout << "failed to create descriptor set layout!" << std::endl;
-        return false;
-    }
-
-    // texture layout
-    VkDescriptorSetLayoutBinding samplerBinding[1]{};
-
-    // texture sampler
-    samplerBinding[0].binding = 0;
-    samplerBinding[0].descriptorCount = 1;
-    samplerBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    samplerBinding[0].pImmutableSamplers = nullptr;
-    samplerBinding[0].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    VkDescriptorSetLayoutCreateInfo layoutInfoSampler{};
-    layoutInfoSampler.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfoSampler.bindingCount = 1;
-    layoutInfoSampler.pBindings = samplerBinding;
-
-    if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoSampler, nullptr, &descriptorSetLayoutSampler) != VK_SUCCESS)
-    {
-        std::cout << "failed to create descriptor set layout!" << std::endl;
-        return false;
-    }
     return true;
 }

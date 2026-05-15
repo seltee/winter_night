@@ -1,6 +1,7 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
+#include "features/renderer/vulkan/pipelines/vulkanDescriptorSetLayout.h"
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
 #include "features/renderer/vulkan/vulkanObjectBuffers.h"
 #include <memory>
@@ -33,26 +34,28 @@ namespace wne
             VulkanDescriptorPool *vulkanDescriptorPool,
             VulkanObjectBuffers *vulkanObjectBuffers);
 
-        void updateDescriptorSet(VulkanObjectBuffers *vulkanObjectBuffers);
+        void updateDescriptorSetColor(VulkanObjectBuffers *vulkanObjectBuffers);
+        void updateDescriptorSetDepth(VulkanObjectBuffers *vulkanObjectBuffers);
 
         VkDescriptorSetLayout getDescriptorSetLayoutPipeline() override final;
         VkDescriptorSetLayout getDescriptorSetLayoutSampler() override final;
         VkDescriptorSet getDescriptorSet() override final;
 
     protected:
-        bool buildShader();
+        bool buildShaderColor();
+        bool buildShaderDepth();
         bool buildPipeline(
             uint32 stageAmount,
             bool enableColorBlending,
             bool enableDepthWrite,
+            bool enableSampler,
             VulkanRenderPass *renderPass,
             VulkanDescriptorPool *vulkanDescriptorPool,
             VulkanObjectBuffers *vulkanObjectBuffers);
 
-        bool createLayouts();
+        std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayoutPipeline;
+        std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayoutSampler;
 
-        VkDescriptorSetLayout descriptorSetLayoutPipeline = nullptr;
-        VkDescriptorSetLayout descriptorSetLayoutSampler = nullptr;
         std::unique_ptr<VulkanShader> shader;
         VkPipelineLayout pipelineLayout = nullptr;
         VkPipeline graphicsPipeline = nullptr;

@@ -18,10 +18,7 @@ namespace wne
 
         VulkanFrameBuffer *getFrameBuffer(VulkanRenderPass *depthPass);
 
-        VkDescriptorSet getDescriptorSet(
-            ModelDataType dataType,
-            VkDescriptorSetLayout layoutPipeline,
-            VkDescriptorSetLayout layoutSampler);
+        VkDescriptorSet getDescriptorSet(ModelDataType dataType, VkDescriptorSetLayout layoutPipeline);
 
         inline VulkanDepthBuffer *getDepthBuffer()
         {

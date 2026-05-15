@@ -27,7 +27,7 @@ void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType)
     vulkanUtils->enablePipelineByType(dataType, false);
 }
 
-void VulkanMaterialFlat::selectDescriptor(ModelDataType dataType)
+void VulkanMaterialFlat::selectDescriptorColor(ModelDataType dataType)
 {
     if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
     {
@@ -43,6 +43,22 @@ void VulkanMaterialFlat::selectDescriptor(ModelDataType dataType)
     }
 }
 
+void VulkanMaterialFlat::selectDescriptorDepth(ModelDataType dataType)
+{
+    if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
+    {
+    }
+    else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
+    {
+        auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
+        auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
+
+        VkDescriptorSet sets[1] = {vulkanUtils->getCurrentPipeline()->getDescriptorSet()};
+        if (sets[0])
+            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, sets, 0, nullptr);
+    }
+}
+
 void VulkanMaterialFlat::selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData)
 {
     if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
@@ -50,13 +66,14 @@ void VulkanMaterialFlat::selectDescriptorDepthShadow(ModelDataType dataType, Vul
     }
     else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
     {
+        // should be depth
         auto pipeline = vulkanUtils->getCurrentPipeline();
         auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
         auto pipelineLayout = pipeline->getPipelineLayout();
 
-        VkDescriptorSet sets[2] = {cascadeData->getDescriptorSet(dataType, pipeline->getDescriptorSetLayoutPipeline(), pipeline->getDescriptorSetLayoutSampler()), getDescriptorSetFlatTextured()};
-        if (sets[0] && sets[1])
-            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 2, sets, 0, nullptr);
+        VkDescriptorSet sets[1] = {cascadeData->getDescriptorSet(dataType, pipeline->getDescriptorSetLayoutPipeline())};
+        if (sets[0])
+            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, sets, 0, nullptr);
     }
 }
 
