@@ -7,6 +7,7 @@
 
 namespace wne
 {
+    class Renderer;
     struct AffectingLights
     {
         uint32 lightsAmount;
@@ -17,6 +18,9 @@ namespace wne
     {
     public:
         virtual void rebuild();
+
+        // bind for light's shadow depth
+        virtual void bindDepthShadow(uint64 objectId, Renderer *renderer, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
 
         // bind for depth render
         virtual void bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);

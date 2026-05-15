@@ -91,13 +91,13 @@ int main()
     auto actorSun = wne::ActorLight::create(sun);
     scene->addActor(actorSun);
 
-    // sun->enableShadows(1, 1024);
-    //auto textureSunShadow = sun->getCascadeAsTexture(0);
-    //auto materialSunShadow = renderer->createFlatMaterial(textureSunShadow);
-    //auto actorSunShadowBox = wne::ActorMesh::create(boxMesh);
-    ////actorSunShadowBox->setMaterial(materialSunShadow);
-    //scene->addActor(actorSunShadowBox);
-    //actorSunShadowBox->setPosition(12.0f, 8.0f, 4.0f);
+    sun->enableShadows(1, 1024);
+    auto textureSunShadow = sun->getCascadeAsTexture(0);
+    auto materialSunShadow = renderer->createFlatMaterial(textureSunShadow);
+    auto actorSunShadowBox = wne::ActorMesh::create(boxMesh);
+    actorSunShadowBox->setMaterial(materialSunShadow);
+    scene->addActor(actorSunShadowBox);
+    actorSunShadowBox->setPosition(12.0f, 8.0f, 0.0f);
 
     auto spot = renderer->createLightSpot();
     spot->setDirection({0, -1.0f, 0});

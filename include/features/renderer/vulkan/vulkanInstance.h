@@ -16,6 +16,7 @@
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
 #include "features/renderer/vulkan/vulkanSampler.h"
 #include "features/renderer/vulkan/vulkanDepthBuffer.h"
+#include "features/renderer/vulkan/lights/vulkanLightCascadeData.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipelineColored.h"
 #include "core/core.h"
@@ -43,6 +44,7 @@ namespace wne
         void finishDepthPass();
         void beginRenderPass();
         void finishRendering();
+        void waitIdle();
 
         VulkanUtils *getVulkanUtils()
         {

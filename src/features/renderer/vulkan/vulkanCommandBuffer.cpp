@@ -32,7 +32,7 @@ VulkanCommandBuffer::~VulkanCommandBuffer()
 {
 }
 
-bool VulkanCommandBuffer::setup(VkSurfaceKHR surface)
+bool VulkanCommandBuffer::setup()
 {
     // command buffer
     VkCommandBufferAllocateInfo allocInfo{};

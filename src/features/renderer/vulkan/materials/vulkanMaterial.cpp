@@ -2,6 +2,8 @@
 #include "features/renderer/vulkan/materials/vulkanMaterialFlat.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
+#include "features/renderer/vulkan/vulkanRendererState.h"
+#include "features/renderer/vulkan/rendererVulkanNT.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <array>
@@ -20,6 +22,20 @@ std::shared_ptr<Material> VulkanMaterial::createFlat(VulkanUtils *vulkanUtils, s
     material->setAlbedo(texture);
     material->rebuild();
     return material;
+}
+
+void VulkanMaterial::bindDepthShadow(uint64 objectId, Renderer *renderer, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType)
+{
+    auto state = (VulkanRendererState *)renderer->getState();
+    VulkanLightCascadeData *cascadeData = state->getVulkanLightCascadeData();
+    if (dataType == ModelDataType::Unknown || !cascadeData)
+        return;
+
+    AffectingLights lights{};
+    selectPipelineDepth(dataType);
+    selectDescriptorDepthShadow(dataType, cascadeData);
+    cascadeData->updateObjectData(objectId, mMVP);
+    setPCData(objectId, lights);
 }
 
 void VulkanMaterial::bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType)
@@ -56,6 +72,10 @@ void VulkanMaterial::selectPipelineColor(ModelDataType dataType)
 }
 
 void VulkanMaterial::selectDescriptor(ModelDataType dataType)
+{
+}
+
+void VulkanMaterial::selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData)
 {
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "features/data/lightDirectional.h"
+#include "features/renderer/vulkan/lights/vulkanLightCascadeData.h"
 #include <vector>
 #include <memory>
 
@@ -13,7 +14,7 @@ namespace wne
     class WNE_API VulkanLightDirectional : public LightDirectional
     {
     public:
-        VulkanLightDirectional(VulkanUtils *vulkanUtils);
+            VulkanLightDirectional(VulkanUtils *vulkanUtils);
         ~VulkanLightDirectional();
 
         void renderShadows(Renderer *renderer, Scene *scene, ActorCamera *camera) override final;
@@ -31,7 +32,7 @@ namespace wne
         uint resolition = 0;
 
         VulkanUtils *vulkanUtils = nullptr;
-        std::vector<std::unique_ptr<VulkanDepthBuffer>> depthBuffers;
-        std::vector<std::unique_ptr<VulkanFrameBuffer>> frameBuffers;
+
+        std::vector<std::unique_ptr<VulkanLightCascadeData>> cascades;
     };
 };

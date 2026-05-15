@@ -15,6 +15,9 @@ namespace wne
 
         virtual void update(float delta);
 
+        // build depth buffer for light's shadow
+        virtual void renderDepthShadow(Renderer *renderer);
+
         // build depth buffer
         virtual void renderDepth(Renderer *renderer);
 

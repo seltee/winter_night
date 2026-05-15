@@ -6,6 +6,10 @@ void Material::rebuild()
 {
 }
 
+void Material::bindDepthShadow(uint64 objectId, Renderer *renderer, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType)
+{
+}
+
 void Material::bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType)
 {
 }

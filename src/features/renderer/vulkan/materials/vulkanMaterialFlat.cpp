@@ -1,6 +1,7 @@
 #include "features/renderer/vulkan/materials/vulkanMaterialFlat.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
+#include "features/renderer/vulkan/lights/vulkanLightCascadeData.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <array>
@@ -37,6 +38,23 @@ void VulkanMaterialFlat::selectDescriptor(ModelDataType dataType)
         auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
 
         VkDescriptorSet sets[2] = {vulkanUtils->getCurrentPipeline()->getDescriptorSet(), getDescriptorSetFlatTextured()};
+        if (sets[0] && sets[1])
+            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 2, sets, 0, nullptr);
+    }
+}
+
+void VulkanMaterialFlat::selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData)
+{
+    if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
+    {
+    }
+    else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
+    {
+        auto pipeline = vulkanUtils->getCurrentPipeline();
+        auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
+        auto pipelineLayout = pipeline->getPipelineLayout();
+
+        VkDescriptorSet sets[2] = {cascadeData->getDescriptorSet(dataType, pipeline->getDescriptorSetLayoutPipeline(), pipeline->getDescriptorSetLayoutSampler()), getDescriptorSetFlatTextured()};
         if (sets[0] && sets[1])
             vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 2, sets, 0, nullptr);
     }
@@ -90,8 +108,7 @@ VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
 
     // albedo sampler
     VkDescriptorImageInfo imageInfo{};
-    std::cout << (VkImageLayout)((VulkanTexture *)albedoTexture.get())->getImageLayout() << std::endl;
-    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imageInfo.imageLayout = (VkImageLayout)((VulkanTexture *)albedoTexture.get())->getImageLayout();
     imageInfo.imageView = ((VulkanTexture *)albedoTexture.get())->getImageView()->getImageView();
     imageInfo.sampler = vulkanUtils->getSampler()->getTextureSampler();
 

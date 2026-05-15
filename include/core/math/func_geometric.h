@@ -69,9 +69,34 @@ namespace wne
     {
         return Matrix4x4(
             2.0f / (right - left), 0.0f, 0.0f, -(right + left) / (right - left),
-            0.0f, 2.0f / (top - bottom), 0.0f, (top + bottom) / (top - bottom),
+            0.0f, -2.0f / (top - bottom), 0.0f, (top + bottom) / (top - bottom),
             0.0f, 0.0f, 1.0f / (far - near), -near / (far - near),
             0.0f, 0.0f, 0.0f, 1.0f);
+    }
+
+    inline Matrix3x3 lookAt(const Vector3 &from, const Vector3 &to)
+    {
+        const Vector3 up = Vector3(0, 1, 0);
+        Vector3 forward = normalize(to - from);
+
+        if (std::abs(dot(forward, up)) > 0.9999f)
+        {
+            Vector3 alternativeUp = std::abs(dot(forward, Vector3(0, 0, 1))) > 0.9999f
+                                        ? Vector3(0, 1, 0)
+                                        : Vector3(0, 0, 1);
+
+            Vector3 right = normalize(cross(alternativeUp, forward));
+            Vector3 newUp = cross(forward, right);
+
+            return Matrix3x3(right, newUp, forward);
+        }
+
+        Vector3 right = normalize(cross(up, forward));
+        Vector3 newUp = cross(forward, right);
+
+        Matrix3x3 rot(right, newUp, forward); 
+
+        return rot;
     }
 
 };

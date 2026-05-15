@@ -36,7 +36,7 @@ bool VulkanFrame::setup(
     VulkanUtils *vulkanUtils)
 {
     commandBuffer = new VulkanCommandBuffer(vulkanDevice, commandPool);
-    if (!commandBuffer->setup(surface))
+    if (!commandBuffer->setup())
     {
         std::cout << "Unable to create vulkan command buffer" << std::endl;
         return false;

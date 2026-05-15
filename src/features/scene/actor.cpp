@@ -13,6 +13,10 @@ void Actor::update(float delta)
 {
 }
 
+void Actor::renderDepthShadow(Renderer *renderer)
+{
+}
+
 void Actor::renderDepth(Renderer *renderer)
 {
 }

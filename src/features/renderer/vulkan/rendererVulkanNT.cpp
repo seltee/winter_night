@@ -1,9 +1,13 @@
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 #include "features/renderer/vulkan/vulkanMesh.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
+#include "features/renderer/vulkan/vulkanRendererState.h"
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
 #include "features/renderer/vulkan/lights/vulkanLight.h"
 #include "features/renderer/vulkan/lights/vulkanLightDirectional.h"
+#include <iostream>
+#include <thread>
+#include <chrono>
 
 using namespace wne;
 
@@ -104,6 +108,7 @@ std::shared_ptr<Light> RendererVulkanNT::createLightSpot()
 
 bool RendererVulkanNT::setup(void *hWnd)
 {
+    state = new VulkanRendererState();
     instance = VulkanInstance::create(hWnd);
     if (!instance)
     {

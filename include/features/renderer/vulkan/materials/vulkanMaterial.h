@@ -7,6 +7,7 @@
 
 namespace wne
 {
+    class VulkanLightCascadeData;
     struct PushConstantObject
     {
         uint32 objectId;
@@ -21,6 +22,7 @@ namespace wne
 
         static std::shared_ptr<Material> createFlat(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture);
 
+        void bindDepthShadow(uint64 objectId, Renderer *renderer, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
         void bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
         void bindColor(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
 
@@ -28,6 +30,7 @@ namespace wne
         virtual void selectPipelineColor(ModelDataType dataType);
 
         virtual void selectDescriptor(ModelDataType dataType);
+        virtual void selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData);
         virtual void setPCData(uint64 objectId, const AffectingLights &lights);
 
     protected:

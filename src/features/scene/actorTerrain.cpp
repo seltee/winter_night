@@ -128,13 +128,27 @@ void ActorTerrain::setMaterial(std::shared_ptr<Material> material)
     this->material = material;
 }
 
+void ActorTerrain::renderDepthShadow(Renderer *renderer)
+{
+    if (!material || !currentScene)
+        return;
+    if (objectId == 0xffffffff)
+        return;
+
+    auto state = renderer->getState();
+    material->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    mesh->render(renderer->getFrameData());
+}
+
 void ActorTerrain::renderDepth(Renderer *renderer)
 {
     if (!material || !mesh || !currentScene)
         return;
     if (objectId == 0xffffffff)
         return;
-    material->bindDepth(objectId, renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+        
+    auto state = renderer->getState();
+    material->bindDepth(objectId, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 
@@ -144,7 +158,9 @@ void ActorTerrain::renderColor(Renderer *renderer)
         return;
     if (objectId == 0xffffffff)
         return;
+        
+    auto state = renderer->getState();
     AffectingLights lights = currentScene->collectAffectingLights();
-    material->bindColor(objectId, lights, renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    material->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }

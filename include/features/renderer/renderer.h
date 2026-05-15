@@ -3,6 +3,7 @@
 #include "features/renderer/mesh.h"
 #include "features/renderer/texture.h"
 #include "features/renderer/material.h"
+#include "features/renderer/rendererState.h"
 #include "features/scene/scene.h"
 #include "features/data/image.h"
 #include "core/core.h"
@@ -36,20 +37,15 @@ namespace wne
         virtual std::shared_ptr<Light> createLightOmni();
         virtual std::shared_ptr<Light> createLightSpot();
 
-        inline const Matrix4x4 &getViewProjectionMatrix()
+        inline RendererState *getState()
         {
-            return mVP;
-        }
-
-        inline void setViewProjectionMatrix(const Matrix4x4 &mVP)
-        {
-            this->mVP = mVP;
+            return state;
         }
 
         void addScene(std::shared_ptr<Scene> scene);
 
     protected:
-        Matrix4x4 mVP = Matrix4x4::identity();
         std::vector<std::shared_ptr<Scene>> scenes;
+        RendererState *state = nullptr;
     };
 }

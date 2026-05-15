@@ -32,6 +32,15 @@ void Scene::renderShadows(Renderer *renderer)
     }
 }
 
+void Scene::renderDepthShadow(Renderer *renderer)
+{
+    // depth path
+    for (const auto &object : actors)
+    {
+        object->renderDepthShadow(renderer);
+    }
+}
+
 void Scene::renderDepth(Renderer *renderer)
 {
     // depth path
@@ -57,7 +66,8 @@ void Scene::calcSceneMVP()
 
 void Scene::provideSceneMVP(Renderer *renderer)
 {
-    renderer->setViewProjectionMatrix(mVP);
+    auto state = renderer->getState();
+    state->setViewProjectionMatrix(mVP);
     renderer->setAmbientColor(ambientLightColor);
 }
 

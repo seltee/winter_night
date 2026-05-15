@@ -278,6 +278,11 @@ void VulkanInstance::finishRendering()
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
+void VulkanInstance::waitIdle()
+{
+    vkQueueWaitIdle(vulkanUtils->getPresentQueue());
+}
+
 bool VulkanInstance::initInstance()
 {
     vulkanInstanceExtensions = new VulkanInstanceExtensions();

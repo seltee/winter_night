@@ -16,7 +16,7 @@ namespace wne
                             VulkanCommandPool *commandPool);
         ~VulkanCommandBuffer();
 
-        bool setup(VkSurfaceKHR surface);
+        bool setup();
 
         void recordCommandBuffer();
         void beginRenderPass(VulkanRenderPass *renderPass, VkFramebuffer frameBuffer, uint16 width, uint16 height);

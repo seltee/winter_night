@@ -54,6 +54,9 @@ namespace wne
 
         bool createImageView(VkImage image, VulkanFormat format, VulkanImageAspectFlags aspectFlags, VkImageView *imageView);
 
+        VkCommandBuffer beginSingleTimeCommands();
+        void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+
         inline VulkanDevice *getVulkanDevice()
         {
             return vulkanDevice;
@@ -117,6 +120,16 @@ namespace wne
             return vulkanDepthPass;
         }
 
+        inline VkQueue getGraphicsQueue()
+        {
+            return graphicsQueue;
+        }
+
+        inline VkQueue getPresentQueue()
+        {
+            return presentQueue;
+        }
+
     protected:
         std::unique_ptr<VulkanDescriptorPool> vulkanDescriptorPool;
         std::unique_ptr<VulkanObjectBuffers> vulkanObjectBuffers;
@@ -135,9 +148,6 @@ namespace wne
         VkQueue presentQueue = nullptr;
 
         bool anisotropySupported = false;
-
-        VkCommandBuffer beginSingleTimeCommands();
-        void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
         VulkanRenderPass *vulkanRenderPass = nullptr;
         VulkanRenderPass *vulkanDepthPass = nullptr;
