@@ -115,25 +115,37 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
     }
 
     renderPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
-    if (!renderPass->setup(width, height, swapChain->getImageFormat()))
+    if (!renderPass->setupColor(swapChain->getImageFormat()))
     {
         std::cout << "Unable to create render pass" << std::endl;
         return false;
     }
 
-    std::cout << "DEPTH PASS" << std::endl;
-    depthPass = std::make_unique<VulkanDepthPass>(vulkanUtils.get());
-    if (!depthPass->setup(true))
+    depthPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
+    if (!depthPass->setupDepth(true))
     {
         std::cout << "Unable to create depth pass" << std::endl;
         return false;
     }
-    std::cout << "DONE" << std::endl;
 
     vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get(), depthPass.get());
 
-    frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
-    if (!frameBuffer->setup(swapChain.get(), renderPass.get()))
+    depthBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils.get());
+    if (!depthBuffer->setup(width, height, true))
+    {
+        std::cout << "unable to create depth buffer" << std::endl;
+        return false;
+    }
+
+    frameColorBuffer = std::make_unique<VulkanFrameBuffer>(device);
+    if (!frameColorBuffer->setupColor(swapChain.get(), renderPass.get(), depthBuffer.get()))
+    {
+        std::cout << "Unable to create vulkan frame buffer" << std::endl;
+        return false;
+    }
+
+    frameDepthBuffer = std::make_unique<VulkanFrameBuffer>(device);
+    if (!frameDepthBuffer->setupDepth(swapChain.get(), depthPass.get(), depthBuffer.get()))
     {
         std::cout << "Unable to create vulkan frame buffer" << std::endl;
         return false;
@@ -159,10 +171,12 @@ void VulkanInstance::changeSize()
 
     vkDeviceWaitIdle(device);
     frames.clear();
-    frameBuffer.reset();
+    frameColorBuffer.reset();
+    frameDepthBuffer.reset();
     vulkanUtils->destroyPipelines();
     renderPass.reset();
     depthPass.reset();
+    depthBuffer.reset();
     swapChain.reset();
     vkDeviceWaitIdle(device);
 
@@ -179,28 +193,39 @@ void VulkanInstance::changeSize()
     }
 
     renderPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
-    if (!renderPass->setup(width, height, swapChain->getImageFormat()))
+    if (!renderPass->setupColor(swapChain->getImageFormat()))
     {
         std::cout << "Unable to create render pass" << std::endl;
         throw std::runtime_error("failed to recreate render pass");
     }
 
-    std::cout << "DEPTH PASS R" << std::endl;
-    depthPass = std::make_unique<VulkanDepthPass>(vulkanUtils.get());
-    if (!depthPass->setup(true))
+    depthPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
+    if (!depthPass->setupDepth(true))
     {
         std::cout << "Unable to create depth pass" << std::endl;
         throw std::runtime_error("failed to recreate depth pass");
     }
-    std::cout << "DONE R" << std::endl;
-
     vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get(), depthPass.get());
 
-    frameBuffer = std::make_unique<VulkanFrameBuffer>(device);
-    if (!frameBuffer->setup(swapChain.get(), renderPass.get()))
+    depthBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils.get());
+    if (!depthBuffer->setup(width, height))
+    {
+        std::cout << "unable to create depth buffer" << std::endl;
+        throw std::runtime_error("unable to create depth buffer");
+    }
+
+    frameColorBuffer = std::make_unique<VulkanFrameBuffer>(device);
+    if (!frameColorBuffer->setupColor(swapChain.get(), renderPass.get(), depthBuffer.get()))
     {
         std::cout << "Unable to create vulkan frame buffer" << std::endl;
         throw std::runtime_error("failed to recreate swap chain");
+    }
+
+    frameDepthBuffer = std::make_unique<VulkanFrameBuffer>(device);
+    if (!frameDepthBuffer->setupDepth(swapChain.get(), depthPass.get(), depthBuffer.get()))
+    {
+        std::cout << "Unable to create vulkan frame buffer" << std::endl;
+        throw std::runtime_error("Unable to create vulkan frame buffer");
     }
 
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
@@ -232,9 +257,19 @@ void VulkanInstance::startRendering()
     vulkanUtils->setCurrentCommandBuffer(frames[currentFrame]->getCommandBuffer());
 }
 
+void VulkanInstance::beginDepthPass()
+{
+    frames[currentFrame]->beginDepthPass(depthPass.get(), frameDepthBuffer.get());
+}
+
+void VulkanInstance::finishDepthPass()
+{
+    frames[currentFrame]->endDepthPass();
+}
+
 void VulkanInstance::beginRenderPass()
 {
-    frames[currentFrame]->beginRenderPass(renderPass.get(), frameBuffer.get());
+    frames[currentFrame]->beginRenderPass(renderPass.get(), frameColorBuffer.get());
 }
 
 void VulkanInstance::finishRendering()

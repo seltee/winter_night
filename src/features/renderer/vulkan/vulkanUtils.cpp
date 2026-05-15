@@ -247,7 +247,7 @@ void VulkanUtils::destroyPipelines()
     vulkanPipelines->reset();
 }
 
-bool VulkanUtils::rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass, VulkanDepthPass *vulkanDepthPass)
+bool VulkanUtils::rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass, VulkanRenderPass *vulkanDepthPass)
 {
     this->vulkanRenderPass = vulkanRenderPass;
     this->vulkanDepthPass = vulkanDepthPass;

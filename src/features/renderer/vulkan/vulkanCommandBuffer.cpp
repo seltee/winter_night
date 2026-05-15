@@ -9,7 +9,6 @@ In addition, this allows command recording to happen in multiple threads if so d
 #include "features/renderer/vulkan/vulkanCommandBuffer.h"
 #include "features/renderer/vulkan/vulkanQueueFamilies.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
-#include "features/renderer/vulkan/vulkanDepthPass.h"
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
 #include "features/renderer/vulkan/vulkanCommandPool.h"
@@ -66,10 +65,10 @@ void VulkanCommandBuffer::recordCommandBuffer()
     }
 }
 // frameBuffer->getFrameBuffers()[imageIndex]
-void VulkanCommandBuffer::beginRenderPass(VulkanRenderPass *renderPass, VkFramebuffer frameBuffer)
+void VulkanCommandBuffer::beginRenderPass(VulkanRenderPass *renderPass, VkFramebuffer frameBuffer, uint16 width, uint16 height)
 {
-    passWidth = renderPass->getWidth();
-    passHeight = renderPass->getHeight();
+    passWidth = width;
+    passHeight = height;
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -80,15 +79,16 @@ void VulkanCommandBuffer::beginRenderPass(VulkanRenderPass *renderPass, VkFrameb
 
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
-    clearValues[1].depthStencil = {1.0f, 0};
+    clearValues[1].depthStencil.depth = 1.0f;
+    clearValues[1].depthStencil.stencil = 0;
 
-    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.clearValueCount = 2;
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
-void VulkanCommandBuffer::beginDepthPass(VulkanDepthPass *depthPass, VkFramebuffer frameBuffer, uint16 width, uint16 height)
+void VulkanCommandBuffer::beginDepthPass(VulkanRenderPass *depthPass, VkFramebuffer frameBuffer, uint16 width, uint16 height)
 {
     passWidth = width;
     passHeight = height;

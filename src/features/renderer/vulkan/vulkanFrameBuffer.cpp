@@ -8,7 +8,6 @@ That means that we have to create a framebuffer for all of the images in the swa
 
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
-#include "features/renderer/vulkan/vulkanDepthPass.h"
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanDepthBuffer.h"
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -31,7 +30,7 @@ VulkanFrameBuffer::~VulkanFrameBuffer()
     }
 }
 
-bool VulkanFrameBuffer::setup(VulkanSwapChain *swapChain, VulkanRenderPass *renderPass)
+bool VulkanFrameBuffer::setupColor(VulkanSwapChain *swapChain, VulkanRenderPass *renderPass, VulkanDepthBuffer *depthBuffer)
 {
     auto swapChainImageViews = swapChain->getImageViews();
     VkExtent2D *swapChainExtent = swapChain->getExtent();
@@ -42,7 +41,7 @@ bool VulkanFrameBuffer::setup(VulkanSwapChain *swapChain, VulkanRenderPass *rend
     {
         std::array<VkImageView, 2> attachments = {
             swapChainImageViews->at(i)->getImageView(),
-            renderPass->getDepthBuffer()->getDepthImageView()};
+            depthBuffer->getDepthImageView()};
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -62,17 +61,47 @@ bool VulkanFrameBuffer::setup(VulkanSwapChain *swapChain, VulkanRenderPass *rend
     return true;
 }
 
-bool VulkanFrameBuffer::setup(VulkanDepthPass *depthPass)
+bool VulkanFrameBuffer::setupDepth(VulkanSwapChain *swapChain, VulkanRenderPass *depthPass, VulkanDepthBuffer *depthBuffer)
 {
-    std::array<VkImageView, 1> attachments = {depthPass->getDepthBuffer()->getDepthImageView()};
+    auto swapChainImageViews = swapChain->getImageViews();
+    VkExtent2D *swapChainExtent = swapChain->getExtent();
+
+    frameBuffers.resize(swapChainImageViews->size());
+
+    for (size_t i = 0; i < swapChainImageViews->size(); i++)
+    {
+        std::array<VkImageView, 1> attachments = {depthBuffer->getDepthImageView()};
+
+        VkFramebufferCreateInfo framebufferInfo{};
+        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferInfo.renderPass = depthPass->getRenderPass();
+        framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        framebufferInfo.pAttachments = attachments.data();
+        framebufferInfo.width = swapChainExtent->width;
+        framebufferInfo.height = swapChainExtent->height;
+        framebufferInfo.layers = 1;
+
+        if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &frameBuffers[i]) != VK_SUCCESS)
+        {
+            std::cout << "Failed creating vulkan frame buffer" << std::endl;
+            return false;
+        }
+    }
+    return true;
+}
+
+bool VulkanFrameBuffer::setup(VulkanRenderPass *depthPass, VulkanDepthBuffer *depthBuffer)
+{
+    this->depthPass = depthPass;
+    std::array<VkImageView, 1> attachments = {depthBuffer->getDepthImageView()};
 
     VkFramebufferCreateInfo framebufferInfo{};
     framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     framebufferInfo.renderPass = depthPass->getRenderPass();
     framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
     framebufferInfo.pAttachments = attachments.data();
-    framebufferInfo.width = depthPass->getDepthBuffer()->getWidth();
-    framebufferInfo.height = depthPass->getDepthBuffer()->getHeight();
+    framebufferInfo.width = depthBuffer->getWidth();
+    framebufferInfo.height = depthBuffer->getHeight();
     framebufferInfo.layers = 1;
 
     frameBuffers.resize(1);

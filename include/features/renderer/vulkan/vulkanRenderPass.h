@@ -13,35 +13,19 @@ namespace wne
         VulkanRenderPass(VulkanUtils *vulkanUtils);
         ~VulkanRenderPass();
 
-        bool setup(uint16 width, uint16 height, VulkanFormat imageFormat);
+        bool setupColor(VulkanFormat imageFormat);
+        bool setupDepth(bool isSampled);
         inline VkRenderPass getRenderPass()
         {
             return renderPass;
         }
 
-        inline VulkanDepthBuffer *getDepthBuffer()
-        {
-            return vulkanDepthBuffer.get();
-        }
-
-        inline uint16 getWidth()
-        {
-            return width;
-        }
-
-        inline uint16 getHeight()
-        {
-            return height;
-        }
-
     protected:
-        uint16 width = 0, height = 0;
+        VulkanFormat findDepthFormat(bool isSampled);
 
         VkRenderPass renderPass = nullptr;
 
         VulkanUtils *vulkanUtils = nullptr;
         VulkanDevice *vulkanDevice = nullptr;
-
-        std::unique_ptr<VulkanDepthBuffer> vulkanDepthBuffer;
     };
 }

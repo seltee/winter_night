@@ -23,11 +23,16 @@ namespace wne
         VkPipeline getGraphicsPipeline() override final;
         VkPipelineLayout getPipelineLayout() override final;
 
-        bool setup(
+        bool setupColor(
             VulkanRenderPass *renderPass,
             VulkanDescriptorPool *vulkanDescriptorPool,
-            VulkanObjectBuffers *vulkanObjectBuffers,
-            bool depthWriteStage);
+            VulkanObjectBuffers *vulkanObjectBuffers);
+
+        bool setupDepth(
+            VulkanRenderPass *depthPass,
+            VulkanDescriptorPool *vulkanDescriptorPool,
+            VulkanObjectBuffers *vulkanObjectBuffers);
+
         void updateDescriptorSet(VulkanObjectBuffers *vulkanObjectBuffers);
 
         VkDescriptorSetLayout getDescriptorSetLayoutPipeline() override final;
@@ -35,6 +40,15 @@ namespace wne
         VkDescriptorSet getDescriptorSet() override final;
 
     protected:
+        bool buildShader();
+        bool buildPipeline(
+            uint32 stageAmount,
+            bool enableColorBlending,
+            bool enableDepthWrite,
+            VulkanRenderPass *renderPass,
+            VulkanDescriptorPool *vulkanDescriptorPool,
+            VulkanObjectBuffers *vulkanObjectBuffers);
+
         bool createLayouts();
 
         VkDescriptorSetLayout descriptorSetLayoutPipeline = nullptr;
@@ -44,4 +58,4 @@ namespace wne
         VkPipeline graphicsPipeline = nullptr;
         VkDescriptorSet descriptorSet = nullptr;
     };
-}
+};

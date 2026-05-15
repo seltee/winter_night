@@ -7,7 +7,6 @@ namespace wne
 {
     class VulkanUtils;
     class VulkanDepthBuffer;
-    class VulkanDepthPass;
     class VulkanFrameBuffer;
 
     class WNE_API VulkanLightDirectional : public LightDirectional
@@ -23,6 +22,7 @@ namespace wne
 
     protected:
         void destroyShadows();
+        VulkanFrameBuffer *getFrameBuffer(int cascade);
 
         uint amountOfCascades = 0;
         uint resolition = 0;

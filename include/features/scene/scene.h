@@ -22,6 +22,7 @@ namespace wne
 
         void update(float delta);
         void renderShadows(Renderer *renderer);
+        void renderDepth(Renderer *renderer);
         void render(Renderer *renderer);
 
         void addActor(std::shared_ptr<Actor> actor);

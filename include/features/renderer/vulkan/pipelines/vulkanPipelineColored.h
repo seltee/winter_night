@@ -25,14 +25,20 @@ namespace wne
         VkDescriptorSetLayout getDescriptorSetLayoutPipeline() override final;
         VkDescriptorSet getDescriptorSet() override final;
 
-        bool setup(
+        bool setupColor(
             VulkanRenderPass *renderPass,
             VulkanDescriptorPool *vulkanDescriptorPool,
-            VulkanObjectBuffers *vulkanObjectBuffers,
-            bool depthWriteStage);
+            VulkanObjectBuffers *vulkanObjectBuffers);
+            
+        bool setupDepth(
+            VulkanRenderPass *renderPass,
+            VulkanDescriptorPool *vulkanDescriptorPool,
+            VulkanObjectBuffers *vulkanObjectBuffers);
+
         void updateDescriptorSet(VulkanObjectBuffers *vulkanObjectBuffers);
 
     protected:
+        bool buildShader();
         bool createLayouts();
 
         VkDescriptorSetLayout descriptorSetLayoutPipeline = nullptr;

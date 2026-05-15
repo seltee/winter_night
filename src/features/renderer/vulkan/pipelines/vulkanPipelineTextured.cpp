@@ -51,19 +51,14 @@ VkPipelineLayout VulkanPipelineTextured::getPipelineLayout()
     return pipelineLayout;
 }
 
-bool VulkanPipelineTextured::setup(
+bool VulkanPipelineTextured::setupColor(
     VulkanRenderPass *renderPass,
     VulkanDescriptorPool *vulkanDescriptorPool,
-    VulkanObjectBuffers *vulkanObjectBuffers,
-    bool depthWriteStage)
+    VulkanObjectBuffers *vulkanObjectBuffers)
 {
-    auto device = vulkanDevice->getDevice();
-
-    shader = std::make_unique<VulkanShader>();
-    const char *fragmentShaderPath = depthWriteStage ? "./shaders/shaderDepth.frag.spv" : "./shaders/shaderTextured.frag.spv";
-    if (!shader->makeFromFiles("./shaders/shaderTextured.vert.spv", fragmentShaderPath, device))
+    if (!buildShader())
     {
-        std::cout << "Unable to compile textured shader" << std::endl;
+        std::cout << "Unable to build shader" << std::endl;
         return false;
     }
 
@@ -72,6 +67,146 @@ bool VulkanPipelineTextured::setup(
         std::cout << "Unable to create layouts" << std::endl;
         return false;
     }
+
+    if (!buildPipeline(2, true, false, renderPass, vulkanDescriptorPool, vulkanObjectBuffers))
+    {
+        std::cout << "Unable to build pipeline" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool VulkanPipelineTextured::setupDepth(
+    VulkanRenderPass *depthPass,
+    VulkanDescriptorPool *vulkanDescriptorPool,
+    VulkanObjectBuffers *vulkanObjectBuffers)
+{
+    if (!buildShader())
+    {
+        std::cout << "Unable to build shader" << std::endl;
+        return false;
+    }
+
+    if (!createLayouts())
+    {
+        std::cout << "Unable to create layouts" << std::endl;
+        return false;
+    }
+
+    if (!buildPipeline(1, false, true, depthPass, vulkanDescriptorPool, vulkanObjectBuffers))
+    {
+        std::cout << "Unable to build pipeline" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+void VulkanPipelineTextured::updateDescriptorSet(VulkanObjectBuffers *vulkanObjectBuffers)
+{
+    auto device = vulkanDevice->getDevice();
+
+    VkDescriptorBufferInfo bufferModelInfo{};
+    bufferModelInfo.buffer = vulkanObjectBuffers->getModelMatricesBuffer();
+    bufferModelInfo.offset = 0;
+    bufferModelInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
+
+    VkDescriptorBufferInfo bufferMVPInfo{};
+    bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer();
+    bufferMVPInfo.offset = 0;
+    bufferMVPInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
+
+    VkDescriptorBufferInfo bufferNormalInfo{};
+    bufferNormalInfo.buffer = vulkanObjectBuffers->getNormalMatricesBuffer();
+    bufferNormalInfo.offset = 0;
+    bufferNormalInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
+
+    VkDescriptorBufferInfo bufferGlobalDataInfo{};
+    bufferGlobalDataInfo.buffer = vulkanObjectBuffers->getGlobalDataBuffer();
+    bufferGlobalDataInfo.offset = 0;
+    bufferGlobalDataInfo.range = vulkanObjectBuffers->getGlobalDataSize();
+
+    VkDescriptorBufferInfo bufferLightsInfo{};
+    bufferLightsInfo.buffer = vulkanObjectBuffers->getLightsDataBuffer();
+    bufferLightsInfo.offset = 0;
+    bufferLightsInfo.range = vulkanObjectBuffers->getLightsBufferSize();
+
+    std::array<VkWriteDescriptorSet, 5> writes{};
+    writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[0].dstSet = descriptorSet;
+    writes[0].dstBinding = 0;
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[0].descriptorCount = 1;
+    writes[0].pBufferInfo = &bufferModelInfo;
+
+    writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[1].dstSet = descriptorSet;
+    writes[1].dstBinding = 1;
+    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[1].descriptorCount = 1;
+    writes[1].pBufferInfo = &bufferMVPInfo;
+
+    writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[2].dstSet = descriptorSet;
+    writes[2].dstBinding = 2;
+    writes[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[2].descriptorCount = 1;
+    writes[2].pBufferInfo = &bufferNormalInfo;
+
+    writes[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[3].dstSet = descriptorSet;
+    writes[3].dstBinding = 3;
+    writes[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[3].descriptorCount = 1;
+    writes[3].pBufferInfo = &bufferGlobalDataInfo;
+
+    writes[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[4].dstSet = descriptorSet;
+    writes[4].dstBinding = 4;
+    writes[4].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[4].descriptorCount = 1;
+    writes[4].pBufferInfo = &bufferLightsInfo;
+
+    vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
+}
+
+VkDescriptorSetLayout VulkanPipelineTextured::getDescriptorSetLayoutPipeline()
+{
+    return descriptorSetLayoutPipeline;
+}
+
+VkDescriptorSetLayout VulkanPipelineTextured::getDescriptorSetLayoutSampler()
+{
+    return descriptorSetLayoutSampler;
+}
+
+VkDescriptorSet VulkanPipelineTextured::getDescriptorSet()
+{
+    return descriptorSet;
+}
+
+bool VulkanPipelineTextured::buildShader()
+{
+    auto device = vulkanDevice->getDevice();
+    shader = std::make_unique<VulkanShader>();
+    if (!shader->makeFromFiles("./shaders/shaderTextured.vert.spv", "./shaders/shaderTextured.frag.spv", device))
+    {
+        std::cout << "Unable to compile textured shader" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool VulkanPipelineTextured::buildPipeline(
+    uint32 stageAmount,
+    bool enableColorBlending,
+    bool enableDepthWrite,
+    VulkanRenderPass *renderPass,
+    VulkanDescriptorPool *vulkanDescriptorPool,
+    VulkanObjectBuffers *vulkanObjectBuffers)
+{
+    auto device = vulkanDevice->getDevice();
 
     VkVertexInputBindingDescription bindingDescription{};
     bindingDescription.binding = 0;
@@ -158,25 +293,35 @@ bool VulkanPipelineTextured::setup(
     multisampling.alphaToOneEnable = VK_FALSE;      // Optional
 
     VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-    colorBlendAttachment.colorWriteMask = depthWriteStage ? 0 : VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    colorBlendAttachment.blendEnable = VK_FALSE;
-    colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;  // Optional
-    colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-    colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;             // Optional
-    colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;  // Optional
-    colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-    colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;             // Optional
-
     VkPipelineColorBlendStateCreateInfo colorBlending{};
-    colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    colorBlending.logicOpEnable = VK_FALSE;
-    colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
-    colorBlending.attachmentCount = 1;
-    colorBlending.pAttachments = &colorBlendAttachment;
-    colorBlending.blendConstants[0] = 0.0f; // Optional
-    colorBlending.blendConstants[1] = 0.0f; // Optional
-    colorBlending.blendConstants[2] = 0.0f; // Optional
-    colorBlending.blendConstants[3] = 0.0f; // Optional
+    if (enableColorBlending)
+    {
+        colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+        colorBlendAttachment.blendEnable = VK_FALSE;
+        colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;  // Optional
+        colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
+        colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;             // Optional
+        colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;  // Optional
+        colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
+        colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;             // Optional
+
+        colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        colorBlending.logicOpEnable = VK_FALSE;
+        colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
+        colorBlending.attachmentCount = 1;
+        colorBlending.pAttachments = &colorBlendAttachment;
+        colorBlending.blendConstants[0] = 0.0f; // Optional
+        colorBlending.blendConstants[1] = 0.0f; // Optional
+        colorBlending.blendConstants[2] = 0.0f; // Optional
+        colorBlending.blendConstants[3] = 0.0f; // Optional
+    }
+    else
+    {
+        colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        colorBlending.logicOpEnable = VK_FALSE;
+        colorBlending.attachmentCount = 0;
+        colorBlending.pAttachments = nullptr;
+    }
 
     VkPushConstantRange pushRange{};
     pushRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -214,18 +359,16 @@ bool VulkanPipelineTextured::setup(
     VkPipelineDepthStencilStateCreateInfo depthStencil{};
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     depthStencil.depthTestEnable = VK_TRUE;
-    depthStencil.depthWriteEnable = depthWriteStage ? VK_TRUE : VK_FALSE;
-    depthStencil.depthCompareOp = depthWriteStage ? VK_COMPARE_OP_LESS : VK_COMPARE_OP_EQUAL;
+    depthStencil.depthWriteEnable = enableDepthWrite ? VK_TRUE : VK_FALSE;
+    depthStencil.depthCompareOp = enableDepthWrite ? VK_COMPARE_OP_LESS : VK_COMPARE_OP_EQUAL;
     depthStencil.depthBoundsTestEnable = VK_FALSE;
     depthStencil.minDepthBounds = 0.0f; // Optional
     depthStencil.maxDepthBounds = 1.0f; // Optional
     depthStencil.stencilTestEnable = VK_FALSE;
-    depthStencil.front = {}; // Optional
-    depthStencil.back = {};  // Optional
 
     VkGraphicsPipelineCreateInfo pipelineInfo{};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    pipelineInfo.stageCount = 2;
+    pipelineInfo.stageCount = stageAmount;
     pipelineInfo.pStages = (VkPipelineShaderStageCreateInfo *)shader->getShaderStages();
     pipelineInfo.pVertexInputState = &vertexInputInfo;
     pipelineInfo.pInputAssemblyState = &inputAssembly;
@@ -250,91 +393,7 @@ bool VulkanPipelineTextured::setup(
     }
     if (graphicsPipeline == VK_NULL_HANDLE)
         std::cout << "Pipeline is null!" << std::endl;
-
     return true;
-}
-
-void VulkanPipelineTextured::updateDescriptorSet(VulkanObjectBuffers *vulkanObjectBuffers)
-{
-    auto device = vulkanDevice->getDevice();
-
-    VkDescriptorBufferInfo bufferModelInfo{};
-    bufferModelInfo.buffer = vulkanObjectBuffers->getModelMatricesBuffer();
-    bufferModelInfo.offset = 0;
-    bufferModelInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
-
-    VkDescriptorBufferInfo bufferMVPInfo{};
-    bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer();
-    bufferMVPInfo.offset = 0;
-    bufferMVPInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
-
-    VkDescriptorBufferInfo bufferNormalInfo{};
-    bufferNormalInfo.buffer = vulkanObjectBuffers->getNormalMatricesBuffer();
-    bufferNormalInfo.offset = 0;
-    bufferNormalInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
-
-    VkDescriptorBufferInfo bufferGlobalDataInfo{};
-    bufferGlobalDataInfo.buffer = vulkanObjectBuffers->getGlobalDataBuffer();
-    bufferGlobalDataInfo.offset = 0;
-    bufferGlobalDataInfo.range = vulkanObjectBuffers->getGlobalDataSize();
-
-    VkDescriptorBufferInfo bufferLightsInfo{};
-    bufferLightsInfo.buffer = vulkanObjectBuffers->getLightsDataBuffer();
-    bufferLightsInfo.offset = 0;
-    bufferLightsInfo.range = vulkanObjectBuffers->getLightsBufferSize();
-
-    std::array<VkWriteDescriptorSet, 5> writes{};
-    writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    writes[0].dstSet = descriptorSet;
-    writes[0].dstBinding = 0;
-    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    writes[0].descriptorCount = 1;
-    writes[0].pBufferInfo = &bufferModelInfo;
-
-    writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    writes[1].dstSet = descriptorSet;
-    writes[1].dstBinding = 1;
-    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    writes[1].descriptorCount = 1;
-    writes[1].pBufferInfo = &bufferMVPInfo;
-
-    writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    writes[2].dstSet = descriptorSet;
-    writes[2].dstBinding = 2;
-    writes[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    writes[2].descriptorCount = 1;
-    writes[2].pBufferInfo = &bufferNormalInfo;
-
-    writes[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    writes[3].dstSet = descriptorSet;
-    writes[3].dstBinding = 3;
-    writes[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    writes[3].descriptorCount = 1;
-    writes[3].pBufferInfo = &bufferGlobalDataInfo;
-
-    writes[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    writes[4].dstSet = descriptorSet;
-    writes[4].dstBinding = 4;
-    writes[4].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    writes[4].descriptorCount = 1;
-    writes[4].pBufferInfo = &bufferLightsInfo;
-
-    vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
-}
-
-VkDescriptorSetLayout VulkanPipelineTextured::getDescriptorSetLayoutPipeline()
-{
-    return descriptorSetLayoutPipeline;
-}
-
-VkDescriptorSetLayout VulkanPipelineTextured::getDescriptorSetLayoutSampler()
-{
-    return descriptorSetLayoutSampler;
-}
-
-VkDescriptorSet VulkanPipelineTextured::getDescriptorSet()
-{
-    return descriptorSet;
 }
 
 bool VulkanPipelineTextured::createLayouts()

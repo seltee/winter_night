@@ -5,7 +5,6 @@ namespace wne
 {
     class VulkanDevice;
     class VulkanRenderPass;
-    class VulkanDepthPass;
     class VulkanFrameBuffer;
     class VulkanCommandPool;
     class VulkanPipeline;
@@ -20,8 +19,8 @@ namespace wne
         bool setup(VkSurfaceKHR surface);
 
         void recordCommandBuffer();
-        void beginRenderPass(VulkanRenderPass *renderPass, VkFramebuffer frameBuffer);
-        void beginDepthPass(VulkanDepthPass *depthPass, VkFramebuffer frameBuffer, uint16 width, uint16 height);
+        void beginRenderPass(VulkanRenderPass *renderPass, VkFramebuffer frameBuffer, uint16 width, uint16 height);
+        void beginDepthPass(VulkanRenderPass *depthPass, VkFramebuffer frameBuffer, uint16 width, uint16 height);
         void endPass();
         void endCommandBuffer();
         void bindPipeline(VulkanPipeline *vulkanPipeline);

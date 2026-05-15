@@ -32,7 +32,7 @@ void Scene::renderShadows(Renderer *renderer)
     }
 }
 
-void Scene::render(Renderer *renderer)
+void Scene::renderDepth(Renderer *renderer)
 {
     Matrix4x4 mVP = actorCamera ? actorCamera->getProjectionMatrix() * actorCamera->getInvModelMatrix() : Matrix4x4::identity();
     renderer->setViewProjectionMatrix(mVP);
@@ -43,6 +43,13 @@ void Scene::render(Renderer *renderer)
     {
         object->renderDepth(renderer);
     }
+}
+
+void Scene::render(Renderer *renderer)
+{
+    // Matrix4x4 mVP = actorCamera ? actorCamera->getProjectionMatrix() * actorCamera->getInvModelMatrix() : Matrix4x4::identity();
+    // renderer->setViewProjectionMatrix(mVP);
+    // renderer->setAmbientColor(ambientLightColor);
 
     // color path
     for (const auto &object : actors)

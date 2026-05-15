@@ -19,7 +19,6 @@ namespace wne
     class VulkanDescriptorLayout;
     class VulkanSwapChain;
     class VulkanRenderPass;
-    class VulkanDepthPass;
     class VulkanObjectBuffers;
 
     class VulkanUtils
@@ -41,7 +40,7 @@ namespace wne
         void transitionImageLayout(VkImage image, uint64 format, uint64 oldLayout, uint64 newLayout);
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width, uint32 height);
         void destroyPipelines();
-        bool rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass, VulkanDepthPass *vulkanDepthPass);
+        bool rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass, VulkanRenderPass *vulkanDepthPass);
 
         bool createImage(
             uint16 width,
@@ -113,7 +112,7 @@ namespace wne
             return vulkanRenderPass;
         }
 
-        inline VulkanDepthPass *getCurrentDepthPass()
+        inline VulkanRenderPass *getCurrentDepthPass()
         {
             return vulkanDepthPass;
         }
@@ -141,6 +140,6 @@ namespace wne
         void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
         VulkanRenderPass *vulkanRenderPass = nullptr;
-        VulkanDepthPass *vulkanDepthPass = nullptr;
+        VulkanRenderPass *vulkanDepthPass = nullptr;
     };
 };

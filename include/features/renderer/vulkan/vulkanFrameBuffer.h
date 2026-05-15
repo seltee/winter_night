@@ -6,15 +6,16 @@ namespace wne
 {
     class VulkanSwapChain;
     class VulkanRenderPass;
-    class VulkanDepthPass;
+    class VulkanDepthBuffer;
 
     class VulkanFrameBuffer
     {
     public:
         VulkanFrameBuffer(VkDevice device);
         ~VulkanFrameBuffer();
-        bool setup(VulkanSwapChain *swapChain, VulkanRenderPass *renderPass);
-        bool setup(VulkanDepthPass *depthPass);
+        bool setupColor(VulkanSwapChain *swapChain, VulkanRenderPass *renderPass, VulkanDepthBuffer *depthBuffer);
+        bool setupDepth(VulkanSwapChain *swapChain, VulkanRenderPass *depthPass, VulkanDepthBuffer *depthBuffer);
+        bool setup(VulkanRenderPass *depthPass, VulkanDepthBuffer *depthBuffer);
 
         inline const VkFramebuffer getFrameBuffer()
         {
@@ -26,7 +27,13 @@ namespace wne
             return frameBuffers;
         }
 
+        inline VulkanRenderPass *getDepthPass()
+        {
+            return depthPass;
+        }
+
     protected:
+        VulkanRenderPass *depthPass = nullptr;
         std::vector<VkFramebuffer> frameBuffers;
         VkDevice device = nullptr;
     };

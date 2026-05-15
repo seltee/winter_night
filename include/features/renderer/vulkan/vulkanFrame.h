@@ -23,6 +23,8 @@ namespace wne
             VulkanUtils *vulkanUtils);
 
         void startFrame();
+        void beginDepthPass(VulkanRenderPass *depthPass, VulkanFrameBuffer *frameBuffers);
+        void endDepthPass();
         void beginRenderPass(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffers);
         void finishFrame(VkQueue graphicsQueue, VkQueue presentQueue);
 

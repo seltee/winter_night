@@ -89,7 +89,7 @@ int main()
 
     auto spot = renderer->createLightSpot();
     spot->setDirection({0, -1.0f, 0});
-    spot->setColor({2.0f, 2.0f, 5.0f});
+    spot->setColor({2.0f, 2.0f, 10.0f});
     spot->setAffectRadius(60.0f);
     spot->setOuterCutOff(0.3f);
     auto actorSpot = wne::ActorLight::create(spot);

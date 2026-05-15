@@ -23,7 +23,7 @@ void VulkanPipelines::reset()
 bool VulkanPipelines::build(
     VulkanSwapChain *vulkanSwapChain,
     VulkanRenderPass *vulkanRenderPass,
-    VulkanDepthPass *VulkanDepthPass,
+    VulkanRenderPass *VulkanDepthPass,
     VulkanDescriptorPool *vulkanDescriptorPool,
     VulkanObjectBuffers *vulkanObjectBuffers)
 {
@@ -32,17 +32,17 @@ bool VulkanPipelines::build(
     bool status = true;
     // depth pipelines
     vulkanPipelineColoredDepth = std::make_unique<VulkanPipelineColored>(vulkanDevice);
-    status &= vulkanPipelineColoredDepth->setup(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, true);
+    status &= vulkanPipelineColoredDepth->setupDepth(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers);
 
     vulkanPipelineTexturedDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedDepth->setup(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, true);
+    status &= vulkanPipelineTexturedDepth->setupDepth(VulkanDepthPass, vulkanDescriptorPool, vulkanObjectBuffers);
 
     // color pipelines
     vulkanPipelineColoredColor = std::make_unique<VulkanPipelineColored>(vulkanDevice);
-    status &= vulkanPipelineColoredColor->setup(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, false);
+    status &= vulkanPipelineColoredColor->setupColor(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers);
 
     vulkanPipelineTexturedColor = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedColor->setup(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers, false);
+    status &= vulkanPipelineTexturedColor->setupColor(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers);
 
     if (!status)
     {
@@ -62,9 +62,10 @@ void VulkanPipelines::enablePipelineColored(VulkanCommandBuffer *commandBuffer, 
 
 void VulkanPipelines::enablePipelineTextured(VulkanCommandBuffer *commandBuffer, bool isDepthRendering)
 {
-    if (isDepthRendering)
+    if (isDepthRendering){
         currentPipeline = vulkanPipelineTexturedDepth.get();
-    else
+    }else{
         currentPipeline = vulkanPipelineTexturedColor.get();
+    }
     commandBuffer->bindPipeline(currentPipeline);
 }

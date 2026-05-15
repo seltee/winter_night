@@ -69,9 +69,21 @@ void VulkanFrame::startFrame()
     commandBuffer->recordCommandBuffer();
 }
 
+void VulkanFrame::beginDepthPass(VulkanRenderPass *depthPass, VulkanFrameBuffer *frameBuffers)
+{
+    auto extent = swapChain->getExtent();
+    commandBuffer->beginDepthPass(depthPass, frameBuffers->getFrameBuffers()[imageIndex], extent->width, extent->height);
+}
+
+void VulkanFrame::endDepthPass()
+{
+    commandBuffer->endPass();
+}
+
 void VulkanFrame::beginRenderPass(VulkanRenderPass *renderPass, VulkanFrameBuffer *frameBuffers)
 {
-    commandBuffer->beginRenderPass(renderPass, frameBuffers->getFrameBuffers()[imageIndex]);
+    auto extent = swapChain->getExtent();
+    commandBuffer->beginRenderPass(renderPass, frameBuffers->getFrameBuffers()[imageIndex], extent->width, extent->height);
 }
 
 void VulkanFrame::finishFrame(VkQueue graphicsQueue, VkQueue presentQueue)
