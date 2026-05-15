@@ -90,6 +90,7 @@ VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
 
     // albedo sampler
     VkDescriptorImageInfo imageInfo{};
+    std::cout << (VkImageLayout)((VulkanTexture *)albedoTexture.get())->getImageLayout() << std::endl;
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     imageInfo.imageView = ((VulkanTexture *)albedoTexture.get())->getImageView()->getImageView();
     imageInfo.sampler = vulkanUtils->getSampler()->getTextureSampler();

@@ -11,6 +11,7 @@ namespace wne
         VulkanImageView(VulkanDevice *vulkanDevice);
         ~VulkanImageView();
         bool setup(VkImage image, uint64 format);
+        bool setup(VkImageView imageView);
 
         inline VkImageView getImageView()
         {

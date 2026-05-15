@@ -9,18 +9,15 @@ namespace wne
     public:
         virtual void render(void *frameRenderData);
 
+        virtual uint64 genNewObjectId();
+        virtual void freeObjectId(uint64 objectId);
+
         inline ModelDataType getDataType()
         {
             return dataType;
         }
 
-        inline uint64 getObjectId()
-        {
-            return objectId;
-        }
-
     protected:
         ModelDataType dataType = ModelDataType::Unknown;
-        uint64 objectId = 0xffffffff;
     };
 }

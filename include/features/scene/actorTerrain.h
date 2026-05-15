@@ -17,6 +17,7 @@ namespace wne
     {
     public:
         ActorTerrain(Renderer *renderer);
+        ~ActorTerrain();
         static std::shared_ptr<ActorTerrain> createFromImage(int resolution, float size, float heightFactor, std::shared_ptr<Image> image, Renderer *renderer);
 
         void setResolution(int resolution);
@@ -34,6 +35,7 @@ namespace wne
     protected:
         std::shared_ptr<Mesh> mesh;
         std::shared_ptr<Material> material;
+        uint64 objectId = 0xffffffff;
 
         std::vector<float> heights;
 

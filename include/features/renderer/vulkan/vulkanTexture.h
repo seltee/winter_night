@@ -17,10 +17,16 @@ namespace wne
         VulkanTexture(VulkanUtils *vulkanUtils);
         ~VulkanTexture();
         bool setup(void *pixels, uint32 width, uint32 height);
+        bool setup(VkImageView vkImageView);
 
         static std::shared_ptr<VulkanTexture> create(std::shared_ptr<Image> image, VulkanUtils *vulkanUtils);
 
         void bind() override final;
+
+        inline uint64 getImageLayout()
+        {
+            return imageLayout;
+        }
 
         inline VulkanImageView *getImageView()
         {
@@ -34,5 +40,6 @@ namespace wne
         VkDeviceMemory textureImageMemory = nullptr;
         VulkanUtils *vulkanUtils = nullptr;
         std::unique_ptr<VulkanImageView> vulkanImageView;
+        uint64 imageLayout = 0;
     };
 };

@@ -14,3 +14,8 @@ bool LightDirectional::enableShadows(uint amountOfCascades, uint resolition)
 void LightDirectional::disableShadows()
 {
 }
+
+std::shared_ptr<Texture> LightDirectional::getCascadeAsTexture(int numOfCascade)
+{
+    return nullptr;
+}

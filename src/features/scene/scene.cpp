@@ -28,16 +28,12 @@ void Scene::renderShadows(Renderer *renderer)
     if (actorCamera)
     {
         for (const auto &light : lights)
-            light->renderShadows(this, actorCamera.get());
+            light->renderShadows(renderer, this, actorCamera.get());
     }
 }
 
 void Scene::renderDepth(Renderer *renderer)
 {
-    Matrix4x4 mVP = actorCamera ? actorCamera->getProjectionMatrix() * actorCamera->getInvModelMatrix() : Matrix4x4::identity();
-    renderer->setViewProjectionMatrix(mVP);
-    renderer->setAmbientColor(ambientLightColor);
-
     // depth path
     for (const auto &object : actors)
     {
@@ -47,15 +43,22 @@ void Scene::renderDepth(Renderer *renderer)
 
 void Scene::render(Renderer *renderer)
 {
-    // Matrix4x4 mVP = actorCamera ? actorCamera->getProjectionMatrix() * actorCamera->getInvModelMatrix() : Matrix4x4::identity();
-    // renderer->setViewProjectionMatrix(mVP);
-    // renderer->setAmbientColor(ambientLightColor);
-
     // color path
     for (const auto &object : actors)
     {
         object->renderColor(renderer);
     }
+}
+
+void Scene::calcSceneMVP()
+{
+    mVP = actorCamera ? actorCamera->getProjectionMatrix() * actorCamera->getInvModelMatrix() : Matrix4x4::identity();
+}
+
+void Scene::provideSceneMVP(Renderer *renderer)
+{
+    renderer->setViewProjectionMatrix(mVP);
+    renderer->setAmbientColor(ambientLightColor);
 }
 
 void Scene::addActor(std::shared_ptr<Actor> actor)

@@ -9,6 +9,12 @@ ActorTerrain::ActorTerrain(Renderer *renderer)
     this->renderer = renderer;
 }
 
+ActorTerrain::~ActorTerrain()
+{
+    if (mesh)
+        mesh->freeObjectId(objectId);
+}
+
 std::shared_ptr<ActorTerrain> ActorTerrain::createFromImage(int resolution, float size, float heightFactor, std::shared_ptr<Image> image, Renderer *renderer)
 {
     std::shared_ptr<ActorTerrain> ptr = std::make_shared<ActorTerrain>(renderer);
@@ -112,6 +118,9 @@ void ActorTerrain::updateMesh()
 
     std::shared_ptr<wne::Model> model = Model::createFromData(vertices, indices);
     mesh = renderer->createMesh(model);
+
+    if (objectId == 0xffffffff)
+        objectId = mesh->genNewObjectId();
 }
 
 void ActorTerrain::setMaterial(std::shared_ptr<Material> material)
@@ -123,7 +132,6 @@ void ActorTerrain::renderDepth(Renderer *renderer)
 {
     if (!material || !mesh || !currentScene)
         return;
-    uint64 objectId = mesh->getObjectId();
     if (objectId == 0xffffffff)
         return;
     material->bindDepth(objectId, renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
@@ -134,7 +142,6 @@ void ActorTerrain::renderColor(Renderer *renderer)
 {
     if (!material || !mesh || !currentScene)
         return;
-    uint64 objectId = mesh->getObjectId();
     if (objectId == 0xffffffff)
         return;
     AffectingLights lights = currentScene->collectAffectingLights();

@@ -8,6 +8,7 @@ namespace wne
     class VulkanUtils;
     class VulkanDepthBuffer;
     class VulkanFrameBuffer;
+    class Renderer;
 
     class WNE_API VulkanLightDirectional : public LightDirectional
     {
@@ -15,10 +16,12 @@ namespace wne
         VulkanLightDirectional(VulkanUtils *vulkanUtils);
         ~VulkanLightDirectional();
 
-        void renderShadows(Scene *scene, ActorCamera *camera) override final;
+        void renderShadows(Renderer *renderer, Scene *scene, ActorCamera *camera) override final;
         bool enableShadows(uint amountOfCascades, uint resolition) override final;
         void disableShadows() override final;
         void prepareForRender() override final;
+
+        std::shared_ptr<Texture> getCascadeAsTexture(int numOfCascade) override final;
 
     protected:
         void destroyShadows();

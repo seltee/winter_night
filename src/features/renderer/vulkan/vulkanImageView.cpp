@@ -37,3 +37,9 @@ bool VulkanImageView::setup(VkImage image, uint64 format)
     }
     return true;
 }
+
+bool VulkanImageView::setup(VkImageView imageView)
+{
+    this->imageView = imageView;
+    return true;
+}

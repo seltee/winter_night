@@ -24,6 +24,8 @@ namespace wne
         void renderShadows(Renderer *renderer);
         void renderDepth(Renderer *renderer);
         void render(Renderer *renderer);
+        void calcSceneMVP();
+        void provideSceneMVP(Renderer *renderer);
 
         void addActor(std::shared_ptr<Actor> actor);
         void setCamera(std::shared_ptr<ActorCamera> actorCamera);
@@ -58,5 +60,7 @@ namespace wne
         std::shared_ptr<ActorCamera> actorCamera;
 
         Vector4 ambientLightColor = {0.8f, 0.8f, 0.8f, 1.0f};
+
+        Matrix4x4 mVP = Matrix4x4::identity();
     };
 };

@@ -27,6 +27,9 @@ namespace wne
 
         void render(void *frameRenderData) override final;
 
+        uint64 genNewObjectId() override final;
+        void freeObjectId(uint64 objectId) override final;
+
         inline uint32 getAmountOfVerticies()
         {
             return amountOfVerticies;

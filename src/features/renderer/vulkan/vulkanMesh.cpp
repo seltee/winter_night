@@ -13,7 +13,6 @@ VulkanMesh::VulkanMesh(VulkanUtils *vulkanUtils)
 {
     this->vulkanUtils = vulkanUtils;
     this->vulkanDevice = vulkanUtils->getVulkanDevice();
-    objectId = vulkanUtils->getObjectBuffers()->getNewObjectId();
 }
 
 VulkanMesh::~VulkanMesh()
@@ -26,7 +25,6 @@ VulkanMesh::~VulkanMesh()
         vkDestroyBuffer(vulkanDevice->getDevice(), indexBuffer, nullptr);
     if (indexBufferMemory)
         vkFreeMemory(vulkanDevice->getDevice(), indexBufferMemory, nullptr);
-    vulkanUtils->getObjectBuffers()->freeObjectId(objectId);
 }
 
 std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, VulkanUtils *vulkanUtils)
@@ -146,6 +144,16 @@ void VulkanMesh::render(void *frameRenderData)
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
     vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, (VkIndexType)vulkanIndexType);
     vkCmdDrawIndexed(commandBuffer, amountOfIndices, 1, 0, 0, 0);
+}
+
+uint64 VulkanMesh::genNewObjectId()
+{
+    return vulkanUtils->getObjectBuffers()->getNewObjectId();
+}
+
+void VulkanMesh::freeObjectId(uint64 objectId)
+{
+    vulkanUtils->getObjectBuffers()->freeObjectId(objectId);
 }
 
 bool VulkanMesh::allocateVertexBuffer(uint64 bufferSize, void *data)

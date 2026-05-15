@@ -7,6 +7,12 @@ using namespace wne;
 ActorMesh::ActorMesh(std::shared_ptr<Mesh> mesh)
 {
     this->mesh = std::move(mesh);
+    objectId = this->mesh->genNewObjectId();
+}
+
+ActorMesh::~ActorMesh()
+{
+    this->mesh->freeObjectId(objectId);
 }
 
 std::shared_ptr<ActorMesh> ActorMesh::create(std::shared_ptr<Mesh> mesh)
@@ -23,7 +29,6 @@ void ActorMesh::renderDepth(Renderer *renderer)
 {
     if (!material || !currentScene)
         return;
-    uint64 objectId = mesh->getObjectId();
     if (objectId == 0xffffffff)
         return;
     material->bindDepth(objectId, renderer->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
@@ -34,7 +39,6 @@ void ActorMesh::renderColor(Renderer *renderer)
 {
     if (!material || !currentScene)
         return;
-    uint64 objectId = mesh->getObjectId();
     if (objectId == 0xffffffff)
         return;
     AffectingLights lights = currentScene->collectAffectingLights();

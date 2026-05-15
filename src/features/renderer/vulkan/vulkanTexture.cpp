@@ -66,6 +66,19 @@ bool VulkanTexture::setup(void *pixels, uint32 width, uint32 height)
         std::cout << "failed to create image view" << std::endl;
         return false;
     }
+    imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    return true;
+}
+
+bool VulkanTexture::setup(VkImageView vkImageView)
+{
+    vulkanImageView = std::make_unique<VulkanImageView>(vulkanUtils->getVulkanDevice());
+    if (!vulkanImageView->setup(vkImageView))
+    {
+        std::cout << "failed to create image view" << std::endl;
+        return false;
+    }
+    imageLayout =  VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
     return true;
 }
 

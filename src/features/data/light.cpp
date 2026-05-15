@@ -17,7 +17,7 @@ void Light::updateTransformation(const Matrix4x4 &mModel)
     realDirection = Vector4(normalize(positionInDirection.xyz() - position.xyz()), 1.0f);
 }
 
-void Light::renderShadows(Scene *scene, ActorCamera *camera)
+void Light::renderShadows(Renderer *renderer, Scene *scene, ActorCamera *camera)
 {
 }
 

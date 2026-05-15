@@ -7,6 +7,7 @@ namespace wne
 {
     class Scene;
     class ActorCamera;
+    class Renderer;
 
     class WNE_API Light
     {
@@ -20,7 +21,7 @@ namespace wne
         Light(Type type);
 
         virtual void updateTransformation(const Matrix4x4 &mModel);
-        virtual void renderShadows(Scene *scene, ActorCamera *camera);
+        virtual void renderShadows(Renderer *renderer, Scene *scene, ActorCamera *camera);
         virtual void prepareForRender();
 
         inline void setColor(Vector3 color)
