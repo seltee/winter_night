@@ -66,11 +66,23 @@ void VulkanObjectBuffers::updateLightData(
     }
 }
 
+void VulkanObjectBuffers::updateLightShadowData(
+    uint32 shadowId,
+    Matrix4x4 &mLightMVP)
+{
+    if (shadowId < MAX_LIGHT_SHADOWS)
+    {
+        bufferLightMVPsMapped[shadowId] = mLightMVP;
+    }
+}
+
 bool VulkanObjectBuffers::setup()
 {
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
     uint64 matrixBufferSize = getMatrixBufferSize();
     uint64 lightsBufferSize = getLightsBufferSize();
+    uint64 lightMVPsSize = getLightMVPsBufferSize();
+
     if (!vulkanUtils->createBuffer(
             matrixBufferSize,
             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -114,6 +126,17 @@ bool VulkanObjectBuffers::setup()
         return false;
     }
     vkMapMemory(device, bufferGlobalDataMemory, 0, sizeof(GlobalData), 0, (void **)&bufferGlobalDataMapped);
+
+    if (!vulkanUtils->createBuffer(
+            lightMVPsSize,
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            bufferLightMVPsData,
+            bufferLightMVPsMemory))
+    {
+        return false;
+    }
+    vkMapMemory(device, bufferLightMVPsMemory, 0, lightMVPsSize, 0, (void **)&bufferLightMVPsMapped);
 
     if (!vulkanUtils->createBuffer(
             lightsBufferSize,

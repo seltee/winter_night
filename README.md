@@ -12,6 +12,7 @@ My personal Vulkan 3d/2d engine I'm constructing using C++ 2020
 - Perspective and Orthographic cameras
 - Rotation using quaternions
 - Directional, Spot and omni lights
+- Directional light shadows
 
 # Compilation
 

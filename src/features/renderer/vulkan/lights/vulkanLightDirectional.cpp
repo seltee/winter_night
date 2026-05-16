@@ -32,14 +32,6 @@ void VulkanLightDirectional::renderShadows(Renderer *renderer, Scene *scene, Act
         VulkanRenderPass *depthPass = vulkanUtils->getCurrentDepthPass();
         VulkanFrameBuffer *frameBuffer = getFrameBuffer(i);
 
-        Matrix4x4 mProjection = makeOrthographicProjectionMatrix(-60.0f, 60.0f, 60.0f, -60.0f, 0.0f, 80.0f);
-
-        Vector3 projectionPosition = position.xyz() + realDirection.xyz() * 40.0f;
-        Matrix4x4 model = Matrix4x4::translation(projectionPosition);
-        model = model * Matrix4x4(lookAt(projectionPosition, position.xyz()));
-        Matrix4x4 invModelMatrix = inverse(model);
-        Matrix4x4 mVP = mProjection * invModelMatrix;
-
         // current queue building state
         auto state = (VulkanRendererState *)renderer->getState();
         state->setViewProjectionMatrix(mVP);
@@ -82,8 +74,16 @@ void VulkanLightDirectional::disableShadows()
 void VulkanLightDirectional::prepareForRender()
 {
     if (amountOfCascades > 0)
+    {
         shadowId = vulkanUtils->getShadowMaps()->registerShadowMap(cascades[0]->getDepthBuffer());
-    
+
+        Matrix4x4 mProjection = makeOrthographicProjectionMatrix(-60.0f, 60.0f, 60.0f, -60.0f, 0.0f, 100.0f);
+        Vector3 projectionPosition = position.xyz() + realDirection.xyz() * 50.0f;
+        Matrix4x4 model = Matrix4x4::translation(projectionPosition);
+        model = model * Matrix4x4(lookAt(projectionPosition, position.xyz()));
+        Matrix4x4 invModelMatrix = inverse(model);
+        mVP = mProjection * invModelMatrix;
+    }
 
     vulkanUtils->getObjectBuffers()->updateLightData(
         lightId,
@@ -96,6 +96,7 @@ void VulkanLightDirectional::prepareForRender()
         position,
         realDirection,
         color);
+    vulkanUtils->getObjectBuffers()->updateLightShadowData(shadowId, mVP);
 }
 
 std::shared_ptr<Texture> VulkanLightDirectional::getCascadeAsTexture(int numOfCascade)

@@ -35,5 +35,6 @@ namespace wne
         VulkanUtils *vulkanUtils = nullptr;
 
         std::vector<std::unique_ptr<VulkanLightCascadeData>> cascades;
+        Matrix4x4 mVP = Matrix4x4::identity();
     };
 };

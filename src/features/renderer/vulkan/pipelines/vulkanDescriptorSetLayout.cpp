@@ -47,7 +47,7 @@ bool VulkanDescriptorSetLayout::setupTexturedColor()
 {
 
     // pipeline layout
-    VkDescriptorSetLayoutBinding pipelineBinding[6]{};
+    VkDescriptorSetLayoutBinding pipelineBinding[7]{};
 
     // mvp matrices
     pipelineBinding[0].binding = 0;
@@ -84,16 +84,23 @@ bool VulkanDescriptorSetLayout::setupTexturedColor()
     pipelineBinding[4].pImmutableSamplers = nullptr;
     pipelineBinding[4].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 
-    // lights shadow textures
+    // lights MVPs
     pipelineBinding[5].binding = 5;
-    pipelineBinding[5].descriptorCount = 16;
-    pipelineBinding[5].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    pipelineBinding[5].descriptorCount = 1;
+    pipelineBinding[5].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     pipelineBinding[5].pImmutableSamplers = nullptr;
-    pipelineBinding[5].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    pipelineBinding[5].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+
+    // lights shadow textures
+    pipelineBinding[6].binding = 6;
+    pipelineBinding[6].descriptorCount = 16;
+    pipelineBinding[6].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    pipelineBinding[6].pImmutableSamplers = nullptr;
+    pipelineBinding[6].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
     VkDescriptorSetLayoutCreateInfo layoutInfoPipeline{};
     layoutInfoPipeline.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfoPipeline.bindingCount = 6;
+    layoutInfoPipeline.bindingCount = 7;
     layoutInfoPipeline.pBindings = pipelineBinding;
 
     if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayout) != VK_SUCCESS)

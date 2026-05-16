@@ -5,6 +5,7 @@ layout(set = 1, binding = 0) uniform sampler2D texSampler;
 layout(location = 0) in vec2 UV;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec4 worldPosition;
+layout(location = 3) in vec4 lightClipPos[16];
 
 layout(location = 0) out vec4 outColor;
 
@@ -42,7 +43,7 @@ layout(set = 0, binding = 4) uniform Lights
     LightData lightData[128];
 };
 
-layout(set = 0, binding = 5) uniform sampler2D shadowTextures[16];
+layout(set = 0, binding = 6) uniform sampler2D shadowTextures[16];
 
 void main() {
     vec3 color = texture(texSampler, UV).xyz;
@@ -62,20 +63,14 @@ void main() {
             float diff = max(dot(normal, lightDir), 0.0);
             float shadow = 0.0f;
             if (lightData[id].amountOfCascades > 0){
-                // shadow = 1.0f;
-                float bias = 0.0001;
+                float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.006); 
+
                 uint shadowId = lightData[id].shadowTextureId;
-                // sampler2D shadowTexture = shadowTextures[shadowId];
-                // shadow = ShadowCalculation(lightShadowTexSampler, shadowCoords, light.type[2], bias) * CalculateEdge(shadowCoords.xy);
-                // inline float ShadowCalculation(sampler2D shadowTexSampler, float3 fragPosLightSpace, float texelSize, float bias)
 
-                //float2 projCoords = fragPosLightSpace.xy;
-                //float currentDepth = fragPosLightSpace.z;
-                //float shadow = 0.0;
-
-                //float2 coords = projCoords;
-                //float pcfDepth = tex2D(shadowTexSampler, coords).r;
-                //shadow += step(step(currentDepth - bias, pcfDepth) + currentDepth, 1.0);
+                vec2 projCoords = lightClipPos[shadowId].xy;
+                float currentDepth = lightClipPos[shadowId].z;
+                float pcfDepth = texture(shadowTextures[shadowId], projCoords).r;
+                shadow += step(step(currentDepth - bias, pcfDepth) + currentDepth, 1.0);
             }
 
             light += diff * lightColor * (1.0f - shadow);

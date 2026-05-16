@@ -14,6 +14,7 @@ namespace wne
     public:
         static const uint32 AMOUNT_OF_OBJECTS = 256;
         static const uint32 AMOUNT_OF_LIGHTS = 128;
+        static const uint32 MAX_LIGHT_SHADOWS = 16;
 
         struct GlobalData
         {
@@ -53,6 +54,9 @@ namespace wne
             const Vector4 &position,
             const Vector4 &direction,
             const Vector4 &color);
+        void updateLightShadowData(
+            uint32 shadowId,
+            Matrix4x4 &mLightMVP);
 
         bool setup();
 
@@ -83,9 +87,19 @@ namespace wne
             return bufferGlobalData;
         }
 
+        VkBuffer getLightMVPsBuffer()
+        {
+            return bufferLightMVPsData;
+        }
+
         VkBuffer getLightsDataBuffer()
         {
             return bufferLightsData;
+        }
+
+        inline VulkanDepthBuffer *getDummyDepthBuffer()
+        {
+            return dummyBuffer.get();
         }
 
         constexpr uint64 getMatrixBufferSize()
@@ -103,9 +117,9 @@ namespace wne
             return sizeof(LightData) * AMOUNT_OF_LIGHTS;
         }
 
-        inline VulkanDepthBuffer *getDummyDepthBuffer()
+        constexpr uint64 getLightMVPsBufferSize()
         {
-            return dummyBuffer.get();
+            return sizeof(Matrix4x4) * MAX_LIGHT_SHADOWS;
         }
 
     protected:
@@ -132,6 +146,10 @@ namespace wne
         VkBuffer bufferGlobalData = nullptr;
         VkDeviceMemory bufferGlobalDataMemory = nullptr;
         GlobalData *bufferGlobalDataMapped = nullptr;
+
+        VkBuffer bufferLightMVPsData = nullptr;
+        VkDeviceMemory bufferLightMVPsMemory = nullptr;
+        Matrix4x4 *bufferLightMVPsMapped = nullptr;
 
         VkBuffer bufferLightsData = nullptr;
         VkDeviceMemory bufferLightsDataMemory = nullptr;

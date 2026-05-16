@@ -91,7 +91,7 @@ void VulkanDescriptorSets::updateShadowMap(VulkanShadowMaps *shadowMaps, VulkanS
     VkWriteDescriptorSet write{};
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     write.dstSet = descriptorSetTexturedColor[currentInFlight];
-    write.dstBinding = 5;
+    write.dstBinding = 6;
     write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     write.descriptorCount = 16;
     write.pImageInfo = imageInfos.data();
@@ -196,7 +196,12 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedColor(
     bufferLightsInfo.offset = 0;
     bufferLightsInfo.range = vulkanObjectBuffers->getLightsBufferSize();
 
-    std::array<VkWriteDescriptorSet, 5> writes{};
+    VkDescriptorBufferInfo bufferLightMVPs{};
+    bufferLightMVPs.buffer = vulkanObjectBuffers->getLightMVPsBuffer();
+    bufferLightMVPs.offset = 0;
+    bufferLightMVPs.range = vulkanObjectBuffers->getLightMVPsBufferSize();
+
+    std::array<VkWriteDescriptorSet, 6> writes{};
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = *descriptorSet;
     writes[0].dstBinding = 0;
@@ -231,6 +236,13 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedColor(
     writes[4].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     writes[4].descriptorCount = 1;
     writes[4].pBufferInfo = &bufferLightsInfo;
+
+    writes[5].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[5].dstSet = *descriptorSet;
+    writes[5].dstBinding = 5;
+    writes[5].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[5].descriptorCount = 1;
+    writes[5].pBufferInfo = &bufferLightMVPs;
 
     vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
     return true;
