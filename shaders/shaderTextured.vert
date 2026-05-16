@@ -6,7 +6,7 @@ layout(location = 2) in vec3 inNormal;
 
 layout(location = 0) out vec2 UV;
 layout(location = 1) out vec3 normal;
-layout(location = 2) out vec3 position;
+layout(location = 2) out vec4 worldPosition;
 
 layout(push_constant) uniform PushConstants {
     uint objectId;
@@ -27,9 +27,9 @@ layout(set = 0, binding = 2) uniform BufferNormals {
 } mNormals;
 
 void main() {
-    position = inPosition;
     gl_Position = mMVPs.matrix[objectData.objectId] * vec4(inPosition, 1.0);
     UV = inUV;
+    worldPosition = mModels.matrix[objectData.objectId] * vec4(inPosition, 1.0);
     normal = normalize(
         (mNormals.matrix[objectData.objectId] * vec4(inNormal, 0.0)).xyz
     );

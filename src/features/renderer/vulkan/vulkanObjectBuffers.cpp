@@ -1,5 +1,6 @@
 #include "features/renderer/vulkan/vulkanObjectBuffers.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
+#include "features/renderer/vulkan/vulkanDepthBuffer.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 
@@ -124,6 +125,13 @@ bool VulkanObjectBuffers::setup()
         return false;
     }
     vkMapMemory(device, bufferLightsDataMemory, 0, lightsBufferSize, 0, (void **)&bufferLightsDataMapped);
+
+    dummyBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils);
+    if (!dummyBuffer->setup(8, 8, true))
+    {
+        return false;
+    }
+    dummyBuffer->transitionToDefined();
 
     return true;
 }

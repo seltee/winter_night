@@ -2,10 +2,12 @@
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/data/light.h"
 #include "core/core.h"
+#include <memory>
 
 namespace wne
 {
     class VulkanUtils;
+    class VulkanDepthBuffer;
 
     class VulkanObjectBuffers
     {
@@ -101,6 +103,11 @@ namespace wne
             return sizeof(LightData) * AMOUNT_OF_LIGHTS;
         }
 
+        inline VulkanDepthBuffer *getDummyDepthBuffer()
+        {
+            return dummyBuffer.get();
+        }
+
     protected:
         VulkanUtils *vulkanUtils = nullptr;
 
@@ -129,5 +136,7 @@ namespace wne
         VkBuffer bufferLightsData = nullptr;
         VkDeviceMemory bufferLightsDataMemory = nullptr;
         LightData *bufferLightsDataMapped = nullptr;
+
+        std::unique_ptr<VulkanDepthBuffer> dummyBuffer;
     };
 };

@@ -23,9 +23,9 @@ namespace wne
         virtual void bindDepthShadow(uint64 objectId, Renderer *renderer, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
 
         // bind for depth render
-        virtual void bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
+        virtual void bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix4x4 &mModel, const Matrix3x3 &mNormal, ModelDataType dataType);
 
         // bind for color render
-        virtual void bindColor(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
+        virtual void bindColor(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix4x4 &mModel, const Matrix3x3 &mNormal, ModelDataType dataType);
     };
 };

@@ -12,6 +12,11 @@ VulkanDepthBuffer::VulkanDepthBuffer(VulkanUtils *vulkanUtils)
 
 VulkanDepthBuffer::~VulkanDepthBuffer()
 {
+    auto device = vulkanUtils->getVulkanDevice()->getDevice();
+    if (depthImageView)
+        vkDestroyImageView(device, depthImageView, nullptr);
+    if (depthImage)
+        vkDestroyImage(device, depthImage, nullptr);
 }
 
 bool VulkanDepthBuffer::setup(uint16 width, uint16 height, bool isSampled)
@@ -35,6 +40,11 @@ bool VulkanDepthBuffer::setup(uint16 width, uint16 height, bool isSampled)
 
     vulkanUtils->createImageView(depthImage, format, VK_IMAGE_ASPECT_DEPTH_BIT, &depthImageView);
     return true;
+}
+
+void VulkanDepthBuffer::transitionToDefined()
+{
+    vulkanUtils->transitionImageLayout(depthImage, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
 }
 
 VulkanFormat VulkanDepthBuffer::findDepthFormat(bool isSampled)

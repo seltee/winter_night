@@ -146,9 +146,9 @@ void ActorTerrain::renderDepth(Renderer *renderer)
         return;
     if (objectId == 0xffffffff)
         return;
-        
+
     auto state = renderer->getState();
-    material->bindDepth(objectId, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    material->bindDepth(objectId, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 
@@ -158,9 +158,9 @@ void ActorTerrain::renderColor(Renderer *renderer)
         return;
     if (objectId == 0xffffffff)
         return;
-        
+
     auto state = renderer->getState();
     AffectingLights lights = currentScene->collectAffectingLights();
-    material->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    material->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }

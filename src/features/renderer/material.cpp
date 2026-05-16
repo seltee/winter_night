@@ -10,10 +10,10 @@ void Material::bindDepthShadow(uint64 objectId, Renderer *renderer, const Matrix
 {
 }
 
-void Material::bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType)
+void Material::bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix4x4 &mModel, const Matrix3x3 &mNormal, ModelDataType dataType)
 {
 }
 
-void Material::bindColor(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType)
+void Material::bindColor(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix4x4 &mModel, const Matrix3x3 &mNormal, ModelDataType dataType)
 {
 }

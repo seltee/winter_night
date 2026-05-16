@@ -4,7 +4,7 @@ layout(set = 1, binding = 0) uniform sampler2D texSampler;
 
 layout(location = 0) in vec2 UV;
 layout(location = 1) in vec3 normal;
-layout(location = 2) in vec3 fragPos;
+layout(location = 2) in vec4 worldPosition;
 
 layout(location = 0) out vec4 outColor;
 
@@ -42,6 +42,8 @@ layout(set = 0, binding = 4) uniform Lights
     LightData lightData[128];
 };
 
+layout(set = 0, binding = 5) uniform sampler2D shadowTextures[16];
+
 void main() {
     vec3 color = texture(texSampler, UV).xyz;
 
@@ -58,7 +60,25 @@ void main() {
             vec3 lightColor = lightData[id].color.xyz;
 
             float diff = max(dot(normal, lightDir), 0.0);
-            light += diff * lightColor;
+            float shadow = 0.0f;
+            if (lightData[id].amountOfCascades > 0){
+                // shadow = 1.0f;
+                float bias = 0.0001;
+                uint shadowId = lightData[id].shadowTextureId;
+                // sampler2D shadowTexture = shadowTextures[shadowId];
+                // shadow = ShadowCalculation(lightShadowTexSampler, shadowCoords, light.type[2], bias) * CalculateEdge(shadowCoords.xy);
+                // inline float ShadowCalculation(sampler2D shadowTexSampler, float3 fragPosLightSpace, float texelSize, float bias)
+
+                //float2 projCoords = fragPosLightSpace.xy;
+                //float currentDepth = fragPosLightSpace.z;
+                //float shadow = 0.0;
+
+                //float2 coords = projCoords;
+                //float pcfDepth = tex2D(shadowTexSampler, coords).r;
+                //shadow += step(step(currentDepth - bias, pcfDepth) + currentDepth, 1.0);
+            }
+
+            light += diff * lightColor * (1.0f - shadow);
         }
         if (lightData[id].enableOmni != 0)
         {
@@ -66,9 +86,9 @@ void main() {
             vec3 lightColor = lightData[id].color.xyz;
             float affectRadius = lightData[id].affectRadius;
 
-            float dist = length(lightPos - fragPos.xyz);
+            float dist = length(lightPos - worldPosition.xyz);
             float attenuation = clamp(1.0 - dist / affectRadius, 0.0, 1.0);
-            vec3 lightDir = normalize(lightPos - fragPos);
+            vec3 lightDir = normalize(lightPos - worldPosition.xyz);
             float diff = max(dot(normal, lightDir), 0.0);
             light += diff * lightColor * attenuation;
         }
@@ -80,13 +100,13 @@ void main() {
             float cutOff = lightData[id].cutOff;
             float outerCutOff = lightData[id].outerCutOff;
 
-            vec3 lightDir = normalize(lightPos - fragPos);
+            vec3 lightDir = normalize(lightPos - worldPosition.xyz);
             float theta = dot(lightDir, lightData[id].direction.xyz);
 
             float epsilon = cutOff - outerCutOff;
             float intensity = clamp((theta - outerCutOff) / epsilon, 0.0, 1.0);
 
-            float dist = length(lightPos - fragPos.xyz);
+            float dist = length(lightPos - worldPosition.xyz);
             float attenuation = clamp(1.0 - dist / affectRadius, 0.0, 1.0);
             float diff = max(dot(normal, lightDir), 0.0);
             light += diff * lightColor * attenuation * intensity;

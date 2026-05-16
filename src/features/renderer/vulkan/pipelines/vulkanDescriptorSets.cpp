@@ -71,12 +71,21 @@ void VulkanDescriptorSets::updateShadowMap(VulkanShadowMaps *shadowMaps, VulkanS
 {
     uint32 amount = std::min((uint32)16, shadowMaps->getShadowMapsAmount());
     std::array<VkDescriptorImageInfo, 16> imageInfos;
-    for (uint32 i = 0; i < amount; i++)
+    for (uint32 i = 0; i < 16; i++)
     {
-        auto depthBuffer = shadowMaps->getDepthBuffer(i);
-        imageInfos[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-        imageInfos[i].imageView = depthBuffer->getDepthImageView();
-        imageInfos[i].sampler = sampler->getTextureSampler();
+        if (i < amount)
+        {
+            auto depthBuffer = shadowMaps->getDepthBuffer(i);
+            imageInfos[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+            imageInfos[i].imageView = depthBuffer->getDepthImageView();
+            imageInfos[i].sampler = sampler->getTextureSampler();
+        }
+        else
+        {
+            imageInfos[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+            imageInfos[i].imageView = vulkanObjectBuffers->getDummyDepthBuffer()->getDepthImageView();
+            imageInfos[i].sampler = sampler->getTextureSampler();
+        }
     }
 
     VkWriteDescriptorSet write{};
@@ -84,7 +93,7 @@ void VulkanDescriptorSets::updateShadowMap(VulkanShadowMaps *shadowMaps, VulkanS
     write.dstSet = descriptorSetTexturedColor[currentInFlight];
     write.dstBinding = 5;
     write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    write.descriptorCount = amount;
+    write.descriptorCount = 16;
     write.pImageInfo = imageInfos.data();
     write.dstArrayElement = 0;
     vkUpdateDescriptorSets(vulkanDevice->getDevice(), 1, &write, 0, nullptr);

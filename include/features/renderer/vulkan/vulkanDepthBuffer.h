@@ -17,6 +17,7 @@ namespace wne
         // width, height - resolution
         // isSampled - will depth be used with sampler in shaders
         bool setup(uint16 width, uint16 height, bool isSampled = false);
+        void transitionToDefined();
 
         inline VulkanFormat getFormat()
         {
