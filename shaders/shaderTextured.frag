@@ -27,6 +27,10 @@ struct LightData
     float cutOff;
     float outerCutOff;
     float fPad3;
+    uint shadowTextureId;
+    uint amountOfCascades;
+    uint pad2;
+    uint pad3;
     uint enableDirectional;
     uint enableOmni;
     uint enableSpot;

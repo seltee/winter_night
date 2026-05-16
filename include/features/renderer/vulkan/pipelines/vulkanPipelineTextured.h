@@ -24,22 +24,14 @@ namespace wne
         VkPipeline getGraphicsPipeline() override final;
         VkPipelineLayout getPipelineLayout() override final;
 
-        bool setupColor(
-            VulkanRenderPass *renderPass,
-            VulkanDescriptorPool *vulkanDescriptorPool,
-            VulkanObjectBuffers *vulkanObjectBuffers);
+        bool setupColor(VulkanRenderPass *renderPass);
 
-        bool setupDepth(
-            VulkanRenderPass *depthPass,
-            VulkanDescriptorPool *vulkanDescriptorPool,
-            VulkanObjectBuffers *vulkanObjectBuffers);
+        bool setupDepth(VulkanRenderPass *depthPass);
 
         void updateDescriptorSetColor(VulkanObjectBuffers *vulkanObjectBuffers);
-        void updateDescriptorSetDepth(VulkanObjectBuffers *vulkanObjectBuffers);
 
-        VkDescriptorSetLayout getDescriptorSetLayoutPipeline() override final;
-        VkDescriptorSetLayout getDescriptorSetLayoutSampler() override final;
-        VkDescriptorSet getDescriptorSet() override final;
+        VulkanDescriptorSetLayout *getDescriptorSetLayoutPipeline() override final;
+        VulkanDescriptorSetLayout *getDescriptorSetLayoutSampler() override final;
 
     protected:
         bool buildShaderColor();
@@ -49,9 +41,7 @@ namespace wne
             bool enableColorBlending,
             bool enableDepthWrite,
             bool enableSampler,
-            VulkanRenderPass *renderPass,
-            VulkanDescriptorPool *vulkanDescriptorPool,
-            VulkanObjectBuffers *vulkanObjectBuffers);
+            VulkanRenderPass *renderPass);
 
         std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayoutPipeline;
         std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayoutSampler;
@@ -59,6 +49,5 @@ namespace wne
         std::unique_ptr<VulkanShader> shader;
         VkPipelineLayout pipelineLayout = nullptr;
         VkPipeline graphicsPipeline = nullptr;
-        VkDescriptorSet descriptorSet = nullptr;
     };
 };

@@ -29,6 +29,7 @@ void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType)
 
 void VulkanMaterialFlat::selectDescriptorColor(ModelDataType dataType)
 {
+    auto descriptorSets = vulkanUtils->getDescriptorSets();
     if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
     {
     }
@@ -37,7 +38,7 @@ void VulkanMaterialFlat::selectDescriptorColor(ModelDataType dataType)
         auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
         auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
 
-        VkDescriptorSet sets[2] = {vulkanUtils->getCurrentPipeline()->getDescriptorSet(), getDescriptorSetFlatTextured()};
+        VkDescriptorSet sets[2] = {descriptorSets->getDescriptorSetTexturedColor(), getDescriptorSetFlatTextured()};
         if (sets[0] && sets[1])
             vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 2, sets, 0, nullptr);
     }
@@ -45,6 +46,7 @@ void VulkanMaterialFlat::selectDescriptorColor(ModelDataType dataType)
 
 void VulkanMaterialFlat::selectDescriptorDepth(ModelDataType dataType)
 {
+    auto descriptorSets = vulkanUtils->getDescriptorSets();
     if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
     {
     }
@@ -53,7 +55,7 @@ void VulkanMaterialFlat::selectDescriptorDepth(ModelDataType dataType)
         auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
         auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
 
-        VkDescriptorSet sets[1] = {vulkanUtils->getCurrentPipeline()->getDescriptorSet()};
+        VkDescriptorSet sets[1] = {descriptorSets->getDescriptorSetTexturedDepth()};
         if (sets[0])
             vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, sets, 0, nullptr);
     }
@@ -71,7 +73,7 @@ void VulkanMaterialFlat::selectDescriptorDepthShadow(ModelDataType dataType, Vul
         auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
         auto pipelineLayout = pipeline->getPipelineLayout();
 
-        VkDescriptorSet sets[1] = {cascadeData->getDescriptorSet(dataType, pipeline->getDescriptorSetLayoutPipeline())};
+        VkDescriptorSet sets[1] = {cascadeData->getDescriptorSet(dataType, pipeline->getDescriptorSetLayoutPipeline()->getDescriptorSetLayout())};
         if (sets[0])
             vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, sets, 0, nullptr);
     }
@@ -111,11 +113,12 @@ VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
     if (!descriptorSetLayout)
         return nullptr;
 
+    VkDescriptorSetLayout vkDescriptorSetLayout = descriptorSetLayout->getDescriptorSetLayout();
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = vulkanUtils->getDescriptorPool()->getDescriptorPool();
     allocInfo.descriptorSetCount = 1;
-    allocInfo.pSetLayouts = &descriptorSetLayout;
+    allocInfo.pSetLayouts = &vkDescriptorSetLayout;
 
     if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)
     {

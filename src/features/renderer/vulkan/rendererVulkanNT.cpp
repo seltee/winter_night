@@ -41,6 +41,9 @@ bool RendererVulkanNT::getSyncState()
 
 void RendererVulkanNT::update(float delta)
 {
+    instance->getVulkanUtils()->swapSets();
+
+    instance->getVulkanUtils()->getShadowMaps()->clear();
     for (const auto &scene : scenes)
     {
         scene->update(delta);
@@ -62,6 +65,7 @@ void RendererVulkanNT::render()
     }
     instance->finishDepthPass();
 
+    instance->getVulkanUtils()->updatePipelineShadowMaps();
     instance->beginRenderPass();
     for (const auto &scene : scenes)
     {

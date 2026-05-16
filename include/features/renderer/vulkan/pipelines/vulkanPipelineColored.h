@@ -22,8 +22,7 @@ namespace wne
         ~VulkanPipelineColored();
         VkPipeline getGraphicsPipeline() override final;
         VkPipelineLayout getPipelineLayout() override final;
-        VkDescriptorSetLayout getDescriptorSetLayoutPipeline() override final;
-        VkDescriptorSet getDescriptorSet() override final;
+        VulkanDescriptorSetLayout *getDescriptorSetLayoutPipeline() override final;
 
         bool setupColor(
             VulkanRenderPass *renderPass,

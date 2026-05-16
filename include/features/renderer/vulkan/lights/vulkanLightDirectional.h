@@ -30,6 +30,7 @@ namespace wne
 
         uint amountOfCascades = 0;
         uint resolition = 0;
+        uint32 shadowId = 0;
 
         VulkanUtils *vulkanUtils = nullptr;
 

@@ -9,10 +9,16 @@
 #include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipelineColored.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipelineTextured.h"
+#include "features/renderer/vulkan/pipelines/vulkanDescriptorSets.h"
+#include <iostream>
 #include <memory>
 
 namespace wne
 {
+    class VulkanShadowMaps;
+    class VulkanSampler;
+    class VulkanDescriptorSets;
+
     class VulkanPipelines
     {
     public:
@@ -29,9 +35,24 @@ namespace wne
         void enablePipelineColored(VulkanCommandBuffer *commandBuffer, bool isDepthRendering);
         void enablePipelineTextured(VulkanCommandBuffer *commandBuffer, bool isDepthRendering);
 
+        inline void updatePipelineShadowMaps(VulkanShadowMaps *shadowMaps, VulkanSampler *sampler)
+        {
+            vulkanDescriptorSets->updateShadowMap(shadowMaps, sampler);
+        }
+
         inline VulkanPipeline *getCurrentPipeline()
         {
             return currentPipeline;
+        }
+
+        inline void swapSets()
+        {
+            vulkanDescriptorSets->swap();
+        }
+
+        inline VulkanDescriptorSets *getDescriptorSets()
+        {
+            return vulkanDescriptorSets.get();
         }
 
     protected:
@@ -42,6 +63,8 @@ namespace wne
 
         std::unique_ptr<VulkanPipelineColored> vulkanPipelineColoredColor;
         std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedColor;
+
+        std::unique_ptr<VulkanDescriptorSets> vulkanDescriptorSets;
 
         VulkanPipeline *currentPipeline = nullptr;
     };

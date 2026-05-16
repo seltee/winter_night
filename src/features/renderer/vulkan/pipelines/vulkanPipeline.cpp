@@ -31,17 +31,12 @@ VkPipelineLayout VulkanPipeline::getPipelineLayout()
     return nullptr;
 }
 
-VkDescriptorSetLayout VulkanPipeline::getDescriptorSetLayoutPipeline()
+VulkanDescriptorSetLayout *VulkanPipeline::getDescriptorSetLayoutPipeline()
 {
     return nullptr;
 }
 
-VkDescriptorSetLayout VulkanPipeline::getDescriptorSetLayoutSampler()
-{
-    return nullptr;
-}
-
-VkDescriptorSet VulkanPipeline::getDescriptorSet()
+VulkanDescriptorSetLayout *VulkanPipeline::getDescriptorSetLayoutSampler()
 {
     return nullptr;
 }

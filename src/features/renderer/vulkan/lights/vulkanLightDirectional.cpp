@@ -48,55 +48,6 @@ void VulkanLightDirectional::renderShadows(Renderer *renderer, Scene *scene, Act
         vulkanUtils->getCurrentCommandBuffer()->beginDepthPass(depthPass, frameBuffer->getFrameBuffer(), resolition, resolition);
         scene->renderDepthShadow(renderer);
         vulkanUtils->getCurrentCommandBuffer()->endPass();
-
-                /*
-        VkMemoryBarrier memBarrier = {};
-        memBarrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
-        memBarrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;           // Correct for depth writes
-        memBarrier.dstAccessMask = VK_ACCESS_UNIFORM_READ_BIT | VK_ACCESS_SHADER_READ_BIT; // What comes next needs
-
-        vkCmdPipelineBarrier(
-            vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer(),
-            VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,                                   // End of depth writes
-            VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, // Before next reads/updates
-            0,
-            1, &memBarrier,
-            0, nullptr,
-            0, nullptr);
-
-        VkImageMemoryBarrier imageBarrier = {};
-        imageBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        imageBarrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-        imageBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        imageBarrier.oldLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-        imageBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageBarrier.image = depthImage;
-        imageBarrier.subresourceRange = {VK_IMAGE_ASPECT_DEPTH_BIT, 0, 1, 0, 1};
-
-        vkCmdPipelineBarrier(cmd,
-                             VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-                             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-                             0,
-                             0, nullptr, 0, nullptr,
-                             1, &imageBarrier);
-        */
-        /*
-        VkImageMemoryBarrier barrier{};
-        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        barrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL; // or whatever your final layout in renderpass was
-        barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        barrier.image = depthBuffer->getDepthImage();
-        barrier.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
-
-        vkCmdPipelineBarrier(vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer(),
-                             VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-                             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-                             0,
-                             0, nullptr, 0, nullptr,
-                             1, &barrier);
-        */
     }
 }
 
@@ -130,12 +81,18 @@ void VulkanLightDirectional::disableShadows()
 
 void VulkanLightDirectional::prepareForRender()
 {
+    if (amountOfCascades > 0)
+        shadowId = vulkanUtils->getShadowMaps()->registerShadowMap(cascades[0]->getDepthBuffer());
+    
+
     vulkanUtils->getObjectBuffers()->updateLightData(
         lightId,
         type,
         affectRadius,
         cutOff,
         outerCutOff,
+        shadowId,
+        amountOfCascades,
         position,
         realDirection,
         color);

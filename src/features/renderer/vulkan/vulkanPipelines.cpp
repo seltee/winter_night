@@ -1,5 +1,13 @@
+
 #include "features/renderer/vulkan/vulkanPipelines.h"
+#include "features/renderer/vulkan/vulkanShadowMaps.h"
+#include "features/renderer/vulkan/vulkanDepthBuffer.h"
+#include "features/renderer/vulkan/vulkanSampler.h"
+#define VK_USE_PLATFORM_WIN32_KHR
+#include "vulkan/vulkan.h"
 #include <iostream>
+#include <array>
+#include <cmath>
 
 using namespace wne;
 
@@ -35,14 +43,21 @@ bool VulkanPipelines::build(
     status &= vulkanPipelineColoredDepth->setupDepth(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers);
 
     vulkanPipelineTexturedDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedDepth->setupDepth(VulkanDepthPass, vulkanDescriptorPool, vulkanObjectBuffers);
+    status &= vulkanPipelineTexturedDepth->setupDepth(VulkanDepthPass);
 
     // color pipelines
     vulkanPipelineColoredColor = std::make_unique<VulkanPipelineColored>(vulkanDevice);
     status &= vulkanPipelineColoredColor->setupColor(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers);
 
     vulkanPipelineTexturedColor = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedColor->setupColor(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers);
+    status &= vulkanPipelineTexturedColor->setupColor(vulkanRenderPass);
+
+    vulkanDescriptorSets = std::make_unique<VulkanDescriptorSets>(vulkanDevice, vulkanDescriptorPool, vulkanObjectBuffers);
+    if (!vulkanDescriptorSets->setup(2, vulkanPipelineTexturedDepth.get(), vulkanPipelineTexturedColor.get()))
+    {
+        std::cout << "Unable to create vulkan descriptor sets" << std::endl;
+        return false;
+    }
 
     if (!status)
     {
@@ -62,9 +77,12 @@ void VulkanPipelines::enablePipelineColored(VulkanCommandBuffer *commandBuffer, 
 
 void VulkanPipelines::enablePipelineTextured(VulkanCommandBuffer *commandBuffer, bool isDepthRendering)
 {
-    if (isDepthRendering){
+    if (isDepthRendering)
+    {
         currentPipeline = vulkanPipelineTexturedDepth.get();
-    }else{
+    }
+    else
+    {
         currentPipeline = vulkanPipelineTexturedColor.get();
     }
     commandBuffer->bindPipeline(currentPipeline);

@@ -80,12 +80,12 @@ VkDescriptorSet VulkanLightCascadeData::getDescriptorSet(
     ModelDataType dataType,
     VkDescriptorSetLayout layoutPipeline)
 {
+    if (descriptorSetTextured)
+        return descriptorSetTextured;
+
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
     VulkanDescriptorPool *vulkanDescriptorPool = vulkanUtils->getDescriptorPool();
     const uint matrixBufferSize = sizeof(Matrix4x4) * VulkanObjectBuffers::AMOUNT_OF_OBJECTS;
-
-    if (descriptorSetTextured)
-        return descriptorSetTextured;
 
     VkDescriptorSetLayout layouts[1] = {layoutPipeline};
 

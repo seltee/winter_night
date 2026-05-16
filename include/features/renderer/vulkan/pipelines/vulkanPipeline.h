@@ -8,6 +8,7 @@ namespace wne
     class VulkanShader;
     class VulkanRenderPass;
     class VulkanDevice;
+    class VulkanDescriptorSetLayout;
 
     class WNE_API VulkanPipeline
     {
@@ -15,9 +16,8 @@ namespace wne
         virtual ~VulkanPipeline();
         virtual VkPipeline getGraphicsPipeline();
         virtual VkPipelineLayout getPipelineLayout();
-        virtual VkDescriptorSetLayout getDescriptorSetLayoutPipeline();
-        virtual VkDescriptorSetLayout getDescriptorSetLayoutSampler();
-        virtual VkDescriptorSet getDescriptorSet();
+        virtual VulkanDescriptorSetLayout *getDescriptorSetLayoutPipeline();
+        virtual VulkanDescriptorSetLayout *getDescriptorSetLayoutSampler();
 
     protected:
         VulkanPipeline(VulkanDevice *vulkanDevice);

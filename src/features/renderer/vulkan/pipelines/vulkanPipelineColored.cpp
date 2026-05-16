@@ -41,14 +41,9 @@ VkPipelineLayout VulkanPipelineColored::getPipelineLayout()
     return pipelineLayout;
 }
 
-VkDescriptorSetLayout VulkanPipelineColored::getDescriptorSetLayoutPipeline()
+VulkanDescriptorSetLayout *VulkanPipelineColored::getDescriptorSetLayoutPipeline()
 {
-    return descriptorSetLayoutPipeline;
-}
-
-VkDescriptorSet VulkanPipelineColored::getDescriptorSet()
-{
-    return descriptorSet;
+    return nullptr;
 }
 
 bool VulkanPipelineColored::setupColor(

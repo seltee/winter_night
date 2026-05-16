@@ -4,6 +4,7 @@
 #include "features/renderer/vulkan/vulkanCommandBuffer.h"
 #include "features/renderer/vulkan/vulkanPipelines.h"
 #include "features/renderer/vulkan/vulkanShader.h"
+#include "features/renderer/vulkan/vulkanShadowMaps.h"
 #include "features/data/model.h"
 
 #include "core/core.h"
@@ -20,6 +21,7 @@ namespace wne
     class VulkanSwapChain;
     class VulkanRenderPass;
     class VulkanObjectBuffers;
+    class VulkanDescriptorSets;
 
     class VulkanUtils
     {
@@ -41,6 +43,7 @@ namespace wne
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width, uint32 height);
         void destroyPipelines();
         bool rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass, VulkanRenderPass *vulkanDepthPass);
+        void updatePipelineShadowMaps();
 
         bool createImage(
             uint16 width,
@@ -56,6 +59,11 @@ namespace wne
 
         VkCommandBuffer beginSingleTimeCommands();
         void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+
+        inline void swapSets()
+        {
+            vulkanPipelines->swapSets();
+        }
 
         inline VulkanDevice *getVulkanDevice()
         {
@@ -120,6 +128,11 @@ namespace wne
             return vulkanDepthPass;
         }
 
+        inline VulkanShadowMaps *getShadowMaps()
+        {
+            return vulkanShadowMaps.get();
+        }
+
         inline VkQueue getGraphicsQueue()
         {
             return graphicsQueue;
@@ -130,10 +143,16 @@ namespace wne
             return presentQueue;
         }
 
+        inline VulkanDescriptorSets *getDescriptorSets()
+        {
+            return vulkanPipelines->getDescriptorSets();
+        }
+
     protected:
         std::unique_ptr<VulkanDescriptorPool> vulkanDescriptorPool;
         std::unique_ptr<VulkanObjectBuffers> vulkanObjectBuffers;
         std::unique_ptr<VulkanSampler> vulkanSampler;
+        std::unique_ptr<VulkanShadowMaps> vulkanShadowMaps;
 
         // pipelines
         std::unique_ptr<VulkanPipelines> vulkanPipelines;

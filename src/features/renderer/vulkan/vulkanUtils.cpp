@@ -5,6 +5,7 @@
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
+#include "features/renderer/vulkan/pipelines/vulkanDescriptorSets.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <iostream>
@@ -57,6 +58,7 @@ bool VulkanUtils::setup()
     }
 
     vulkanPipelines = std::make_unique<VulkanPipelines>(vulkanDevice);
+    vulkanShadowMaps = std::make_unique<VulkanShadowMaps>();
 
     return true;
 }
@@ -263,6 +265,11 @@ bool VulkanUtils::rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRende
     }
 
     return true;
+}
+
+void VulkanUtils::updatePipelineShadowMaps()
+{
+    vulkanPipelines->updatePipelineShadowMaps(vulkanShadowMaps.get(), vulkanSampler.get());
 }
 
 bool VulkanUtils::createImage(

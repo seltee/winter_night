@@ -22,6 +22,8 @@ void VulkanLight::prepareForRender()
         affectRadius,
         cutOff,
         outerCutOff,
+        0,
+        0,
         position,
         realDirection,
         color);

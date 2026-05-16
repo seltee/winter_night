@@ -27,6 +27,7 @@ namespace wne
             Vector4 direction;
             Vector4 color;
             float affectRadius, cutOff, outerCutOff, fPad3;
+            uint32 shadowId, amountOfCascades, pad2, pad3;
             uint32 enableDirectional, enableOmni, enableSpot, pad1;
         };
 
@@ -45,6 +46,8 @@ namespace wne
             float affectRadius,
             float cutOff,
             float outerCutOff,
+            uint32 shadowId,
+            uint32 amountOfCascades,
             const Vector4 &position,
             const Vector4 &direction,
             const Vector4 &color);

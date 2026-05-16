@@ -43,6 +43,8 @@ void VulkanObjectBuffers::updateLightData(
     float affectRadius,
     float cutOff,
     float outerCutOff,
+    uint32 shadowId,
+    uint32 amountOfCascades,
     const Vector4 &position,
     const Vector4 &direction,
     const Vector4 &color)
@@ -55,6 +57,8 @@ void VulkanObjectBuffers::updateLightData(
         bufferLightsDataMapped[lightId].position = position;
         bufferLightsDataMapped[lightId].direction = direction;
         bufferLightsDataMapped[lightId].color = color;
+        bufferLightsDataMapped[lightId].shadowId = shadowId;
+        bufferLightsDataMapped[lightId].amountOfCascades = amountOfCascades;
         bufferLightsDataMapped[lightId].enableDirectional = (type == Light::Type::Directional);
         bufferLightsDataMapped[lightId].enableOmni = (type == Light::Type::Omni);
         bufferLightsDataMapped[lightId].enableSpot = (type == Light::Type::Spot);
