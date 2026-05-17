@@ -5,6 +5,9 @@
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
 #include "features/renderer/vulkan/lights/vulkanLight.h"
 #include "features/renderer/vulkan/lights/vulkanLightDirectional.h"
+#include "utils/primitives.h"
+#include "core/core.h"
+#include "core/math.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -75,6 +78,16 @@ void RendererVulkanNT::render()
     instance->finishRendering();
 }
 
+void RendererVulkanNT::renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial)
+{
+    auto state = getState();
+    Matrix4x4 mModel = Matrix4x4::translation(state->getCameraPosition());
+    Matrix3x3 mNormal = Matrix3x3::identity();
+    AffectingLights lights{};
+    atmoMaterial->bindColor(atmoSphereMeshId, lights, state->getViewProjectionMatrix() * mModel, mModel, mNormal, atmoSphere->getDataType());
+    atmoSphere->render(getFrameData());
+}
+
 void RendererVulkanNT::changeWindowSize(uint32 width, uint32 height)
 {
     instance->changeSize();
@@ -93,6 +106,11 @@ std::shared_ptr<Texture> RendererVulkanNT::createTexture(std::shared_ptr<Image> 
 std::shared_ptr<Material> RendererVulkanNT::createFlatMaterial(std::shared_ptr<Texture> texture)
 {
     return VulkanMaterial::createFlat(instance->getVulkanUtils(), texture);
+}
+
+std::shared_ptr<Material> RendererVulkanNT::createAtmosphereMaterial(std::shared_ptr<Texture> texture)
+{
+    return VulkanMaterial::createAtmosphere(instance->getVulkanUtils(), texture);
 }
 
 std::shared_ptr<LightDirectional> RendererVulkanNT::createLightDirectional()
@@ -118,5 +136,10 @@ bool RendererVulkanNT::setup(void *hWnd)
     {
         return false;
     }
+
+    auto sphereModel = Primitives::createSphere(1.0f, 14, 10);
+    atmoSphere = createMesh(sphereModel);
+    atmoSphereMeshId = atmoSphere->genNewObjectId();
+
     return true;
 }

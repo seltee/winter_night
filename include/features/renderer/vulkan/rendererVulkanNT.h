@@ -19,10 +19,13 @@ namespace wne
         void update(float delta) override final;
         void render() override final;
 
+        void renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial) override final;
+
         void changeWindowSize(uint32 width, uint32 height) override final;
         std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model) override final;
         std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image) override final;
         std::shared_ptr<Material> createFlatMaterial(std::shared_ptr<Texture> texture) override final;
+        std::shared_ptr<Material> createAtmosphereMaterial(std::shared_ptr<Texture> texture) override final;
 
         std::shared_ptr<LightDirectional> createLightDirectional() override final;
         std::shared_ptr<Light> createLightOmni() override final;
@@ -35,5 +38,7 @@ namespace wne
 
         void *hWnd = nullptr;
         std::unique_ptr<VulkanInstance> instance;
+        std::shared_ptr<Mesh> atmoSphere;
+        uint64 atmoSphereMeshId = 0xffffffff;
     };
 }

@@ -80,3 +80,43 @@ std::shared_ptr<Model> Primitives::createBox(const Vector3 &size)
 
     return Model::createFromData(vertices, indices);
 }
+
+std::shared_ptr<Model> Primitives::createSphere(float radius, unsigned int rings, unsigned int segments)
+{
+    std::vector<wne::VertexTextured> vertices;
+    std::vector<uint16_t> indices;
+
+    for (unsigned int y = 0; y <= rings; ++y)
+    {
+        for (unsigned int x = 0; x <= segments; ++x)
+        {
+            float xSegment = (float)x / (float)segments;
+            float ySegment = (float)y / (float)rings;
+            float xPos = radius * cos(xSegment * PI2) * sin(ySegment * PI);
+            float yPos = radius * cos(ySegment * PI);
+            float zPos = radius * sin(xSegment * PI2) * sin(ySegment * PI);
+
+            Vector3 normal = normalize(Vector3(xPos, yPos, zPos));
+            vertices.push_back({{xPos, yPos, zPos}, {xSegment, ySegment}, {normal.x, normal.y, normal.z}});
+        }
+    }
+
+    for (unsigned int y = 0; y < rings; ++y)
+    {
+        for (unsigned int x = 0; x < segments; ++x)
+        {
+            unsigned int first = (y * (segments + 1)) + x;
+            unsigned int second = first + segments + 1;
+
+            indices.emplace_back(first);
+            indices.emplace_back(first + 1);
+            indices.emplace_back(second);
+                
+            indices.emplace_back(second);
+            indices.emplace_back(first + 1);
+            indices.emplace_back(second + 1);
+        }
+    }
+
+    return Model::createFromData(vertices, indices);
+}

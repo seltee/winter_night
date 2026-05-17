@@ -31,6 +31,8 @@ namespace wne
         void addActor(std::shared_ptr<Actor> actor);
         void setCamera(std::shared_ptr<ActorCamera> actorCamera);
 
+        void setAtmosphere(std::shared_ptr<Texture> atmosphereMap, std::shared_ptr<Texture> atmosphereRadiance);
+
         AffectingLights collectAffectingLights();
 
         // called when actor with light added
@@ -59,6 +61,10 @@ namespace wne
         std::vector<std::shared_ptr<Actor>> actors;
         std::vector<Light *> lights;
         std::shared_ptr<ActorCamera> actorCamera;
+
+        std::shared_ptr<Texture> atmosphereMap;
+        std::shared_ptr<Texture> atmosphereRadiance;
+        std::shared_ptr<Material> atmoMaterial;
 
         Vector4 ambientLightColor = {0.8f, 0.8f, 0.8f, 1.0f};
 

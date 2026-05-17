@@ -1,28 +1,28 @@
-#include "features/data/imageAthmo.h"
+#include "features/data/imageAtmo.h"
 #include "features/loaders/stb_image.h"
 #include <iostream>
 #include <memory>
 
 using namespace wne;
 
-ImageAthmo::ImageAthmo(ImageDataPtr imageData, uint32 width, uint32 height, uint32 bytesPerPixel, uint bluredSize)
+ImageAtmo::ImageAtmo(ImageDataPtr imageData, uint32 width, uint32 height, uint32 bytesPerPixel, uint bluredSize)
     : Image(imageData, width, height, bytesPerPixel)
 {
     this->bluredSize = bluredSize;
     createBluredData(bluredSize);
 }
 
-std::shared_ptr<ImageAthmo> ImageAthmo::create(const std::string &path)
+std::shared_ptr<ImageAtmo> ImageAtmo::create(const std::string &path)
 {
     return create(path, 128, 1.8f, 2.9f);
 }
 
-std::shared_ptr<ImageAthmo> ImageAthmo::create(const std::string &path, uint bluredSize)
+std::shared_ptr<ImageAtmo> ImageAtmo::create(const std::string &path, uint bluredSize)
 {
     return create(path, bluredSize, 1.8f, 2.9f);
 }
 
-std::shared_ptr<ImageAthmo> ImageAthmo::create(const std::string &path, uint bluredSize, float fLdrScale, float fLdrGamma)
+std::shared_ptr<ImageAtmo> ImageAtmo::create(const std::string &path, uint bluredSize, float fLdrScale, float fLdrGamma)
 {
     stbi_hdr_to_ldr_gamma(fLdrScale);
     stbi_hdr_to_ldr_scale(fLdrGamma);
@@ -40,14 +40,14 @@ std::shared_ptr<ImageAthmo> ImageAthmo::create(const std::string &path, uint blu
         return nullptr;
     }
 
-    return std::make_shared<ImageAthmo>(
+    return std::make_shared<ImageAtmo>(
         ImageDataPtr(data, stbi_image_free),
         (uint32)width,
         (uint32)height,
         4, bluredSize);
 }
 
-void ImageAthmo::createBluredData(uint bluredSize)
+void ImageAtmo::createBluredData(uint bluredSize)
 {
     imageBluredData = std::shared_ptr<uint8>(
         new uint8[bluredSize * bluredSize * bytesPerPixel],

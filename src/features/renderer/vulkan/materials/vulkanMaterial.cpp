@@ -1,5 +1,6 @@
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
 #include "features/renderer/vulkan/materials/vulkanMaterialFlat.h"
+#include "features/renderer/vulkan/materials/vulkanMaterialAtmosphere.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/vulkanRendererState.h"
@@ -20,6 +21,14 @@ std::shared_ptr<Material> VulkanMaterial::createFlat(VulkanUtils *vulkanUtils, s
 {
     std::shared_ptr<VulkanMaterialFlat> material = std::make_shared<VulkanMaterialFlat>(vulkanUtils);
     material->setAlbedo(texture);
+    material->rebuild();
+    return material;
+}
+
+std::shared_ptr<Material> VulkanMaterial::createAtmosphere(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture)
+{
+    std::shared_ptr<VulkanMaterialAtmosphere> material = std::make_shared<VulkanMaterialAtmosphere>(vulkanUtils);
+    material->setAtmosphereTexture(texture);
     material->rebuild();
     return material;
 }

@@ -35,6 +35,7 @@ namespace wne
         void enablePipelineColored(VulkanCommandBuffer *commandBuffer, bool isDepthRendering);
         void enablePipelineTextured(VulkanCommandBuffer *commandBuffer, bool isDepthRendering);
         void enablePipelineTexturedShadowDepth(VulkanCommandBuffer *commandBuffer);
+        void enablePipelineAtmosphere(VulkanCommandBuffer *commandBuffer);
 
         inline void updatePipelineShadowMaps(VulkanShadowMaps *shadowMaps, VulkanSampler *sampler)
         {
@@ -59,12 +60,14 @@ namespace wne
     protected:
         VulkanDevice *vulkanDevice = nullptr;
 
-        std::unique_ptr<VulkanPipelineColored> vulkanPipelineColoredDepth;
-        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedDepth;
-        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedShadowDepth;
-
         std::unique_ptr<VulkanPipelineColored> vulkanPipelineColoredColor;
+        std::unique_ptr<VulkanPipelineColored> vulkanPipelineColoredDepth;
+
+        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedShadowDepth;
+        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedDepth;
         std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedColor;
+
+        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineAtmosphereColor;
 
         std::unique_ptr<VulkanDescriptorSets> vulkanDescriptorSets;
 

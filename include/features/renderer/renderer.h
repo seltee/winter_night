@@ -26,12 +26,15 @@ namespace wne
         virtual std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model);
         virtual std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image);
         virtual std::shared_ptr<Material> createFlatMaterial(std::shared_ptr<Texture> texture);
+        virtual std::shared_ptr<Material> createAtmosphereMaterial(std::shared_ptr<Texture> texture);
 
         virtual void *getFrameData();
         virtual void setAmbientColor(Vector4 &color);
 
         virtual void setSyncState(bool syncEnabled);
         virtual bool getSyncState();
+
+        virtual void renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial);
 
         virtual std::shared_ptr<LightDirectional> createLightDirectional();
         virtual std::shared_ptr<Light> createLightOmni();

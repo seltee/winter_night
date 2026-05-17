@@ -34,6 +34,12 @@ std::shared_ptr<Material> Renderer::createFlatMaterial(std::shared_ptr<Texture> 
     return nullptr;
 }
 
+std::shared_ptr<Material> Renderer::createAtmosphereMaterial(std::shared_ptr<Texture> texture)
+{
+    return nullptr;
+}
+
+
 void *Renderer::getFrameData()
 {
     return nullptr;
@@ -50,6 +56,10 @@ void Renderer::setSyncState(bool syncEnabled)
 bool Renderer::getSyncState()
 {
     return false;
+}
+
+void Renderer::renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial)
+{
 }
 
 void Renderer::addScene(std::shared_ptr<Scene> scene)

@@ -123,6 +123,11 @@ namespace wne
             vulkanPipelines->enablePipelineTexturedShadowDepth(currentCommandBuffer);
         }
 
+        inline void enablePipelineAtmosphere()
+        {
+            vulkanPipelines->enablePipelineAtmosphere(currentCommandBuffer);
+        }
+
         inline VulkanRenderPass *getCurrentRenderPass()
         {
             return vulkanRenderPass;

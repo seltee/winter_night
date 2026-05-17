@@ -25,6 +25,11 @@ int main()
     scene->setAmbientLight(0.3f, 0.2f, 0.2f);
 
     // images
+    auto imageAtmosphere = wne::ImageAtmo::create("./atmosphere.jpg");
+    scene->setAtmosphere(
+        renderer->createTexture(imageAtmosphere),
+        renderer->createTexture(imageAtmosphere->getAtmosphereAsImage()));
+
     auto imageEx = wne::Image::create("./ex.png");
     auto textureEx = renderer->createTexture(imageEx);
     auto materialEx = renderer->createFlatMaterial(textureEx);
@@ -67,6 +72,13 @@ int main()
     actorBox->setMaterial(materialBox);
     scene->addActor(actorBox);
     actorBox->setPosition(-12.0f, 8.0f, 4.0f);
+
+    auto sphereModel = wne::Primitives::createSphere(4.0f, 10, 10);
+    auto sphereMesh = renderer->createMesh(sphereModel);
+    auto sphereBox = wne::ActorMesh::create(sphereMesh);
+    sphereBox->setMaterial(materialBox);
+    scene->addActor(sphereBox);
+    sphereBox->setPosition(-12.0f, 8.0f, -6.0f);
 
     auto actorBox2 = wne::ActorMesh::create(boxMesh);
     actorBox2->setMaterial(materialBox);

@@ -34,7 +34,7 @@ void Scene::renderShadows(Renderer *renderer)
 
 void Scene::renderDepthShadow(Renderer *renderer)
 {
-    // depth path
+    // shadow depth pass
     for (const auto &object : actors)
     {
         object->renderDepthShadow(renderer);
@@ -43,7 +43,7 @@ void Scene::renderDepthShadow(Renderer *renderer)
 
 void Scene::renderDepth(Renderer *renderer)
 {
-    // depth path
+    // depth pass
     for (const auto &object : actors)
     {
         object->renderDepth(renderer);
@@ -52,7 +52,15 @@ void Scene::renderDepth(Renderer *renderer)
 
 void Scene::render(Renderer *renderer)
 {
-    // color path
+    // render atmosphere if set
+    if (this->atmosphereMap)
+    {
+        if (!atmoMaterial)
+            atmoMaterial = renderer->createAtmosphereMaterial(atmosphereMap);
+        renderer->renderAtmosphereMap(atmoMaterial);
+    }
+
+    // color pass
     for (const auto &object : actors)
     {
         object->renderColor(renderer);
@@ -68,6 +76,7 @@ void Scene::provideSceneMVP(Renderer *renderer)
 {
     auto state = renderer->getState();
     state->setViewProjectionMatrix(mVP);
+    state->setCameraPosition(actorCamera ? actorCamera->getPosition() : Vector3{});
     renderer->setAmbientColor(ambientLightColor);
 }
 
@@ -80,6 +89,13 @@ void Scene::addActor(std::shared_ptr<Actor> actor)
 void Scene::setCamera(std::shared_ptr<ActorCamera> actorCamera)
 {
     this->actorCamera = std::move(actorCamera);
+}
+
+void Scene::setAtmosphere(std::shared_ptr<Texture> atmosphereMap, std::shared_ptr<Texture> atmosphereRadiance)
+{
+    this->atmosphereMap = atmosphereMap;
+    this->atmosphereRadiance = atmosphereRadiance;
+    atmoMaterial = nullptr;
 }
 
 AffectingLights Scene::collectAffectingLights()

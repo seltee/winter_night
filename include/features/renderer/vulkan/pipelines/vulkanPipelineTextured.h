@@ -25,10 +25,9 @@ namespace wne
         VkPipelineLayout getPipelineLayout() override final;
 
         bool setupColor(VulkanRenderPass *renderPass);
-
         bool setupDepth(VulkanRenderPass *depthPass);
-        
         bool setupDepthShadow(VulkanRenderPass *depthPass);
+        bool setupAtmosphere(VulkanRenderPass *renderPass);
 
         VulkanDescriptorSetLayout *getDescriptorSetLayoutPipeline() override final;
         VulkanDescriptorSetLayout *getDescriptorSetLayoutSampler() override final;
@@ -36,10 +35,12 @@ namespace wne
     protected:
         bool buildShaderColor();
         bool buildShaderDepth();
+        bool buildShaderAtmosphere();
         bool buildPipeline(
             uint32 stageAmount,
             bool enableColorBlending,
             bool enableDepthWrite,
+            bool enableDepthTest,
             bool enableSampler,
             bool reverseFaceCooling,
             VulkanRenderPass *renderPass);

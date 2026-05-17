@@ -63,7 +63,7 @@ bool VulkanPipelineTextured::setupColor(VulkanRenderPass *renderPass)
         return false;
     }
 
-    if (!buildPipeline(2, true, false, true, false, renderPass))
+    if (!buildPipeline(2, true, false, true, true, false, renderPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -87,7 +87,7 @@ bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass)
         return false;
     }
 
-    if (!buildPipeline(1, false, true, false, false, depthPass))
+    if (!buildPipeline(1, false, true, true, false, false, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -111,7 +111,38 @@ bool VulkanPipelineTextured::setupDepthShadow(VulkanRenderPass *depthPass)
         return false;
     }
 
-    if (!buildPipeline(1, false, true, false, false, depthPass))
+    if (!buildPipeline(1, false, true, true, false, false, depthPass))
+    {
+        std::cout << "Unable to build pipeline" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool VulkanPipelineTextured::setupAtmosphere(VulkanRenderPass *renderPass)
+{
+    if (!buildShaderAtmosphere())
+    {
+        std::cout << "Unable to build shader" << std::endl;
+        return false;
+    }
+
+    descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutPipeline->setupTexturedColor())
+    {
+        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        return false;
+    }
+
+    descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutSampler->setupSampler())
+    {
+        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        return false;
+    }
+
+    if (!buildPipeline(2, true, false, false, true, true, renderPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -154,10 +185,23 @@ bool VulkanPipelineTextured::buildShaderDepth()
     return true;
 }
 
+bool VulkanPipelineTextured::buildShaderAtmosphere()
+{
+    auto device = vulkanDevice->getDevice();
+    shader = std::make_unique<VulkanShader>();
+    if (!shader->makeFromFiles("./shaders/shaderAtmosphere.vert.spv", "./shaders/shaderAtmosphere.frag.spv", device))
+    {
+        std::cout << "Unable to compile textured shader" << std::endl;
+        return false;
+    }
+    return true;
+}
+
 bool VulkanPipelineTextured::buildPipeline(
     uint32 stageAmount,
     bool enableColorBlending,
     bool enableDepthWrite,
+    bool enableDepthTest,
     bool enableSampler,
     bool reverseFaceCooling,
     VulkanRenderPass *renderPass)
@@ -323,7 +367,7 @@ bool VulkanPipelineTextured::buildPipeline(
 
     VkPipelineDepthStencilStateCreateInfo depthStencil{};
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    depthStencil.depthTestEnable = VK_TRUE;
+    depthStencil.depthTestEnable = enableDepthTest ? VK_TRUE : VK_FALSE;
     depthStencil.depthWriteEnable = enableDepthWrite ? VK_TRUE : VK_FALSE;
     depthStencil.depthCompareOp = enableDepthWrite ? VK_COMPARE_OP_LESS : VK_COMPARE_OP_EQUAL;
     depthStencil.depthBoundsTestEnable = VK_FALSE;

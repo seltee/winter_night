@@ -57,6 +57,10 @@ bool VulkanPipelines::build(
     vulkanPipelineTexturedColor = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
     status &= vulkanPipelineTexturedColor->setupColor(vulkanRenderPass);
 
+    // atmosphere pipelines
+    vulkanPipelineAtmosphereColor = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
+    status &= vulkanPipelineAtmosphereColor->setupAtmosphere(vulkanRenderPass);
+
     vulkanDescriptorSets = std::make_unique<VulkanDescriptorSets>(vulkanDevice, vulkanDescriptorPool, vulkanObjectBuffers);
     if (!vulkanDescriptorSets->setup(2, vulkanPipelineTexturedDepth.get(), vulkanPipelineTexturedColor.get()))
     {
@@ -96,5 +100,11 @@ void VulkanPipelines::enablePipelineTextured(VulkanCommandBuffer *commandBuffer,
 void VulkanPipelines::enablePipelineTexturedShadowDepth(VulkanCommandBuffer *commandBuffer)
 {
     currentPipeline = vulkanPipelineTexturedShadowDepth.get();
+    commandBuffer->bindPipeline(currentPipeline);
+}
+
+void VulkanPipelines::enablePipelineAtmosphere(VulkanCommandBuffer *commandBuffer)
+{
+    currentPipeline = vulkanPipelineAtmosphereColor.get();
     commandBuffer->bindPipeline(currentPipeline);
 }

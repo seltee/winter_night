@@ -13,6 +13,8 @@ namespace wne
         static std::shared_ptr<Model> createPlain(float halfSize, const Vector3 &normal);
         static std::shared_ptr<Model> createBox(float size);
         static std::shared_ptr<Model> createBox(const Vector3 &size);
+        static std::shared_ptr<Model> createSphere(float radius, unsigned int rings, unsigned int segments);
+
     private:
         Primitives();
     };
