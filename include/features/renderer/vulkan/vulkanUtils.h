@@ -118,6 +118,11 @@ namespace wne
                 vulkanPipelines->enablePipelineTextured(currentCommandBuffer, isDepthRendering);
         }
 
+        inline void enablePipelineShadowByType(ModelDataType dataType)
+        {
+            vulkanPipelines->enablePipelineTexturedShadowDepth(currentCommandBuffer);
+        }
+
         inline VulkanRenderPass *getCurrentRenderPass()
         {
             return vulkanRenderPass;

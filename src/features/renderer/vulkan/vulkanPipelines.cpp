@@ -22,6 +22,8 @@ void VulkanPipelines::reset()
         vulkanPipelineColoredDepth.reset();
     if (vulkanPipelineTexturedDepth)
         vulkanPipelineTexturedDepth.reset();
+    if (vulkanPipelineTexturedShadowDepth)
+        vulkanPipelineTexturedShadowDepth.reset();
     if (vulkanPipelineColoredColor)
         vulkanPipelineColoredColor.reset();
     if (vulkanPipelineTexturedColor)
@@ -44,6 +46,9 @@ bool VulkanPipelines::build(
 
     vulkanPipelineTexturedDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
     status &= vulkanPipelineTexturedDepth->setupDepth(VulkanDepthPass);
+
+    vulkanPipelineTexturedShadowDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
+    status &= vulkanPipelineTexturedShadowDepth->setupDepthShadow(VulkanDepthPass);
 
     // color pipelines
     vulkanPipelineColoredColor = std::make_unique<VulkanPipelineColored>(vulkanDevice);
@@ -85,5 +90,11 @@ void VulkanPipelines::enablePipelineTextured(VulkanCommandBuffer *commandBuffer,
     {
         currentPipeline = vulkanPipelineTexturedColor.get();
     }
+    commandBuffer->bindPipeline(currentPipeline);
+}
+
+void VulkanPipelines::enablePipelineTexturedShadowDepth(VulkanCommandBuffer *commandBuffer)
+{
+    currentPipeline = vulkanPipelineTexturedShadowDepth.get();
     commandBuffer->bindPipeline(currentPipeline);
 }

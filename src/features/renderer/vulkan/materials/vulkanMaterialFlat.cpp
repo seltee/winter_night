@@ -27,6 +27,11 @@ void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType)
     vulkanUtils->enablePipelineByType(dataType, false);
 }
 
+void VulkanMaterialFlat::selectPipelineShadowDepth(ModelDataType dataType)
+{
+    vulkanUtils->enablePipelineShadowByType(dataType);
+}
+
 void VulkanMaterialFlat::selectDescriptorColor(ModelDataType dataType)
 {
     auto descriptorSets = vulkanUtils->getDescriptorSets();

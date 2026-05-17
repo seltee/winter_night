@@ -63,7 +63,7 @@ bool VulkanPipelineTextured::setupColor(VulkanRenderPass *renderPass)
         return false;
     }
 
-    if (!buildPipeline(2, true, false, true, renderPass))
+    if (!buildPipeline(2, true, false, true, false, renderPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -87,7 +87,31 @@ bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass)
         return false;
     }
 
-    if (!buildPipeline(1, false, true, false, depthPass))
+    if (!buildPipeline(1, false, true, false, false, depthPass))
+    {
+        std::cout << "Unable to build pipeline" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool VulkanPipelineTextured::setupDepthShadow(VulkanRenderPass *depthPass)
+{
+    if (!buildShaderDepth())
+    {
+        std::cout << "Unable to build shader" << std::endl;
+        return false;
+    }
+
+    descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutPipeline->setupTexturedDepth())
+    {
+        std::cout << "Unable to setup textured depth pipeline" << std::endl;
+        return false;
+    }
+
+    if (!buildPipeline(1, false, true, false, false, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -135,6 +159,7 @@ bool VulkanPipelineTextured::buildPipeline(
     bool enableColorBlending,
     bool enableDepthWrite,
     bool enableSampler,
+    bool reverseFaceCooling,
     VulkanRenderPass *renderPass)
 {
     auto device = vulkanDevice->getDevice();
@@ -207,7 +232,7 @@ bool VulkanPipelineTextured::buildPipeline(
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterizer.cullMode = reverseFaceCooling ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_BACK_BIT;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.depthBiasConstantFactor = 0.0f; // Optional

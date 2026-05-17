@@ -27,8 +27,8 @@ namespace wne
         bool setupColor(VulkanRenderPass *renderPass);
 
         bool setupDepth(VulkanRenderPass *depthPass);
-
-        void updateDescriptorSetColor(VulkanObjectBuffers *vulkanObjectBuffers);
+        
+        bool setupDepthShadow(VulkanRenderPass *depthPass);
 
         VulkanDescriptorSetLayout *getDescriptorSetLayoutPipeline() override final;
         VulkanDescriptorSetLayout *getDescriptorSetLayoutSampler() override final;
@@ -41,6 +41,7 @@ namespace wne
             bool enableColorBlending,
             bool enableDepthWrite,
             bool enableSampler,
+            bool reverseFaceCooling,
             VulkanRenderPass *renderPass);
 
         std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayoutPipeline;

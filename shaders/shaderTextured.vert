@@ -38,7 +38,7 @@ struct LightData
     float fPad3;
     uint shadowTextureId;
     uint amountOfCascades;
-    uint pad2;
+    float texelSize;
     uint pad3;
     uint enableDirectional;
     uint enableOmni;
@@ -73,7 +73,7 @@ void main() {
             if (lightData[id].amountOfCascades > 0)
             {
                 uint shadowId = lightData[id].shadowTextureId;
-                const float normalOffsetAmount = 0.08;
+                const float normalOffsetAmount = 0.06;
                 vec3 offsetPos = worldPosition.xyz + normal * normalOffsetAmount;  // 0.05 – 0.2 often works
 
                 vec4 shadowCoord = mLightMvps.matrix[shadowId] * vec4(offsetPos, 1.0);

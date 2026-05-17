@@ -28,6 +28,7 @@ namespace wne
 
         virtual void selectPipelineDepth(ModelDataType dataType);
         virtual void selectPipelineColor(ModelDataType dataType);
+        virtual void selectPipelineShadowDepth(ModelDataType dataType);
 
         virtual void selectDescriptorColor(ModelDataType dataType);
         virtual void selectDescriptorDepth(ModelDataType dataType);

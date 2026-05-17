@@ -93,6 +93,7 @@ void VulkanLightDirectional::prepareForRender()
         outerCutOff,
         shadowId,
         amountOfCascades,
+        1.0f / (float)resolition,
         position,
         realDirection,
         color);

@@ -30,7 +30,7 @@ struct LightData
     float fPad3;
     uint shadowTextureId;
     uint amountOfCascades;
-    uint pad2;
+    float texelSize;
     uint pad3;
     uint enableDirectional;
     uint enableOmni;
@@ -63,14 +63,26 @@ void main() {
             float diff = max(dot(normal, lightDir), 0.0);
             float shadow = 0.0f;
             if (lightData[id].amountOfCascades > 0){
-                float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.006); 
+                float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005); 
 
                 uint shadowId = lightData[id].shadowTextureId;
 
+                const float texelSize = lightData[id].texelSize;
                 vec2 projCoords = lightClipPos[shadowId].xy;
                 float currentDepth = lightClipPos[shadowId].z;
-                float pcfDepth = texture(shadowTextures[shadowId], projCoords).r;
-                shadow += step(step(currentDepth - bias, pcfDepth) + currentDepth, 1.0);
+
+                for (int x = -1; x <= 1; ++x)
+                {
+                    for (int y = -1; y <= 1; ++y)
+                    {
+                        vec2 coords = (projCoords) + vec2(x, y) * texelSize;
+                        float pcfDepth = texture(shadowTextures[shadowId], coords).r;
+                        shadow += step(step(currentDepth - bias, pcfDepth) + currentDepth, 1.0);
+                    }
+                }
+                if (shadow < 0.2)
+                    shadow = 0;
+                shadow /= 9.0;
             }
 
             light += diff * lightColor * (1.0f - shadow);

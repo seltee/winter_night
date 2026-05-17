@@ -32,7 +32,7 @@ void VulkanMaterial::bindDepthShadow(uint64 objectId, Renderer *renderer, const 
         return;
 
     AffectingLights lights{};
-    selectPipelineDepth(dataType);
+    selectPipelineShadowDepth(dataType);
     selectDescriptorDepthShadow(dataType, cascadeData);
     cascadeData->updateObjectData(objectId, mMVP);
     setPCData(objectId, lights);
@@ -66,6 +66,10 @@ void VulkanMaterial::selectPipelineDepth(ModelDataType dataType)
 }
 
 void VulkanMaterial::selectPipelineColor(ModelDataType dataType)
+{
+}
+
+void VulkanMaterial::selectPipelineShadowDepth(ModelDataType dataType)
 {
 }
 
