@@ -65,6 +65,11 @@ namespace wne
             vulkanObjectBuffers->swap();
         }
 
+        inline VulkanTexture *getDummyTexture()
+        {
+            return dummyTexture.get();
+        }
+
         inline VulkanDevice *getVulkanDevice()
         {
             return vulkanDevice;
@@ -158,6 +163,11 @@ namespace wne
             return vulkanPipelines->getDescriptorSets();
         }
 
+        inline void setRadianceMap(VulkanTexture *radianceMap)
+        {
+            vulkanPipelines->getDescriptorSets()->updateRadianceMap(radianceMap ? radianceMap : dummyTexture.get(), vulkanSampler.get());
+        }
+
     protected:
         std::unique_ptr<VulkanDescriptorPool> vulkanDescriptorPool;
         std::unique_ptr<VulkanObjectBuffers> vulkanObjectBuffers;
@@ -180,5 +190,7 @@ namespace wne
 
         VulkanRenderPass *vulkanRenderPass = nullptr;
         VulkanRenderPass *vulkanDepthPass = nullptr;
+
+        std::unique_ptr<VulkanTexture> dummyTexture;
     };
 };

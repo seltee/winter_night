@@ -11,7 +11,6 @@ namespace wne
     public:
         static std::unique_ptr<RendererVulkanNT> create(void *hwnd);
         void *getFrameData() override final;
-        void setAmbientColor(Vector4 &color) override final;
 
         void setSyncState(bool syncEnabled) override final;
         bool getSyncState() override final;
@@ -20,6 +19,7 @@ namespace wne
         void render() override final;
 
         void renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial) override final;
+        void provideSceneData(const Vector4 &ambientColor, const Vector4 &cameraPosition, Texture *radianceMap) override final;
 
         std::shared_ptr<wne::Material> getDefaultMaterial() override final;
 

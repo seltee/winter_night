@@ -1,6 +1,7 @@
 #version 450
 
-layout(set = 1, binding = 0) uniform sampler2D texSampler;
+layout(set = 1, binding = 0) uniform sampler2D albedoTexSampler;
+layout(set = 0, binding = 7) uniform sampler2D radianceTexSampler;
 
 layout(location = 0) in vec2 UV;
 layout(location = 1) in vec3 normal;
@@ -17,6 +18,8 @@ layout(push_constant) uniform PushConstants {
 
 layout(set = 0, binding = 3) uniform BufferGlobalData {
      vec4 ambientColor;
+     vec4 cameraPosition;
+     uint useRadianceMap;
 } globalData;
 
 struct LightData
@@ -45,13 +48,26 @@ layout(set = 0, binding = 4) uniform Lights
 
 layout(set = 0, binding = 6) uniform sampler2D shadowTextures[16];
 
+vec2 sampleSphericalMap(vec3 v);
+
 void main() {
-    vec3 color = texture(texSampler, UV).xyz;
+    vec3 color = texture(albedoTexSampler, UV).xyz;
 
-    // ambient
-    vec3 light = globalData.ambientColor.xyz;
+    // ambient + radiance
+    vec3 ambientColor = globalData.ambientColor.xyz;
+    if (globalData.useRadianceMap != 0)
+    {
+        vec3 worldDifference = globalData.cameraPosition.xyz - worldPosition.xyz;
+        vec3 V = normalize(worldDifference);
 
-    // Diffuse shading
+        vec2 uv = sampleSphericalMap(normal);
+        vec2 uv2 = sampleSphericalMap(normalize(reflect(-V, normal)));
+        vec3 irradiance = texture(radianceTexSampler, vec2(uv.x, 1.0 - uv.y)).rgb;
+        ambientColor += irradiance;
+    }
+
+    // Diffuse light shading
+    vec3 light = vec3(0.0, 0.0, 0.0);
     for (uint i = 0; i < objectData.lightsAmount; i++)
     {
         uint id = objectData.lightIds[i];
@@ -120,9 +136,19 @@ void main() {
         }
     }
 
-    vec3 result = light * color;
-    outColor = vec4(result, 1.0);
+    vec3 result = (light + ambientColor) * color;
+    vec3 gammaResult = vec3(pow(result.r, 1.0 / 1.2), pow(result.g, 1.0 / 1.2), pow(result.b, 1.0 / 1.2));
+    outColor = vec4(gammaResult, 1.0);
 
     // outColor = vec4(normal, 1.0);
     // outColor = texture(texSampler, UV);
+}
+
+vec2 sampleSphericalMap(vec3 v) 
+{
+    const vec2 invAtan = vec2(0.1591, 0.3183);
+    vec2 uv = vec2(atan(v.z, v.x), asin(v.y));
+    uv *= invAtan;
+    uv += 0.5;
+    return uv;
 }

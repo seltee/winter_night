@@ -47,7 +47,7 @@ bool VulkanDescriptorSetLayout::setupTexturedColor()
 {
 
     // pipeline layout
-    VkDescriptorSetLayoutBinding pipelineBinding[7]{};
+    VkDescriptorSetLayoutBinding pipelineBinding[8]{};
 
     // mvp matrices
     pipelineBinding[0].binding = 0;
@@ -98,9 +98,16 @@ bool VulkanDescriptorSetLayout::setupTexturedColor()
     pipelineBinding[6].pImmutableSamplers = nullptr;
     pipelineBinding[6].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
+    // athmosphere texture
+    pipelineBinding[7].binding = 7;
+    pipelineBinding[7].descriptorCount = 1;
+    pipelineBinding[7].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    pipelineBinding[7].pImmutableSamplers = nullptr;
+    pipelineBinding[7].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
     VkDescriptorSetLayoutCreateInfo layoutInfoPipeline{};
     layoutInfoPipeline.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfoPipeline.bindingCount = 7;
+    layoutInfoPipeline.bindingCount = 8;
     layoutInfoPipeline.pBindings = pipelineBinding;
 
     if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayout) != VK_SUCCESS)

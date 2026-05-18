@@ -25,6 +25,7 @@ namespace wne
             VulkanPipelineTextured *pipelineTexturedColor);
 
         void updateShadowMap(VulkanShadowMaps *shadowMaps, VulkanSampler *sampler);
+        void updateRadianceMap(VulkanTexture *texture, VulkanSampler *sampler);
 
         inline VkDescriptorSet getDescriptorSetColoredColor()
         {
@@ -49,12 +50,12 @@ namespace wne
         bool initDescriptorSetColoredColor(uint frame, VkDescriptorSet *descriptorSet);
 
         bool initDescriptorSetTexturedDepth(
-            uint frame, 
+            uint frame,
             VkDescriptorSet *descriptorSet,
             VulkanDescriptorSetLayout *descriptorSetLayoutPipeline);
 
         bool initDescriptorSetTexturedColor(
-            uint frame, 
+            uint frame,
             VkDescriptorSet *descriptorSet,
             VulkanDescriptorSetLayout *descriptorSetLayoutPipeline,
             VulkanDescriptorSetLayout *descriptorSetLayoutSampler);

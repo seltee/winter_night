@@ -1,8 +1,10 @@
 #include "features/renderer/vulkan/vulkanObjectBuffers.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
 #include "features/renderer/vulkan/vulkanDepthBuffer.h"
+#include "features/renderer/vulkan/vulkanTexture.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
+#include <memory>
 
 using namespace wne;
 
@@ -109,11 +111,11 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
     bufferModelMatrices.resize(maxFramesInFlight);
     bufferModelMatricesMemory.resize(maxFramesInFlight);
     bufferModelMatricesMapped.resize(maxFramesInFlight);
-    
+
     bufferMVPMatrices.resize(maxFramesInFlight);
     bufferMVPMatricesMemory.resize(maxFramesInFlight);
     bufferMVPMatricesMapped.resize(maxFramesInFlight);
-    
+
     bufferNormalMatrices.resize(maxFramesInFlight);
     bufferNormalMatricesMemory.resize(maxFramesInFlight);
     bufferNormalMatricesMapped.resize(maxFramesInFlight);
@@ -121,7 +123,7 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
     bufferGlobalData.resize(maxFramesInFlight);
     bufferGlobalDataMemory.resize(maxFramesInFlight);
     bufferGlobalDataMapped.resize(maxFramesInFlight);
-    
+
     bufferLightMVPsData.resize(maxFramesInFlight);
     bufferLightMVPsMemory.resize(maxFramesInFlight);
     bufferLightMVPsMapped.resize(maxFramesInFlight);
@@ -205,6 +207,7 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
         return false;
     }
     dummyBuffer->transitionToDefined();
+
     return true;
 }
 
@@ -233,9 +236,14 @@ void VulkanObjectBuffers::freeObjectId(uint32 objectId)
         bufferObjectsOccupied[objectId] = 0;
 }
 
-void VulkanObjectBuffers::setAmbientColor(Vector4 &ambientColor)
+void VulkanObjectBuffers::setGlobalData(
+    const Vector4 &ambientColor,
+    const Vector4 &cameraPosition,
+    uint useRadianceMap)
 {
     bufferGlobalDataMapped[currentInFlight]->ambientLightColor = ambientColor;
+    bufferGlobalDataMapped[currentInFlight]->cameraPosition = cameraPosition;
+    bufferGlobalDataMapped[currentInFlight]->useRadianceMap = useRadianceMap;
 }
 
 uint32 VulkanObjectBuffers::getNewLightId()

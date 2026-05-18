@@ -45,10 +45,6 @@ void *Renderer::getFrameData()
     return nullptr;
 }
 
-void Renderer::setAmbientColor(Vector4 &color)
-{
-}
-
 void Renderer::setSyncState(bool syncEnabled)
 {
 }
@@ -59,6 +55,10 @@ bool Renderer::getSyncState()
 }
 
 void Renderer::renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial)
+{
+}
+
+void Renderer::provideSceneData(const Vector4 &ambientColor, const Vector4 &cameraPosition, Texture *radianceMap)
 {
 }
 

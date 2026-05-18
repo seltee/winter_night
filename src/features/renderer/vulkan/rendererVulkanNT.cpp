@@ -29,11 +29,6 @@ void *RendererVulkanNT::getFrameData()
     return instance->getCurrentFrame();
 }
 
-void RendererVulkanNT::setAmbientColor(Vector4 &color)
-{
-    instance->getVulkanUtils()->getObjectBuffers()->setAmbientColor(color);
-}
-
 void RendererVulkanNT::setSyncState(bool syncEnabled)
 {
     instance->setSyncState(syncEnabled);
@@ -75,6 +70,7 @@ void RendererVulkanNT::render()
     for (const auto &scene : scenes)
     {
         scene->provideSceneMVP(this);
+        scene->provideSceneData(this);
         scene->render(this);
     }
     instance->finishRendering();
@@ -88,6 +84,12 @@ void RendererVulkanNT::renderAtmosphereMap(std::shared_ptr<Material> atmoMateria
     AffectingLights lights{};
     atmoMaterial->bindColor(atmoSphereMeshId, lights, state->getViewProjectionMatrix() * mModel, mModel, mNormal, atmoSphere->getDataType());
     atmoSphere->render(getFrameData());
+}
+
+void RendererVulkanNT::provideSceneData(const Vector4 &ambientColor, const Vector4 &cameraPosition, Texture *radianceMap)
+{
+    instance->getVulkanUtils()->getObjectBuffers()->setGlobalData(ambientColor, cameraPosition, radianceMap != nullptr);
+    instance->getVulkanUtils()->setRadianceMap((VulkanTexture *)radianceMap);
 }
 
 std::shared_ptr<wne::Material> RendererVulkanNT::getDefaultMaterial()
@@ -172,9 +174,10 @@ bool RendererVulkanNT::setup(void *hWnd)
         {
             uint quadXShift = quadX * blockSize;
             for (uint iy = 0; iy < cellSize; iy++)
-                for (uint ix = 0; ix < cellSize; ix++){
-                    ((uint32 *)textureData.get())[(iy + quadYShift)*defaultWidth + (ix + quadXShift)] = darkColor;
-                    ((uint32 *)textureData.get())[(iy + quadYShift + cellSize)*defaultWidth + (ix + quadXShift + cellSize)] = darkColor;
+                for (uint ix = 0; ix < cellSize; ix++)
+                {
+                    ((uint32 *)textureData.get())[(iy + quadYShift) * defaultWidth + (ix + quadXShift)] = darkColor;
+                    ((uint32 *)textureData.get())[(iy + quadYShift + cellSize) * defaultWidth + (ix + quadXShift + cellSize)] = darkColor;
                 }
         }
     }

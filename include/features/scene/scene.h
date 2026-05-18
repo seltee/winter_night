@@ -27,6 +27,7 @@ namespace wne
         void render(Renderer *renderer);
         void calcSceneMVP();
         void provideSceneMVP(Renderer *renderer);
+        void provideSceneData(Renderer *renderer);
 
         void addActor(std::shared_ptr<Actor> actor);
         void setCamera(std::shared_ptr<ActorCamera> actorCamera);

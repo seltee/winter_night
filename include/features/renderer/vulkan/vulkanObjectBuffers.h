@@ -9,6 +9,7 @@ namespace wne
 {
     class VulkanUtils;
     class VulkanDepthBuffer;
+    class VulkanTexture;
 
     class VulkanObjectBuffers
     {
@@ -20,9 +21,9 @@ namespace wne
         struct GlobalData
         {
             Vector4 ambientLightColor;
-            Vector4 u1;
-            Vector4 u2;
-            Vector4 u3;
+            Vector4 cameraPosition;
+            uint32 useRadianceMap;
+            uint32 pad1, pad2, pad3;
         };
 
         struct LightData
@@ -69,7 +70,10 @@ namespace wne
         uint32 getNewLightId();
         void freeLightId(uint32 lightId);
 
-        void setAmbientColor(Vector4 &ambientColor);
+        void setGlobalData(
+            const Vector4 &ambientColor,
+            const Vector4 &cameraPosition, 
+            uint useRadianceMap);
 
         inline uint getFrameInFlight()
         {

@@ -77,7 +77,14 @@ void Scene::provideSceneMVP(Renderer *renderer)
     auto state = renderer->getState();
     state->setViewProjectionMatrix(mVP);
     state->setCameraPosition(actorCamera ? actorCamera->getPosition() : Vector3{});
-    renderer->setAmbientColor(ambientLightColor);
+}
+
+void Scene::provideSceneData(Renderer *renderer)
+{
+    renderer->provideSceneData(
+        ambientLightColor,
+        actorCamera ? Vector4(actorCamera->getPosition(), 1.0f) : Vector4(0, 0, 0, 1.0f),
+        atmosphereRadiance.get());
 }
 
 void Scene::addActor(std::shared_ptr<Actor> actor)

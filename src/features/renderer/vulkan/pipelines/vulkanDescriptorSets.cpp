@@ -7,6 +7,7 @@
 #include "features/renderer/vulkan/vulkanSampler.h"
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
+#include "features/renderer/vulkan/vulkanTexture.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <iostream>
@@ -89,6 +90,24 @@ void VulkanDescriptorSets::updateShadowMap(VulkanShadowMaps *shadowMaps, VulkanS
     write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     write.descriptorCount = 16;
     write.pImageInfo = imageInfos.data();
+    write.dstArrayElement = 0;
+    vkUpdateDescriptorSets(vulkanDevice->getDevice(), 1, &write, 0, nullptr);
+}
+
+void VulkanDescriptorSets::updateRadianceMap(VulkanTexture *texture, VulkanSampler *sampler)
+{
+    VkDescriptorImageInfo radianceImageInfo{};
+    radianceImageInfo.imageLayout = (VkImageLayout)texture->getImageLayout();
+    radianceImageInfo.imageView = texture->getImageView()->getImageView();
+    radianceImageInfo.sampler = sampler->getTextureSampler();
+
+    VkWriteDescriptorSet write{};
+    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write.dstSet = descriptorSetTexturedColor[vulkanObjectBuffers->getFrameInFlight()];
+    write.dstBinding = 7;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write.descriptorCount = 1;
+    write.pImageInfo = &radianceImageInfo;
     write.dstArrayElement = 0;
     vkUpdateDescriptorSets(vulkanDevice->getDevice(), 1, &write, 0, nullptr);
 }
