@@ -40,6 +40,8 @@ namespace wne
         virtual std::shared_ptr<Light> createLightOmni();
         virtual std::shared_ptr<Light> createLightSpot();
 
+        virtual std::shared_ptr<wne::Material> getDefaultMaterial();
+
         inline RendererState *getState()
         {
             return state;

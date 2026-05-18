@@ -5,12 +5,14 @@
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
 #include "features/renderer/vulkan/lights/vulkanLight.h"
 #include "features/renderer/vulkan/lights/vulkanLightDirectional.h"
+#include "features/data/image.h"
 #include "utils/primitives.h"
 #include "core/core.h"
 #include "core/math.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <memory>
 
 using namespace wne;
 
@@ -88,6 +90,11 @@ void RendererVulkanNT::renderAtmosphereMap(std::shared_ptr<Material> atmoMateria
     atmoSphere->render(getFrameData());
 }
 
+std::shared_ptr<wne::Material> RendererVulkanNT::getDefaultMaterial()
+{
+    return defaultMaterial;
+}
+
 void RendererVulkanNT::changeWindowSize(uint32 width, uint32 height)
 {
     instance->changeSize();
@@ -140,6 +147,40 @@ bool RendererVulkanNT::setup(void *hWnd)
     auto sphereModel = Primitives::createSphere(1.0f, 14, 10);
     atmoSphere = createMesh(sphereModel);
     atmoSphereMeshId = atmoSphere->genNewObjectId();
+
+    const uint16 defaultWidth = 256;
+    const uint16 defaultHeight = 256;
+    const uint16 cellSize = 32;
+    const uint16 blockSize = cellSize * 2;
+    const uint16 blocksPerWidth = defaultWidth / blockSize;
+    const uint16 blocksPerHeight = defaultHeight / blockSize;
+    const uint32 brightColor = 0xffa2a2a2;
+    const uint32 darkColor = 0xff797979;
+
+    auto textureData = std::shared_ptr<uint8>(
+        new uint8[defaultWidth * defaultHeight * 4],
+        std::default_delete<uint8[]>());
+
+    for (uint iy = 0; iy < defaultHeight; iy++)
+        for (uint ix = 0; ix < defaultWidth; ix++)
+            ((uint32 *)textureData.get())[iy * defaultWidth + ix] = brightColor;
+
+    for (uint quadY = 0; quadY < blocksPerHeight; quadY++)
+    {
+        uint quadYShift = quadY * blockSize;
+        for (uint quadX = 0; quadX < blocksPerWidth; quadX++)
+        {
+            uint quadXShift = quadX * blockSize;
+            for (uint iy = 0; iy < cellSize; iy++)
+                for (uint ix = 0; ix < cellSize; ix++){
+                    ((uint32 *)textureData.get())[(iy + quadYShift)*defaultWidth + (ix + quadXShift)] = darkColor;
+                    ((uint32 *)textureData.get())[(iy + quadYShift + cellSize)*defaultWidth + (ix + quadXShift + cellSize)] = darkColor;
+                }
+        }
+    }
+
+    auto defaultTexture = createTexture(std::make_shared<Image>(textureData, defaultWidth, defaultHeight, 4));
+    defaultMaterial = createFlatMaterial(defaultTexture);
 
     return true;
 }

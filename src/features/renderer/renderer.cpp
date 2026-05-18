@@ -1,5 +1,6 @@
 #include "features/renderer/renderer.h"
 #include "features/renderer/vulkan/rendererVulkanNT.h"
+#include <iostream>
 
 using namespace wne;
 
@@ -39,7 +40,6 @@ std::shared_ptr<Material> Renderer::createAtmosphereMaterial(std::shared_ptr<Tex
     return nullptr;
 }
 
-
 void *Renderer::getFrameData()
 {
     return nullptr;
@@ -78,6 +78,11 @@ std::shared_ptr<Light> Renderer::createLightOmni()
 }
 
 std::shared_ptr<Light> Renderer::createLightSpot()
+{
+    return nullptr;
+}
+
+std::shared_ptr<wne::Material> Renderer::getDefaultMaterial()
 {
     return nullptr;
 }

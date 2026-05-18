@@ -69,14 +69,12 @@ int main()
     auto boxModel = wne::Primitives::createBox(4.0f);
     auto boxMesh = renderer->createMesh(boxModel);
     auto actorBox = wne::ActorMesh::create(boxMesh);
-    actorBox->setMaterial(materialBox);
     scene->addActor(actorBox);
     actorBox->setPosition(-12.0f, 8.0f, 4.0f);
 
     auto sphereModel = wne::Primitives::createSphere(4.0f, 10, 10);
     auto sphereMesh = renderer->createMesh(sphereModel);
     auto sphereBox = wne::ActorMesh::create(sphereMesh);
-    sphereBox->setMaterial(materialBox);
     scene->addActor(sphereBox);
     sphereBox->setPosition(-12.0f, 8.0f, -6.0f);
 

@@ -27,37 +27,40 @@ void ActorMesh::setMaterial(std::shared_ptr<Material> material)
 
 void ActorMesh::renderDepthShadow(Renderer *renderer)
 {
-    if (!material || !currentScene)
+    Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
+    if (!materialToUse || !currentScene)
         return;
     if (objectId == 0xffffffff)
         return;
 
     auto state = renderer->getState();
-    material->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 
 void ActorMesh::renderDepth(Renderer *renderer)
 {
-    if (!material || !currentScene)
+    Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
+    if (!materialToUse || !currentScene)
         return;
     if (objectId == 0xffffffff)
         return;
 
     auto state = renderer->getState();
-    material->bindDepth(objectId, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    materialToUse->bindDepth(objectId, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 
 void ActorMesh::renderColor(Renderer *renderer)
 {
-    if (!material || !currentScene)
+    Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
+    if (!materialToUse || !currentScene)
         return;
     if (objectId == 0xffffffff)
         return;
 
     auto state = renderer->getState();
     AffectingLights lights = currentScene->collectAffectingLights();
-    material->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
