@@ -51,7 +51,7 @@ bool VulkanUtils::setup()
     }
 
     vulkanObjectBuffers = std::make_unique<VulkanObjectBuffers>(this);
-    if (!vulkanObjectBuffers->setup())
+    if (!vulkanObjectBuffers->setup(MAX_FRAMES_IN_FLIGHT))
     {
         std::cout << "Unable to create objects buffer" << std::endl;
         return false;

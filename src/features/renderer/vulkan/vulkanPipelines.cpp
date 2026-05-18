@@ -62,7 +62,7 @@ bool VulkanPipelines::build(
     status &= vulkanPipelineAtmosphereColor->setupAtmosphere(vulkanRenderPass);
 
     vulkanDescriptorSets = std::make_unique<VulkanDescriptorSets>(vulkanDevice, vulkanDescriptorPool, vulkanObjectBuffers);
-    if (!vulkanDescriptorSets->setup(2, vulkanPipelineTexturedDepth.get(), vulkanPipelineTexturedColor.get()))
+    if (!vulkanDescriptorSets->setup(vulkanPipelineTexturedDepth.get(), vulkanPipelineTexturedColor.get()))
     {
         std::cout << "Unable to create vulkan descriptor sets" << std::endl;
         return false;

@@ -3,6 +3,7 @@
 #include "features/data/light.h"
 #include "core/core.h"
 #include <memory>
+#include <vector>
 
 namespace wne
 {
@@ -60,7 +61,8 @@ namespace wne
             uint32 shadowId,
             Matrix4x4 &mLightMVP);
 
-        bool setup();
+        bool setup(uint maxFramesInFlight);
+        void swap();
 
         uint32 getNewObjectId();
         void freeObjectId(uint32 objectId);
@@ -69,34 +71,44 @@ namespace wne
 
         void setAmbientColor(Vector4 &ambientColor);
 
-        VkBuffer getModelMatricesBuffer()
+        inline uint getFrameInFlight()
         {
-            return bufferModelMatrices;
+            return currentInFlight;
         }
 
-        VkBuffer getMVPMatricesBuffer()
+        inline uint getFramesMaxInFlight()
         {
-            return bufferMVPMatrices;
+            return maxFramesInFlight;
         }
 
-        VkBuffer getNormalMatricesBuffer()
+        VkBuffer getMVPMatricesBuffer(uint frame)
         {
-            return bufferNormalMatrices;
+            return bufferMVPMatrices[frame];
         }
 
-        VkBuffer getGlobalDataBuffer()
+        VkBuffer getModelMatricesBuffer(uint frame)
         {
-            return bufferGlobalData;
+            return bufferModelMatrices[frame];
         }
 
-        VkBuffer getLightMVPsBuffer()
+        VkBuffer getNormalMatricesBuffer(uint frame)
         {
-            return bufferLightMVPsData;
+            return bufferNormalMatrices[frame];
         }
 
-        VkBuffer getLightsDataBuffer()
+        VkBuffer getGlobalDataBuffer(uint frame)
         {
-            return bufferLightsData;
+            return bufferGlobalData[frame];
+        }
+
+        VkBuffer getLightMVPsBuffer(uint frame)
+        {
+            return bufferLightMVPsData[frame];
+        }
+
+        VkBuffer getLightsDataBuffer(uint frame)
+        {
+            return bufferLightsData[frame];
         }
 
         inline VulkanDepthBuffer *getDummyDepthBuffer()
@@ -125,6 +137,9 @@ namespace wne
         }
 
     protected:
+        uint maxFramesInFlight = 0;
+        uint currentInFlight = 0;
+
         VulkanUtils *vulkanUtils = nullptr;
 
         uint32 searchObjectIndex = 0;
@@ -133,29 +148,29 @@ namespace wne
         uint32 searchLightIndex = 0;
         uint8 bufferLightsOccupied[AMOUNT_OF_LIGHTS]{};
 
-        VkBuffer bufferModelMatrices = nullptr;
-        VkDeviceMemory bufferModelMatricesMemory = nullptr;
-        Matrix4x4 *bufferModelMatricesMapped = nullptr;
+        std::vector<VkBuffer> bufferModelMatrices;
+        std::vector<VkDeviceMemory> bufferModelMatricesMemory;
+        std::vector<Matrix4x4 *> bufferModelMatricesMapped;
 
-        VkBuffer bufferMVPMatrices = nullptr;
-        VkDeviceMemory bufferMVPMatricesMemory = nullptr;
-        Matrix4x4 *bufferMVPMatricesMapped = nullptr;
+        std::vector<VkBuffer> bufferMVPMatrices;
+        std::vector<VkDeviceMemory> bufferMVPMatricesMemory;
+        std::vector<Matrix4x4 *> bufferMVPMatricesMapped;
 
-        VkBuffer bufferNormalMatrices = nullptr;
-        VkDeviceMemory bufferNormalMatricesMemory = nullptr;
-        Matrix4x4 *bufferNormalMatricesMapped = nullptr;
+        std::vector<VkBuffer> bufferNormalMatrices;
+        std::vector<VkDeviceMemory> bufferNormalMatricesMemory;
+        std::vector<Matrix4x4 *> bufferNormalMatricesMapped;
 
-        VkBuffer bufferGlobalData = nullptr;
-        VkDeviceMemory bufferGlobalDataMemory = nullptr;
-        GlobalData *bufferGlobalDataMapped = nullptr;
+        std::vector<VkBuffer> bufferGlobalData;
+        std::vector<VkDeviceMemory> bufferGlobalDataMemory;
+        std::vector<GlobalData *> bufferGlobalDataMapped;
 
-        VkBuffer bufferLightMVPsData = nullptr;
-        VkDeviceMemory bufferLightMVPsMemory = nullptr;
-        Matrix4x4 *bufferLightMVPsMapped = nullptr;
+        std::vector<VkBuffer> bufferLightMVPsData;
+        std::vector<VkDeviceMemory> bufferLightMVPsMemory;
+        std::vector<Matrix4x4 *> bufferLightMVPsMapped;
 
-        VkBuffer bufferLightsData = nullptr;
-        VkDeviceMemory bufferLightsDataMemory = nullptr;
-        LightData *bufferLightsDataMapped = nullptr;
+        std::vector<VkBuffer> bufferLightsData;
+        std::vector<VkDeviceMemory> bufferLightsDataMemory;
+        std::vector<LightData *> bufferLightsDataMapped;
 
         std::unique_ptr<VulkanDepthBuffer> dummyBuffer;
     };

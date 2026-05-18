@@ -1,5 +1,7 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
+#include "features/renderer/vulkan/vulkanObjectBuffers.h"
+
 #include <vector>
 
 namespace wne
@@ -19,43 +21,40 @@ namespace wne
         ~VulkanDescriptorSets();
 
         bool setup(
-            uint maxFramesInFlight,
             VulkanPipelineTextured *pipelineTexturedDepth,
             VulkanPipelineTextured *pipelineTexturedColor);
-        void swap();
 
         void updateShadowMap(VulkanShadowMaps *shadowMaps, VulkanSampler *sampler);
 
         inline VkDescriptorSet getDescriptorSetColoredColor()
         {
-            return descriptorSetColoredColor[currentInFlight];
+            return descriptorSetColoredColor[vulkanObjectBuffers->getFrameInFlight()];
         }
         inline VkDescriptorSet getDescriptorSetColoredDepth()
         {
-            return descriptorSetColoredDepth[currentInFlight];
+            return descriptorSetColoredDepth[vulkanObjectBuffers->getFrameInFlight()];
         }
         inline VkDescriptorSet getDescriptorSetTexturedColor()
         {
-            return descriptorSetTexturedColor[currentInFlight];
+            return descriptorSetTexturedColor[vulkanObjectBuffers->getFrameInFlight()];
         }
         inline VkDescriptorSet getDescriptorSetTexturedDepth()
         {
-            return descriptorSetTexturedDepth[currentInFlight];
+            return descriptorSetTexturedDepth[vulkanObjectBuffers->getFrameInFlight()];
         }
 
     protected:
-        uint maxFramesInFlight = 0;
-        uint currentInFlight = 0;
+        bool initDescriptorSetColoredDepth(uint frame, VkDescriptorSet *descriptorSet);
 
-        bool initDescriptorSetColoredDepth(VkDescriptorSet *descriptorSet);
-
-        bool initDescriptorSetColoredColor(VkDescriptorSet *descriptorSet);
+        bool initDescriptorSetColoredColor(uint frame, VkDescriptorSet *descriptorSet);
 
         bool initDescriptorSetTexturedDepth(
+            uint frame, 
             VkDescriptorSet *descriptorSet,
             VulkanDescriptorSetLayout *descriptorSetLayoutPipeline);
 
         bool initDescriptorSetTexturedColor(
+            uint frame, 
             VkDescriptorSet *descriptorSet,
             VulkanDescriptorSetLayout *descriptorSetLayoutPipeline,
             VulkanDescriptorSetLayout *descriptorSetLayoutSampler);

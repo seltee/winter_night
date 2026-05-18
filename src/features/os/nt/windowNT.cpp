@@ -111,7 +111,7 @@ void WindowNT::update(float delta)
     // The most reliable way is still to just check the window size manually
     uint newWidth = rect.right - rect.left;
     uint newHeight = rect.bottom - rect.top;
-    if (width != newWidth || height != newHeight)
+    if ((width != newWidth || height != newHeight) && IsWindow(hWnd))
     {
         width = newWidth;
         height = newHeight;

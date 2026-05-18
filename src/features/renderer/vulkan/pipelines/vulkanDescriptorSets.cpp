@@ -27,44 +27,38 @@ VulkanDescriptorSets::~VulkanDescriptorSets()
 }
 
 bool VulkanDescriptorSets::setup(
-    uint maxFramesInFlight,
     VulkanPipelineTextured *pipelineTexturedDepth,
     VulkanPipelineTextured *pipelineTexturedColor)
 {
-    this->maxFramesInFlight = maxFramesInFlight;
-    currentInFlight = 0;
-
+    uint maxFramesInFlight = vulkanObjectBuffers->getFramesMaxInFlight();
     descriptorSetColoredDepth.resize(maxFramesInFlight);
     descriptorSetColoredColor.resize(maxFramesInFlight);
     descriptorSetTexturedDepth.resize(maxFramesInFlight);
     descriptorSetTexturedColor.resize(maxFramesInFlight);
 
-    for (uint32 i = 0; i < maxFramesInFlight; i++)
+    for (uint32 frame = 0; frame < maxFramesInFlight; frame++)
     {
-        if (!initDescriptorSetColoredDepth(&descriptorSetColoredDepth[i]))
+        if (!initDescriptorSetColoredDepth(frame, &descriptorSetColoredDepth[frame]))
             return false;
 
-        if (!initDescriptorSetColoredColor(&descriptorSetColoredColor[i]))
+        if (!initDescriptorSetColoredColor(frame, &descriptorSetColoredColor[frame]))
             return false;
 
         if (!initDescriptorSetTexturedDepth(
-                &descriptorSetTexturedDepth[i],
+                frame,
+                &descriptorSetTexturedDepth[frame],
                 pipelineTexturedDepth->getDescriptorSetLayoutPipeline()))
             return false;
 
         if (!initDescriptorSetTexturedColor(
-                &descriptorSetTexturedColor[i],
+                frame,
+                &descriptorSetTexturedColor[frame],
                 pipelineTexturedColor->getDescriptorSetLayoutPipeline(),
                 pipelineTexturedColor->getDescriptorSetLayoutSampler()))
             return false;
     }
 
     return true;
-}
-
-void VulkanDescriptorSets::swap()
-{
-    currentInFlight = (currentInFlight + 1) % maxFramesInFlight;
 }
 
 void VulkanDescriptorSets::updateShadowMap(VulkanShadowMaps *shadowMaps, VulkanSampler *sampler)
@@ -90,7 +84,7 @@ void VulkanDescriptorSets::updateShadowMap(VulkanShadowMaps *shadowMaps, VulkanS
 
     VkWriteDescriptorSet write{};
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write.dstSet = descriptorSetTexturedColor[currentInFlight];
+    write.dstSet = descriptorSetTexturedColor[vulkanObjectBuffers->getFrameInFlight()];
     write.dstBinding = 6;
     write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     write.descriptorCount = 16;
@@ -99,19 +93,20 @@ void VulkanDescriptorSets::updateShadowMap(VulkanShadowMaps *shadowMaps, VulkanS
     vkUpdateDescriptorSets(vulkanDevice->getDevice(), 1, &write, 0, nullptr);
 }
 
-bool VulkanDescriptorSets::initDescriptorSetColoredDepth(VkDescriptorSet *descriptorSet)
+bool VulkanDescriptorSets::initDescriptorSetColoredDepth(uint frame, VkDescriptorSet *descriptorSet)
 {
     *descriptorSet = nullptr;
     return true;
 }
 
-bool VulkanDescriptorSets::initDescriptorSetColoredColor(VkDescriptorSet *descriptorSet)
+bool VulkanDescriptorSets::initDescriptorSetColoredColor(uint frame, VkDescriptorSet *descriptorSet)
 {
     *descriptorSet = nullptr;
     return true;
 }
 
 bool VulkanDescriptorSets::initDescriptorSetTexturedDepth(
+    uint frame,
     VkDescriptorSet *descriptorSet,
     VulkanDescriptorSetLayout *descriptorSetLayoutPipeline)
 {
@@ -132,7 +127,7 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedDepth(
     }
 
     VkDescriptorBufferInfo bufferMVPInfo{};
-    bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer();
+    bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer(frame);
     bufferMVPInfo.offset = 0;
     bufferMVPInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
@@ -149,6 +144,7 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedDepth(
 }
 
 bool VulkanDescriptorSets::initDescriptorSetTexturedColor(
+    uint frame,
     VkDescriptorSet *descriptorSet,
     VulkanDescriptorSetLayout *descriptorSetLayoutPipeline,
     VulkanDescriptorSetLayout *descriptorSetLayoutSampler)
@@ -172,32 +168,32 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedColor(
     }
 
     VkDescriptorBufferInfo bufferMVPInfo{};
-    bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer();
+    bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer(frame);
     bufferMVPInfo.offset = 0;
     bufferMVPInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
     VkDescriptorBufferInfo bufferModelInfo{};
-    bufferModelInfo.buffer = vulkanObjectBuffers->getModelMatricesBuffer();
+    bufferModelInfo.buffer = vulkanObjectBuffers->getModelMatricesBuffer(frame);
     bufferModelInfo.offset = 0;
     bufferModelInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
     VkDescriptorBufferInfo bufferNormalInfo{};
-    bufferNormalInfo.buffer = vulkanObjectBuffers->getNormalMatricesBuffer();
+    bufferNormalInfo.buffer = vulkanObjectBuffers->getNormalMatricesBuffer(frame);
     bufferNormalInfo.offset = 0;
     bufferNormalInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
     VkDescriptorBufferInfo bufferGlobalDataInfo{};
-    bufferGlobalDataInfo.buffer = vulkanObjectBuffers->getGlobalDataBuffer();
+    bufferGlobalDataInfo.buffer = vulkanObjectBuffers->getGlobalDataBuffer(frame);
     bufferGlobalDataInfo.offset = 0;
     bufferGlobalDataInfo.range = vulkanObjectBuffers->getGlobalDataSize();
 
     VkDescriptorBufferInfo bufferLightsInfo{};
-    bufferLightsInfo.buffer = vulkanObjectBuffers->getLightsDataBuffer();
+    bufferLightsInfo.buffer = vulkanObjectBuffers->getLightsDataBuffer(frame);
     bufferLightsInfo.offset = 0;
     bufferLightsInfo.range = vulkanObjectBuffers->getLightsBufferSize();
 
     VkDescriptorBufferInfo bufferLightMVPs{};
-    bufferLightMVPs.buffer = vulkanObjectBuffers->getLightMVPsBuffer();
+    bufferLightMVPs.buffer = vulkanObjectBuffers->getLightMVPsBuffer(frame);
     bufferLightMVPs.offset = 0;
     bufferLightMVPs.range = vulkanObjectBuffers->getLightMVPsBufferSize();
 

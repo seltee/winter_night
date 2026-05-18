@@ -449,27 +449,27 @@ void VulkanPipelineColored::updateDescriptorSet(VulkanObjectBuffers *vulkanObjec
     auto device = vulkanDevice->getDevice();
 
     VkDescriptorBufferInfo bufferModelInfo{};
-    bufferModelInfo.buffer = vulkanObjectBuffers->getModelMatricesBuffer();
+    bufferModelInfo.buffer = vulkanObjectBuffers->getModelMatricesBuffer(0);
     bufferModelInfo.offset = 0;
     bufferModelInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
     VkDescriptorBufferInfo bufferMVPInfo{};
-    bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer();
+    bufferMVPInfo.buffer = vulkanObjectBuffers->getMVPMatricesBuffer(0);
     bufferMVPInfo.offset = 0;
     bufferMVPInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
     VkDescriptorBufferInfo bufferNormalInfo{};
-    bufferNormalInfo.buffer = vulkanObjectBuffers->getNormalMatricesBuffer();
+    bufferNormalInfo.buffer = vulkanObjectBuffers->getNormalMatricesBuffer(0);
     bufferNormalInfo.offset = 0;
     bufferNormalInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
     VkDescriptorBufferInfo bufferGlobalDataInfo{};
-    bufferGlobalDataInfo.buffer = vulkanObjectBuffers->getGlobalDataBuffer();
+    bufferGlobalDataInfo.buffer = vulkanObjectBuffers->getGlobalDataBuffer(0);
     bufferGlobalDataInfo.offset = 0;
     bufferGlobalDataInfo.range = vulkanObjectBuffers->getGlobalDataSize();
 
     VkDescriptorBufferInfo bufferLightsInfo{};
-    bufferLightsInfo.buffer = vulkanObjectBuffers->getLightsDataBuffer();
+    bufferLightsInfo.buffer = vulkanObjectBuffers->getLightsDataBuffer(0);
     bufferLightsInfo.offset = 0;
     bufferLightsInfo.range = vulkanObjectBuffers->getLightsBufferSize();
 

@@ -47,11 +47,6 @@ namespace wne
             return currentPipeline;
         }
 
-        inline void swapSets()
-        {
-            vulkanDescriptorSets->swap();
-        }
-
         inline VulkanDescriptorSets *getDescriptorSets()
         {
             return vulkanDescriptorSets.get();

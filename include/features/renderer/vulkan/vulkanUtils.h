@@ -62,7 +62,7 @@ namespace wne
 
         inline void swapSets()
         {
-            vulkanPipelines->swapSets();
+            vulkanObjectBuffers->swap();
         }
 
         inline VulkanDevice *getVulkanDevice()

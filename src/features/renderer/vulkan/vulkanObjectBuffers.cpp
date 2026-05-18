@@ -14,27 +14,44 @@ VulkanObjectBuffers::VulkanObjectBuffers(VulkanUtils *vulkanUtils)
 VulkanObjectBuffers::~VulkanObjectBuffers()
 {
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
-    if (bufferModelMatrices)
-        vkDestroyBuffer(device, bufferModelMatrices, nullptr);
-    if (bufferModelMatricesMemory)
-        vkFreeMemory(device, bufferModelMatricesMemory, nullptr);
-    if (bufferMVPMatrices)
-        vkDestroyBuffer(device, bufferMVPMatrices, nullptr);
-    if (bufferMVPMatricesMemory)
-        vkFreeMemory(device, bufferMVPMatricesMemory, nullptr);
-    if (bufferNormalMatrices)
-        vkDestroyBuffer(device, bufferNormalMatrices, nullptr);
-    if (bufferNormalMatricesMemory)
-        vkFreeMemory(device, bufferNormalMatricesMemory, nullptr);
+    for (const auto &buffer : bufferModelMatrices)
+        vkDestroyBuffer(device, buffer, nullptr);
+    for (const auto &buffer : bufferModelMatricesMemory)
+        vkFreeMemory(device, buffer, nullptr);
+
+    for (const auto &buffer : bufferMVPMatrices)
+        vkDestroyBuffer(device, buffer, nullptr);
+    for (const auto &buffer : bufferMVPMatricesMemory)
+        vkFreeMemory(device, buffer, nullptr);
+
+    for (const auto &buffer : bufferNormalMatrices)
+        vkDestroyBuffer(device, buffer, nullptr);
+    for (const auto &buffer : bufferNormalMatricesMemory)
+        vkFreeMemory(device, buffer, nullptr);
+
+    for (const auto &buffer : bufferGlobalData)
+        vkDestroyBuffer(device, buffer, nullptr);
+    for (const auto &buffer : bufferGlobalDataMemory)
+        vkFreeMemory(device, buffer, nullptr);
+
+    for (const auto &buffer : bufferLightMVPsData)
+        vkDestroyBuffer(device, buffer, nullptr);
+    for (const auto &buffer : bufferLightMVPsMemory)
+        vkFreeMemory(device, buffer, nullptr);
+
+    for (const auto &buffer : bufferLightsData)
+        vkDestroyBuffer(device, buffer, nullptr);
+    for (const auto &buffer : bufferLightsDataMemory)
+        vkFreeMemory(device, buffer, nullptr);
 }
 
 void VulkanObjectBuffers::updateObjectData(uint32 objectId, const Matrix4x4 &mModel, const Matrix4x4 &mNormal, const Matrix4x4 &mMVP) noexcept
 {
     if (objectId < AMOUNT_OF_OBJECTS)
     {
-        bufferModelMatricesMapped[objectId] = mModel;
-        bufferMVPMatricesMapped[objectId] = mMVP;
-        bufferNormalMatricesMapped[objectId] = mNormal;
+        bufferModelMatricesMapped[currentInFlight][objectId] = mModel;
+        bufferMVPMatricesMapped[currentInFlight][objectId] = mMVP;
+        bufferNormalMatricesMapped[currentInFlight][objectId] = mNormal;
     }
 }
 
@@ -53,18 +70,19 @@ void VulkanObjectBuffers::updateLightData(
 {
     if (lightId < AMOUNT_OF_LIGHTS)
     {
-        bufferLightsDataMapped[lightId].affectRadius = affectRadius;
-        bufferLightsDataMapped[lightId].cutOff = cutOff;
-        bufferLightsDataMapped[lightId].outerCutOff = outerCutOff;
-        bufferLightsDataMapped[lightId].position = position;
-        bufferLightsDataMapped[lightId].direction = direction;
-        bufferLightsDataMapped[lightId].color = color;
-        bufferLightsDataMapped[lightId].shadowId = shadowId;
-        bufferLightsDataMapped[lightId].amountOfCascades = amountOfCascades;
-        bufferLightsDataMapped[lightId].texelSize = texelSize;
-        bufferLightsDataMapped[lightId].enableDirectional = (type == Light::Type::Directional);
-        bufferLightsDataMapped[lightId].enableOmni = (type == Light::Type::Omni);
-        bufferLightsDataMapped[lightId].enableSpot = (type == Light::Type::Spot);
+        auto dataMapped = &bufferLightsDataMapped[currentInFlight][lightId];
+        dataMapped->affectRadius = affectRadius;
+        dataMapped->cutOff = cutOff;
+        dataMapped->outerCutOff = outerCutOff;
+        dataMapped->position = position;
+        dataMapped->direction = direction;
+        dataMapped->color = color;
+        dataMapped->shadowId = shadowId;
+        dataMapped->amountOfCascades = amountOfCascades;
+        dataMapped->texelSize = texelSize;
+        dataMapped->enableDirectional = (type == Light::Type::Directional);
+        dataMapped->enableOmni = (type == Light::Type::Omni);
+        dataMapped->enableSpot = (type == Light::Type::Spot);
     }
 }
 
@@ -74,82 +92,112 @@ void VulkanObjectBuffers::updateLightShadowData(
 {
     if (shadowId < MAX_LIGHT_SHADOWS)
     {
-        bufferLightMVPsMapped[shadowId] = mLightMVP;
+        bufferLightMVPsMapped[currentInFlight][shadowId] = mLightMVP;
     }
 }
 
-bool VulkanObjectBuffers::setup()
+bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
 {
+    this->maxFramesInFlight = maxFramesInFlight;
+    this->currentInFlight = 0;
+
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
     uint64 matrixBufferSize = getMatrixBufferSize();
     uint64 lightsBufferSize = getLightsBufferSize();
     uint64 lightMVPsSize = getLightMVPsBufferSize();
 
-    if (!vulkanUtils->createBuffer(
-            matrixBufferSize,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            bufferModelMatrices,
-            bufferModelMatricesMemory))
-    {
-        return false;
-    }
-    vkMapMemory(device, bufferModelMatricesMemory, 0, matrixBufferSize, 0, (void **)&bufferModelMatricesMapped);
+    bufferModelMatrices.resize(maxFramesInFlight);
+    bufferModelMatricesMemory.resize(maxFramesInFlight);
+    bufferModelMatricesMapped.resize(maxFramesInFlight);
+    
+    bufferMVPMatrices.resize(maxFramesInFlight);
+    bufferMVPMatricesMemory.resize(maxFramesInFlight);
+    bufferMVPMatricesMapped.resize(maxFramesInFlight);
+    
+    bufferNormalMatrices.resize(maxFramesInFlight);
+    bufferNormalMatricesMemory.resize(maxFramesInFlight);
+    bufferNormalMatricesMapped.resize(maxFramesInFlight);
 
-    if (!vulkanUtils->createBuffer(
-            matrixBufferSize,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            bufferMVPMatrices,
-            bufferMVPMatricesMemory))
-    {
-        return false;
-    }
-    vkMapMemory(device, bufferMVPMatricesMemory, 0, matrixBufferSize, 0, (void **)&bufferMVPMatricesMapped);
+    bufferGlobalData.resize(maxFramesInFlight);
+    bufferGlobalDataMemory.resize(maxFramesInFlight);
+    bufferGlobalDataMapped.resize(maxFramesInFlight);
+    
+    bufferLightMVPsData.resize(maxFramesInFlight);
+    bufferLightMVPsMemory.resize(maxFramesInFlight);
+    bufferLightMVPsMapped.resize(maxFramesInFlight);
 
-    if (!vulkanUtils->createBuffer(
-            matrixBufferSize,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            bufferNormalMatrices,
-            bufferNormalMatricesMemory))
-    {
-        return false;
-    }
-    vkMapMemory(device, bufferNormalMatricesMemory, 0, matrixBufferSize, 0, (void **)&bufferNormalMatricesMapped);
+    bufferLightsData.resize(maxFramesInFlight);
+    bufferLightsDataMemory.resize(maxFramesInFlight);
+    bufferLightsDataMapped.resize(maxFramesInFlight);
 
-    if (!vulkanUtils->createBuffer(
-            sizeof(GlobalData),
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            bufferGlobalData,
-            bufferGlobalDataMemory))
+    for (uint i = 0; i < maxFramesInFlight; i++)
     {
-        return false;
-    }
-    vkMapMemory(device, bufferGlobalDataMemory, 0, sizeof(GlobalData), 0, (void **)&bufferGlobalDataMapped);
+        if (!vulkanUtils->createBuffer(
+                matrixBufferSize,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                bufferModelMatrices[i],
+                bufferModelMatricesMemory[i]))
+        {
+            return false;
+        }
+        vkMapMemory(device, bufferModelMatricesMemory[i], 0, matrixBufferSize, 0, (void **)&bufferModelMatricesMapped[i]);
 
-    if (!vulkanUtils->createBuffer(
-            lightMVPsSize,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            bufferLightMVPsData,
-            bufferLightMVPsMemory))
-    {
-        return false;
-    }
-    vkMapMemory(device, bufferLightMVPsMemory, 0, lightMVPsSize, 0, (void **)&bufferLightMVPsMapped);
+        if (!vulkanUtils->createBuffer(
+                matrixBufferSize,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                bufferMVPMatrices[i],
+                bufferMVPMatricesMemory[i]))
+        {
+            return false;
+        }
+        vkMapMemory(device, bufferMVPMatricesMemory[i], 0, matrixBufferSize, 0, (void **)&bufferMVPMatricesMapped[i]);
 
-    if (!vulkanUtils->createBuffer(
-            lightsBufferSize,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            bufferLightsData,
-            bufferLightsDataMemory))
-    {
-        return false;
+        if (!vulkanUtils->createBuffer(
+                matrixBufferSize,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                bufferNormalMatrices[i],
+                bufferNormalMatricesMemory[i]))
+        {
+            return false;
+        }
+        vkMapMemory(device, bufferNormalMatricesMemory[i], 0, matrixBufferSize, 0, (void **)&bufferNormalMatricesMapped[i]);
+
+        if (!vulkanUtils->createBuffer(
+                sizeof(GlobalData),
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                bufferGlobalData[i],
+                bufferGlobalDataMemory[i]))
+        {
+            return false;
+        }
+        vkMapMemory(device, bufferGlobalDataMemory[i], 0, sizeof(GlobalData), 0, (void **)&bufferGlobalDataMapped[i]);
+
+        if (!vulkanUtils->createBuffer(
+                lightMVPsSize,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                bufferLightMVPsData[i],
+                bufferLightMVPsMemory[i]))
+        {
+            return false;
+        }
+        vkMapMemory(device, bufferLightMVPsMemory[i], 0, lightMVPsSize, 0, (void **)&bufferLightMVPsMapped[i]);
+
+        if (!vulkanUtils->createBuffer(
+                lightsBufferSize,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                bufferLightsData[i],
+                bufferLightsDataMemory[i]))
+        {
+            return false;
+        }
+        vkMapMemory(device, bufferLightsDataMemory[i], 0, lightsBufferSize, 0, (void **)&bufferLightsDataMapped[i]);
     }
-    vkMapMemory(device, bufferLightsDataMemory, 0, lightsBufferSize, 0, (void **)&bufferLightsDataMapped);
 
     dummyBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils);
     if (!dummyBuffer->setup(8, 8, true))
@@ -157,8 +205,12 @@ bool VulkanObjectBuffers::setup()
         return false;
     }
     dummyBuffer->transitionToDefined();
-
     return true;
+}
+
+void VulkanObjectBuffers::swap()
+{
+    currentInFlight = (currentInFlight + 1) % maxFramesInFlight;
 }
 
 uint32 VulkanObjectBuffers::getNewObjectId()
@@ -183,7 +235,7 @@ void VulkanObjectBuffers::freeObjectId(uint32 objectId)
 
 void VulkanObjectBuffers::setAmbientColor(Vector4 &ambientColor)
 {
-    bufferGlobalDataMapped->ambientLightColor = ambientColor;
+    bufferGlobalDataMapped[currentInFlight]->ambientLightColor = ambientColor;
 }
 
 uint32 VulkanObjectBuffers::getNewLightId()

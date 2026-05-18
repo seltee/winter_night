@@ -35,3 +35,4 @@ using VulkanImageUsageFlags = uint64;
 using VulkanMemoryPropertyFlagBits = uint64;
 using VulkanImageAspectFlags = uint64;
 
+#define MAX_FRAMES_IN_FLIGHT 2
