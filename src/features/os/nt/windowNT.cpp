@@ -102,6 +102,22 @@ void WindowNT::update(float delta)
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+    RECT rect;
+    GetWindowRect((HWND__ *)hWnd, &rect);
+
+    // 2026. Still better check than relying on Windows events
+    // You can detect maximization of the window, but when you go backwards WM_RESTORE
+    // is shared among other actions like changing the window size
+    // The most reliable way is still to just check the window size manually
+    uint newWidth = rect.right - rect.left;
+    uint newHeight = rect.bottom - rect.top;
+    if (width != newWidth || height != newHeight)
+    {
+        width = newWidth;
+        height = newHeight;
+        renderer->changeWindowSize(width, height);
+    }
+
     renderer->update(delta);
 }
 
@@ -198,7 +214,7 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
     {
     case WM_DESTROY:
         PostQuitMessage(0);
-        break;
+        return DefWindowProcW(hWnd, message, wParam, lParam);
 
     case WM_SETFOCUS:
         window->setFocused(true);
@@ -260,14 +276,9 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         break;
 
     case WM_MOUSEWHEEL:
-
         break;
 
     case WM_WINDOWPOSCHANGED:
-        break;
-
-    case WM_EXITSIZEMOVE:
-        window->updateWindowSize();
         break;
 
     case WM_MOUSEHOVER:
@@ -282,5 +293,5 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         return DefWindowProcW(hWnd, message, wParam, lParam);
     }
 
-    return 0;
+    return DefWindowProcW(hWnd, message, wParam, lParam);
 }
