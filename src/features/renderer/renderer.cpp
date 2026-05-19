@@ -86,3 +86,8 @@ std::shared_ptr<wne::Material> Renderer::getDefaultMaterial()
 {
     return nullptr;
 }
+
+std::shared_ptr<wne::Mesh> Renderer::getDefaultPlain()
+{
+    return nullptr;
+}

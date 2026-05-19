@@ -131,9 +131,7 @@ void ActorTerrain::setMaterial(std::shared_ptr<Material> material)
 void ActorTerrain::renderDepthShadow(Renderer *renderer)
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
-    if (!materialToUse || !mesh || !currentScene)
-        return;
-    if (objectId == 0xffffffff)
+    if (!materialToUse || !mesh || !currentScene || objectId == 0xffffffff)
         return;
 
     auto state = renderer->getState();
@@ -144,9 +142,7 @@ void ActorTerrain::renderDepthShadow(Renderer *renderer)
 void ActorTerrain::renderDepth(Renderer *renderer)
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
-    if (!materialToUse || !mesh || !currentScene)
-        return;
-    if (objectId == 0xffffffff)
+    if (!materialToUse || !mesh || !currentScene || objectId == 0xffffffff)
         return;
 
     auto state = renderer->getState();
@@ -157,9 +153,7 @@ void ActorTerrain::renderDepth(Renderer *renderer)
 void ActorTerrain::renderColor(Renderer *renderer)
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
-    if (!materialToUse || !mesh || !currentScene)
-        return;
-    if (objectId == 0xffffffff)
+    if (!materialToUse || !mesh || !currentScene || objectId == 0xffffffff)
         return;
 
     auto state = renderer->getState();

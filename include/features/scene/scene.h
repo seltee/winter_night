@@ -58,6 +58,11 @@ namespace wne
             return ambientLightColor;
         }
 
+        inline std::shared_ptr<ActorCamera> getCameraActor()
+        {
+            return actorCamera;
+        }
+
     protected:
         std::vector<std::shared_ptr<Actor>> actors;
         std::vector<Light *> lights;

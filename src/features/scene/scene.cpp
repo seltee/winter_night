@@ -37,7 +37,8 @@ void Scene::renderDepthShadow(Renderer *renderer)
     // shadow depth pass
     for (const auto &object : actors)
     {
-        object->renderDepthShadow(renderer);
+        if (object->hasShadow())
+            object->renderDepthShadow(renderer);
     }
 }
 

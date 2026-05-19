@@ -23,7 +23,7 @@ std::shared_ptr<Model> Primitives::createPlain(float halfSize, const Vector3 &no
         {xAxis * halfSize + zAxis * halfSize, {1.0f, 0.0f}, normal},
         {xAxis * -halfSize + zAxis * halfSize, {0.0f, 0.0f}, normal}};
 
-    const std::vector<uint16_t> indices = {0, 1, 2, 3, 2, 0};
+    const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 
     return Model::createFromData(vertices, indices);
 }

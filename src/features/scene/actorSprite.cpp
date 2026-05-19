@@ -1,31 +1,47 @@
-#include "features/scene/actorMesh.h"
+#include "features/scene/actorSprite.h"
+#include "features/renderer/mesh.h"
 #include "features/renderer/renderer.h"
-#include <iostream>
 
 using namespace wne;
 
-ActorMesh::ActorMesh(std::shared_ptr<Mesh> mesh)
+ActorSprite::ActorSprite(Renderer *renderer)
 {
-    this->mesh = std::move(mesh);
-    objectId = this->mesh->genNewObjectId();
+    mesh = renderer->getDefaultPlain();
+    objectId = mesh->genNewObjectId();
+    isShadowEnabled = false;
 }
 
-ActorMesh::~ActorMesh()
+ActorSprite::~ActorSprite()
 {
-    this->mesh->freeObjectId(objectId);
+    mesh->freeObjectId(objectId);
 }
 
-std::shared_ptr<ActorMesh> ActorMesh::create(std::shared_ptr<Mesh> mesh)
+std::shared_ptr<ActorSprite> ActorSprite::create(Renderer *renderer)
 {
-    return std::make_shared<ActorMesh>(std::move(mesh));
+    return std::make_shared<ActorSprite>(renderer);
 }
 
-void ActorMesh::setMaterial(std::shared_ptr<Material> material)
+const Matrix4x4 &ActorSprite::getModelMatrix()
+{
+    if (currentScene){
+        Matrix4x4 newModel = Matrix4x4::translation(position);
+        newModel = newModel * Matrix4x4(lookAt(position, currentScene->getCameraActor()->getPosition()));
+        mModel = newModel * Matrix4x4::scale(scale);
+    }
+    return mModel;
+}
+
+void ActorSprite::update(float delta)
+{
+    isDirtyFlag = true;
+}
+
+void ActorSprite::setMaterial(std::shared_ptr<Material> material)
 {
     this->material = std::move(material);
 }
 
-void ActorMesh::renderDepthShadow(Renderer *renderer)
+void ActorSprite::renderDepthShadow(Renderer *renderer)
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || !currentScene || objectId == 0xffffffff)
@@ -36,7 +52,7 @@ void ActorMesh::renderDepthShadow(Renderer *renderer)
     mesh->render(renderer->getFrameData());
 }
 
-void ActorMesh::renderDepth(Renderer *renderer)
+void ActorSprite::renderDepth(Renderer *renderer)
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || !currentScene || objectId == 0xffffffff)
@@ -47,7 +63,7 @@ void ActorMesh::renderDepth(Renderer *renderer)
     mesh->render(renderer->getFrameData());
 }
 
-void ActorMesh::renderColor(Renderer *renderer)
+void ActorSprite::renderColor(Renderer *renderer)
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || !currentScene || objectId == 0xffffffff)

@@ -12,6 +12,7 @@
 #include "features/scene/actorCameraFlying.h"
 #include "features/scene/actorMesh.h"
 #include "features/scene/actorTerrain.h"
+#include "features/scene/actorSprite.h"
 #include "features/scene/actorLight.h"
 #include "features/data/light.h"
 #include "features/data/lightDirectional.h"

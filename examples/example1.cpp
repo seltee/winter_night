@@ -66,6 +66,12 @@ int main()
     scene->addActor(actorPlain);
     actorPlain->setPosition(12.0f, -4.0f, 12.0f);
 
+    auto actorSprite = wne::ActorSprite::create(renderer);
+    actorSprite->setMaterial(materialMetalBox);
+    scene->addActor(actorSprite);
+    actorSprite->setScale(6.0f);
+    actorSprite->setPosition(0.0f, 16.0f, 12.0f);
+
     auto boxModel = wne::Primitives::createBox(4.0f);
     auto boxMesh = renderer->createMesh(boxModel);
     auto actorBox = wne::ActorMesh::create(boxMesh);

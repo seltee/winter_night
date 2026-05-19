@@ -83,9 +83,21 @@ namespace wne
             return scale;
         }
 
+        inline bool hasShadow()
+        {
+            return isShadowEnabled;
+        }
+
+        inline void setShadow(bool isEnabled)
+        {
+            isShadowEnabled = isEnabled;
+        }
+
     protected:
         bool isDirtyFlag = true;
         bool isDirtyNormalsFlag = true;
+        bool isShadowEnabled = true;
+
         Quat rotation = Quat();
         Vector3 position = Vector3(0, 0, 0);
         Vector3 scale = Vector3(1.0f, 1.0f, 1.0f);
