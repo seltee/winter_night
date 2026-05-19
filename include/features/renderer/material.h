@@ -27,5 +27,18 @@ namespace wne
 
         // bind for color render
         virtual void bindColor(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix4x4 &mModel, const Matrix3x3 &mNormal, ModelDataType dataType);
+
+        void setMasked(bool masked)
+        {
+            flagIsMasked = masked;
+        }
+
+        bool isMasked()
+        {
+            return flagIsMasked;
+        }
+
+    protected:
+        bool flagIsMasked = false;
     };
 };

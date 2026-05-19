@@ -42,6 +42,11 @@ int main()
     auto textureMetalBox = renderer->createTexture(imageMetalBox);
     auto materialMetalBox = renderer->createFlatMaterial(textureMetalBox);
 
+    auto imageExplosion = wne::Image::create("./explosion.png");
+    auto textureExplosion = renderer->createTexture(imageExplosion);
+    auto materialExplosion = renderer->createFlatMaterial(textureExplosion);
+    materialExplosion->setMasked(true);
+
     // actor with mesh
     auto model = wne::Model::createFromData(vertices, indices);
     auto mesh = renderer->createMesh(model);
@@ -67,7 +72,7 @@ int main()
     actorPlain->setPosition(12.0f, -4.0f, 12.0f);
 
     auto actorSprite = wne::ActorSprite::create(renderer);
-    actorSprite->setMaterial(materialMetalBox);
+    actorSprite->setMaterial(materialExplosion);
     scene->addActor(actorSprite);
     actorSprite->setScale(6.0f);
     actorSprite->setPosition(0.0f, 16.0f, 12.0f);

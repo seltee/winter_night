@@ -24,10 +24,16 @@ void VulkanPipelines::reset()
         vulkanPipelineTexturedDepth.reset();
     if (vulkanPipelineTexturedShadowDepth)
         vulkanPipelineTexturedShadowDepth.reset();
+    if (vulkanPipelineTexturedMaskedShadowDepth)
+        vulkanPipelineTexturedMaskedShadowDepth.reset();
+    if (vulkanPipelineTexturedMaskedDepth)
+        vulkanPipelineTexturedMaskedDepth.reset();
     if (vulkanPipelineColoredColor)
         vulkanPipelineColoredColor.reset();
     if (vulkanPipelineTexturedColor)
         vulkanPipelineTexturedColor.reset();
+    if (vulkanPipelineAtmosphereColor)
+        vulkanPipelineAtmosphereColor.reset();
 }
 
 bool VulkanPipelines::build(
@@ -47,8 +53,14 @@ bool VulkanPipelines::build(
     vulkanPipelineTexturedDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
     status &= vulkanPipelineTexturedDepth->setupDepth(VulkanDepthPass);
 
+    vulkanPipelineTexturedMaskedDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
+    status &= vulkanPipelineTexturedMaskedDepth->setupMaskedDepth(VulkanDepthPass);
+
     vulkanPipelineTexturedShadowDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
     status &= vulkanPipelineTexturedShadowDepth->setupDepthShadow(VulkanDepthPass);
+
+    vulkanPipelineTexturedMaskedShadowDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
+    status &= vulkanPipelineTexturedMaskedShadowDepth->setupMaskedDepthShadow(VulkanDepthPass);
 
     // color pipelines
     vulkanPipelineColoredColor = std::make_unique<VulkanPipelineColored>(vulkanDevice);
@@ -84,11 +96,14 @@ void VulkanPipelines::enablePipelineColored(VulkanCommandBuffer *commandBuffer, 
     commandBuffer->bindPipeline(currentPipeline);
 }
 
-void VulkanPipelines::enablePipelineTextured(VulkanCommandBuffer *commandBuffer, bool isDepthRendering)
+void VulkanPipelines::enablePipelineTextured(VulkanCommandBuffer *commandBuffer, bool isDepthRendering, bool isMasked)
 {
     if (isDepthRendering)
     {
-        currentPipeline = vulkanPipelineTexturedDepth.get();
+        if (isMasked)
+            currentPipeline = vulkanPipelineTexturedMaskedDepth.get();
+        else
+            currentPipeline = vulkanPipelineTexturedDepth.get();
     }
     else
     {
@@ -97,9 +112,12 @@ void VulkanPipelines::enablePipelineTextured(VulkanCommandBuffer *commandBuffer,
     commandBuffer->bindPipeline(currentPipeline);
 }
 
-void VulkanPipelines::enablePipelineTexturedShadowDepth(VulkanCommandBuffer *commandBuffer)
+void VulkanPipelines::enablePipelineTexturedShadowDepth(VulkanCommandBuffer *commandBuffer, bool isMasked)
 {
-    currentPipeline = vulkanPipelineTexturedShadowDepth.get();
+    if (isMasked)
+        currentPipeline = vulkanPipelineTexturedMaskedShadowDepth.get();
+    else
+        currentPipeline = vulkanPipelineTexturedShadowDepth.get();
     commandBuffer->bindPipeline(currentPipeline);
 }
 

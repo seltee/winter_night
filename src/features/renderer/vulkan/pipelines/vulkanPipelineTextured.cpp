@@ -87,7 +87,40 @@ bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass)
         return false;
     }
 
+    // mask needs fragment shader otherwise only vertex depth needed
     if (!buildPipeline(1, false, true, true, false, false, depthPass))
+    {
+        std::cout << "Unable to build pipeline" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool VulkanPipelineTextured::setupMaskedDepth(VulkanRenderPass *depthPass)
+{
+    if (!buildShaderMaskedDepth())
+    {
+        std::cout << "Unable to build shader" << std::endl;
+        return false;
+    }
+
+    descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutPipeline->setupTexturedDepth())
+    {
+        std::cout << "Unable to setup textured depth pipeline" << std::endl;
+        return false;
+    }
+
+    descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutSampler->setupSampler())
+    {
+        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        return false;
+    }
+
+    // mask needs fragment shader otherwise only vertex depth needed
+    if (!buildPipeline(2, false, true, true, true, false, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -111,7 +144,40 @@ bool VulkanPipelineTextured::setupDepthShadow(VulkanRenderPass *depthPass)
         return false;
     }
 
+    // mask needs fragment shader otherwise only vertex depth needed
     if (!buildPipeline(1, false, true, true, false, false, depthPass))
+    {
+        std::cout << "Unable to build pipeline" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool VulkanPipelineTextured::setupMaskedDepthShadow(VulkanRenderPass *depthPass)
+{
+    if (!buildShaderMaskedDepth())
+    {
+        std::cout << "Unable to build shader" << std::endl;
+        return false;
+    }
+
+    descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutPipeline->setupTexturedDepth())
+    {
+        std::cout << "Unable to setup textured depth pipeline" << std::endl;
+        return false;
+    }
+
+    descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutSampler->setupSampler())
+    {
+        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        return false;
+    }
+
+    // mask needs fragment shader otherwise only vertex depth needed
+    if (!buildPipeline(2, false, true, true, true, false, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -178,6 +244,18 @@ bool VulkanPipelineTextured::buildShaderDepth()
     auto device = vulkanDevice->getDevice();
     shader = std::make_unique<VulkanShader>();
     if (!shader->makeFromFiles("./shaders/shaderTexturedDepth.vert.spv", "./shaders/shaderTexturedDepth.frag.spv", device))
+    {
+        std::cout << "Unable to compile textured shader" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool VulkanPipelineTextured::buildShaderMaskedDepth()
+{
+    auto device = vulkanDevice->getDevice();
+    shader = std::make_unique<VulkanShader>();
+    if (!shader->makeFromFiles("./shaders/shaderTexturedDepth.vert.spv", "./shaders/shaderTexturedMaskedDepth.frag.spv", device))
     {
         std::cout << "Unable to compile textured shader" << std::endl;
         return false;

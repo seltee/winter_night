@@ -115,17 +115,17 @@ namespace wne
             return vulkanPipelines->getCurrentPipeline();
         }
 
-        inline void enablePipelineByType(ModelDataType dataType, bool isDepthRendering)
+        inline void enablePipelineByType(ModelDataType dataType, bool isDepthRendering, bool isMasked)
         {
             if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
                 vulkanPipelines->enablePipelineColored(currentCommandBuffer, isDepthRendering);
             else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
-                vulkanPipelines->enablePipelineTextured(currentCommandBuffer, isDepthRendering);
+                vulkanPipelines->enablePipelineTextured(currentCommandBuffer, isDepthRendering, isMasked);
         }
 
-        inline void enablePipelineShadowByType(ModelDataType dataType)
+        inline void enablePipelineShadowByType(ModelDataType dataType, bool isMasked)
         {
-            vulkanPipelines->enablePipelineTexturedShadowDepth(currentCommandBuffer);
+            vulkanPipelines->enablePipelineTexturedShadowDepth(currentCommandBuffer, isMasked);
         }
 
         inline void enablePipelineAtmosphere()
