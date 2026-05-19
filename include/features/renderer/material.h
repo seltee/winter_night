@@ -38,7 +38,18 @@ namespace wne
             return flagIsMasked;
         }
 
+        void setLighted(bool lighted)
+        {
+            flagIsLighted = lighted;
+        }
+
+        bool isLighted()
+        {
+            return flagIsLighted;
+        }
+
     protected:
         bool flagIsMasked = false;
+        bool flagIsLighted = true;
     };
 };

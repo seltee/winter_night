@@ -123,6 +123,11 @@ namespace wne
                 vulkanPipelines->enablePipelineTextured(currentCommandBuffer, isDepthRendering, isMasked);
         }
 
+        inline void enablePipelineNoLightsByType(ModelDataType dataType)
+        {
+            vulkanPipelines->enablePipelineTexturedNoLights(currentCommandBuffer);
+        }
+
         inline void enablePipelineShadowByType(ModelDataType dataType, bool isMasked)
         {
             vulkanPipelines->enablePipelineTexturedShadowDepth(currentCommandBuffer, isMasked);

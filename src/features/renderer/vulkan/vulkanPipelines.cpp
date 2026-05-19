@@ -32,6 +32,8 @@ void VulkanPipelines::reset()
         vulkanPipelineColoredColor.reset();
     if (vulkanPipelineTexturedColor)
         vulkanPipelineTexturedColor.reset();
+    if (vulkanPipelineTexturedColorNoLights)
+        vulkanPipelineTexturedColorNoLights.reset();
     if (vulkanPipelineAtmosphereColor)
         vulkanPipelineAtmosphereColor.reset();
 }
@@ -68,6 +70,9 @@ bool VulkanPipelines::build(
 
     vulkanPipelineTexturedColor = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
     status &= vulkanPipelineTexturedColor->setupColor(vulkanRenderPass);
+
+    vulkanPipelineTexturedColorNoLights = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
+    status &= vulkanPipelineTexturedColorNoLights->setupColorNoLights(vulkanRenderPass);
 
     // atmosphere pipelines
     vulkanPipelineAtmosphereColor = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
@@ -109,6 +114,12 @@ void VulkanPipelines::enablePipelineTextured(VulkanCommandBuffer *commandBuffer,
     {
         currentPipeline = vulkanPipelineTexturedColor.get();
     }
+    commandBuffer->bindPipeline(currentPipeline);
+}
+
+void VulkanPipelines::enablePipelineTexturedNoLights(VulkanCommandBuffer *commandBuffer)
+{
+    currentPipeline = vulkanPipelineTexturedColorNoLights.get();
     commandBuffer->bindPipeline(currentPipeline);
 }
 

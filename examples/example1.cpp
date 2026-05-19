@@ -46,6 +46,7 @@ int main()
     auto textureExplosion = renderer->createTexture(imageExplosion);
     auto materialExplosion = renderer->createFlatMaterial(textureExplosion);
     materialExplosion->setMasked(true);
+    materialExplosion->setLighted(false);
 
     // actor with mesh
     auto model = wne::Model::createFromData(vertices, indices);

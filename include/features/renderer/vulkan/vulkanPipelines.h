@@ -34,6 +34,7 @@ namespace wne
 
         void enablePipelineColored(VulkanCommandBuffer *commandBuffer, bool isDepthRendering);
         void enablePipelineTextured(VulkanCommandBuffer *commandBuffer, bool isDepthRendering, bool isMasked);
+        void enablePipelineTexturedNoLights(VulkanCommandBuffer *commandBuffer);
         void enablePipelineTexturedShadowDepth(VulkanCommandBuffer *commandBuffer, bool isMasked);
         void enablePipelineAtmosphere(VulkanCommandBuffer *commandBuffer);
 
@@ -63,6 +64,7 @@ namespace wne
         std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedDepth;
         std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedMaskedDepth;
         std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedColor;
+        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedColorNoLights;
 
         std::unique_ptr<VulkanPipelineTextured> vulkanPipelineAtmosphereColor;
 

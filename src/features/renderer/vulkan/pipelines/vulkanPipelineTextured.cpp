@@ -72,6 +72,37 @@ bool VulkanPipelineTextured::setupColor(VulkanRenderPass *renderPass)
     return true;
 }
 
+bool VulkanPipelineTextured::setupColorNoLights(VulkanRenderPass *renderPass)
+{
+    if (!buildShaderColorNoLights())
+    {
+        std::cout << "Unable to build shader" << std::endl;
+        return false;
+    }
+
+    descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutPipeline->setupTexturedColor())
+    {
+        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        return false;
+    }
+
+    descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutSampler->setupSampler())
+    {
+        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        return false;
+    }
+
+    if (!buildPipeline(2, true, false, true, true, false, renderPass))
+    {
+        std::cout << "Unable to build pipeline" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
 bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass)
 {
     if (!buildShaderDepth())
@@ -232,6 +263,18 @@ bool VulkanPipelineTextured::buildShaderColor()
     auto device = vulkanDevice->getDevice();
     shader = std::make_unique<VulkanShader>();
     if (!shader->makeFromFiles("./shaders/shaderTextured.vert.spv", "./shaders/shaderTextured.frag.spv", device))
+    {
+        std::cout << "Unable to compile textured shader" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool VulkanPipelineTextured::buildShaderColorNoLights()
+{
+    auto device = vulkanDevice->getDevice();
+    shader = std::make_unique<VulkanShader>();
+    if (!shader->makeFromFiles("./shaders/shaderTexturedNoLight.vert.spv", "./shaders/shaderTexturedNoLight.frag.spv", device))
     {
         std::cout << "Unable to compile textured shader" << std::endl;
         return false;

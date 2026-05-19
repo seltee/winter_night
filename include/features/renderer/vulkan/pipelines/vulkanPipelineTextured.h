@@ -25,6 +25,7 @@ namespace wne
         VkPipelineLayout getPipelineLayout() override final;
 
         bool setupColor(VulkanRenderPass *renderPass);
+        bool setupColorNoLights(VulkanRenderPass *renderPass);
         bool setupDepth(VulkanRenderPass *depthPass);
         bool setupMaskedDepth(VulkanRenderPass *depthPass);
         bool setupDepthShadow(VulkanRenderPass *depthPass);
@@ -36,6 +37,7 @@ namespace wne
 
     protected:
         bool buildShaderColor();
+        bool buildShaderColorNoLights();
         bool buildShaderDepth();
         bool buildShaderMaskedDepth();
         bool buildShaderAtmosphere();
