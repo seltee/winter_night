@@ -21,6 +21,7 @@ lib/**/*.dll.a
 *.dll 
 *.ilk  
 objects/**/*.o
+objects/**/*.d
 log.txt
 terminal.lnk
 docs

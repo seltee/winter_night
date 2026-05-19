@@ -2,7 +2,7 @@ CXX = g++
 CC = gcc
 LD = g++
 
-CXX_FLAGS = -DWNE_BUILD_DLL -Iinclude -I../vulkan/Include -Wall -std=c++20 -mfpmath=sse -g -O2
+CXX_FLAGS = -DWNE_BUILD_DLL -Iinclude -I../vulkan/Include -Wall -MMD -std=c++20 -mfpmath=sse -g -O2
 
 LIBRARIES = -lkernel32 -luser32 -lgdi32 -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lvulkan-1
 
@@ -50,6 +50,8 @@ $(info OBJECTS = $(OBJ_FILES))
 $(info VERT SHADERS = $(VERTEX_SHADER_SOURCES))
 $(info FRAG SHADERS = $(FRAGMENT_SHADER_SOURCES))
 
+DEP_FILES := $(OBJ_FILES:.o=.d)
+
 all: engine shaders examples 
 
 # Library
@@ -63,6 +65,8 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 $(TARGET): $(OBJ_FILES)
 	@echo Linking $@
 	$(LD) -o $@ $^ $(LIBRARIES) $(L_FLAGS) -Wl,--out-implib,$(IMPLIB)
+
+-include $(DEP_FILES)
 
 # Shaders
 shaders: $(SHADER_OBJECTS)
