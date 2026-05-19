@@ -39,7 +39,7 @@ void ActorMesh::renderDepthShadow(Renderer *renderer)
 void ActorMesh::renderDepth(Renderer *renderer)
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
-    if (!materialToUse || !currentScene || objectId == 0xffffffff)
+    if (!materialToUse || materialToUse->getColorBlending() != ColorBlending::Solid || !currentScene || objectId == 0xffffffff)
         return;
 
     auto state = renderer->getState();
@@ -57,4 +57,9 @@ void ActorMesh::renderColor(Renderer *renderer)
     AffectingLights lights = currentScene->collectAffectingLights();
     materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
+}
+
+Actor::RenderPass ActorMesh::getRenderPass()
+{
+    return (!material || material->getColorBlending() == ColorBlending::Solid) ? RenderPass::Main : RenderPass::Blended;
 }

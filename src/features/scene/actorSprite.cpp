@@ -55,7 +55,7 @@ void ActorSprite::renderDepthShadow(Renderer *renderer)
 void ActorSprite::renderDepth(Renderer *renderer)
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
-    if (!materialToUse || !currentScene || objectId == 0xffffffff)
+    if (!materialToUse || materialToUse->getColorBlending() != ColorBlending::Solid || !currentScene || objectId == 0xffffffff)
         return;
 
     auto state = renderer->getState();
@@ -73,4 +73,9 @@ void ActorSprite::renderColor(Renderer *renderer)
     AffectingLights lights = material->isLighted() ? currentScene->collectAffectingLights() : AffectingLights{};
     materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
+}
+
+Actor::RenderPass ActorSprite::getRenderPass()
+{
+    return (!material || material->getColorBlending() == ColorBlending::Solid) ? RenderPass::Main : RenderPass::Blended;
 }

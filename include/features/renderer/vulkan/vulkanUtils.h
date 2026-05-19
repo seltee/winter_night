@@ -115,15 +115,23 @@ namespace wne
             return vulkanPipelines->getCurrentPipeline();
         }
 
-        inline void enablePipelineByType(ModelDataType dataType, bool isDepthRendering, bool isMasked)
+        inline void enablePipelineDepthByType(ModelDataType dataType, bool isMasked)
         {
             if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
-                vulkanPipelines->enablePipelineColored(currentCommandBuffer, isDepthRendering);
+                vulkanPipelines->enablePipelineColored(currentCommandBuffer, true);
             else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
-                vulkanPipelines->enablePipelineTextured(currentCommandBuffer, isDepthRendering, isMasked);
+                vulkanPipelines->enablePipelineTexturedDepth(currentCommandBuffer, isMasked);
         }
 
-        inline void enablePipelineNoLightsByType(ModelDataType dataType)
+        inline void enablePipelineColorByType(ModelDataType dataType, ColorBlending blending)
+        {
+            if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
+                vulkanPipelines->enablePipelineColored(currentCommandBuffer, false);
+            else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
+                vulkanPipelines->enablePipelineTexturedColor(currentCommandBuffer, blending);
+        }
+
+        inline void enablePipelineColorByTypeNoLights(ModelDataType dataType, ColorBlending blending)
         {
             vulkanPipelines->enablePipelineTexturedNoLights(currentCommandBuffer);
         }

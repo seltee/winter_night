@@ -63,7 +63,7 @@ bool VulkanPipelineTextured::setupColor(VulkanRenderPass *renderPass)
         return false;
     }
 
-    if (!buildPipeline(2, true, false, true, true, false, renderPass))
+    if (!buildPipeline(2, true, false, true, true, false, ColorBlending::Solid, renderPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -94,7 +94,38 @@ bool VulkanPipelineTextured::setupColorNoLights(VulkanRenderPass *renderPass)
         return false;
     }
 
-    if (!buildPipeline(2, true, false, true, true, false, renderPass))
+    if (!buildPipeline(2, true, false, true, true, false, ColorBlending::Solid, renderPass))
+    {
+        std::cout << "Unable to build pipeline" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool VulkanPipelineTextured::setupColorAddition(VulkanRenderPass *renderPass)
+{
+    if (!buildShaderColorNoLights())
+    {
+        std::cout << "Unable to build shader" << std::endl;
+        return false;
+    }
+
+    descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutPipeline->setupTexturedColor())
+    {
+        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        return false;
+    }
+
+    descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!descriptorSetLayoutSampler->setupSampler())
+    {
+        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        return false;
+    }
+
+    if (!buildPipeline(2, true, false, false, true, false, ColorBlending::Addition, renderPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -119,7 +150,7 @@ bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(1, false, true, true, false, false, depthPass))
+    if (!buildPipeline(1, false, true, true, false, false, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -151,7 +182,7 @@ bool VulkanPipelineTextured::setupMaskedDepth(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(2, false, true, true, true, false, depthPass))
+    if (!buildPipeline(2, false, true, true, true, false, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -176,7 +207,7 @@ bool VulkanPipelineTextured::setupDepthShadow(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(1, false, true, true, false, false, depthPass))
+    if (!buildPipeline(1, false, true, true, false, false, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -208,7 +239,7 @@ bool VulkanPipelineTextured::setupMaskedDepthShadow(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(2, false, true, true, true, false, depthPass))
+    if (!buildPipeline(2, false, true, true, true, false, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -239,7 +270,7 @@ bool VulkanPipelineTextured::setupAtmosphere(VulkanRenderPass *renderPass)
         return false;
     }
 
-    if (!buildPipeline(2, true, false, false, true, true, renderPass))
+    if (!buildPipeline(2, true, false, false, true, true, ColorBlending::Solid, renderPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -325,6 +356,7 @@ bool VulkanPipelineTextured::buildPipeline(
     bool enableDepthTest,
     bool enableSampler,
     bool reverseFaceCooling,
+    ColorBlending blending,
     VulkanRenderPass *renderPass)
 {
     auto device = vulkanDevice->getDevice();
@@ -417,14 +449,21 @@ bool VulkanPipelineTextured::buildPipeline(
     VkPipelineColorBlendStateCreateInfo colorBlending{};
     if (enableColorBlending)
     {
+        // ColorBlending blending
         colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-        colorBlendAttachment.blendEnable = VK_FALSE;
-        colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;  // Optional
-        colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-        colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;             // Optional
-        colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;  // Optional
-        colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-        colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;             // Optional
+        colorBlendAttachment.blendEnable = (blending == ColorBlending::Solid) ? VK_FALSE : VK_TRUE;
+        if (blending == ColorBlending::Solid)
+        {
+        }
+        else if (blending == ColorBlending::Addition)
+        {
+            colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+            colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
+            colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+            colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+            colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+            colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
+        }
 
         colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
         colorBlending.logicOpEnable = VK_FALSE;
@@ -511,8 +550,8 @@ bool VulkanPipelineTextured::buildPipeline(
     pipelineInfo.layout = pipelineLayout;
     pipelineInfo.renderPass = renderPass->getRenderPass();
     pipelineInfo.subpass = 0;
-    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
-    pipelineInfo.basePipelineIndex = -1;              // Optional
+    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+    pipelineInfo.basePipelineIndex = -1;
 
     vkDeviceWaitIdle(device);
 

@@ -21,6 +21,8 @@ namespace wne
         void renderDepth(Renderer *renderer) override final;
         void renderColor(Renderer *renderer) override final;
 
+        RenderPass getRenderPass() override final;
+
         inline uint64 getObjectId()
         {
             return objectId;

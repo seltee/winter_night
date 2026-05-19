@@ -33,6 +33,8 @@ namespace wne
         void renderDepth(Renderer *renderer) override final;
         void renderColor(Renderer *renderer) override final;
 
+        RenderPass getRenderPass() override final;
+
     protected:
         std::shared_ptr<Mesh> mesh;
         std::shared_ptr<Material> material;

@@ -11,6 +11,12 @@ namespace wne
     class WNE_API Actor : public Object
     {
     public:
+        enum RenderPass
+        {
+            Main,
+            Blended
+        };
+
         Actor();
 
         virtual void update(float delta);
@@ -27,6 +33,7 @@ namespace wne
         virtual const Matrix4x4 &getModelMatrix();
         virtual const Matrix3x3 &getNormalMatrix();
         virtual Matrix4x4 getInvModelMatrix();
+        virtual RenderPass getRenderPass();
 
         void setScene(Scene *scene);
 

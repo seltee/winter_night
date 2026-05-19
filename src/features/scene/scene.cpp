@@ -61,8 +61,20 @@ void Scene::render(Renderer *renderer)
         renderer->renderAtmosphereMap(atmoMaterial);
     }
 
+    std::vector<Actor *> blendingPass;
+    blendingPass.reserve(actors.size());
+
     // color pass
     for (const auto &object : actors)
+    {
+        if (object->getRenderPass() == Actor::RenderPass::Main)
+            object->renderColor(renderer);
+        else
+            blendingPass.push_back(object.get());
+    }
+
+    // blending pass
+    for (const auto &object : blendingPass)
     {
         object->renderColor(renderer);
     }

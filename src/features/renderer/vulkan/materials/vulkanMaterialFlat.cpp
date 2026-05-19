@@ -19,17 +19,17 @@ VulkanMaterialFlat::~VulkanMaterialFlat()
 
 void VulkanMaterialFlat::selectPipelineDepth(ModelDataType dataType)
 {
-    vulkanUtils->enablePipelineByType(dataType, true, flagIsMasked);
+    vulkanUtils->enablePipelineDepthByType(dataType, flagIsMasked);
 }
 
 void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType)
 {
-    vulkanUtils->enablePipelineByType(dataType, false, flagIsMasked);
+    vulkanUtils->enablePipelineColorByType(dataType, colorBlending);
 }
 
 void VulkanMaterialFlat::selectPipelineColorNoLights(ModelDataType dataType)
 {
-    vulkanUtils->enablePipelineNoLightsByType(dataType);
+    vulkanUtils->enablePipelineColorByTypeNoLights(dataType, colorBlending);
 }
 
 void VulkanMaterialFlat::selectPipelineShadowDepth(ModelDataType dataType)

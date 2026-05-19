@@ -34,6 +34,8 @@ void VulkanPipelines::reset()
         vulkanPipelineTexturedColor.reset();
     if (vulkanPipelineTexturedColorNoLights)
         vulkanPipelineTexturedColorNoLights.reset();
+    if (vulkanPipelineTexturedColorAddition)
+        vulkanPipelineTexturedColorAddition.reset();
     if (vulkanPipelineAtmosphereColor)
         vulkanPipelineAtmosphereColor.reset();
 }
@@ -74,6 +76,9 @@ bool VulkanPipelines::build(
     vulkanPipelineTexturedColorNoLights = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
     status &= vulkanPipelineTexturedColorNoLights->setupColorNoLights(vulkanRenderPass);
 
+    vulkanPipelineTexturedColorAddition = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
+    status &= vulkanPipelineTexturedColorAddition->setupColorAddition(vulkanRenderPass);
+
     // atmosphere pipelines
     vulkanPipelineAtmosphereColor = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
     status &= vulkanPipelineAtmosphereColor->setupAtmosphere(vulkanRenderPass);
@@ -101,19 +106,22 @@ void VulkanPipelines::enablePipelineColored(VulkanCommandBuffer *commandBuffer, 
     commandBuffer->bindPipeline(currentPipeline);
 }
 
-void VulkanPipelines::enablePipelineTextured(VulkanCommandBuffer *commandBuffer, bool isDepthRendering, bool isMasked)
+void VulkanPipelines::enablePipelineTexturedDepth(VulkanCommandBuffer *commandBuffer, bool isMasked)
 {
-    if (isDepthRendering)
-    {
-        if (isMasked)
-            currentPipeline = vulkanPipelineTexturedMaskedDepth.get();
-        else
-            currentPipeline = vulkanPipelineTexturedDepth.get();
-    }
+    if (isMasked)
+        currentPipeline = vulkanPipelineTexturedMaskedDepth.get();
     else
-    {
+        currentPipeline = vulkanPipelineTexturedDepth.get();
+    commandBuffer->bindPipeline(currentPipeline);
+}
+
+void VulkanPipelines::enablePipelineTexturedColor(VulkanCommandBuffer *commandBuffer, ColorBlending blending)
+{
+
+    if (blending == ColorBlending::Solid)
         currentPipeline = vulkanPipelineTexturedColor.get();
-    }
+    else
+        currentPipeline = vulkanPipelineTexturedColorAddition.get();
     commandBuffer->bindPipeline(currentPipeline);
 }
 

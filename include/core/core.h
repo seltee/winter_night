@@ -18,3 +18,12 @@ static_assert(sizeof(uint8) == 1, "Invalid size of uint8");
 static_assert(sizeof(uint16) == 2, "Invalid size of uint16");
 static_assert(sizeof(uint32) == 4, "Invalid size of uint32");
 static_assert(sizeof(uint64) == 8, "Invalid size of uint64");
+
+namespace wne
+{
+    enum ColorBlending
+    {
+        Solid,
+        Addition
+    };
+}

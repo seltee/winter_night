@@ -54,6 +54,11 @@ Matrix4x4 Actor::getInvModelMatrix()
     return inverse(getModelMatrix());
 }
 
+Actor::RenderPass Actor::getRenderPass()
+{
+    return RenderPass::Main;
+}
+
 void Actor::setScene(Scene *scene)
 {
     Scene *oldScene = this->currentScene;

@@ -48,8 +48,20 @@ namespace wne
             return flagIsLighted;
         }
 
+        void setColorBlending(ColorBlending colorBlending)
+        {
+            this->colorBlending = colorBlending;
+        }
+
+        ColorBlending getColorBlending()
+        {
+            return colorBlending;
+        }
+
     protected:
         bool flagIsMasked = false;
         bool flagIsLighted = true;
+
+        ColorBlending colorBlending = ColorBlending::Solid;
     };
 };

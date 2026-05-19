@@ -26,6 +26,7 @@ namespace wne
 
         bool setupColor(VulkanRenderPass *renderPass);
         bool setupColorNoLights(VulkanRenderPass *renderPass);
+        bool setupColorAddition(VulkanRenderPass *renderPass);
         bool setupDepth(VulkanRenderPass *depthPass);
         bool setupMaskedDepth(VulkanRenderPass *depthPass);
         bool setupDepthShadow(VulkanRenderPass *depthPass);
@@ -48,6 +49,7 @@ namespace wne
             bool enableDepthTest,
             bool enableSampler,
             bool reverseFaceCooling,
+            ColorBlending blending,
             VulkanRenderPass *renderPass);
 
         std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayoutPipeline;
