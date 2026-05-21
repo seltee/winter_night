@@ -185,6 +185,10 @@ int main()
     spawnTree(-46.0f, -76.0f, actorTerrain.get(), scene.get(), treeMesh, materialTreeBark);
     spawnTree(33.0f, -77.0f, actorTerrain.get(), scene.get(), treeMesh, materialTreeBark);
     spawnTree(44.0f, -78.0f, actorTerrain.get(), scene.get(), treeMesh, materialTreeBark);
+    spawnTree(-36.0f, -71.0f, actorTerrain.get(), scene.get(), treeMesh, materialTreeBark);
+    spawnTree(21.0f, -67.0f, actorTerrain.get(), scene.get(), treeMesh, materialTreeBark);
+    spawnTree(36.0f, -72.0f, actorTerrain.get(), scene.get(), treeMesh, materialTreeBark);
+    spawnTree(-49.0f, -69.0f, actorTerrain.get(), scene.get(), treeMesh, materialTreeBark);
 
     const uint AmountOfSnowflakes = 1000;
     for (uint i = 0; i < AmountOfSnowflakes; i++)

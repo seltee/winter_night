@@ -2,7 +2,7 @@
 #include "core/core.h"
 #include <mutex>
 
-#define WINDOW_EVENTS_MAX 32
+#define WINDOW_EVENTS_MAX 64
 
 namespace wne
 {
@@ -15,7 +15,9 @@ namespace wne
             KEY_UP,
             MOUSE_BUTTON_DOWN,
             MOUSE_BUTTON_UP,
-            MOUSE_MOVE
+            MOUSE_MOVE,
+            WINDOW_FOCUSED,
+            WINDOW_UNFOCUSED,
         };
 
         struct WindowEventKey
@@ -48,12 +50,14 @@ namespace wne
         void pushEventKey(bool isDown, uint16 keyCode);
         void pushEventMouseMove(int16 shiftX, int16 shiftY);
         void pushEventMouseClick(bool isDown, uint16 mouseButton);
+        void pushEventWindowFocusChanged(bool newFocusState);
 
         bool getEvent(WindowEvent *event);
 
     protected:
         WindowEvent events[WINDOW_EVENTS_MAX];
-        uint32 lastEventNum = 0;
+        uint32 lastEventRead = 0;
+        uint32 lastEventWrote = 0;
         std::mutex mutex;
     };
 }

@@ -51,6 +51,7 @@ namespace wne
         void emitEventKey(bool isDown, uint16 keyCode);
         void emitEventMouseMove(int16 shiftX, int16 shiftY);
         void emitEventMouseClick(bool isDown, uint16 mouseButton);
+        void emitEventFocusChanged(bool newFocusState);
 
         inline Renderer *getRenderer()
         {

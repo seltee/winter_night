@@ -43,7 +43,7 @@ void ActorCameraFlying::update(float delta)
             else if (event.key.scancode == 69)
                 moveDown = true;
         }
-        if (event.type == WindowEvents::WindowEventType::KEY_UP)
+        else if (event.type == WindowEvents::WindowEventType::KEY_UP)
         {
             if (event.key.scancode == 87)
                 moveForward = false;
@@ -58,7 +58,7 @@ void ActorCameraFlying::update(float delta)
             else if (event.key.scancode == 69)
                 moveDown = false;
         }
-        if (event.type == WindowEvents::WindowEventType::MOUSE_MOVE)
+        else if (event.type == WindowEvents::WindowEventType::MOUSE_MOVE)
         {
             yaw += (float)event.mouseMove.shiftX * 0.009f;   // left/right
             pitch += (float)event.mouseMove.shiftY * 0.009f; // up/down
@@ -71,6 +71,15 @@ void ActorCameraFlying::update(float delta)
             Quat qYaw = Quat::aroundWorldY(yaw);
             rotation = normalize(qYaw * qPitch);
             isDirtyFlag = true;
+        }
+        else if (event.type == WindowEvents::WindowEventType::WINDOW_FOCUSED || event.type == WindowEvents::WindowEventType::WINDOW_UNFOCUSED)
+        {
+            moveForward = false;
+            moveBackward = false;
+            moveLeft = false;
+            moveRight = false;
+            moveUp = false;
+            moveDown = false;
         }
     }
 

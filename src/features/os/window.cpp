@@ -132,3 +132,22 @@ void Window::emitEventMouseClick(bool isDown, uint16 mouseButton)
         }
     }
 }
+
+void Window::emitEventFocusChanged(bool newFocusState)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    for (int i = 0; i < subscribersAmount;)
+    {
+        auto subscriber = subscribers[i].lock();
+        if (subscriber)
+        {
+            subscriber->pushEventWindowFocusChanged(newFocusState);
+            i++;
+        }
+        else
+        {
+            subscribersAmount--;
+            subscribers[i] = subscribers[subscribersAmount];
+        }
+    }
+}

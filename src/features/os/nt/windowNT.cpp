@@ -150,6 +150,7 @@ void WindowNT::close()
 void WindowNT::setFocused(bool state)
 {
     focused = state;
+    emitEventFocusChanged(state);
 }
 
 void WindowNT::setProcessDPIAware()
