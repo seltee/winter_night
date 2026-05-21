@@ -71,16 +71,16 @@ void VulkanLightDirectional::disableShadows()
     destroyShadows();
 }
 
-void VulkanLightDirectional::prepareForRender()
+void VulkanLightDirectional::prepareForRender(const Vector3 &cameraPosition)
 {
     if (amountOfCascades > 0)
     {
         shadowId = vulkanUtils->getShadowMaps()->registerShadowMap(cascades[0]->getDepthBuffer());
 
-        Matrix4x4 mProjection = makeOrthographicProjectionMatrix(-60.0f, 60.0f, 60.0f, -60.0f, 0.0f, 100.0f);
-        Vector3 projectionPosition = position.xyz() + realDirection.xyz() * 50.0f;
+        Matrix4x4 mProjection = makeOrthographicProjectionMatrix(-90.0f, 90.0f, 90.0f, -90.0f, 0.0f, 120.0f);
+        Vector3 projectionPosition = cameraPosition + realDirection.xyz() * 40.0f;
         Matrix4x4 model = Matrix4x4::translation(projectionPosition);
-        model = model * Matrix4x4(lookAt(projectionPosition, position.xyz()));
+        model = model * Matrix4x4(lookAt(projectionPosition, cameraPosition));
         Matrix4x4 invModelMatrix = inverse(model);
         mVP = mProjection * invModelMatrix;
     }

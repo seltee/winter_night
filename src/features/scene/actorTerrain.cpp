@@ -1,6 +1,7 @@
 #include "features/scene/actorTerrain.h"
 #include "features/renderer/renderer.h"
 #include <cmath>
+#include <iostream>
 
 using namespace wne;
 
@@ -126,6 +127,22 @@ void ActorTerrain::updateMesh()
 void ActorTerrain::setMaterial(std::shared_ptr<Material> material)
 {
     this->material = material;
+}
+
+float ActorTerrain::getHeightLocal(float x, float y)
+{
+    // heights resolution
+    int xPoint = (int)((float)resolution * x); 
+    int yPoint = (int)((float)resolution * y);
+    uint xPointClamped = std::min(std::max(xPoint, 0), resolution - 1);
+    uint yPointClamped = std::min(std::max(yPoint, 0), resolution - 1);
+
+    return heights[yPointClamped * resolution + xPointClamped];
+}
+
+float ActorTerrain::getHeightGlobal(float x, float y)
+{
+    return getHeightLocal((x + size * 0.5f) / size, (y + size * 0.5f) / size);
 }
 
 void ActorTerrain::renderDepthShadow(Renderer *renderer)

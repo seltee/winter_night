@@ -29,6 +29,11 @@ namespace wne
 
         void setMaterial(std::shared_ptr<Material> material);
 
+        // 0.0 - 1.0
+        float getHeightLocal(float x, float y);
+        // -size - size
+        float getHeightGlobal(float x, float y);
+
         void renderDepthShadow(Renderer *renderer) override final;
         void renderDepth(Renderer *renderer) override final;
         void renderColor(Renderer *renderer) override final;

@@ -1,6 +1,7 @@
 #include "features/scene/actorSprite.h"
 #include "features/renderer/mesh.h"
 #include "features/renderer/renderer.h"
+#include <iostream>
 
 using namespace wne;
 
@@ -23,7 +24,8 @@ std::shared_ptr<ActorSprite> ActorSprite::create(Renderer *renderer)
 
 const Matrix4x4 &ActorSprite::getModelMatrix()
 {
-    if (currentScene){
+    if (currentScene)
+    {
         Matrix4x4 newModel = Matrix4x4::translation(position);
         newModel = newModel * Matrix4x4(lookAt(position, currentScene->getCameraActor()->getPosition()));
         mModel = newModel * Matrix4x4::scale(scale);
@@ -34,6 +36,7 @@ const Matrix4x4 &ActorSprite::getModelMatrix()
 void ActorSprite::update(float delta)
 {
     isDirtyFlag = true;
+    eventUpdate(delta);
 }
 
 void ActorSprite::setMaterial(std::shared_ptr<Material> material)
@@ -70,7 +73,7 @@ void ActorSprite::renderColor(Renderer *renderer)
         return;
 
     auto state = renderer->getState();
-    AffectingLights lights = material->isLighted() ? currentScene->collectAffectingLights() : AffectingLights{};
+    AffectingLights lights = materialToUse->isLighted() ? currentScene->collectAffectingLights() : AffectingLights{};
     materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }

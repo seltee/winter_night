@@ -14,7 +14,7 @@ namespace wne
     class VulkanObjectBuffers
     {
     public:
-        static const uint32 AMOUNT_OF_OBJECTS = 256;
+        static const uint32 AMOUNT_OF_OBJECTS = 8192;
         static const uint32 AMOUNT_OF_LIGHTS = 128;
         static const uint32 MAX_LIGHT_SHADOWS = 16;
 

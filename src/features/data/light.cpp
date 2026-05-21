@@ -21,6 +21,6 @@ void Light::renderShadows(Renderer *renderer, Scene *scene, ActorCamera *camera)
 {
 }
 
-void Light::prepareForRender()
+void Light::prepareForRender(const Vector3 &cameraPosition)
 {
 }

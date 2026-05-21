@@ -11,6 +11,7 @@ Actor::Actor()
 
 void Actor::update(float delta)
 {
+    eventUpdate(delta);
 }
 
 void Actor::renderDepthShadow(Renderer *renderer)
@@ -67,5 +68,9 @@ void Actor::setScene(Scene *scene)
 }
 
 void Actor::eventSetScene(Scene *oldScene, Scene *newScene)
+{
+}
+
+void Actor::eventUpdate(float delta)
 {
 }

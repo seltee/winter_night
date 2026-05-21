@@ -15,15 +15,15 @@ layout(push_constant) uniform PushConstants {
 } objectData;
 
 layout(set = 0, binding = 0) uniform BufferObjects {
-     mat4 matrix[256];
+     mat4 matrix[8192];
 } mModels;
 
 layout(set = 0, binding = 1) uniform BufferMVPs {
-     mat4 matrix[256];
+     mat4 matrix[8192];
 } mMVPs;
 
 layout(set = 0, binding = 2) uniform BufferNormals {
-     mat4 matrix[256];
+     mat4 matrix[8192];
 } mNormals;
 
 

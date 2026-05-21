@@ -38,7 +38,8 @@ namespace wne
         void setScene(Scene *scene);
 
         virtual void eventSetScene(Scene *oldScene, Scene *newScene);
-
+        virtual void eventUpdate(float delta);
+        
         inline void setPosition(float x, float y, float z)
         {
             isDirtyFlag = true;

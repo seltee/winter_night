@@ -22,7 +22,7 @@ namespace wne
 
         virtual void updateTransformation(const Matrix4x4 &mModel);
         virtual void renderShadows(Renderer *renderer, Scene *scene, ActorCamera *camera);
-        virtual void prepareForRender();
+        virtual void prepareForRender(const Vector3 &cameraPosition);
 
         inline void setColor(Vector3 color)
         {

@@ -10,7 +10,7 @@ namespace wne
         VulkanLight(VulkanUtils *vulkanUtils, Light::Type type);
         ~VulkanLight();
 
-        void prepareForRender() override final;
+        void prepareForRender(const Vector3 &cameraPosition) override final;
 
     protected:
         VulkanUtils *vulkanUtils = nullptr;

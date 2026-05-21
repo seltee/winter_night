@@ -22,7 +22,7 @@ int main()
     // scene
     auto scene = wne::Scene::create();
     renderer->addScene(scene);
-    // scene->setAmbientLight(0.0f, 0.0f, 0.0f);
+    scene->setAmbientLight(0.0f, 0.0f, 0.0f);
 
     // images
     auto imageAtmosphere = wne::ImageAtmo::create("./atmosphere.jpg");

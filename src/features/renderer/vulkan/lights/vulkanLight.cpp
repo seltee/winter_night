@@ -14,7 +14,7 @@ VulkanLight::~VulkanLight()
     vulkanUtils->getObjectBuffers()->freeLightId(lightId);
 }
 
-void VulkanLight::prepareForRender()
+void VulkanLight::prepareForRender(const Vector3 &cameraPosition)
 {
     vulkanUtils->getObjectBuffers()->updateLightData(
         lightId,

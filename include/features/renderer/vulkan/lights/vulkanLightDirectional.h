@@ -20,7 +20,7 @@ namespace wne
         void renderShadows(Renderer *renderer, Scene *scene, ActorCamera *camera) override final;
         bool enableShadows(uint amountOfCascades, uint resolition) override final;
         void disableShadows() override final;
-        void prepareForRender() override final;
+        void prepareForRender(const Vector3 &cameraPosition) override final;
 
         std::shared_ptr<Texture> getCascadeAsTexture(int numOfCascade) override final;
 

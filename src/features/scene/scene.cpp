@@ -17,9 +17,12 @@ void Scene::update(float delta)
     {
         actor->update(delta);
     }
-    for (const auto &light : lights)
+    if (actorCamera)
     {
-        light->prepareForRender();
+        for (const auto &light : lights)
+        {
+            light->prepareForRender(actorCamera->getPosition());
+        }
     }
 }
 

@@ -60,7 +60,7 @@ void ActorCameraFlying::update(float delta)
         }
         if (event.type == WindowEvents::WindowEventType::MOUSE_MOVE)
         {
-            yaw += (float)event.mouseMove.shiftX * 0.009f;    // left/right
+            yaw += (float)event.mouseMove.shiftX * 0.009f;   // left/right
             pitch += (float)event.mouseMove.shiftY * 0.009f; // up/down
 
             yaw = wrap2Pi(yaw);
@@ -108,6 +108,7 @@ void ActorCameraFlying::update(float delta)
         position += up * delta * speed;
         isDirtyFlag = true;
     }
+    eventUpdate(delta);
 }
 
 std::shared_ptr<ActorCameraFlying> ActorCameraFlying::create(std::shared_ptr<Camera> camera, std::shared_ptr<Window> eventWindow)
