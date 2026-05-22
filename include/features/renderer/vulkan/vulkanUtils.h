@@ -123,17 +123,12 @@ namespace wne
                 vulkanPipelines->enablePipelineTexturedDepth(currentCommandBuffer, isMasked);
         }
 
-        inline void enablePipelineColorByType(ModelDataType dataType, ColorBlending blending)
+        inline void enablePipelineColorByType(ModelDataType dataType, ColorBlending blending, bool isLightEnabled)
         {
             if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
                 vulkanPipelines->enablePipelineColored(currentCommandBuffer, false);
             else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
-                vulkanPipelines->enablePipelineTexturedColor(currentCommandBuffer, blending);
-        }
-
-        inline void enablePipelineColorByTypeNoLights(ModelDataType dataType, ColorBlending blending)
-        {
-            vulkanPipelines->enablePipelineTexturedNoLights(currentCommandBuffer);
+                vulkanPipelines->enablePipelineTextured(currentCommandBuffer, isLightEnabled, blending);
         }
 
         inline void enablePipelineShadowByType(ModelDataType dataType, bool isMasked)

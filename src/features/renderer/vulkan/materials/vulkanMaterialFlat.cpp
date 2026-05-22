@@ -24,12 +24,7 @@ void VulkanMaterialFlat::selectPipelineDepth(ModelDataType dataType)
 
 void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType)
 {
-    vulkanUtils->enablePipelineColorByType(dataType, colorBlending);
-}
-
-void VulkanMaterialFlat::selectPipelineColorNoLights(ModelDataType dataType)
-{
-    vulkanUtils->enablePipelineColorByTypeNoLights(dataType, colorBlending);
+    vulkanUtils->enablePipelineColorByType(dataType, colorBlending, flagIsLighted);
 }
 
 void VulkanMaterialFlat::selectPipelineShadowDepth(ModelDataType dataType)

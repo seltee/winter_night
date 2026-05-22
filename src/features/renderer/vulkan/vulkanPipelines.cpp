@@ -30,14 +30,16 @@ void VulkanPipelines::reset()
         vulkanPipelineTexturedMaskedDepth.reset();
     if (vulkanPipelineColoredColor)
         vulkanPipelineColoredColor.reset();
-    if (vulkanPipelineTexturedColor)
-        vulkanPipelineTexturedColor.reset();
-    if (vulkanPipelineTexturedColorNoLights)
-        vulkanPipelineTexturedColorNoLights.reset();
-    if (vulkanPipelineTexturedColorAddition)
-        vulkanPipelineTexturedColorAddition.reset();
     if (vulkanPipelineAtmosphereColor)
         vulkanPipelineAtmosphereColor.reset();
+
+    for (uint8 lightState = 0; lightState < val(LightState::Total); lightState++)
+    {
+        for (uint8 colorState = 0; colorState < val(ColorBlending::Total); colorState++)
+        {
+            vulkanPipelineTextured[lightState][colorState].reset();
+        }
+    }
 }
 
 bool VulkanPipelines::build(
@@ -70,21 +72,21 @@ bool VulkanPipelines::build(
     vulkanPipelineColoredColor = std::make_unique<VulkanPipelineColored>(vulkanDevice);
     status &= vulkanPipelineColoredColor->setupColor(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers);
 
-    vulkanPipelineTexturedColor = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedColor->setupColor(vulkanRenderPass);
-
-    vulkanPipelineTexturedColorNoLights = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedColorNoLights->setupColorNoLights(vulkanRenderPass);
-
-    vulkanPipelineTexturedColorAddition = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedColorAddition->setupColorAddition(vulkanRenderPass);
+    for (uint8 lightState = 0; lightState < val(LightState::Total); lightState++)
+    {
+        for (uint8 blending = 0; blending < val(ColorBlending::Total); blending++)
+        {
+            vulkanPipelineTextured[lightState][blending] = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
+            status &= vulkanPipelineTextured[lightState][blending]->setupParametred(vulkanRenderPass, lightState, (ColorBlending)blending);
+        }
+    }
 
     // atmosphere pipelines
     vulkanPipelineAtmosphereColor = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
     status &= vulkanPipelineAtmosphereColor->setupAtmosphere(vulkanRenderPass);
 
     vulkanDescriptorSets = std::make_unique<VulkanDescriptorSets>(vulkanDevice, vulkanDescriptorPool, vulkanObjectBuffers);
-    if (!vulkanDescriptorSets->setup(vulkanPipelineTexturedDepth.get(), vulkanPipelineTexturedColor.get()))
+    if (!vulkanDescriptorSets->setup(vulkanPipelineTexturedDepth.get(), vulkanPipelineTextured[val(LightState::Disabled)][val(ColorBlending::Solid)].get()))
     {
         std::cout << "Unable to create vulkan descriptor sets" << std::endl;
         return false;
@@ -115,28 +117,18 @@ void VulkanPipelines::enablePipelineTexturedDepth(VulkanCommandBuffer *commandBu
     commandBuffer->bindPipeline(currentPipeline);
 }
 
-void VulkanPipelines::enablePipelineTexturedColor(VulkanCommandBuffer *commandBuffer, ColorBlending blending)
-{
-
-    if (blending == ColorBlending::Solid)
-        currentPipeline = vulkanPipelineTexturedColor.get();
-    else
-        currentPipeline = vulkanPipelineTexturedColorAddition.get();
-    commandBuffer->bindPipeline(currentPipeline);
-}
-
-void VulkanPipelines::enablePipelineTexturedNoLights(VulkanCommandBuffer *commandBuffer)
-{
-    currentPipeline = vulkanPipelineTexturedColorNoLights.get();
-    commandBuffer->bindPipeline(currentPipeline);
-}
-
 void VulkanPipelines::enablePipelineTexturedShadowDepth(VulkanCommandBuffer *commandBuffer, bool isMasked)
 {
     if (isMasked)
         currentPipeline = vulkanPipelineTexturedMaskedShadowDepth.get();
     else
         currentPipeline = vulkanPipelineTexturedShadowDepth.get();
+    commandBuffer->bindPipeline(currentPipeline);
+}
+
+void VulkanPipelines::enablePipelineTextured(VulkanCommandBuffer *commandBuffer, bool isLightEnabled, ColorBlending blending)
+{
+    currentPipeline = vulkanPipelineTextured[isLightEnabled ? val(LightState::Enabled) : val(LightState::Disabled)][val(blending)].get();
     commandBuffer->bindPipeline(currentPipeline);
 }
 

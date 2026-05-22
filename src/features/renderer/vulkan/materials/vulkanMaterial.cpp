@@ -64,10 +64,7 @@ void VulkanMaterial::bindColor(uint64 objectId, const AffectingLights &lights, c
     if (dataType == ModelDataType::Unknown)
         return;
 
-    if (flagIsLighted)
-        selectPipelineColor(dataType);
-    else
-        selectPipelineColorNoLights(dataType);
+    selectPipelineColor(dataType);
     selectDescriptorColor(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
     setPCData(objectId, lights);
@@ -78,10 +75,6 @@ void VulkanMaterial::selectPipelineDepth(ModelDataType dataType)
 }
 
 void VulkanMaterial::selectPipelineColor(ModelDataType dataType)
-{
-}
-
-void VulkanMaterial::selectPipelineColorNoLights(ModelDataType dataType)
 {
 }
 

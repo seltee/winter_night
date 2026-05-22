@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <utility>
 
 // Standard types
 using uint = unsigned int;
@@ -21,9 +22,24 @@ static_assert(sizeof(uint64) == 8, "Invalid size of uint64");
 
 namespace wne
 {
-    enum ColorBlending
+    enum class ColorBlending : uint8
     {
-        Solid,
-        Addition
+        Solid = 0,
+        Addition = 1,
+        Substraction = 2,
+        Total = 3
     };
+
+    enum class LightState : uint8
+    {
+        Disabled = 0,
+        Enabled = 1,
+        Total = 2
+    };
+
+    template <typename E>
+    constexpr auto val(E e) noexcept
+    {
+        return static_cast<std::underlying_type_t<E>>(e);
+    }
 }

@@ -24,9 +24,7 @@ namespace wne
         VkPipeline getGraphicsPipeline() override final;
         VkPipelineLayout getPipelineLayout() override final;
 
-        bool setupColor(VulkanRenderPass *renderPass);
-        bool setupColorNoLights(VulkanRenderPass *renderPass);
-        bool setupColorAddition(VulkanRenderPass *renderPass);
+        bool setupParametred(VulkanRenderPass *renderPass, bool enableLights, ColorBlending blending);
         bool setupDepth(VulkanRenderPass *depthPass);
         bool setupMaskedDepth(VulkanRenderPass *depthPass);
         bool setupDepthShadow(VulkanRenderPass *depthPass);
@@ -49,6 +47,7 @@ namespace wne
             bool enableDepthTest,
             bool enableSampler,
             bool reverseFaceCooling,
+            bool opEqual,
             ColorBlending blending,
             VulkanRenderPass *renderPass);
 

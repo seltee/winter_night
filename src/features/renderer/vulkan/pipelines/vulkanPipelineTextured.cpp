@@ -41,9 +41,9 @@ VkPipelineLayout VulkanPipelineTextured::getPipelineLayout()
     return pipelineLayout;
 }
 
-bool VulkanPipelineTextured::setupColor(VulkanRenderPass *renderPass)
+bool VulkanPipelineTextured::setupParametred(VulkanRenderPass *renderPass, bool enableLights, ColorBlending blending)
 {
-    if (!buildShaderColor())
+    if (!(enableLights ? buildShaderColor() : buildShaderColorNoLights()))
     {
         std::cout << "Unable to build shader" << std::endl;
         return false;
@@ -63,69 +63,8 @@ bool VulkanPipelineTextured::setupColor(VulkanRenderPass *renderPass)
         return false;
     }
 
-    if (!buildPipeline(2, true, false, true, true, false, ColorBlending::Solid, renderPass))
-    {
-        std::cout << "Unable to build pipeline" << std::endl;
-        return false;
-    }
-
-    return true;
-}
-
-bool VulkanPipelineTextured::setupColorNoLights(VulkanRenderPass *renderPass)
-{
-    if (!buildShaderColorNoLights())
-    {
-        std::cout << "Unable to build shader" << std::endl;
-        return false;
-    }
-
-    descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
-    if (!descriptorSetLayoutPipeline->setupTexturedColor())
-    {
-        std::cout << "Unable to setup textured color pipeline" << std::endl;
-        return false;
-    }
-
-    descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
-    if (!descriptorSetLayoutSampler->setupSampler())
-    {
-        std::cout << "Unable to setup textured color pipeline" << std::endl;
-        return false;
-    }
-
-    if (!buildPipeline(2, true, false, true, true, false, ColorBlending::Solid, renderPass))
-    {
-        std::cout << "Unable to build pipeline" << std::endl;
-        return false;
-    }
-
-    return true;
-}
-
-bool VulkanPipelineTextured::setupColorAddition(VulkanRenderPass *renderPass)
-{
-    if (!buildShaderColorNoLights())
-    {
-        std::cout << "Unable to build shader" << std::endl;
-        return false;
-    }
-
-    descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
-    if (!descriptorSetLayoutPipeline->setupTexturedColor())
-    {
-        std::cout << "Unable to setup textured color pipeline" << std::endl;
-        return false;
-    }
-
-    descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
-    if (!descriptorSetLayoutSampler->setupSampler())
-    {
-        std::cout << "Unable to setup textured color pipeline" << std::endl;
-        return false;
-    }
-
-    if (!buildPipeline(2, true, false, false, true, false, ColorBlending::Addition, renderPass))
+    // if solid then it's solid stage and depth is prepared so op is equal
+    if (!buildPipeline(2, true, false, true, true, false, blending == ColorBlending::Solid, blending, renderPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -150,7 +89,7 @@ bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(1, false, true, true, false, false, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(1, false, true, true, false, false, false, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -182,7 +121,7 @@ bool VulkanPipelineTextured::setupMaskedDepth(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(2, false, true, true, true, false, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(2, false, true, true, true, false, false, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -207,7 +146,7 @@ bool VulkanPipelineTextured::setupDepthShadow(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(1, false, true, true, false, false, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(1, false, true, true, false, false, false, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -239,7 +178,7 @@ bool VulkanPipelineTextured::setupMaskedDepthShadow(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(2, false, true, true, true, false, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(2, false, true, true, true, false, false, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -270,7 +209,7 @@ bool VulkanPipelineTextured::setupAtmosphere(VulkanRenderPass *renderPass)
         return false;
     }
 
-    if (!buildPipeline(2, true, false, false, true, true, ColorBlending::Solid, renderPass))
+    if (!buildPipeline(2, true, false, false, true, true, false, ColorBlending::Solid, renderPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -356,6 +295,7 @@ bool VulkanPipelineTextured::buildPipeline(
     bool enableDepthTest,
     bool enableSampler,
     bool reverseFaceCooling,
+    bool opEqual,
     ColorBlending blending,
     VulkanRenderPass *renderPass)
 {
@@ -464,6 +404,15 @@ bool VulkanPipelineTextured::buildPipeline(
             colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
             colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
         }
+        else if (blending == ColorBlending::Substraction)
+        {
+            colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+            colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
+            colorBlendAttachment.colorBlendOp = VK_BLEND_OP_SUBTRACT;
+            colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+            colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+            colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+        }
 
         colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
         colorBlending.logicOpEnable = VK_FALSE;
@@ -529,7 +478,7 @@ bool VulkanPipelineTextured::buildPipeline(
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     depthStencil.depthTestEnable = enableDepthTest ? VK_TRUE : VK_FALSE;
     depthStencil.depthWriteEnable = enableDepthWrite ? VK_TRUE : VK_FALSE;
-    depthStencil.depthCompareOp = enableDepthWrite ? VK_COMPARE_OP_LESS : VK_COMPARE_OP_EQUAL;
+    depthStencil.depthCompareOp = opEqual ? VK_COMPARE_OP_EQUAL : VK_COMPARE_OP_LESS;
     depthStencil.depthBoundsTestEnable = VK_FALSE;
     depthStencil.minDepthBounds = 0.0f; // Optional
     depthStencil.maxDepthBounds = 1.0f; // Optional
