@@ -14,14 +14,19 @@ namespace wne
             return type == 'S';
         }
 
-        inline bool idDouble() const
+        inline bool isFloat() const
+        {
+            return type == 'F';
+        }
+
+        inline bool isDouble() const
         {
             return type == 'D';
         }
 
         inline const char *asString() const
         {
-            
+
             return (const char *)data.data();
         }
 
@@ -31,6 +36,9 @@ namespace wne
                 return (float)*((double *)(data.data()));
             if (type == 'F')
                 return *((float *)(data.data()));
+            if (type == 'I')
+                return *((int *)(data.data()));
+
             return 0.0f;
         }
 

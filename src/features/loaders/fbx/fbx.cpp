@@ -1,5 +1,6 @@
 #include "features/loaders/fbx/fbx.h"
 #include "features/loaders/fbx/fbxHeader.h"
+#include "features/loaders/fbx/fbxGlobalSettings.h"
 #include <iostream>
 
 using namespace wne;
@@ -24,8 +25,12 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
     auto nodes = FBXNode::readTree(*file);
     auto objects = findByName(nodes, "Objects");
     auto connections = findByName(nodes, "Connections");
-    if (!objects || !connections)
+    auto globalSettings = findByName(nodes, "GlobalSettings");
+
+    if (!objects || !connections || !globalSettings)
         return nullptr;
+
+    // auto fbxGlobalSettings = std::make_unique<FBXGlobalSettings>(*globalSettings);
 
     std::vector<FBXGeometry> geometries;
     std::vector<FBXModel> models;
@@ -79,13 +84,13 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
         Matrix4x4 rotationX = Matrix4x4::rotationX(model.getRotation().x);
         Matrix4x4 rotationY = Matrix4x4::rotationY(model.getRotation().y);
         Matrix4x4 rotationZ = Matrix4x4::rotationZ(model.getRotation().z);
-        // Matrix4x4 scale = Matrix4x4::scale(model.getScale());
+        Matrix4x4 scale = Matrix4x4::scale(model.getScale());
 
         Matrix4x4 transformation = translation;
         transformation = transformation * rotationX;
         transformation = transformation * rotationY;
         transformation = transformation * rotationZ;
-        // transformation = transformation * scale;
+        transformation = transformation * scale;
 
         base->addModel(model.getName(), model.getAsModel(), transformation);
     }

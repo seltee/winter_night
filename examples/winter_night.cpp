@@ -206,7 +206,7 @@ int main()
     sun->setColor({0.02f, 0.02f, 0.04f});
     auto actorSun = wne::ActorLight::create(sun);
     scene->addActor(actorSun);
-    sun->enableShadows(1, 1024);
+    sun->enableShadows(1, 2048);
 
     auto spot = renderer->createLightSpot();
     spot->setDirection({0, -1.0f, 0});
