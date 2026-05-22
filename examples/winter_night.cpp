@@ -24,12 +24,14 @@ public:
         this->actorTerrain = actorTerrain;
         if (!materialSnowFlake)
         {
-            auto snowImage = wne::Image::create("./snow_defuse.png");
+            auto snowImage = wne::Image::create("./snowflake.png");
             auto snowTexture = renderer->createTexture(snowImage);
             materialSnowFlake = renderer->createFlatMaterial(snowTexture);
+            materialSnowFlake->setNormalShadowingFactor(1.0f);
+            materialSnowFlake->setMasked(true);
         }
         this->setMaterial(materialSnowFlake);
-        setScale(0.3f);
+        setScale(0.12f);
         genNewPosition();
     }
     static std::shared_ptr<ActorSnowflake> create(wne::Renderer *renderer, wne::ActorTerrain *actorTerrain)
@@ -212,7 +214,7 @@ int main()
     spot->setAffectRadius(30.0f);
     spot->setOuterCutOff(0.3f);
     auto actorSpot = wne::ActorLight::create(spot);
-    actorSpot->setPosition(0, 24.0f, 20.0f);
+    actorSpot->setPosition(0, 28.0f, 20.0f);
     scene->addActor(actorSpot);
 
     // camera

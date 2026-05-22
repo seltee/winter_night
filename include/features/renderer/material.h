@@ -53,6 +53,18 @@ namespace wne
             this->colorBlending = colorBlending;
         }
 
+        // 0 - full normal effect, 1 - full light, ignoring polygon's normal
+        // use it to make the light to go through polygons
+        void setNormalShadowingFactor(float normalShadowingFactor = 0.0f)
+        {
+            this->normalShadowingFactor = normalShadowingFactor;
+        }
+
+        float getNormalShadowingFactor()
+        {
+            return normalShadowingFactor;
+        }
+
         ColorBlending getColorBlending()
         {
             return colorBlending;
@@ -63,5 +75,6 @@ namespace wne
         bool flagIsLighted = true;
 
         ColorBlending colorBlending = ColorBlending::Solid;
+        float normalShadowingFactor = 0.0f;
     };
 };

@@ -14,6 +14,7 @@ layout(push_constant) uniform PushConstants {
     uint objectId;
     uint lightsAmount;
     uint lightIds[12];
+    float normalShadowingFactor;
 } objectData;
 
 layout(set = 0, binding = 3) uniform BufferGlobalData {
@@ -77,7 +78,7 @@ void main() {
             vec3 lightDir = lightData[id].direction.xyz;
             vec3 lightColor = lightData[id].color.xyz;
 
-            float diff = max(dot(normal, lightDir), 0.0);
+            float diff = max(max(dot(normal, lightDir), 0.0), objectData.normalShadowingFactor);
             float shadow = 0.0f;
             if (lightData[id].amountOfCascades > 0){
                 float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005); 
@@ -113,7 +114,7 @@ void main() {
             float dist = length(lightPos - worldPosition.xyz);
             float attenuation = clamp(1.0 - dist / affectRadius, 0.0, 1.0);
             vec3 lightDir = normalize(lightPos - worldPosition.xyz);
-            float diff = max(dot(normal, lightDir), 0.0);
+            float diff = max(max(dot(normal, lightDir), 0.0), objectData.normalShadowingFactor);
             light += diff * lightColor * attenuation;
         }
         if (lightData[id].enableSpot != 0)
@@ -132,7 +133,7 @@ void main() {
 
             float dist = length(lightPos - worldPosition.xyz);
             float attenuation = clamp(1.0 - dist / affectRadius, 0.0, 1.0);
-            float diff = max(dot(normal, lightDir), 0.0);
+            float diff = max(max(dot(normal, lightDir), 0.0), objectData.normalShadowingFactor);
             light += diff * lightColor * attenuation * intensity;
         }
     }

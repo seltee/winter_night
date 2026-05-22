@@ -118,6 +118,7 @@ void VulkanMaterialFlat::setPCData(uint64 objectId, const AffectingLights &light
     PushConstantObject pco{};
     pco.objectId = objectId;
     pco.lights = lights;
+    pco.normalShadowingFactor = normalShadowingFactor;
 
     vkCmdPushConstants(
         commandBuffer,

@@ -12,6 +12,7 @@ namespace wne
     {
         uint32 objectId;
         AffectingLights lights;
+        float normalShadowingFactor;
     };
 
     struct VulkanMaterialDescription;
