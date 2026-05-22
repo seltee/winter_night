@@ -23,7 +23,8 @@ namespace wne
             Vector4 ambientLightColor;
             Vector4 cameraPosition;
             uint32 useRadianceMap;
-            uint32 pad1, pad2, pad3;
+            float radienceMapFactor;
+            uint32 pad1, pad2;
         };
 
         struct LightData
@@ -72,8 +73,9 @@ namespace wne
 
         void setGlobalData(
             const Vector4 &ambientColor,
-            const Vector4 &cameraPosition, 
-            uint useRadianceMap);
+            const Vector4 &cameraPosition,
+            uint useRadianceMap,
+            float radienceMapFactor);
 
         inline uint getFrameInFlight()
         {

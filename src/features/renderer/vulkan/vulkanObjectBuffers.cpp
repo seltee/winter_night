@@ -239,11 +239,13 @@ void VulkanObjectBuffers::freeObjectId(uint32 objectId)
 void VulkanObjectBuffers::setGlobalData(
     const Vector4 &ambientColor,
     const Vector4 &cameraPosition,
-    uint useRadianceMap)
+    uint useRadianceMap,
+    float radienceMapFactor)
 {
     bufferGlobalDataMapped[currentInFlight]->ambientLightColor = ambientColor;
     bufferGlobalDataMapped[currentInFlight]->cameraPosition = cameraPosition;
     bufferGlobalDataMapped[currentInFlight]->useRadianceMap = useRadianceMap;
+    bufferGlobalDataMapped[currentInFlight]->radienceMapFactor = radienceMapFactor;
 }
 
 uint32 VulkanObjectBuffers::getNewLightId()

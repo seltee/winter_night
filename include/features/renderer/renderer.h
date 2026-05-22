@@ -34,7 +34,11 @@ namespace wne
         virtual bool getSyncState();
 
         virtual void renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial);
-        virtual void provideSceneData(const Vector4 &ambientColor, const Vector4 &cameraPosition, Texture *radianceMap);
+        virtual void provideSceneData(
+            const Vector4 &ambientColor, 
+            const Vector4 &cameraPosition, 
+            Texture *radianceMap, 
+            float radienceMapFactor);
 
         virtual std::shared_ptr<LightDirectional> createLightDirectional();
         virtual std::shared_ptr<Light> createLightOmni();

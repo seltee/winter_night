@@ -20,6 +20,7 @@ layout(set = 0, binding = 3) uniform BufferGlobalData {
      vec4 ambientColor;
      vec4 cameraPosition;
      uint useRadianceMap;
+     float radienceMapFactor;
 } globalData;
 
 struct LightData
@@ -63,7 +64,7 @@ void main() {
         vec2 uv = sampleSphericalMap(normal);
         vec2 uv2 = sampleSphericalMap(normalize(reflect(-V, normal)));
         vec3 irradiance = texture(radianceTexSampler, vec2(uv.x, 1.0 - uv.y)).rgb;
-        ambientColor += irradiance;
+        ambientColor += irradiance * globalData.radienceMapFactor;
     }
 
     // Diffuse light shading

@@ -19,7 +19,11 @@ namespace wne
         void render() override final;
 
         void renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial) override final;
-        void provideSceneData(const Vector4 &ambientColor, const Vector4 &cameraPosition, Texture *radianceMap) override final;
+        void provideSceneData(
+            const Vector4 &ambientColor, 
+            const Vector4 &cameraPosition, 
+            Texture *radianceMap, 
+            float radienceMapFactor) override final;
 
         std::shared_ptr<wne::Material> getDefaultMaterial() override final;
         std::shared_ptr<Mesh> getDefaultPlain() override final;

@@ -58,7 +58,7 @@ void Renderer::renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial)
 {
 }
 
-void Renderer::provideSceneData(const Vector4 &ambientColor, const Vector4 &cameraPosition, Texture *radianceMap)
+void Renderer::provideSceneData(const Vector4 &ambientColor, const Vector4 &cameraPosition, Texture *radianceMap, float radienceMapFactor)
 {
 }
 

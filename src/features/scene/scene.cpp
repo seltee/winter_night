@@ -100,7 +100,7 @@ void Scene::provideSceneData(Renderer *renderer)
     renderer->provideSceneData(
         ambientLightColor,
         actorCamera ? Vector4(actorCamera->getPosition(), 1.0f) : Vector4(0, 0, 0, 1.0f),
-        atmosphereRadiance.get());
+        atmosphereRadiance.get(), atmosphereRadianceFactor);
 }
 
 void Scene::addActor(std::shared_ptr<Actor> actor)
@@ -114,10 +114,11 @@ void Scene::setCamera(std::shared_ptr<ActorCamera> actorCamera)
     this->actorCamera = std::move(actorCamera);
 }
 
-void Scene::setAtmosphere(std::shared_ptr<Texture> atmosphereMap, std::shared_ptr<Texture> atmosphereRadiance)
+void Scene::setAtmosphere(std::shared_ptr<Texture> atmosphereMap, std::shared_ptr<Texture> atmosphereRadiance, float atmosphereRadianceFactor)
 {
     this->atmosphereMap = atmosphereMap;
     this->atmosphereRadiance = atmosphereRadiance;
+    this->atmosphereRadianceFactor = atmosphereRadianceFactor;
     atmoMaterial = nullptr;
 }
 

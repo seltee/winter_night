@@ -92,7 +92,8 @@ int main()
     auto imageAtmosphere = wne::ImageAtmo::create("./atmosphereNight2.jpg");
     scene->setAtmosphere(
         renderer->createTexture(imageAtmosphere),
-        renderer->createTexture(imageAtmosphere->getAtmosphereAsImage()));
+        renderer->createTexture(imageAtmosphere->getAtmosphereAsImage()),
+        0.8f);
 
     auto snowImageHeight = wne::Image::create("./snow_height.png");
     auto snowImage = wne::Image::create("./snow_defuse.png");
@@ -208,10 +209,10 @@ int main()
     auto spot = renderer->createLightSpot();
     spot->setDirection({0, -1.0f, 0});
     spot->setColor({1.2f, 1.2f, 1.1f});
-    spot->setAffectRadius(60.0f);
+    spot->setAffectRadius(30.0f);
     spot->setOuterCutOff(0.3f);
     auto actorSpot = wne::ActorLight::create(spot);
-    actorSpot->setPosition(0, 50.0f, 20.0f);
+    actorSpot->setPosition(0, 24.0f, 20.0f);
     scene->addActor(actorSpot);
 
     // camera

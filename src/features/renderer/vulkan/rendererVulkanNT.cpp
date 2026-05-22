@@ -86,9 +86,9 @@ void RendererVulkanNT::renderAtmosphereMap(std::shared_ptr<Material> atmoMateria
     atmoSphere->render(getFrameData());
 }
 
-void RendererVulkanNT::provideSceneData(const Vector4 &ambientColor, const Vector4 &cameraPosition, Texture *radianceMap)
+void RendererVulkanNT::provideSceneData(const Vector4 &ambientColor, const Vector4 &cameraPosition, Texture *radianceMap, float radienceMapFactor)
 {
-    instance->getVulkanUtils()->getObjectBuffers()->setGlobalData(ambientColor, cameraPosition, radianceMap != nullptr);
+    instance->getVulkanUtils()->getObjectBuffers()->setGlobalData(ambientColor, cameraPosition, radianceMap != nullptr, radienceMapFactor);
     instance->getVulkanUtils()->setRadianceMap((VulkanTexture *)radianceMap);
 }
 
