@@ -96,7 +96,7 @@ void WindowNT::update(float delta)
     {
         if (WM_QUIT == msg.message)
         {
-            closeRequested = true;
+            flagCloseRequested = true;
             break;
         }
         TranslateMessage(&msg);
@@ -116,6 +116,15 @@ void WindowNT::update(float delta)
         width = newWidth;
         height = newHeight;
         renderer->changeWindowSize(width, height);
+    }
+
+    if (flagMouseCapture && flagFocused)
+    {
+        POINT pt = {(int)(width / 2), (int)(height / 2)};
+        ClientToScreen(hWnd, &pt); // Converts client to screen coords
+        SetCursorPos(pt.x, pt.y);  // Moves the mouse
+        mousePositionX = width / 2;
+        mousePositionY = height / 2;
     }
 
     renderer->update(delta);
@@ -149,7 +158,7 @@ void WindowNT::close()
 
 void WindowNT::setFocused(bool state)
 {
-    focused = state;
+    flagFocused = state;
     emitEventFocusChanged(state);
 }
 

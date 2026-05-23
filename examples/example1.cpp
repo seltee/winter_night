@@ -4,10 +4,10 @@
 int main()
 {
     auto window = wne::Window::create(2560, 1440);
-
     if (!window)
         return 1;
 
+    window->setMouseCapture(true);
     auto renderer = window->getRenderer();
     renderer->setSyncState(false);
 

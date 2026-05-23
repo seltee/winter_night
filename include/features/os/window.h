@@ -23,8 +23,9 @@ namespace wne
 
         uint width, height;
         WindowType windowType;
-        bool focused = false;
-        bool closeRequested = false;
+        bool flagFocused = false;
+        bool flagCloseRequested = false;
+        bool flagMouseCapture = false;
         std::unique_ptr<Renderer> renderer;
         std::mutex mutex;
 
@@ -75,12 +76,22 @@ namespace wne
 
         inline bool isFocused()
         {
-            return focused;
+            return flagFocused;
         }
 
         inline bool isCloseRequested()
         {
-            return closeRequested;
+            return flagCloseRequested;
+        }
+
+        inline void setMouseCapture(bool state)
+        {
+            flagMouseCapture = state;
+        }
+
+        inline bool idMouseCaptured()
+        {
+            return flagMouseCapture;
         }
     };
 };
