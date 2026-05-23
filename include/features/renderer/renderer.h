@@ -47,6 +47,8 @@ namespace wne
         virtual std::shared_ptr<Material> getDefaultMaterial();
         virtual std::shared_ptr<Mesh> getDefaultPlain();
 
+        std::shared_ptr<Scene> createScene();
+
         inline RendererState *getState()
         {
             return state;

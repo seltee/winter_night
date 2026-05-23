@@ -6,9 +6,14 @@
 
 using namespace wne;
 
-std::shared_ptr<Scene> Scene::create()
+Scene::Scene(Renderer *renderer)
 {
-    return std::make_shared<Scene>();
+    this->renderer = renderer;
+}
+
+std::shared_ptr<Scene> Scene::create(Renderer *renderer)
+{
+    return std::make_shared<Scene>(renderer);
 }
 
 void Scene::update(float delta)
@@ -26,7 +31,7 @@ void Scene::update(float delta)
     }
 }
 
-void Scene::renderShadows(Renderer *renderer)
+void Scene::renderShadows()
 {
     if (actorCamera)
     {
@@ -35,26 +40,26 @@ void Scene::renderShadows(Renderer *renderer)
     }
 }
 
-void Scene::renderDepthShadow(Renderer *renderer)
+void Scene::renderDepthShadow()
 {
     // shadow depth pass
     for (const auto &object : actors)
     {
         if (object->hasShadow())
-            object->renderDepthShadow(renderer);
+            object->renderDepthShadow();
     }
 }
 
-void Scene::renderDepth(Renderer *renderer)
+void Scene::renderDepth()
 {
     // depth pass
     for (const auto &object : actors)
     {
-        object->renderDepth(renderer);
+        object->renderDepth();
     }
 }
 
-void Scene::render(Renderer *renderer)
+void Scene::render()
 {
     // render atmosphere if set
     if (this->atmosphereMap)
@@ -71,7 +76,7 @@ void Scene::render(Renderer *renderer)
     for (const auto &object : actors)
     {
         if (object->getRenderPass() == Actor::RenderPass::Main)
-            object->renderColor(renderer);
+            object->renderColor();
         else
             blendingPass.push_back(object.get());
     }
@@ -79,7 +84,7 @@ void Scene::render(Renderer *renderer)
     // blending pass
     for (const auto &object : blendingPass)
     {
-        object->renderColor(renderer);
+        object->renderColor();
     }
 }
 
@@ -88,14 +93,14 @@ void Scene::calcSceneMVP()
     mVP = actorCamera ? actorCamera->getProjectionMatrix() * actorCamera->getInvModelMatrix() : Matrix4x4::identity();
 }
 
-void Scene::provideSceneMVP(Renderer *renderer)
+void Scene::provideSceneMVP()
 {
     auto state = renderer->getState();
     state->setViewProjectionMatrix(mVP);
     state->setCameraPosition(actorCamera ? actorCamera->getPosition() : Vector3{});
 }
 
-void Scene::provideSceneData(Renderer *renderer)
+void Scene::provideSceneData()
 {
     renderer->provideSceneData(
         ambientLightColor,

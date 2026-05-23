@@ -7,16 +7,15 @@ namespace wne
 {
     class Window;
     class WindowEvents;
+    class Renderer;
 
     class WNE_API ActorCameraFlying : public ActorCamera
     {
     public:
-        ActorCameraFlying(std::shared_ptr<Camera> camera, std::shared_ptr<Window> eventWindow);
+        ActorCameraFlying(Renderer *renderer, std::shared_ptr<Camera> camera, std::shared_ptr<Window> eventWindow);
         ~ActorCameraFlying();
 
         void update(float delta) override;
-
-        static std::shared_ptr<ActorCameraFlying> create(std::shared_ptr<Camera> camera, std::shared_ptr<Window> eventWindow);
 
         inline float getSpeed()
         {

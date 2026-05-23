@@ -13,16 +13,15 @@ namespace wne
     public:
         ActorSprite(Renderer *renderer);
         ~ActorSprite();
-        static std::shared_ptr<ActorSprite> create(Renderer *renderer);
 
         void setMaterial(std::shared_ptr<Material> material);
 
         const Matrix4x4 &getModelMatrix();
 
         void update(float delta) override final;
-        void renderDepthShadow(Renderer *renderer) override final;
-        void renderDepth(Renderer *renderer) override final;
-        void renderColor(Renderer *renderer) override final;
+        void renderDepthShadow() override final;
+        void renderDepth() override final;
+        void renderColor() override final;
 
         RenderPass getRenderPass() override final;
 

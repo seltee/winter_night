@@ -12,8 +12,7 @@ namespace wne
     class WNE_API ActorCamera : public Actor
     {
     public:
-        ActorCamera(std::shared_ptr<Camera> camera);
-        static std::shared_ptr<ActorCamera> create(std::shared_ptr<Camera> camera);
+        ActorCamera(Renderer *renderer, std::shared_ptr<Camera> camera);
 
         void update(float delta) override;
 

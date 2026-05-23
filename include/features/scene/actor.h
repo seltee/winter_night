@@ -17,18 +17,18 @@ namespace wne
             Blended
         };
 
-        Actor();
+        Actor(Renderer *renderer);
 
         virtual void update(float delta);
 
         // build depth buffer for light's shadow
-        virtual void renderDepthShadow(Renderer *renderer);
+        virtual void renderDepthShadow();
 
         // build depth buffer
-        virtual void renderDepth(Renderer *renderer);
+        virtual void renderDepth();
 
         // render equal to depth buffer
-        virtual void renderColor(Renderer *renderer);
+        virtual void renderColor();
 
         virtual const Matrix4x4 &getModelMatrix();
         virtual const Matrix3x3 &getNormalMatrix();
@@ -114,5 +114,6 @@ namespace wne
         Matrix3x3 mNormal = Matrix3x3::identity();
 
         Scene *currentScene = nullptr;
+        Renderer *renderer = nullptr;
     };
 };

@@ -8,8 +8,7 @@ void spawnTree(
     std::shared_ptr<wne::Mesh> mesh,
     std::shared_ptr<wne::Material> material)
 {
-    auto actorTree = wne::ActorMesh::create(mesh);
-    scene->addActor(actorTree);
+    auto actorTree = scene->createActor<wne::ActorMesh>(mesh);
     actorTree->setPosition(x, terrain->getHeightGlobal(x, z), z);
     actorTree->setRotation(0.0f, fRand(PI2), 0.0f);
     actorTree->setScale(12.0f + fRand(12.0f));
@@ -86,8 +85,7 @@ int main()
     const std::vector<uint16_t> indices = {0, 2, 1, 3, 2, 0};
 
     // scene
-    auto scene = wne::Scene::create();
-    renderer->addScene(scene);
+    auto scene = renderer->createScene();
     scene->setAmbientLight(0.0f, 0.0f, 0.0f);
 
     // images
@@ -106,9 +104,8 @@ int main()
     auto textureTreeBark = renderer->createTexture(treeBark);
     auto materialTreeBark = renderer->createFlatMaterial(textureTreeBark);
 
-    auto actorTerrain = wne::ActorTerrain::createFromImage(60, 160.0f, 16.0f, snowImageHeight, renderer);
+    auto actorTerrain = scene->createActor<wne::ActorTerrain>(60, 160.0f, 16.0f, snowImageHeight);
     actorTerrain->setMaterial(snowMaterial);
-    scene->addActor(actorTerrain);
     actorTerrain->setPosition(0, 0, 0);
 
     auto treeModel = wne::Loader3d::loadAsModel("./tree1.fbx");
@@ -195,17 +192,13 @@ int main()
 
     const uint AmountOfSnowflakes = 1000;
     for (uint i = 0; i < AmountOfSnowflakes; i++)
-    {
-        auto snowFlake = ActorSnowflake::create(renderer, actorTerrain.get());
-        scene->addActor(snowFlake);
-    }
+        scene->createActor<ActorSnowflake>(actorTerrain.get());
 
     // light
     auto sun = renderer->createLightDirectional();
     sun->setDirection({-0.5, 0.9, 0.5});
     sun->setColor({0.02f, 0.02f, 0.04f});
-    auto actorSun = wne::ActorLight::create(sun);
-    scene->addActor(actorSun);
+    auto actorSun = scene->createActor<wne::ActorLight>(sun);
     sun->enableShadows(1, 2048);
 
     auto spot = renderer->createLightSpot();
@@ -213,15 +206,13 @@ int main()
     spot->setColor({1.2f, 1.2f, 1.1f});
     spot->setAffectRadius(30.0f);
     spot->setOuterCutOff(0.3f);
-    auto actorSpot = wne::ActorLight::create(spot);
+    auto actorSpot = scene->createActor<wne::ActorLight>(spot);
     actorSpot->setPosition(0, 28.0f, 20.0f);
-    scene->addActor(actorSpot);
 
     // camera
     auto camera = wne::CameraPerspective::create(window);
     camera->setFarPlane(160.0f);
-    auto actorCamera = wne::ActorCameraFlying::create(camera, window);
-    scene->addActor(actorCamera);
+    auto actorCamera = scene->createActor<wne::ActorCameraFlying>(camera, window);
     scene->setCamera(actorCamera);
 
     float translate = 0.0f;

@@ -8,7 +8,7 @@
 
 using namespace wne;
 
-ActorCameraFlying::ActorCameraFlying(std::shared_ptr<Camera> camera, std::shared_ptr<Window> eventWindow) : ActorCamera(camera)
+ActorCameraFlying::ActorCameraFlying(Renderer *renderer, std::shared_ptr<Camera> camera, std::shared_ptr<Window> eventWindow) : ActorCamera(renderer, camera)
 {
     eventsSubscription = eventWindow->subscribe();
 }
@@ -118,9 +118,4 @@ void ActorCameraFlying::update(float delta)
         isDirtyFlag = true;
     }
     eventUpdate(delta);
-}
-
-std::shared_ptr<ActorCameraFlying> ActorCameraFlying::create(std::shared_ptr<Camera> camera, std::shared_ptr<Window> eventWindow)
-{
-    return std::make_shared<ActorCameraFlying>(std::move(camera), std::move(eventWindow));
 }

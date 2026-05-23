@@ -18,18 +18,18 @@ namespace wne
     class WNE_API Scene
     {
     public:
-        static std::shared_ptr<Scene> create();
+        Scene(Renderer *renderer);
+        static std::shared_ptr<Scene> create(Renderer *renderer);
 
         void update(float delta);
-        void renderShadows(Renderer *renderer);
-        void renderDepthShadow(Renderer *renderer);
-        void renderDepth(Renderer *renderer);
-        void render(Renderer *renderer);
+        void renderShadows();
+        void renderDepthShadow();
+        void renderDepth();
+        void render();
         void calcSceneMVP();
-        void provideSceneMVP(Renderer *renderer);
-        void provideSceneData(Renderer *renderer);
+        void provideSceneMVP();
+        void provideSceneData();
 
-        void addActor(std::shared_ptr<Actor> actor);
         void setCamera(std::shared_ptr<ActorCamera> actorCamera);
 
         void setAtmosphere(std::shared_ptr<Texture> atmosphereMap, std::shared_ptr<Texture> atmosphereRadiance, float atmosphereRadianceFactor = 1.0f);
@@ -42,6 +42,17 @@ namespace wne
 
         // called when actor with light removed
         void unregisterLight(Light *light);
+
+        template <typename T, typename... Args>
+            requires std::derived_from<T, Actor>
+        std::shared_ptr<T> createActor(Args &&...args)
+        {
+            auto actor = std::make_shared<T>(
+                renderer,
+                std::forward<Args>(args)...);
+            addActor(actor);
+            return actor;
+        }
 
         inline void setAmbientLight(float r, float g, float b, float a = 1.0f)
         {
@@ -63,7 +74,16 @@ namespace wne
             return actorCamera;
         }
 
+        inline Renderer *getRenderer()
+        {
+            return renderer;
+        }
+
     protected:
+        void addActor(std::shared_ptr<Actor> actor);
+
+        Renderer *renderer = nullptr;
+
         std::vector<std::shared_ptr<Actor>> actors;
         std::vector<Light *> lights;
         std::shared_ptr<ActorCamera> actorCamera;

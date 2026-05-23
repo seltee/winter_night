@@ -16,9 +16,8 @@ namespace wne
     class WNE_API ActorTerrain : public Actor
     {
     public:
-        ActorTerrain(Renderer *renderer);
+        ActorTerrain(Renderer *renderer, int resolution, float size, float heightFactor, std::shared_ptr<Image> image);
         ~ActorTerrain();
-        static std::shared_ptr<ActorTerrain> createFromImage(int resolution, float size, float heightFactor, std::shared_ptr<Image> image, Renderer *renderer);
 
         void setResolution(int resolution);
         void setSize(float size);
@@ -34,9 +33,9 @@ namespace wne
         // -size - size
         float getHeightGlobal(float x, float y);
 
-        void renderDepthShadow(Renderer *renderer) override final;
-        void renderDepth(Renderer *renderer) override final;
-        void renderColor(Renderer *renderer) override final;
+        void renderDepthShadow() override final;
+        void renderDepth() override final;
+        void renderColor() override final;
 
         RenderPass getRenderPass() override final;
 
@@ -49,6 +48,5 @@ namespace wne
 
         int resolution = 10;
         float size = 10.0f;
-        Renderer *renderer = nullptr;
     };
 }

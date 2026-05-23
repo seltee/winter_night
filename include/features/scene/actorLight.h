@@ -10,8 +10,7 @@ namespace wne
     class WNE_API ActorLight : public Actor
     {
     public:
-        ActorLight(std::shared_ptr<Light> light);
-        static std::shared_ptr<ActorLight> create(std::shared_ptr<Light> light);
+        ActorLight(Renderer *renderer, std::shared_ptr<Light> light);
 
         void eventSetScene(Scene *oldScene, Scene *newScene) override final;
         

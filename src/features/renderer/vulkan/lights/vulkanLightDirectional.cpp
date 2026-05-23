@@ -38,7 +38,7 @@ void VulkanLightDirectional::renderShadows(Renderer *renderer, Scene *scene, Act
         state->setVulkanLightCascadeData(cascades[i].get());
 
         vulkanUtils->getCurrentCommandBuffer()->beginDepthPass(depthPass, frameBuffer->getFrameBuffer(), resolition, resolition);
-        scene->renderDepthShadow(renderer);
+        scene->renderDepthShadow();
         vulkanUtils->getCurrentCommandBuffer()->endPass();
     }
 }

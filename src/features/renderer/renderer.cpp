@@ -91,3 +91,10 @@ std::shared_ptr<wne::Mesh> Renderer::getDefaultPlain()
 {
     return nullptr;
 }
+
+std::shared_ptr<Scene> Renderer::createScene()
+{
+    auto scene = wne::Scene::create(this);
+    addScene(scene);
+    return scene;
+}

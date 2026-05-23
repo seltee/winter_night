@@ -54,14 +54,14 @@ void RendererVulkanNT::render()
 {
     instance->startRendering();
     for (const auto &scene : scenes)
-        scene->renderShadows(this);
+        scene->renderShadows();
 
     instance->beginDepthPass();
     for (const auto &scene : scenes)
     {
         scene->calcSceneMVP();
-        scene->provideSceneMVP(this);
-        scene->renderDepth(this);
+        scene->provideSceneMVP();
+        scene->renderDepth();
     }
     instance->finishDepthPass();
 
@@ -69,9 +69,9 @@ void RendererVulkanNT::render()
     instance->beginRenderPass();
     for (const auto &scene : scenes)
     {
-        scene->provideSceneMVP(this);
-        scene->provideSceneData(this);
-        scene->render(this);
+        scene->provideSceneMVP();
+        scene->provideSceneData();
+        scene->render();
     }
     instance->finishRendering();
 }

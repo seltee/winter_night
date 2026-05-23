@@ -1,11 +1,13 @@
 #include "features/scene/actor.h"
 #include "features/renderer/renderer.h"
 #include <memory>
+#include <iostream>
 
 using namespace wne;
 
-Actor::Actor()
+Actor::Actor(Renderer *renderer)
 {
+    this->renderer = renderer;
     name = "Actor";
 }
 
@@ -14,15 +16,15 @@ void Actor::update(float delta)
     eventUpdate(delta);
 }
 
-void Actor::renderDepthShadow(Renderer *renderer)
+void Actor::renderDepthShadow()
 {
 }
 
-void Actor::renderDepth(Renderer *renderer)
+void Actor::renderDepth()
 {
 }
 
-void Actor::renderColor(Renderer *renderer)
+void Actor::renderColor()
 {
 }
 
@@ -62,6 +64,11 @@ Actor::RenderPass Actor::getRenderPass()
 
 void Actor::setScene(Scene *scene)
 {
+    if (currentScene && scene && (scene->getRenderer() != currentScene->getRenderer()))
+    {
+        std::cout << "Error: you can't change actor's scene to a scene with a different renderer" << std::endl;
+        return;
+    }
     Scene *oldScene = this->currentScene;
     this->currentScene = scene;
     eventSetScene(oldScene, this->currentScene);

@@ -20,8 +20,7 @@ int main()
     const std::vector<uint16_t> indices = {0, 2, 1, 3, 2, 0};
 
     // scene
-    auto scene = wne::Scene::create();
-    renderer->addScene(scene);
+    auto scene = renderer->createScene();
     scene->setAmbientLight(0.0f, 0.0f, 0.0f);
 
     // images
@@ -52,74 +51,62 @@ int main()
     // actor with mesh
     auto model = wne::Model::createFromData(vertices, indices);
     auto mesh = renderer->createMesh(model);
-    auto actorMesh = wne::ActorMesh::create(mesh);
+    auto actorMesh = scene->createActor<wne::ActorMesh>(mesh);
     actorMesh->setMaterial(materialEx);
-    scene->addActor(actorMesh);
 
-    auto actorMesh2 = wne::ActorMesh::create(mesh);
+    auto actorMesh2 = scene->createActor<wne::ActorMesh>(mesh);
     actorMesh2->setMaterial(materialEx);
-    scene->addActor(actorMesh2);
     actorMesh2->setPosition(8.0f, 8.0f, 24.0f);
 
-    auto actorMesh3 = wne::ActorMesh::create(mesh);
+    auto actorMesh3 = scene->createActor<wne::ActorMesh>(mesh);
     actorMesh3->setMaterial(materialEx);
-    scene->addActor(actorMesh3);
     actorMesh3->setPosition(-8.0f, 8.0f, 20.0f);
 
     auto plainModel = wne::Primitives::createPlain(4.0f, wne::normalize(wne::Vector3(-1.0f, 1.0f, -1.0f)));
     auto plainMesh = renderer->createMesh(plainModel);
-    auto actorPlain = wne::ActorMesh::create(plainMesh);
+    auto actorPlain = scene->createActor<wne::ActorMesh>(plainMesh);
     actorPlain->setMaterial(materialBox);
-    scene->addActor(actorPlain);
     actorPlain->setPosition(12.0f, -4.0f, 12.0f);
 
-    auto actorSprite = wne::ActorSprite::create(renderer);
+    auto actorSprite = scene->createActor<wne::ActorSprite>();
     actorSprite->setMaterial(materialExplosion);
-    scene->addActor(actorSprite);
     actorSprite->setScale(6.0f);
     actorSprite->setPosition(0.0f, 16.0f, 12.0f);
 
     auto boxModel = wne::Primitives::createBox(4.0f);
     auto boxMesh = renderer->createMesh(boxModel);
-    auto actorBox = wne::ActorMesh::create(boxMesh);
-    scene->addActor(actorBox);
+    auto actorBox = scene->createActor<wne::ActorMesh>(boxMesh);
     actorBox->setPosition(-12.0f, 8.0f, 4.0f);
 
     auto sphereModel = wne::Primitives::createSphere(4.0f, 10, 10);
     auto sphereMesh = renderer->createMesh(sphereModel);
-    auto sphereBox = wne::ActorMesh::create(sphereMesh);
-    scene->addActor(sphereBox);
+    auto sphereBox = scene->createActor<wne::ActorMesh>(sphereMesh);
     sphereBox->setPosition(-12.0f, 8.0f, -6.0f);
 
-    auto actorBox2 = wne::ActorMesh::create(boxMesh);
+    auto actorBox2 = scene->createActor<wne::ActorMesh>(boxMesh);
     actorBox2->setMaterial(materialBox);
-    scene->addActor(actorBox2);
     actorBox2->setPosition(-20.0f, 8.0f, 4.0f);
 
-    auto actorTerrain = wne::ActorTerrain::createFromImage(100, 80.0f, 10.0f, imageBox, renderer);
+    auto actorTerrain = scene->createActor<wne::ActorTerrain>(100, 80.0f, 10.0f, imageBox);
     actorTerrain->setMaterial(materialBox);
-    scene->addActor(actorTerrain);
 
     auto actorLoadedModel = wne::Loader3d::loadAsModel("./box.fbx");
     auto actorLoadedMesh = renderer->createMesh(actorLoadedModel);
-    auto actorLoadedBox = wne::ActorMesh::create(actorLoadedMesh);
+    auto actorLoadedBox = scene->createActor<wne::ActorMesh>(actorLoadedMesh);
     actorLoadedBox->setMaterial(materialMetalBox);
-    scene->addActor(actorLoadedBox);
     actorLoadedBox->setPosition(10.0f, 8.0f, 4.0f);
 
     // light
     auto sun = renderer->createLightDirectional();
     sun->setDirection({-0.5, -0.5, -0.5});
     sun->setColor({4.0f, 4.0f, 4.0f});
-    auto actorSun = wne::ActorLight::create(sun);
-    scene->addActor(actorSun);
+    auto actorSun = scene->createActor<wne::ActorLight>(sun);
 
     sun->enableShadows(1, 1024);
     auto textureSunShadow = sun->getCascadeAsTexture(0);
     auto materialSunShadow = renderer->createFlatMaterial(textureSunShadow);
-    auto actorSunShadowBox = wne::ActorMesh::create(boxMesh);
+    auto actorSunShadowBox = scene->createActor<wne::ActorMesh>(boxMesh);
     actorSunShadowBox->setMaterial(materialSunShadow);
-    scene->addActor(actorSunShadowBox);
     actorSunShadowBox->setPosition(12.0f, 8.0f, 0.0f);
 
     auto spot = renderer->createLightSpot();
@@ -127,8 +114,7 @@ int main()
     spot->setColor({2.0f, 2.0f, 10.0f});
     spot->setAffectRadius(60.0f);
     spot->setOuterCutOff(0.3f);
-    auto actorSpot = wne::ActorLight::create(spot);
-    scene->addActor(actorSpot);
+    auto actorSpot = scene->createActor<wne::ActorLight>(spot);
 
     const int amountOfLights = 8;
     std::vector<std::shared_ptr<wne::ActorLight>> omniLights;
@@ -137,15 +123,13 @@ int main()
         auto light = renderer->createLightOmni();
         light->setColor({fRand(0.5f, 5.0f), fRand(0.5f, 5.0f), fRand(0.5f, 5.0f)});
         light->setAffectRadius(10.0f);
-        auto actorLight = wne::ActorLight::create(light);
-        scene->addActor(actorLight);
+        auto actorLight = scene->createActor<wne::ActorLight>(light);
         omniLights.push_back(actorLight);
     }
 
     // camera
     auto camera = wne::CameraPerspective::create(window);
-    auto actorCamera = wne::ActorCameraFlying::create(camera, window);
-    scene->addActor(actorCamera);
+    auto actorCamera = scene->createActor<wne::ActorCameraFlying>(camera, window);
     scene->setCamera(actorCamera);
 
     float translate = 0.0f;

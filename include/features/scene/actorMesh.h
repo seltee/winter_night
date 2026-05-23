@@ -11,15 +11,14 @@ namespace wne
     class WNE_API ActorMesh : public Actor
     {
     public:
-        ActorMesh(std::shared_ptr<Mesh> mesh);
+        ActorMesh(Renderer *renderer, std::shared_ptr<Mesh> mesh);
         ~ActorMesh();
-        static std::shared_ptr<ActorMesh> create(std::shared_ptr<Mesh> mesh);
 
         void setMaterial(std::shared_ptr<Material> material);
 
-        void renderDepthShadow(Renderer *renderer) override final;
-        void renderDepth(Renderer *renderer) override final;
-        void renderColor(Renderer *renderer) override final;
+        void renderDepthShadow() override final;
+        void renderDepth() override final;
+        void renderColor() override final;
 
         RenderPass getRenderPass() override final;
 

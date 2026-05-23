@@ -5,24 +5,18 @@
 
 using namespace wne;
 
-ActorTerrain::ActorTerrain(Renderer *renderer)
+ActorTerrain::ActorTerrain(Renderer *renderer, int resolution, float size, float heightFactor, std::shared_ptr<Image> image) : Actor(renderer)
 {
     this->renderer = renderer;
+    setResolutionSize(resolution, size);
+    shapeByImage(image, heightFactor);
+    updateMesh();
 }
 
 ActorTerrain::~ActorTerrain()
 {
     if (mesh)
         mesh->freeObjectId(objectId);
-}
-
-std::shared_ptr<ActorTerrain> ActorTerrain::createFromImage(int resolution, float size, float heightFactor, std::shared_ptr<Image> image, Renderer *renderer)
-{
-    std::shared_ptr<ActorTerrain> ptr = std::make_shared<ActorTerrain>(renderer);
-    ptr->setResolutionSize(resolution, size);
-    ptr->shapeByImage(image, heightFactor);
-    ptr->updateMesh();
-    return ptr;
 }
 
 void ActorTerrain::setResolution(int resolution)
@@ -132,7 +126,7 @@ void ActorTerrain::setMaterial(std::shared_ptr<Material> material)
 float ActorTerrain::getHeightLocal(float x, float y)
 {
     // heights resolution
-    int xPoint = (int)((float)resolution * x); 
+    int xPoint = (int)((float)resolution * x);
     int yPoint = (int)((float)resolution * y);
     uint xPointClamped = std::min(std::max(xPoint, 0), resolution - 1);
     uint yPointClamped = std::min(std::max(yPoint, 0), resolution - 1);
@@ -145,7 +139,7 @@ float ActorTerrain::getHeightGlobal(float x, float y)
     return getHeightLocal((x + size * 0.5f) / size, (y + size * 0.5f) / size);
 }
 
-void ActorTerrain::renderDepthShadow(Renderer *renderer)
+void ActorTerrain::renderDepthShadow()
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || !mesh || !currentScene || objectId == 0xffffffff)
@@ -156,7 +150,7 @@ void ActorTerrain::renderDepthShadow(Renderer *renderer)
     mesh->render(renderer->getFrameData());
 }
 
-void ActorTerrain::renderDepth(Renderer *renderer)
+void ActorTerrain::renderDepth()
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || materialToUse->getColorBlending() != ColorBlending::Solid || !mesh || !currentScene || objectId == 0xffffffff)
@@ -167,7 +161,7 @@ void ActorTerrain::renderDepth(Renderer *renderer)
     mesh->render(renderer->getFrameData());
 }
 
-void ActorTerrain::renderColor(Renderer *renderer)
+void ActorTerrain::renderColor()
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || !mesh || !currentScene || objectId == 0xffffffff)

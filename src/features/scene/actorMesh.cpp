@@ -4,7 +4,7 @@
 
 using namespace wne;
 
-ActorMesh::ActorMesh(std::shared_ptr<Mesh> mesh)
+ActorMesh::ActorMesh(Renderer *renderer, std::shared_ptr<Mesh> mesh) : Actor(renderer)
 {
     this->mesh = std::move(mesh);
     objectId = this->mesh->genNewObjectId();
@@ -15,17 +15,12 @@ ActorMesh::~ActorMesh()
     this->mesh->freeObjectId(objectId);
 }
 
-std::shared_ptr<ActorMesh> ActorMesh::create(std::shared_ptr<Mesh> mesh)
-{
-    return std::make_shared<ActorMesh>(std::move(mesh));
-}
-
 void ActorMesh::setMaterial(std::shared_ptr<Material> material)
 {
     this->material = std::move(material);
 }
 
-void ActorMesh::renderDepthShadow(Renderer *renderer)
+void ActorMesh::renderDepthShadow()
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || !currentScene || objectId == 0xffffffff)
@@ -36,7 +31,7 @@ void ActorMesh::renderDepthShadow(Renderer *renderer)
     mesh->render(renderer->getFrameData());
 }
 
-void ActorMesh::renderDepth(Renderer *renderer)
+void ActorMesh::renderDepth()
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || materialToUse->getColorBlending() != ColorBlending::Solid || !currentScene || objectId == 0xffffffff)
@@ -47,7 +42,7 @@ void ActorMesh::renderDepth(Renderer *renderer)
     mesh->render(renderer->getFrameData());
 }
 
-void ActorMesh::renderColor(Renderer *renderer)
+void ActorMesh::renderColor()
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || !currentScene || objectId == 0xffffffff)

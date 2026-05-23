@@ -4,14 +4,9 @@
 
 using namespace wne;
 
-ActorLight::ActorLight(std::shared_ptr<Light> light)
+ActorLight::ActorLight(Renderer *renderer, std::shared_ptr<Light> light) : Actor(renderer)
 {
     this->light = light;
-}
-
-std::shared_ptr<ActorLight> ActorLight::create(std::shared_ptr<Light> light)
-{
-    return std::make_shared<ActorLight>(std::move(light));
 }
 
 void ActorLight::eventSetScene(Scene *oldScene, Scene *newScene)
