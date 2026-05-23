@@ -80,6 +80,7 @@ void ActorCameraFlying::update(float delta)
             moveRight = false;
             moveUp = false;
             moveDown = false;
+            isDirtyFlag = true;
         }
     }
 

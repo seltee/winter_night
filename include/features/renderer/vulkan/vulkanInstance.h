@@ -58,13 +58,13 @@ namespace wne
 
         VulkanFrame *getCurrentFrame()
         {
+            uint currentFrame = vulkanUtils->getCurrentFrame();
             return frames[currentFrame].get();
         }
 
     protected:
         uint32 width = 0,
                height = 0;
-        uint32_t currentFrame = 0;
         bool isImmidiateSwap = false;
 
         VulkanInstanceExtensions *vulkanInstanceExtensions = nullptr;

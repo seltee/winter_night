@@ -2,12 +2,26 @@
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/renderer/vulkan/vulkanDepthBuffer.h"
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
+#include "features/renderer/vulkan/vulkanUtils.h"
 #include "features/data/model.h"
 #include <memory>
 
 namespace wne
 {
     class VulkanUitls;
+
+    struct CascadeFrame
+    {
+        std::unique_ptr<VulkanDepthBuffer> vulkanDepthBuffer;
+        std::unique_ptr<VulkanFrameBuffer> vulkanFrameBuffer;
+
+        VkBuffer objectBufferMVP;
+        VkDeviceMemory objectBufferMVPMemory;
+        Matrix4x4 *objectBufferMVPMapped;
+
+        VkDescriptorSet descriptorSetTextured;
+    };
+
     class VulkanLightCascadeData
     {
     public:
@@ -22,25 +36,16 @@ namespace wne
 
         inline VulkanDepthBuffer *getDepthBuffer()
         {
-            return vulkanDepthBuffer.get();
+            return frames[vulkanUtils->getCurrentFrame()].vulkanDepthBuffer.get();
         }
 
         inline VulkanFrameBuffer *getFrameBuffer()
         {
-            return vulkanFrameBuffer.get();
+            return frames[vulkanUtils->getCurrentFrame()].vulkanFrameBuffer.get();
         }
 
     protected:
         VulkanUtils *vulkanUtils = nullptr;
-
-        // used to render shadow buffer
-        VkBuffer objectBufferMVP = nullptr;
-        VkDeviceMemory objectBufferMVPMemory = nullptr;
-        Matrix4x4 *objectBufferMVPMapped = nullptr;
-
-        VkDescriptorSet descriptorSetTextured = nullptr;
-
-        std::unique_ptr<VulkanDepthBuffer> vulkanDepthBuffer;
-        std::unique_ptr<VulkanFrameBuffer> vulkanFrameBuffer;
+        std::vector<CascadeFrame> frames;
     };
 };

@@ -268,29 +268,33 @@ bool VulkanInstance::getSyncState()
 
 void VulkanInstance::startRendering()
 {
+    uint currentFrame = vulkanUtils->getCurrentFrame();
     frames[currentFrame]->startFrame();
     vulkanUtils->setCurrentCommandBuffer(frames[currentFrame]->getCommandBuffer());
 }
 
 void VulkanInstance::beginDepthPass()
 {
+    uint currentFrame = vulkanUtils->getCurrentFrame();
     frames[currentFrame]->beginDepthPass(depthPass.get(), frameDepthBuffer.get());
 }
 
 void VulkanInstance::finishDepthPass()
 {
+    uint currentFrame = vulkanUtils->getCurrentFrame();
     frames[currentFrame]->endDepthPass();
 }
 
 void VulkanInstance::beginRenderPass()
 {
+    uint currentFrame = vulkanUtils->getCurrentFrame();
     frames[currentFrame]->beginRenderPass(renderPass.get(), frameColorBuffer.get());
 }
 
 void VulkanInstance::finishRendering()
 {
+    uint currentFrame = vulkanUtils->getCurrentFrame();
     frames[currentFrame]->finishFrame(graphicsQueue, presentQueue);
-    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 void VulkanInstance::waitIdle()

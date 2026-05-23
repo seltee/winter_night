@@ -75,6 +75,11 @@ namespace wne
             vulkanObjectBuffers->swap();
         }
 
+        inline uint getCurrentFrame()
+        {
+            return vulkanObjectBuffers->getFrameInFlight();
+        }
+
         inline VulkanTexture *getDummyTexture()
         {
             return dummyTexture.get();

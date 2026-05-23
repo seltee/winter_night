@@ -16,33 +16,42 @@ VulkanLightCascadeData::VulkanLightCascadeData(VulkanUtils *vulkanUtils)
 VulkanLightCascadeData::~VulkanLightCascadeData()
 {
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
-    if (objectBufferMVP)
-        vkDestroyBuffer(device, objectBufferMVP, nullptr);
-    if (objectBufferMVPMemory)
-        vkFreeMemory(device, objectBufferMVPMemory, nullptr);
+
+    for (const auto &frame : frames)
+    {
+        if (frame.objectBufferMVP)
+            vkDestroyBuffer(device, frame.objectBufferMVP, nullptr);
+        if (frame.objectBufferMVPMemory)
+            vkFreeMemory(device, frame.objectBufferMVPMemory, nullptr);
+    }
 }
 
 bool VulkanLightCascadeData::setup(uint32 resolution)
 {
-    vulkanDepthBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils);
-    if (!vulkanDepthBuffer->setup(resolution, resolution, 1, true))
+    frames.resize(MAX_FRAMES_IN_FLIGHT);
+    for (uint frameNum = 0; frameNum < MAX_FRAMES_IN_FLIGHT; frameNum++)
     {
-        std::cout << "unable to create depth buffer" << std::endl;
-        return false;
+        frames[frameNum].vulkanDepthBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils);
+        if (!frames[frameNum].vulkanDepthBuffer->setup(resolution, resolution, 1, true))
+        {
+            std::cout << "unable to create depth buffer" << std::endl;
+            return false;
+        }
+        const uint matrixBufferSize = sizeof(Matrix4x4) * VulkanObjectBuffers::AMOUNT_OF_OBJECTS;
+        if (!vulkanUtils->createBuffer(
+                matrixBufferSize,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                frames[frameNum].objectBufferMVP,
+                frames[frameNum].objectBufferMVPMemory))
+        {
+            return false;
+        }
+        vkMapMemory(vulkanUtils->getVulkanDevice()->getDevice(), frames[frameNum].objectBufferMVPMemory, 0, matrixBufferSize, 0, (void **)&(frames[frameNum].objectBufferMVPMapped));
     }
 
     // To store mvp for each object to render
-    const uint matrixBufferSize = sizeof(Matrix4x4) * VulkanObjectBuffers::AMOUNT_OF_OBJECTS;
-    if (!vulkanUtils->createBuffer(
-            matrixBufferSize,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            objectBufferMVP,
-            objectBufferMVPMemory))
-    {
-        return false;
-    }
-    vkMapMemory(vulkanUtils->getVulkanDevice()->getDevice(), objectBufferMVPMemory, 0, matrixBufferSize, 0, (void **)&objectBufferMVPMapped);
+
     return true;
 }
 
@@ -50,38 +59,41 @@ void VulkanLightCascadeData::updateObjectData(uint32 objectId, const Matrix4x4 &
 {
     if (objectId < VulkanObjectBuffers::AMOUNT_OF_OBJECTS)
     {
-        objectBufferMVPMapped[objectId] = mMVP;
+        uint frameNum = vulkanUtils->getCurrentFrame();
+        frames[frameNum].objectBufferMVPMapped[objectId] = mMVP;
     }
 }
 
 VulkanFrameBuffer *VulkanLightCascadeData::getFrameBuffer(VulkanRenderPass *depthPass)
 {
-    if (!vulkanFrameBuffer)
+    uint frameNum = vulkanUtils->getCurrentFrame();
+    if (!frames[frameNum].vulkanFrameBuffer)
     {
-        vulkanFrameBuffer = std::make_unique<VulkanFrameBuffer>(vulkanUtils->getVulkanDevice()->getDevice());
-        if (!vulkanFrameBuffer->setup(depthPass, vulkanDepthBuffer.get()))
+        frames[frameNum].vulkanFrameBuffer = std::make_unique<VulkanFrameBuffer>(vulkanUtils->getVulkanDevice()->getDevice());
+        if (!frames[frameNum].vulkanFrameBuffer->setup(depthPass, frames[frameNum].vulkanDepthBuffer.get()))
             return nullptr;
     }
     else
     {
         // check if depth pass is still correct
-        if (vulkanFrameBuffer->getDepthPass() != depthPass)
+        if (frames[frameNum].vulkanFrameBuffer->getDepthPass() != depthPass)
         {
             // utils have new one, recreate
-            vulkanFrameBuffer = std::make_unique<VulkanFrameBuffer>(vulkanUtils->getVulkanDevice()->getDevice());
-            if (!vulkanFrameBuffer->setup(depthPass, vulkanDepthBuffer.get()))
+            frames[frameNum].vulkanFrameBuffer = std::make_unique<VulkanFrameBuffer>(vulkanUtils->getVulkanDevice()->getDevice());
+            if (!frames[frameNum].vulkanFrameBuffer->setup(depthPass, frames[frameNum].vulkanDepthBuffer.get()))
                 return nullptr;
         }
     }
-    return vulkanFrameBuffer.get();
+    return frames[frameNum].vulkanFrameBuffer.get();
 }
 
 VkDescriptorSet VulkanLightCascadeData::getDescriptorSet(
     ModelDataType dataType,
     VkDescriptorSetLayout layoutPipeline)
 {
-    if (descriptorSetTextured)
-        return descriptorSetTextured;
+    uint frameNum = vulkanUtils->getCurrentFrame();
+    if (frames[frameNum].descriptorSetTextured)
+        return frames[frameNum].descriptorSetTextured;
 
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
     VulkanDescriptorPool *vulkanDescriptorPool = vulkanUtils->getDescriptorPool();
@@ -95,21 +107,21 @@ VkDescriptorSet VulkanLightCascadeData::getDescriptorSet(
     allocInfo.descriptorSetCount = 1;
     allocInfo.pSetLayouts = layouts;
 
-    if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSetTextured) != VK_SUCCESS)
+    if (vkAllocateDescriptorSets(device, &allocInfo, &(frames[frameNum].descriptorSetTextured)) != VK_SUCCESS)
     {
         std::cout << "unable to create descriptor set" << std::endl;
         return nullptr;
     }
 
     VkDescriptorBufferInfo bufferMVPInfo{};
-    bufferMVPInfo.buffer = objectBufferMVP;
+    bufferMVPInfo.buffer = frames[frameNum].objectBufferMVP;
     bufferMVPInfo.offset = 0;
     bufferMVPInfo.range = matrixBufferSize;
 
     std::array<VkWriteDescriptorSet, 1> writes{};
 
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    writes[0].dstSet = descriptorSetTextured;
+    writes[0].dstSet = frames[frameNum].descriptorSetTextured;
     writes[0].dstBinding = 0;
     writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     writes[0].descriptorCount = 1;
@@ -117,5 +129,5 @@ VkDescriptorSet VulkanLightCascadeData::getDescriptorSet(
 
     vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
 
-    return descriptorSetTextured;
+    return frames[frameNum].descriptorSetTextured;
 }
