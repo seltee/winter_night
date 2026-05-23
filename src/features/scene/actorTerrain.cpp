@@ -168,7 +168,7 @@ void ActorTerrain::renderColor()
         return;
 
     auto state = renderer->getState();
-    AffectingLights lights = currentScene->collectAffectingLights();
+    AffectingLights lights = currentScene->collectAffectingLights(getPosition(), 0.0f);
     materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }

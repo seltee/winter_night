@@ -7,6 +7,7 @@ My personal Vulkan 3d/2d engine I'm constructing using C++ 2020
 ### Features
 
 - Forward+ rendering
+- MSAA antialiasing
 - 3d Model (fbx) and texture (any major format) loading
 - Window event system with subscriptions
 - Perspective and Orthographic cameras

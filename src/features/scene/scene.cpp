@@ -127,17 +127,29 @@ void Scene::setAtmosphere(std::shared_ptr<Texture> atmosphereMap, std::shared_pt
     atmoMaterial = nullptr;
 }
 
-AffectingLights Scene::collectAffectingLights()
+AffectingLights Scene::collectAffectingLights(const Vector3 &point, float radius)
 {
-    AffectingLights affectingLights{};
+    std::vector<std::pair<uint32, float>> lightsList;
     for (auto &light : lights)
     {
         if (light->getLightId() != 0xffffffff)
         {
-            affectingLights.lightIds[affectingLights.lightsAmount] = light->getLightId();
-            affectingLights.lightsAmount++;
+            lightsList.emplace_back(light->getLightId(), distance(point, light->getPosition().xyz()));
         }
     }
+
+    std::sort(lightsList.begin(), lightsList.end(), [](const std::pair<uint32, float> &a, const std::pair<uint32, float> &b)
+              { return a.second < b.second; });
+
+    AffectingLights affectingLights{};
+    for (auto &lightPart : lightsList)
+    {
+        affectingLights.lightIds[affectingLights.lightsAmount] = lightPart.first;
+        affectingLights.lightsAmount++;
+        if (affectingLights.lightsAmount >= 12) // max lights reached
+            break;
+    }
+
     return affectingLights;
 }
 

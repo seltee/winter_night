@@ -94,9 +94,17 @@ namespace wne
         Vector3 right = normalize(cross(up, forward));
         Vector3 newUp = cross(forward, right);
 
-        Matrix3x3 rot(right, newUp, forward); 
+        Matrix3x3 rot(right, newUp, forward);
 
         return rot;
+    }
+
+    inline float distance(const Vector3 &from, const Vector3 &to)
+    {
+        float difX = to.x - from.x;
+        float difY = to.y - from.y;
+        float difZ = to.z - from.z;
+        return sqrtf(difX * difX + difY * difY + difZ * difZ);
     }
 
 };

@@ -34,7 +34,7 @@ namespace wne
 
         void setAtmosphere(std::shared_ptr<Texture> atmosphereMap, std::shared_ptr<Texture> atmosphereRadiance, float atmosphereRadianceFactor = 1.0f);
 
-        AffectingLights collectAffectingLights();
+        AffectingLights collectAffectingLights(const Vector3 &point, float radius);
 
         // called when actor with light added
         // actor owns and removes light so it's ok to be just a pointer

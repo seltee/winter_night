@@ -102,7 +102,7 @@ int main()
     sun->setColor({4.0f, 4.0f, 4.0f});
     auto actorSun = scene->createActor<wne::ActorLight>(sun);
 
-    sun->enableShadows(1, 1024);
+    sun->enableShadows(1, 2048);
     auto textureSunShadow = sun->getCascadeAsTexture(0);
     auto materialSunShadow = renderer->createFlatMaterial(textureSunShadow);
     auto actorSunShadowBox = scene->createActor<wne::ActorMesh>(boxMesh);

@@ -68,7 +68,7 @@ void ActorSprite::renderColor()
         return;
 
     auto state = renderer->getState();
-    AffectingLights lights = materialToUse->isLighted() ? currentScene->collectAffectingLights() : AffectingLights{};
+    AffectingLights lights = materialToUse->isLighted() ? currentScene->collectAffectingLights(getPosition(), 0.0f) : AffectingLights{};
     materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
