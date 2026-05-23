@@ -92,6 +92,17 @@ void RendererVulkanNT::provideSceneData(const Vector4 &ambientColor, const Vecto
     instance->getVulkanUtils()->setRadianceMap((VulkanTexture *)radianceMap);
 }
 
+void RendererVulkanNT::setMSAASampleCount(uint sampleCount)
+{
+    MSAASampleCount = std::min(std::max(sampleCount, (uint)1), getMaxMSAASampleCount());
+    instance->updateMSAASampleCount(MSAASampleCount);
+}
+
+uint RendererVulkanNT::getMaxMSAASampleCount()
+{
+    return instance->getVulkanUtils()->getMSAAUsableSampleCount();
+}
+
 std::shared_ptr<wne::Material> RendererVulkanNT::getDefaultMaterial()
 {
     return defaultMaterial;

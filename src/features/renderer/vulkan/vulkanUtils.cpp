@@ -105,6 +105,28 @@ VulkanFormat VulkanUtils::findSupportedFormat(const std::vector<VulkanFormat> &c
     return VkFormat::VK_FORMAT_UNDEFINED;
 }
 
+uint VulkanUtils::getMSAAUsableSampleCount()
+{
+    VkPhysicalDeviceProperties physicalDeviceProperties;
+    vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
+
+    VkSampleCountFlags counts = physicalDeviceProperties.limits.framebufferColorSampleCounts & physicalDeviceProperties.limits.framebufferDepthSampleCounts;
+    if (counts & VK_SAMPLE_COUNT_64_BIT)
+        return 64;
+    if (counts & VK_SAMPLE_COUNT_32_BIT)
+        return 32;
+    if (counts & VK_SAMPLE_COUNT_16_BIT)
+        return 16;
+    if (counts & VK_SAMPLE_COUNT_8_BIT)
+        return 8;
+    if (counts & VK_SAMPLE_COUNT_4_BIT)
+        return 4;
+    if (counts & VK_SAMPLE_COUNT_2_BIT)
+        return 2;
+
+    return 1;
+}
+
 bool VulkanUtils::createBuffer(uint64 size, uint32 usage, uint32 properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory)
 {
     VkBufferCreateInfo bufferInfo{};
@@ -266,17 +288,30 @@ void VulkanUtils::destroyPipelines()
     vulkanPipelines->reset();
 }
 
-bool VulkanUtils::rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass, VulkanRenderPass *vulkanDepthPass)
+bool VulkanUtils::rebuildPipelines(
+    VulkanSwapChain *vulkanSwapChain,
+    VulkanRenderPass *vulkanRenderPass,
+    VulkanRenderPass *vulkanDepthPass,
+    VulkanRenderPass *vulkanShadowDepthPass,
+    uint sampleCount)
 {
     this->vulkanRenderPass = vulkanRenderPass;
     this->vulkanDepthPass = vulkanDepthPass;
+    this->vulkanShadowDepthPass = vulkanShadowDepthPass;
 
     VkDevice device = vulkanDevice->getDevice();
     vkDeviceWaitIdle(device);
     destroyPipelines();
     vkDeviceWaitIdle(device);
 
-    if (!vulkanPipelines->build(vulkanSwapChain, vulkanRenderPass, vulkanDepthPass, vulkanDescriptorPool.get(), vulkanObjectBuffers.get()))
+    if (!vulkanPipelines->build(
+            vulkanSwapChain,
+            vulkanRenderPass,
+            vulkanDepthPass,
+            vulkanShadowDepthPass,
+            vulkanDescriptorPool.get(),
+            vulkanObjectBuffers.get(),
+            getVkSampleCountFlagBits(sampleCount)))
     {
         return false;
     }
@@ -293,6 +328,7 @@ bool VulkanUtils::createImage(
     uint16 width,
     uint16 height,
     VulkanFormat format,
+    uint64 numSamples,
     VulkanImageTiling tiling,
     VulkanImageUsageFlags usage,
     VulkanMemoryPropertyFlagBits memoryFlags,
@@ -312,7 +348,7 @@ bool VulkanUtils::createImage(
     imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     imageInfo.usage = usage;
     imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.samples = (VkSampleCountFlagBits)getVkSampleCountFlagBits(numSamples);
     imageInfo.flags = 0; // Optional
 
     if (vkCreateImage(device, &imageInfo, nullptr, pImage) != VK_SUCCESS)
@@ -393,4 +429,21 @@ void VulkanUtils::endSingleTimeCommands(VkCommandBuffer commandBuffer)
     vkQueueWaitIdle(graphicsQueue);
 
     vkFreeCommandBuffers(device, vulkanCommandPool->getCommandPool(), 1, &commandBuffer);
+}
+
+uint64 VulkanUtils::getVkSampleCountFlagBits(uint64 sampleCount)
+{
+    if (sampleCount == 64)
+        return VK_SAMPLE_COUNT_64_BIT;
+    if (sampleCount == 32)
+        return VK_SAMPLE_COUNT_32_BIT;
+    if (sampleCount == 16)
+        return VK_SAMPLE_COUNT_16_BIT;
+    if (sampleCount == 8)
+        return VK_SAMPLE_COUNT_8_BIT;
+    if (sampleCount == 4)
+        return VK_SAMPLE_COUNT_4_BIT;
+    if (sampleCount == 2)
+        return VK_SAMPLE_COUNT_2_BIT;
+    return VK_SAMPLE_COUNT_1_BIT;
 }

@@ -92,6 +92,20 @@ std::shared_ptr<wne::Mesh> Renderer::getDefaultPlain()
     return nullptr;
 }
 
+void Renderer::setMSAASampleCount(uint sampleCount)
+{
+}
+
+uint Renderer::getMSAASampleCount()
+{
+    return 1;
+}
+
+uint Renderer::getMaxMSAASampleCount()
+{
+    return 1;
+}
+
 std::shared_ptr<Scene> Renderer::createScene()
 {
     auto scene = wne::Scene::create(this);

@@ -10,6 +10,7 @@
 #include "features/renderer/vulkan/pipelines/vulkanPipelineColored.h"
 #include "features/renderer/vulkan/pipelines/vulkanPipelineTextured.h"
 #include "features/renderer/vulkan/pipelines/vulkanDescriptorSets.h"
+#include "core/core.h"
 #include <iostream>
 #include <memory>
 
@@ -29,15 +30,16 @@ namespace wne
             VulkanSwapChain *vulkanSwapChain,
             VulkanRenderPass *vulkanRenderPass,
             VulkanRenderPass *VulkanDepthPass,
+            VulkanRenderPass *VulkanShadowDepthPass,
             VulkanDescriptorPool *vulkanDescriptorPool,
-            VulkanObjectBuffers *vulkanObjectBuffers);
+            VulkanObjectBuffers *vulkanObjectBuffers,
+            uint64 MSAASampleCountBit);
 
         void enablePipelineColored(VulkanCommandBuffer *commandBuffer, bool isDepthRendering);
         void enablePipelineTexturedDepth(VulkanCommandBuffer *commandBuffer, bool isMasked);
         void enablePipelineTexturedShadowDepth(VulkanCommandBuffer *commandBuffer, bool isMasked);
         void enablePipelineTextured(VulkanCommandBuffer *commandBuffer, bool isLightEnabled, ColorBlending blending);
         void enablePipelineAtmosphere(VulkanCommandBuffer *commandBuffer);
-
 
         inline void updatePipelineShadowMaps(VulkanShadowMaps *shadowMaps, VulkanSampler *sampler)
         {

@@ -20,10 +20,13 @@ namespace wne
 
         void renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial) override final;
         void provideSceneData(
-            const Vector4 &ambientColor, 
-            const Vector4 &cameraPosition, 
-            Texture *radianceMap, 
+            const Vector4 &ambientColor,
+            const Vector4 &cameraPosition,
+            Texture *radianceMap,
             float radienceMapFactor) override final;
+
+        void setMSAASampleCount(uint sampleCount) override final;
+        uint getMaxMSAASampleCount() override final;
 
         std::shared_ptr<wne::Material> getDefaultMaterial() override final;
         std::shared_ptr<Mesh> getDefaultPlain() override final;
@@ -50,5 +53,7 @@ namespace wne
 
         std::shared_ptr<Material> defaultMaterial;
         std::shared_ptr<Mesh> defaultPlain;
+
+        uint MSAASampleCount = 1;
     };
 }

@@ -46,44 +46,46 @@ bool VulkanPipelines::build(
     VulkanSwapChain *vulkanSwapChain,
     VulkanRenderPass *vulkanRenderPass,
     VulkanRenderPass *VulkanDepthPass,
+    VulkanRenderPass *VulkanShadowDepthPass,
     VulkanDescriptorPool *vulkanDescriptorPool,
-    VulkanObjectBuffers *vulkanObjectBuffers)
+    VulkanObjectBuffers *vulkanObjectBuffers,
+    uint64 MSAASampleCountBit)
 {
     reset();
 
     bool status = true;
     // depth pipelines
-    vulkanPipelineColoredDepth = std::make_unique<VulkanPipelineColored>(vulkanDevice);
-    status &= vulkanPipelineColoredDepth->setupDepth(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers);
+    // vulkanPipelineColoredDepth = std::make_unique<VulkanPipelineColored>(vulkanDevice);
+    // status &= vulkanPipelineColoredDepth->setupDepth(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers);
 
     vulkanPipelineTexturedDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedDepth->setupDepth(VulkanDepthPass);
+    status &= vulkanPipelineTexturedDepth->setupDepth(VulkanDepthPass, MSAASampleCountBit);
 
     vulkanPipelineTexturedMaskedDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedMaskedDepth->setupMaskedDepth(VulkanDepthPass);
+    status &= vulkanPipelineTexturedMaskedDepth->setupMaskedDepth(VulkanDepthPass, MSAASampleCountBit);
 
     vulkanPipelineTexturedShadowDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedShadowDepth->setupDepthShadow(VulkanDepthPass);
+    status &= vulkanPipelineTexturedShadowDepth->setupDepthShadow(VulkanShadowDepthPass);
 
     vulkanPipelineTexturedMaskedShadowDepth = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineTexturedMaskedShadowDepth->setupMaskedDepthShadow(VulkanDepthPass);
+    status &= vulkanPipelineTexturedMaskedShadowDepth->setupMaskedDepthShadow(VulkanShadowDepthPass);
 
     // color pipelines
-    vulkanPipelineColoredColor = std::make_unique<VulkanPipelineColored>(vulkanDevice);
-    status &= vulkanPipelineColoredColor->setupColor(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers);
+    //vulkanPipelineColoredColor = std::make_unique<VulkanPipelineColored>(vulkanDevice);
+    // status &= vulkanPipelineColoredColor->setupColor(vulkanRenderPass, vulkanDescriptorPool, vulkanObjectBuffers);
 
     for (uint8 lightState = 0; lightState < val(LightState::Total); lightState++)
     {
         for (uint8 blending = 0; blending < val(ColorBlending::Total); blending++)
         {
             vulkanPipelineTextured[lightState][blending] = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-            status &= vulkanPipelineTextured[lightState][blending]->setupParametred(vulkanRenderPass, lightState, (ColorBlending)blending);
+            status &= vulkanPipelineTextured[lightState][blending]->setupParametred(vulkanRenderPass, lightState, (ColorBlending)blending, MSAASampleCountBit);
         }
     }
 
     // atmosphere pipelines
     vulkanPipelineAtmosphereColor = std::make_unique<VulkanPipelineTextured>(vulkanDevice);
-    status &= vulkanPipelineAtmosphereColor->setupAtmosphere(vulkanRenderPass);
+    status &= vulkanPipelineAtmosphereColor->setupAtmosphere(vulkanRenderPass, MSAASampleCountBit);
 
     vulkanDescriptorSets = std::make_unique<VulkanDescriptorSets>(vulkanDevice, vulkanDescriptorPool, vulkanObjectBuffers);
     if (!vulkanDescriptorSets->setup(vulkanPipelineTexturedDepth.get(), vulkanPipelineTextured[val(LightState::Disabled)][val(ColorBlending::Solid)].get()))

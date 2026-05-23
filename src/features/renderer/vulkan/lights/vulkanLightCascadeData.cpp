@@ -25,7 +25,7 @@ VulkanLightCascadeData::~VulkanLightCascadeData()
 bool VulkanLightCascadeData::setup(uint32 resolution)
 {
     vulkanDepthBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils);
-    if (!vulkanDepthBuffer->setup(resolution, resolution, true))
+    if (!vulkanDepthBuffer->setup(resolution, resolution, 1, true))
     {
         std::cout << "unable to create depth buffer" << std::endl;
         return false;

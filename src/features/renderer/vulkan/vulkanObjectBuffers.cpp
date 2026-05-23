@@ -202,7 +202,7 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
     }
 
     dummyBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils);
-    if (!dummyBuffer->setup(8, 8, true))
+    if (!dummyBuffer->setup(8, 8, 1, true))
     {
         return false;
     }

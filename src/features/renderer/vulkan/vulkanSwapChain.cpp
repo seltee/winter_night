@@ -1,6 +1,7 @@
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanQueueFamilies.h"
 #include "features/renderer/vulkan/vulkanDeviceExtensions.h"
+#include "features/renderer/vulkan/vulkanUtils.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <iostream>
@@ -20,18 +21,23 @@ VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &ava
 VkExtent2D _chooseSwapExtent(int screenWidth, int screenHeight);
 bool _checkDeviceExtensionSupport(VkPhysicalDevice device);
 
-VulkanSwapChain::VulkanSwapChain(VulkanDevice *vulkanDevice)
+VulkanSwapChain::VulkanSwapChain(VulkanUtils *vulkanUtils)
 {
-    this->vulkanDevice = vulkanDevice;
+    this->vulkanDevice = vulkanUtils->getVulkanDevice();
+    this->vulkanUtils = vulkanUtils;
 }
 
 VulkanSwapChain::~VulkanSwapChain()
 {
+    auto device = vulkanDevice->getDevice();
+    for (auto &image : swapChainSampledImages)
+        vkDestroyImage(device, image, nullptr);
+
     if (swapChain)
-        vkDestroySwapchainKHR(vulkanDevice->getDevice(), swapChain, nullptr);
+        vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
 
-bool VulkanSwapChain::setup(int width, int height, VkSurfaceKHR surface, bool isImmidiateSwap)
+bool VulkanSwapChain::setup(int width, int height, VkSurfaceKHR surface, bool isImmidiateSwap, uint MSAASampleCount)
 {
     auto device = vulkanDevice->getDevice();
 
@@ -53,6 +59,34 @@ bool VulkanSwapChain::setup(int width, int height, VkSurfaceKHR surface, bool is
     {
         std::cout << "Unable to create swap chain images" << std::endl;
         return false;
+    }
+
+    if (MSAASampleCount > 1)
+    {
+        swapChainSampledImages.resize(unImageCount);
+        swapChainSampledMemory.resize(unImageCount);
+        swapChainSampledImageViews.resize(unImageCount);
+
+        for (uint i = 0; i < unImageCount; i++)
+        {
+            vulkanUtils->createImage(
+                width, height,
+                (VkFormat)swapChainImageFormat,
+                vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount),
+                VK_IMAGE_TILING_OPTIMAL,
+                VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                &swapChainSampledImages[i],
+                &swapChainSampledMemory[i]);
+
+            auto vulkanImagePtr = std::make_unique<VulkanImageView>(vulkanDevice);
+            if (!vulkanImagePtr->setup(swapChainSampledImages[i], (VkFormat)swapChainImageFormat))
+            {
+                std::cout << "Failed to create MSAA color image view" << std::endl;
+                return false;
+            }
+            swapChainSampledImageViews[i] = std::move(vulkanImagePtr);
+        }
     }
 
     return true;
@@ -121,6 +155,7 @@ VkSwapchainKHR VulkanSwapChain::createSwapChain(
     *swapChainImageFormat = surfaceFormat.format;
     memcpy(&swapChainExtent, &extent, sizeof(extent));
     *punImageCount = unImageCount;
+
     return swapChain;
 }
 

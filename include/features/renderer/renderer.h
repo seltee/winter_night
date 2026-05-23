@@ -35,9 +35,9 @@ namespace wne
 
         virtual void renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial);
         virtual void provideSceneData(
-            const Vector4 &ambientColor, 
-            const Vector4 &cameraPosition, 
-            Texture *radianceMap, 
+            const Vector4 &ambientColor,
+            const Vector4 &cameraPosition,
+            Texture *radianceMap,
             float radienceMapFactor);
 
         virtual std::shared_ptr<LightDirectional> createLightDirectional();
@@ -46,6 +46,10 @@ namespace wne
 
         virtual std::shared_ptr<Material> getDefaultMaterial();
         virtual std::shared_ptr<Mesh> getDefaultPlain();
+
+        virtual void setMSAASampleCount(uint sampleCount);
+        uint getMSAASampleCount();
+        virtual uint getMaxMSAASampleCount();
 
         std::shared_ptr<Scene> createScene();
 

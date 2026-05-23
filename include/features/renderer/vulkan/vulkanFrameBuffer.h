@@ -13,8 +13,8 @@ namespace wne
     public:
         VulkanFrameBuffer(VkDevice device);
         ~VulkanFrameBuffer();
-        bool setupColor(VulkanSwapChain *swapChain, VulkanRenderPass *renderPass, VulkanDepthBuffer *depthBuffer);
-        bool setupDepth(VulkanSwapChain *swapChain, VulkanRenderPass *depthPass, VulkanDepthBuffer *depthBuffer);
+        bool setupColor(VulkanSwapChain *swapChain, VulkanRenderPass *renderPass, VulkanDepthBuffer *depthBuffer, uint64 sampleCount);
+        bool setupDepth(VulkanSwapChain *swapChain, VulkanRenderPass *depthPass, VulkanDepthBuffer *depthBuffer, uint64 sampleCount);
         bool setup(VulkanRenderPass *depthPass, VulkanDepthBuffer *depthBuffer);
 
         inline const VkFramebuffer getFrameBuffer()

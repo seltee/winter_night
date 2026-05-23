@@ -96,13 +96,6 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
         return false;
     }
 
-    swapChain = std::make_unique<VulkanSwapChain>(vulkanDevice.get());
-    if (!swapChain->setup(width, height, surface, !isImmidiateSwap))
-    {
-        std::cout << "Unable to create swap chain" << std::endl;
-        return false;
-    }
-
     vulkanUtils = std::make_unique<VulkanUtils>(
         vulkanDevice.get(),
         commandPool.get(),
@@ -114,38 +107,51 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
         return false;
     }
 
+    swapChain = std::make_unique<VulkanSwapChain>(vulkanUtils.get());
+    if (!swapChain->setup(width, height, surface, !isImmidiateSwap, MSAASampleCount))
+    {
+        std::cout << "Unable to create swap chain" << std::endl;
+        return false;
+    }
+
     renderPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
-    if (!renderPass->setupColor(swapChain->getImageFormat()))
+    if (!renderPass->setupColor(swapChain->getImageFormat(), vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount)))
     {
         std::cout << "Unable to create render pass" << std::endl;
         return false;
     }
 
     depthPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
-    if (!depthPass->setupDepth(true))
+    if (!depthPass->setupDepth(true, vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount)))
     {
         std::cout << "Unable to create depth pass" << std::endl;
         return false;
     }
 
-    vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get(), depthPass.get());
+    shadowDepthPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
+    if (!shadowDepthPass->setupDepth(true, 1))
+    {
+        std::cout << "Unable to create depth pass" << std::endl;
+        return false;
+    }
+    vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get(), depthPass.get(), shadowDepthPass.get(), MSAASampleCount);
 
     depthBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils.get());
-    if (!depthBuffer->setup(width, height, true))
+    if (!depthBuffer->setup(width, height, vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount), true))
     {
         std::cout << "unable to create depth buffer" << std::endl;
         return false;
     }
 
     frameColorBuffer = std::make_unique<VulkanFrameBuffer>(device);
-    if (!frameColorBuffer->setupColor(swapChain.get(), renderPass.get(), depthBuffer.get()))
+    if (!frameColorBuffer->setupColor(swapChain.get(), renderPass.get(), depthBuffer.get(), MSAASampleCount))
     {
         std::cout << "Unable to create vulkan frame buffer" << std::endl;
         return false;
     }
 
     frameDepthBuffer = std::make_unique<VulkanFrameBuffer>(device);
-    if (!frameDepthBuffer->setupDepth(swapChain.get(), depthPass.get(), depthBuffer.get()))
+    if (!frameDepthBuffer->setupDepth(swapChain.get(), depthPass.get(), depthBuffer.get(), MSAASampleCount))
     {
         std::cout << "Unable to create vulkan frame buffer" << std::endl;
         return false;
@@ -176,6 +182,7 @@ void VulkanInstance::changeSize()
     vulkanUtils->destroyPipelines();
     renderPass.reset();
     depthPass.reset();
+    shadowDepthPass.reset();
     depthBuffer.reset();
     swapChain.reset();
     vkDeviceWaitIdle(device);
@@ -185,44 +192,52 @@ void VulkanInstance::changeSize()
     width = caps.currentExtent.width;
     height = caps.currentExtent.height;
 
-    swapChain = std::make_unique<VulkanSwapChain>(vulkanDevice.get());
-    if (!swapChain->setup(width, height, surface, !isImmidiateSwap))
+    swapChain = std::make_unique<VulkanSwapChain>(vulkanUtils.get());
+    if (!swapChain->setup(width, height, surface, !isImmidiateSwap, MSAASampleCount))
     {
         std::cout << "Unable to create swap chain" << std::endl;
         throw std::runtime_error("failed to recreate swap chain");
     }
 
     renderPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
-    if (!renderPass->setupColor(swapChain->getImageFormat()))
+    if (!renderPass->setupColor(swapChain->getImageFormat(), vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount)))
     {
         std::cout << "Unable to create render pass" << std::endl;
         throw std::runtime_error("failed to recreate render pass");
     }
 
     depthPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
-    if (!depthPass->setupDepth(true))
+    if (!depthPass->setupDepth(true, vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount)))
     {
         std::cout << "Unable to create depth pass" << std::endl;
         throw std::runtime_error("failed to recreate depth pass");
     }
-    vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get(), depthPass.get());
+
+    shadowDepthPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
+    if (!shadowDepthPass->setupDepth(true, 1))
+    {
+        std::cout << "Unable to create shadow depth pass" << std::endl;
+        throw std::runtime_error("failed to recreate shadow depth pass");
+    }
+
+    vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get(), depthPass.get(), shadowDepthPass.get(), MSAASampleCount);
 
     depthBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils.get());
-    if (!depthBuffer->setup(width, height))
+    if (!depthBuffer->setup(width, height, vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount), true))
     {
         std::cout << "unable to create depth buffer" << std::endl;
         throw std::runtime_error("unable to create depth buffer");
     }
 
     frameColorBuffer = std::make_unique<VulkanFrameBuffer>(device);
-    if (!frameColorBuffer->setupColor(swapChain.get(), renderPass.get(), depthBuffer.get()))
+    if (!frameColorBuffer->setupColor(swapChain.get(), renderPass.get(), depthBuffer.get(), MSAASampleCount))
     {
         std::cout << "Unable to create vulkan frame buffer" << std::endl;
         throw std::runtime_error("failed to recreate swap chain");
     }
 
     frameDepthBuffer = std::make_unique<VulkanFrameBuffer>(device);
-    if (!frameDepthBuffer->setupDepth(swapChain.get(), depthPass.get(), depthBuffer.get()))
+    if (!frameDepthBuffer->setupDepth(swapChain.get(), depthPass.get(), depthBuffer.get(), MSAASampleCount))
     {
         std::cout << "Unable to create vulkan frame buffer" << std::endl;
         throw std::runtime_error("Unable to create vulkan frame buffer");
@@ -281,6 +296,12 @@ void VulkanInstance::finishRendering()
 void VulkanInstance::waitIdle()
 {
     vkQueueWaitIdle(vulkanUtils->getPresentQueue());
+}
+
+void VulkanInstance::updateMSAASampleCount(uint MSAASampleCount)
+{
+    this->MSAASampleCount = MSAASampleCount;
+    changeSize();
 }
 
 bool VulkanInstance::initInstance()

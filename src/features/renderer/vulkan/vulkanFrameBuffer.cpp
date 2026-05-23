@@ -30,23 +30,34 @@ VulkanFrameBuffer::~VulkanFrameBuffer()
     }
 }
 
-bool VulkanFrameBuffer::setupColor(VulkanSwapChain *swapChain, VulkanRenderPass *renderPass, VulkanDepthBuffer *depthBuffer)
+bool VulkanFrameBuffer::setupColor(VulkanSwapChain *swapChain, VulkanRenderPass *renderPass, VulkanDepthBuffer *depthBuffer, uint64 sampleCount)
 {
     auto swapChainImageViews = swapChain->getImageViews();
+    auto swapChainSampledImageViews = swapChain->getSampledImageViews();
     VkExtent2D *swapChainExtent = swapChain->getExtent();
 
     frameBuffers.resize(swapChainImageViews->size());
 
     for (size_t i = 0; i < swapChainImageViews->size(); i++)
     {
-        std::array<VkImageView, 2> attachments = {
-            swapChainImageViews->at(i)->getImageView(),
-            depthBuffer->getDepthImageView()};
+        std::array<VkImageView, 3> attachments{};
+
+        if (sampleCount == 1)
+        {
+            attachments[0] = swapChainImageViews->at(i)->getImageView();
+            attachments[1] = depthBuffer->getDepthImageView();
+        }
+        else
+        {
+            attachments[0] = swapChainSampledImageViews->at(i)->getImageView();
+            attachments[1] = depthBuffer->getDepthImageView();
+            attachments[2] = swapChainImageViews->at(i)->getImageView();
+        }
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         framebufferInfo.renderPass = renderPass->getRenderPass();
-        framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        framebufferInfo.attachmentCount = (sampleCount == 1) ? 2 : 3;
         framebufferInfo.pAttachments = attachments.data();
         framebufferInfo.width = swapChainExtent->width;
         framebufferInfo.height = swapChainExtent->height;
@@ -61,7 +72,7 @@ bool VulkanFrameBuffer::setupColor(VulkanSwapChain *swapChain, VulkanRenderPass 
     return true;
 }
 
-bool VulkanFrameBuffer::setupDepth(VulkanSwapChain *swapChain, VulkanRenderPass *depthPass, VulkanDepthBuffer *depthBuffer)
+bool VulkanFrameBuffer::setupDepth(VulkanSwapChain *swapChain, VulkanRenderPass *depthPass, VulkanDepthBuffer *depthBuffer, uint64 sampleCount)
 {
     auto swapChainImageViews = swapChain->getImageViews();
     VkExtent2D *swapChainExtent = swapChain->getExtent();
@@ -70,7 +81,7 @@ bool VulkanFrameBuffer::setupDepth(VulkanSwapChain *swapChain, VulkanRenderPass 
 
     for (size_t i = 0; i < swapChainImageViews->size(); i++)
     {
-        std::array<VkImageView, 1> attachments = {depthBuffer->getDepthImageView()};
+        std::array<VkImageView, 1> attachments = {attachments[0] = depthBuffer->getDepthImageView()};
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;

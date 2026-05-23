@@ -44,6 +44,8 @@ namespace wne
         void finishRendering();
         void waitIdle();
 
+        void updateMSAASampleCount(uint MSAASampleCount);
+
         VulkanUtils *getVulkanUtils()
         {
             return vulkanUtils.get();
@@ -74,6 +76,7 @@ namespace wne
 
         std::unique_ptr<VulkanRenderPass> renderPass = nullptr;
         std::unique_ptr<VulkanRenderPass> depthPass = nullptr;
+        std::unique_ptr<VulkanRenderPass> shadowDepthPass = nullptr;
         std::unique_ptr<VulkanFrameBuffer> frameColorBuffer = nullptr;
         std::unique_ptr<VulkanFrameBuffer> frameDepthBuffer = nullptr;
         std::unique_ptr<VulkanDepthBuffer> depthBuffer = nullptr;
@@ -91,5 +94,7 @@ namespace wne
         bool initNT(void *hWnd);
         bool init(VkSurfaceKHR surface);
         bool initInstance();
+
+        uint MSAASampleCount = 1;
     };
 }

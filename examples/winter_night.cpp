@@ -75,6 +75,7 @@ int main()
     window->setMouseCapture(true);
     auto renderer = window->getRenderer();
     renderer->setSyncState(false);
+    renderer->setMSAASampleCount(4);
 
     const std::vector<wne::VertexTextured> vertices = {
         {{-5.0f, -5.0f, 0.0f}, {0.0f, 1.0f}, {0, 0, -1.0f}},

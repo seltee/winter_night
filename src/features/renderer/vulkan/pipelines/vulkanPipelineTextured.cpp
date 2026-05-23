@@ -41,7 +41,7 @@ VkPipelineLayout VulkanPipelineTextured::getPipelineLayout()
     return pipelineLayout;
 }
 
-bool VulkanPipelineTextured::setupParametred(VulkanRenderPass *renderPass, bool enableLights, ColorBlending blending)
+bool VulkanPipelineTextured::setupParametred(VulkanRenderPass *renderPass, bool enableLights, ColorBlending blending, uint64 MSAASmapleCountBit)
 {
     if (!(enableLights ? buildShaderColor() : buildShaderColorNoLights()))
     {
@@ -64,7 +64,7 @@ bool VulkanPipelineTextured::setupParametred(VulkanRenderPass *renderPass, bool 
     }
 
     // if solid then it's solid stage and depth is prepared so op is equal
-    if (!buildPipeline(2, true, false, true, true, false, blending == ColorBlending::Solid, blending, renderPass))
+    if (!buildPipeline(2, true, false, true, true, false, blending == ColorBlending::Solid, MSAASmapleCountBit, blending, renderPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -73,7 +73,7 @@ bool VulkanPipelineTextured::setupParametred(VulkanRenderPass *renderPass, bool 
     return true;
 }
 
-bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass)
+bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass, uint64 MSAASmapleCountBit)
 {
     if (!buildShaderDepth())
     {
@@ -89,7 +89,7 @@ bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(1, false, true, true, false, false, false, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(1, false, true, true, false, false, false, MSAASmapleCountBit, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -98,7 +98,7 @@ bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass)
     return true;
 }
 
-bool VulkanPipelineTextured::setupMaskedDepth(VulkanRenderPass *depthPass)
+bool VulkanPipelineTextured::setupMaskedDepth(VulkanRenderPass *depthPass, uint64 MSAASmapleCountBit)
 {
     if (!buildShaderMaskedDepth())
     {
@@ -121,7 +121,7 @@ bool VulkanPipelineTextured::setupMaskedDepth(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(2, false, true, true, true, false, false, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(2, false, true, true, true, false, false, MSAASmapleCountBit, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -146,7 +146,7 @@ bool VulkanPipelineTextured::setupDepthShadow(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(1, false, true, true, false, false, false, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(1, false, true, true, false, false, false, 1, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -178,7 +178,7 @@ bool VulkanPipelineTextured::setupMaskedDepthShadow(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(2, false, true, true, true, false, false, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(2, false, true, true, true, false, false, 1, ColorBlending::Solid, depthPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -187,7 +187,7 @@ bool VulkanPipelineTextured::setupMaskedDepthShadow(VulkanRenderPass *depthPass)
     return true;
 }
 
-bool VulkanPipelineTextured::setupAtmosphere(VulkanRenderPass *renderPass)
+bool VulkanPipelineTextured::setupAtmosphere(VulkanRenderPass *renderPass, uint64 MSAASmapleCountBit)
 {
     if (!buildShaderAtmosphere())
     {
@@ -209,7 +209,7 @@ bool VulkanPipelineTextured::setupAtmosphere(VulkanRenderPass *renderPass)
         return false;
     }
 
-    if (!buildPipeline(2, true, false, false, true, true, false, ColorBlending::Solid, renderPass))
+    if (!buildPipeline(2, true, false, false, true, true, false, MSAASmapleCountBit, ColorBlending::Solid, renderPass))
     {
         std::cout << "Unable to build pipeline" << std::endl;
         return false;
@@ -296,6 +296,7 @@ bool VulkanPipelineTextured::buildPipeline(
     bool enableSampler,
     bool reverseFaceCooling,
     bool opEqual,
+    uint64 MSAASmapleCountBit,
     ColorBlending blending,
     VulkanRenderPass *renderPass)
 {
@@ -379,7 +380,7 @@ bool VulkanPipelineTextured::buildPipeline(
     VkPipelineMultisampleStateCreateInfo multisampling{};
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     multisampling.sampleShadingEnable = VK_FALSE;
-    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    multisampling.rasterizationSamples = (VkSampleCountFlagBits)MSAASmapleCountBit;
     multisampling.minSampleShading = 1.0f;          // Optional
     multisampling.pSampleMask = nullptr;            // Optional
     multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
@@ -511,5 +512,6 @@ bool VulkanPipelineTextured::buildPipeline(
     }
     if (graphicsPipeline == VK_NULL_HANDLE)
         std::cout << "Pipeline is null!" << std::endl;
+
     return true;
 }

@@ -29,7 +29,7 @@ void VulkanLightDirectional::renderShadows(Renderer *renderer, Scene *scene, Act
 {
     for (uint i = 0; i < amountOfCascades; i++)
     {
-        VulkanRenderPass *depthPass = vulkanUtils->getCurrentDepthPass();
+        VulkanRenderPass *depthPass = vulkanUtils->getShadowDepthPass();
         VulkanFrameBuffer *frameBuffer = getFrameBuffer(i);
 
         // current queue building state
@@ -121,6 +121,6 @@ void VulkanLightDirectional::destroyShadows()
 
 VulkanFrameBuffer *VulkanLightDirectional::getFrameBuffer(int cascade)
 {
-    VulkanRenderPass *depthPass = vulkanUtils->getCurrentDepthPass();
+    VulkanRenderPass *depthPass = vulkanUtils->getShadowDepthPass();
     return cascades[cascade]->getFrameBuffer(depthPass);
 }

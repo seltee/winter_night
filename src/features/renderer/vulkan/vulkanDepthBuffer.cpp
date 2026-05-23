@@ -19,7 +19,7 @@ VulkanDepthBuffer::~VulkanDepthBuffer()
         vkDestroyImage(device, depthImage, nullptr);
 }
 
-bool VulkanDepthBuffer::setup(uint16 width, uint16 height, bool isSampled)
+bool VulkanDepthBuffer::setup(uint16 width, uint16 height, uint64 sampledCountBit, bool isSampled)
 {
     this->width = width;
     this->height = height;
@@ -29,6 +29,7 @@ bool VulkanDepthBuffer::setup(uint16 width, uint16 height, bool isSampled)
             width,
             height,
             format,
+            sampledCountBit,
             VK_IMAGE_TILING_OPTIMAL,
             VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | (isSampled ? VK_IMAGE_USAGE_SAMPLED_BIT : 0),
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,

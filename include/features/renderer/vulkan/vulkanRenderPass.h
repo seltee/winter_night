@@ -13,8 +13,8 @@ namespace wne
         VulkanRenderPass(VulkanUtils *vulkanUtils);
         ~VulkanRenderPass();
 
-        bool setupColor(VulkanFormat imageFormat);
-        bool setupDepth(bool isSampled);
+        bool setupColor(VulkanFormat imageFormat, uint64 MSAASampleCountBit);
+        bool setupDepth(bool isSampled, uint64 MSAASampleCountBit);
         inline VkRenderPass getRenderPass()
         {
             return renderPass;

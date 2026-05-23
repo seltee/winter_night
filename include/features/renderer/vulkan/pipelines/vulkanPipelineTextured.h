@@ -24,12 +24,12 @@ namespace wne
         VkPipeline getGraphicsPipeline() override final;
         VkPipelineLayout getPipelineLayout() override final;
 
-        bool setupParametred(VulkanRenderPass *renderPass, bool enableLights, ColorBlending blending);
-        bool setupDepth(VulkanRenderPass *depthPass);
-        bool setupMaskedDepth(VulkanRenderPass *depthPass);
+        bool setupParametred(VulkanRenderPass *renderPass, bool enableLights, ColorBlending blending, uint64 MSAASmapleCountBit);
+        bool setupDepth(VulkanRenderPass *depthPass, uint64 MSAASmapleCountBit);
+        bool setupMaskedDepth(VulkanRenderPass *depthPass, uint64 MSAASmapleCountBit);
         bool setupDepthShadow(VulkanRenderPass *depthPass);
         bool setupMaskedDepthShadow(VulkanRenderPass *depthPass);
-        bool setupAtmosphere(VulkanRenderPass *renderPass);
+        bool setupAtmosphere(VulkanRenderPass *renderPass, uint64 MSAASmapleCountBit);
 
         VulkanDescriptorSetLayout *getDescriptorSetLayoutPipeline() override final;
         VulkanDescriptorSetLayout *getDescriptorSetLayoutSampler() override final;
@@ -48,6 +48,7 @@ namespace wne
             bool enableSampler,
             bool reverseFaceCooling,
             bool opEqual,
+            uint64 MSAASmapleCountBit,
             ColorBlending blending,
             VulkanRenderPass *renderPass);
 

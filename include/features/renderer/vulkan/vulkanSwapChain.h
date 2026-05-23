@@ -7,6 +7,7 @@
 
 namespace wne
 {
+    class VulkanUtils;
     typedef struct Extent
     {
         uint32 width;
@@ -16,9 +17,9 @@ namespace wne
     class VulkanSwapChain
     {
     public:
-        VulkanSwapChain(VulkanDevice *vulkanDevice);
+        VulkanSwapChain(VulkanUtils *vulkanUtils);
         ~VulkanSwapChain();
-        bool setup(int width, int height, VkSurfaceKHR surface, bool isImmidiateSwap);
+        bool setup(int width, int height, VkSurfaceKHR surface, bool isImmidiateSwap, uint MSAASampleCount);
 
         inline unsigned int getImageFormat()
         {
@@ -27,12 +28,17 @@ namespace wne
 
         inline VkExtent2D *getExtent()
         {
-            return (VkExtent2D*)&swapChainExtent;
+            return (VkExtent2D *)&swapChainExtent;
         }
 
         inline std::vector<std::unique_ptr<VulkanImageView>> *getImageViews()
         {
             return &swapChainImageViews;
+        }
+
+        inline std::vector<std::unique_ptr<wne::VulkanImageView>> *getSampledImageViews()
+        {
+            return &swapChainSampledImageViews;
         }
 
         inline VkSwapchainKHR getSwapChain()
@@ -43,8 +49,15 @@ namespace wne
         static bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface);
 
     protected:
-        VulkanDevice *vulkanDevice;
+        VulkanDevice *vulkanDevice = nullptr;
+        VulkanUtils *vulkanUtils = nullptr;
+
         std::vector<std::unique_ptr<VulkanImageView>> swapChainImageViews;
+
+        std::vector<VkImage> swapChainSampledImages;
+        std::vector<VkDeviceMemory> swapChainSampledMemory;
+        std::vector<std::unique_ptr<VulkanImageView>> swapChainSampledImageViews;
+
         VkSwapchainKHR swapChain = nullptr;
         unsigned int swapChainImageFormat;
         Extent swapChainExtent{};

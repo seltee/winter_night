@@ -37,18 +37,26 @@ namespace wne
         int64 findMemoryType(uint32 typeFilter, uint64 properties) noexcept;
         VulkanFormat findSupportedFormat(const std::vector<VulkanFormat> &candidates, VulkanImageTiling tiling, VulkanFormatFeatureFlags features) noexcept;
 
+        uint getMSAAUsableSampleCount();
+
         bool createBuffer(uint64 size, uint32 usage, uint32 properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
         bool copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint64 size);
         void transitionImageLayout(VkImage image, uint64 format, uint64 oldLayout, uint64 newLayout);
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width, uint32 height);
         void destroyPipelines();
-        bool rebuildPipelines(VulkanSwapChain *vulkanSwapChain, VulkanRenderPass *vulkanRenderPass, VulkanRenderPass *vulkanDepthPass);
+        bool rebuildPipelines(
+            VulkanSwapChain *vulkanSwapChain,
+            VulkanRenderPass *vulkanRenderPass,
+            VulkanRenderPass *vulkanDepthPass,
+            VulkanRenderPass *vulkanShadowDepthPass,
+            uint sampleCount);
         void updatePipelineShadowMaps();
 
         bool createImage(
             uint16 width,
             uint16 height,
             VulkanFormat format,
+            uint64 numSamples,
             VulkanImageTiling tiling,
             VulkanImageUsageFlags usage,
             VulkanMemoryPropertyFlagBits memoryFlags,
@@ -59,6 +67,8 @@ namespace wne
 
         VkCommandBuffer beginSingleTimeCommands();
         void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+
+        uint64 getVkSampleCountFlagBits(uint64 sampleCount);
 
         inline void swapSets()
         {
@@ -151,6 +161,11 @@ namespace wne
             return vulkanDepthPass;
         }
 
+        inline VulkanRenderPass *getShadowDepthPass()
+        {
+            return vulkanShadowDepthPass;
+        }
+
         inline VulkanShadowMaps *getShadowMaps()
         {
             return vulkanShadowMaps.get();
@@ -198,6 +213,7 @@ namespace wne
 
         VulkanRenderPass *vulkanRenderPass = nullptr;
         VulkanRenderPass *vulkanDepthPass = nullptr;
+        VulkanRenderPass *vulkanShadowDepthPass = nullptr;
 
         std::unique_ptr<VulkanTexture> dummyTexture;
     };
