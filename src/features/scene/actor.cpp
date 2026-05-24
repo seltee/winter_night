@@ -28,17 +28,9 @@ void Actor::renderColor()
 {
 }
 
-const Matrix4x4 &Actor::getModelMatrix()
+void Actor::modelMatrixChanged()
 {
-    if (isDirtyFlag)
-    {
-        isDirtyFlag = false;
-        isDirtyNormalsFlag = true;
-        Matrix4x4 newModel = Matrix4x4::translation(position);
-        newModel = newModel * asMatrix(rotation);
-        mModel = newModel * Matrix4x4::scale(scale);
-    }
-    return mModel;
+    isDirtyNormalsFlag = true;
 }
 
 const Matrix3x3 &Actor::getNormalMatrix()
@@ -50,11 +42,6 @@ const Matrix3x3 &Actor::getNormalMatrix()
         isDirtyNormalsFlag = false;
     }
     return mNormal;
-}
-
-Matrix4x4 Actor::getInvModelMatrix()
-{
-    return inverse(getModelMatrix());
 }
 
 Actor::RenderPass Actor::getRenderPass()

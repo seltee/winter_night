@@ -40,6 +40,7 @@ void VulkanLightDirectional::renderShadows(Renderer *renderer, Scene *scene, Act
         vulkanUtils->getCurrentCommandBuffer()->beginDepthPass(depthPass, frameBuffer->getFrameBuffer(), resolition, resolition);
         scene->renderDepthShadow();
         vulkanUtils->getCurrentCommandBuffer()->endPass();
+        vulkanUtils->getCurrentCommandBuffer()->addDepthImageBarrier(cascades[i]->getDepthBuffer()->getDepthImage());
     }
 }
 

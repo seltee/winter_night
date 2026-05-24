@@ -86,6 +86,7 @@ int main()
     auto actorBox2 = scene->createActor<wne::ActorMesh>(boxMesh);
     actorBox2->setMaterial(materialBox);
     actorBox2->setPosition(-20.0f, 8.0f, 4.0f);
+    actorBox2->setParent(actorMesh.get());
 
     auto actorTerrain = scene->createActor<wne::ActorTerrain>(100, 80.0f, 10.0f, imageBox);
     actorTerrain->setMaterial(materialBox);

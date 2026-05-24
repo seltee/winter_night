@@ -37,6 +37,7 @@ bool VulkanLightCascadeData::setup(uint32 resolution)
             std::cout << "unable to create depth buffer" << std::endl;
             return false;
         }
+        // To store mvp for each object to render
         const uint matrixBufferSize = sizeof(Matrix4x4) * VulkanObjectBuffers::AMOUNT_OF_OBJECTS;
         if (!vulkanUtils->createBuffer(
                 matrixBufferSize,
@@ -47,11 +48,12 @@ bool VulkanLightCascadeData::setup(uint32 resolution)
         {
             return false;
         }
-        vkMapMemory(vulkanUtils->getVulkanDevice()->getDevice(), frames[frameNum].objectBufferMVPMemory, 0, matrixBufferSize, 0, (void **)&(frames[frameNum].objectBufferMVPMapped));
+        vkMapMemory(
+            vulkanUtils->getVulkanDevice()->getDevice(),
+            frames[frameNum].objectBufferMVPMemory, 0,
+            matrixBufferSize, 0,
+            (void **)&(frames[frameNum].objectBufferMVPMapped));
     }
-
-    // To store mvp for each object to render
-
     return true;
 }
 

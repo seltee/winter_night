@@ -21,9 +21,23 @@ const Matrix4x4 &ActorSprite::getModelMatrix()
 {
     if (currentScene)
     {
-        Matrix4x4 newModel = Matrix4x4::translation(position);
-        newModel = newModel * Matrix4x4(lookAt(position, currentScene->getCameraActor()->getPosition()));
-        mModel = newModel * Matrix4x4::scale(scale);
+        if (parent)
+        {
+            Matrix4x4 translation = Matrix4x4::translation(position);
+            Matrix4x4 mPosition = parent->getModelMatrix() * translation;
+            Vector4 absolutePosition = mPosition * Vector4(0, 0, 0, 1.0f);
+            absolutePosition = absolutePosition / absolutePosition.w;
+
+            Matrix4x4 newModel = Matrix4x4::translation(absolutePosition);
+            newModel = newModel * Matrix4x4(lookAt(absolutePosition.xyz(), currentScene->getCameraActor()->getPosition()));
+            mModel = newModel * Matrix4x4::scale(scale);
+        }
+        else
+        {
+            Matrix4x4 newModel = Matrix4x4::translation(position);
+            newModel = newModel * Matrix4x4(lookAt(position, currentScene->getCameraActor()->getPosition()));
+            mModel = newModel * Matrix4x4::scale(scale);
+        }
     }
     return mModel;
 }
