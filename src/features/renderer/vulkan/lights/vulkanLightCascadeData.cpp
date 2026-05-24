@@ -37,6 +37,8 @@ bool VulkanLightCascadeData::setup(uint32 resolution)
             std::cout << "unable to create depth buffer" << std::endl;
             return false;
         }
+        frames[frameNum].vulkanDepthBuffer->transitionToDefined();
+
         // To store mvp for each object to render
         const uint matrixBufferSize = sizeof(Matrix4x4) * VulkanObjectBuffers::AMOUNT_OF_OBJECTS;
         if (!vulkanUtils->createBuffer(

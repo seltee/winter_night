@@ -31,16 +31,22 @@ void VulkanLightDirectional::renderShadows(Renderer *renderer, Scene *scene, Act
     {
         VulkanRenderPass *depthPass = vulkanUtils->getShadowDepthPass();
         VulkanFrameBuffer *frameBuffer = getFrameBuffer(i);
+        VkImage depthImage = cascades[i]->getDepthBuffer()->getDepthImage();
+        auto depthFormat = cascades[i]->getDepthBuffer()->getFormat();
 
         // current queue building state
         auto state = (VulkanRendererState *)renderer->getState();
         state->setViewProjectionMatrix(mVP);
         state->setVulkanLightCascadeData(cascades[i].get());
 
+        vulkanUtils->transitionImageLayout(
+            depthImage,
+            depthFormat,
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
         vulkanUtils->getCurrentCommandBuffer()->beginDepthPass(depthPass, frameBuffer->getFrameBuffer(), resolition, resolition);
         scene->renderDepthShadow();
         vulkanUtils->getCurrentCommandBuffer()->endPass();
-        vulkanUtils->getCurrentCommandBuffer()->addDepthImageBarrier(cascades[i]->getDepthBuffer()->getDepthImage());
     }
 }
 

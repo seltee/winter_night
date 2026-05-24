@@ -25,7 +25,6 @@ namespace wne
         void endCommandBuffer();
         void bindPipeline(VulkanPipeline *vulkanPipeline);
         void resetBuffer();
-        void addDepthImageBarrier(VkImage image);
 
         inline VkCommandBuffer getCommandBuffer()
         {
