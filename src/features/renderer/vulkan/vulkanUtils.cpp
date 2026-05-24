@@ -38,7 +38,14 @@ VulkanUtils::~VulkanUtils()
 bool VulkanUtils::setup()
 {
     vulkanSampler = std::make_unique<VulkanSampler>(this);
-    if (!vulkanSampler->setup())
+    if (!vulkanSampler->setup(true))
+    {
+        std::cout << "Unable to create sampler" << std::endl;
+        return false;
+    }
+
+    vulkanShadowSampler = std::make_unique<VulkanSampler>(this);
+    if (!vulkanShadowSampler->setup(false))
     {
         std::cout << "Unable to create sampler" << std::endl;
         return false;
@@ -321,7 +328,7 @@ bool VulkanUtils::rebuildPipelines(
 
 void VulkanUtils::updatePipelineShadowMaps()
 {
-    vulkanPipelines->updatePipelineShadowMaps(vulkanShadowMaps.get(), vulkanSampler.get());
+    vulkanPipelines->updatePipelineShadowMaps(vulkanShadowMaps.get(), vulkanShadowSampler.get());
 }
 
 bool VulkanUtils::createImage(

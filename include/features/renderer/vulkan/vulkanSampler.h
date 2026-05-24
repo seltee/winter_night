@@ -9,7 +9,7 @@ namespace wne
     public:
         VulkanSampler(VulkanUtils *vulkanUtils);
         ~VulkanSampler();
-        bool setup();
+        bool setup(bool UVRepeat);
 
         inline VkSampler getTextureSampler()
         {

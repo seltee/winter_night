@@ -110,6 +110,11 @@ namespace wne
             return vulkanSampler.get();
         }
 
+        inline VulkanSampler *getShadowSampler()
+        {
+            return vulkanShadowSampler.get();
+        }
+
         inline VulkanCommandBuffer *getCurrentCommandBuffer()
         {
             return currentCommandBuffer;
@@ -200,6 +205,7 @@ namespace wne
         std::unique_ptr<VulkanDescriptorPool> vulkanDescriptorPool;
         std::unique_ptr<VulkanObjectBuffers> vulkanObjectBuffers;
         std::unique_ptr<VulkanSampler> vulkanSampler;
+        std::unique_ptr<VulkanSampler> vulkanShadowSampler;
         std::unique_ptr<VulkanShadowMaps> vulkanShadowMaps;
 
         // pipelines

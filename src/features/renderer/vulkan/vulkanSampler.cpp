@@ -18,7 +18,7 @@ VulkanSampler::~VulkanSampler()
         vkDestroySampler(device, textureSampler, nullptr);
 }
 
-bool VulkanSampler::setup()
+bool VulkanSampler::setup(bool UVRepeat)
 {
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
     auto physicalDevice = vulkanUtils->getVulkanDevice()->getPhysicalDevice();
@@ -28,13 +28,15 @@ bool VulkanSampler::setup()
     VkPhysicalDeviceProperties properties{};
     vkGetPhysicalDeviceProperties(physicalDevice, &properties);
 
+    VkSamplerAddressMode addressMode = UVRepeat ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
     VkSamplerCreateInfo samplerInfo{};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
     samplerInfo.magFilter = VK_FILTER_LINEAR;
     samplerInfo.minFilter = VK_FILTER_LINEAR;
-    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeU = addressMode;
+    samplerInfo.addressModeV = addressMode;
+    samplerInfo.addressModeW = addressMode;
+    samplerInfo.borderColor = UVRepeat ? VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK : VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
     if (vulkanUtils->isAnisotropySupported())
     {
@@ -47,7 +49,6 @@ bool VulkanSampler::setup()
         samplerInfo.maxAnisotropy = 1.0f;
     }
 
-    samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
     samplerInfo.unnormalizedCoordinates = VK_FALSE;
     samplerInfo.compareEnable = VK_FALSE;
     // todo comparison might not be needed
