@@ -3,9 +3,9 @@
 #include "features/renderer/vulkan/vulkanShadowMaps.h"
 #include "features/renderer/vulkan/vulkanDepthBuffer.h"
 #include "features/renderer/vulkan/vulkanSampler.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 #include <array>
 #include <cmath>
 
@@ -90,13 +90,13 @@ bool VulkanPipelines::build(
     vulkanDescriptorSets = std::make_unique<VulkanDescriptorSets>(vulkanDevice, vulkanDescriptorPool, vulkanObjectBuffers);
     if (!vulkanDescriptorSets->setup(vulkanPipelineTexturedDepth.get(), vulkanPipelineTextured[val(LightState::Disabled)][val(ColorBlending::Solid)].get()))
     {
-        std::cout << "Unable to create vulkan descriptor sets" << std::endl;
+        Logger::log << "Unable to create vulkan descriptor sets" << endl;
         return false;
     }
 
     if (!status)
     {
-        std::cout << "Unable to create vulkan colored pipeline" << std::endl;
+        Logger::log << "Unable to create vulkan colored pipeline" << endl;
         return false;
     }
     return true;

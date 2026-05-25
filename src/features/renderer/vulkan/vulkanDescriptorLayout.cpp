@@ -1,8 +1,8 @@
 #include "features/renderer/vulkan/vulkanDescriptorLayout.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 
 using namespace wne;
 
@@ -33,7 +33,7 @@ bool VulkanDescriptorLayout::setup()
 
     if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
     {
-        std::cout << "failed to create descriptor set layout!" << std::endl;
+        Logger::log << "failed to create descriptor set layout!" << endl;
         return false;
     }
 

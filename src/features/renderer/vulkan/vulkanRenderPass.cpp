@@ -2,9 +2,9 @@
 #include "features/renderer/vulkan/vulkanDevice.h"
 #include "features/renderer/vulkan/vulkanDepthBuffer.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 #include <array>
 
 using namespace wne;
@@ -44,7 +44,7 @@ bool VulkanRenderPass::setupColor(VulkanFormat imageFormat, uint64 MSAASampleCou
     depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 
     VkAttachmentDescription depthAttachment{};
-    depthAttachment.format = (VkFormat)findDepthFormat(false);
+    depthAttachment.format = (VkFormat)vulkanUtils->findDepthFormat(false);
     depthAttachment.samples = (VkSampleCountFlagBits)MSAASampleCountBit;
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -95,7 +95,7 @@ bool VulkanRenderPass::setupColor(VulkanFormat imageFormat, uint64 MSAASampleCou
 
     if (vkCreateRenderPass(vulkanDevice->getDevice(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
     {
-        std::cout << "unable to create render pass" << std::endl;
+        Logger::log << "unable to create render pass" << endl;
         return false;
     }
     return true;
@@ -109,7 +109,7 @@ bool VulkanRenderPass::setupDepth(bool isSampled, uint64 MSAASampleCountBit)
     depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     VkAttachmentDescription depthAttachment{};
-    depthAttachment.format = (VkFormat)findDepthFormat(isSampled);
+    depthAttachment.format = (VkFormat)vulkanUtils->findDepthFormat(isSampled);
     depthAttachment.samples = (VkSampleCountFlagBits)MSAASampleCountBit;
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -145,17 +145,9 @@ bool VulkanRenderPass::setupDepth(bool isSampled, uint64 MSAASampleCountBit)
 
     if (vkCreateRenderPass(vulkanDevice->getDevice(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
     {
-        std::cout << "unable to create render pass" << std::endl;
+        Logger::log << "unable to create render pass" << endl;
         return false;
     }
 
     return true;
-}
-
-VulkanFormat VulkanRenderPass::findDepthFormat(bool isSampled)
-{
-    return vulkanUtils->findSupportedFormat(
-        {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
-        VK_IMAGE_TILING_OPTIMAL,
-        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 }

@@ -1,6 +1,6 @@
 #include "features/data/imageAtmo.h"
 #include "features/loaders/stb_image.h"
-#include <iostream>
+#include "features/logger/logger.h"
 #include <memory>
 
 using namespace wne;
@@ -31,12 +31,12 @@ std::shared_ptr<ImageAtmo> ImageAtmo::create(const std::string &path, uint blure
     uint8 *data = stbi_load(path.c_str(), &width, &height, &bytesPerPixel, 4);
     if (!data)
     {
-        std::cout << "Image loading failed: " << stbi_failure_reason() << std::endl;
+        Logger::log << "Image loading failed: " << stbi_failure_reason() << endl;
         return nullptr;
     }
     if (width <= 0 || height <= 0)
     {
-        std::cout << "Image loading failed: wrong image dimensions" << std::endl;
+        Logger::log << "Image loading failed: wrong image dimensions" << endl;
         return nullptr;
     }
 

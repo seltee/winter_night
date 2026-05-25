@@ -5,9 +5,9 @@
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 #include <array>
 
 using namespace wne;
@@ -38,7 +38,7 @@ bool VulkanFrame::setup(
     commandBuffer = new VulkanCommandBuffer(vulkanDevice, commandPool);
     if (!commandBuffer->setup())
     {
-        std::cout << "Unable to create vulkan command buffer" << std::endl;
+        Logger::log << "Unable to create vulkan command buffer" << endl;
         return false;
     }
 
@@ -51,7 +51,7 @@ bool VulkanFrame::setup(
         vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS ||
         vkCreateFence(device, &fenceInfo, nullptr, &inFlightFence) != VK_SUCCESS)
     {
-        std::cout << "failed to create semaphores!" << std::endl;
+        Logger::log << "failed to create semaphores!" << endl;
         return false;
     }
 
@@ -112,7 +112,7 @@ void VulkanFrame::finishFrame(VkQueue graphicsQueue, VkQueue presentQueue)
     if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFence) != VK_SUCCESS)
     {
         // todo handle this error
-        std::cout << "failed to submit draw command buffer!" << std::endl;
+        Logger::log << "failed to submit draw command buffer!" << endl;
         return;
     }
 

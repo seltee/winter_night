@@ -1,5 +1,6 @@
 #include "features/renderer/vulkan/vulkanDepthBuffer.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 
@@ -23,7 +24,7 @@ bool VulkanDepthBuffer::setup(uint16 width, uint16 height, uint64 sampledCountBi
 {
     this->width = width;
     this->height = height;
-    format = findDepthFormat(isSampled);
+    format = vulkanUtils->findDepthFormat(isSampled);
 
     if (!vulkanUtils->createImage(
             width,
@@ -35,7 +36,7 @@ bool VulkanDepthBuffer::setup(uint16 width, uint16 height, uint64 sampledCountBi
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
             &depthImage, &depthImageMemory))
     {
-        std::cout << "Failed to create depth buffer image" << std::endl;
+        Logger::log << "Failed to create depth buffer image" << endl;
         return false;
     }
 
@@ -46,14 +47,6 @@ bool VulkanDepthBuffer::setup(uint16 width, uint16 height, uint64 sampledCountBi
 void VulkanDepthBuffer::transitionToDefined()
 {
     vulkanUtils->transitionImageLayout(depthImage, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
-}
-
-VulkanFormat VulkanDepthBuffer::findDepthFormat(bool isSampled)
-{
-    return vulkanUtils->findSupportedFormat(
-        {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
-        VK_IMAGE_TILING_OPTIMAL,
-        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | (isSampled ? VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT : 0));
 }
 
 bool VulkanDepthBuffer::hasStencilComponent(VulkanFormat format)

@@ -32,12 +32,6 @@ FBXGeometry::FBXGeometry(FBXNode &node)
 
     if (elementNormalsNode)
     {
-        /*
-        std::cout << "Normals" << std::endl;
-        for (auto &node : elementNormalsNode->getChildren())
-            std::cout << node->getName() << std::endl;
-        */
-
         FBXNode *normalsNode = elementNormalsNode->findNode("Normals");
         FBXNode *normalIndicesNode = elementNormalsNode->findNode("NormalsIndex");
 

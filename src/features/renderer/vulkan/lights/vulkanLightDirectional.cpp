@@ -5,6 +5,7 @@
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanRendererState.h"
 #include "features/renderer/vulkan/rendererVulkanNT.h"
+#include "features/logger/logger.h"
 #include "features/renderer/renderer.h"
 #include "features/scene/scene.h"
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -62,7 +63,7 @@ bool VulkanLightDirectional::enableShadows(uint amountOfCascades, uint resolitio
         cascades[i] = std::make_unique<VulkanLightCascadeData>(vulkanUtils);
         if (!cascades[i]->setup(resolition))
         {
-            std::cout << "unable to create depth buffer" << std::endl;
+            Logger::log << "unable to create depth buffer" << endl;
             return false;
         }
     }
@@ -114,7 +115,7 @@ std::shared_ptr<Texture> VulkanLightDirectional::getCascadeAsTexture(int numOfCa
     std::shared_ptr<VulkanTexture> texture = std::make_shared<VulkanTexture>(vulkanUtils);
     if (!texture->setup(depthBuffer->getDepthImageView()))
     {
-        std::cout << "Unable to create texture from image view for shadow cascade" << std::endl;
+        Logger::log << "Unable to create texture from image view for shadow cascade" << endl;
         return nullptr;
     }
     return texture;

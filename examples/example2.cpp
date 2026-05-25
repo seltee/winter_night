@@ -1,6 +1,5 @@
 #include "engine.h"
 #include <stdio.h>
-#include <iostream>
 
 // Iterations
 constexpr int iterations = 1'000'000'000; // 1kkk
@@ -26,7 +25,7 @@ void benchInverse4x4(wne::Matrix4x4 m);
 
 int main()
 {
-    std::cout << "Math tests" << std::endl;
+    wne::Logger::log << "Math tests" << wne::endl;
 
     // Dot benches
     benchDotVec2();
@@ -82,7 +81,7 @@ void benchDotVec2()
     wne::Vector2 va(1.0f, 2.0f);
     wne::Vector2 vb(2.0f, 1.0f);
 
-    std::cout << "Vec2 dot bench" << std::endl;
+    wne::Logger::log << "Vec2 dot bench" << wne::endl;
     {
         float result = 0.0f;
         auto start = std::chrono::high_resolution_clock::now();
@@ -95,7 +94,7 @@ void benchDotVec2()
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "wne dot: " << diff.count() << " s\n";
+        wne::Logger::log << "wne dot: " << diff.count() << " s" << wne::endl;
     }
 }
 
@@ -104,7 +103,7 @@ void benchDotVec3()
     wne::Vector3 va(1.0f, 2.0f, 1.0f);
     wne::Vector3 vb(2.0f, 1.0f, 0.0f);
 
-    std::cout << "Vec3 dot bench" << std::endl;
+    wne::Logger::log << "Vec3 dot bench" << wne::endl;
     {
         float result = 0.0f;
         auto start = std::chrono::high_resolution_clock::now();
@@ -118,7 +117,7 @@ void benchDotVec3()
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "wne dot: " << diff.count() << " s\n";
+        wne::Logger::log << "wne dot: " << diff.count() << " s" << wne::endl;
     }
 }
 
@@ -127,7 +126,7 @@ void benchDotVec4()
     wne::Vector4 va(1.0f, 2.0f, 1.0f, 4.0f);
     wne::Vector4 vb(2.0f, 1.0f, 0.0f, -2.0f);
 
-    std::cout << "Vec4 dot bench" << std::endl;
+    wne::Logger::log << "Vec4 dot bench" << wne::endl;
     {
         float result = 0.0f;
         auto start = std::chrono::high_resolution_clock::now();
@@ -142,7 +141,7 @@ void benchDotVec4()
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "wne dot: " << diff.count() << " s\n";
+        wne::Logger::log << "wne dot: " << diff.count() << " s" << wne::endl;
     }
 }
 
@@ -151,7 +150,7 @@ void benchCross()
     wne::Vector3 va(1.0f, 2.0f, 1.0f);
     wne::Vector3 vb(2.0f, 1.0f, -1.0f);
 
-    std::cout << "Cross bench" << std::endl;
+    wne::Logger::log << "Cross bench" << wne::endl;
     {
         wne::Vector3 result;
         auto start = std::chrono::high_resolution_clock::now();
@@ -164,13 +163,13 @@ void benchCross()
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "Result: " << diff.count() << " s\n";
+        wne::Logger::log << "Result: " << diff.count() << " s" << wne::endl;
     }
 }
 
 void benchMult3x3(wne::Matrix3x3 ma, wne::Matrix3x3 mb)
 {
-    std::cout << "Mul Matrix 3x3 bench" << std::endl;
+    wne::Logger::log << "Mul Matrix 3x3 bench" << wne::endl;
     {
         wne::Matrix3x3 result;
         auto start = std::chrono::high_resolution_clock::now();
@@ -181,13 +180,13 @@ void benchMult3x3(wne::Matrix3x3 ma, wne::Matrix3x3 mb)
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "Result: " << diff.count() << " s\n";
+        wne::Logger::log << "Result: " << diff.count() << " s" << wne::endl;
     }
 }
 
 void benchMult4x4(wne::Matrix4x4 ma, wne::Matrix4x4 mb)
 {
-    std::cout << "Mul Matrix 4x4 bench" << std::endl;
+    wne::Logger::log << "Mul Matrix 4x4 bench" << wne::endl;
     {
         wne::Matrix4x4 result;
         auto start = std::chrono::high_resolution_clock::now();
@@ -198,13 +197,13 @@ void benchMult4x4(wne::Matrix4x4 ma, wne::Matrix4x4 mb)
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "Result: " << diff.count() << " s\n";
+        wne::Logger::log << "Result: " << diff.count() << " s" << wne::endl;
     }
 }
 
 void benchDet3x3(wne::Matrix3x3 m)
 {
-    std::cout << "Det Matrix 3x3 bench" << std::endl;
+    wne::Logger::log << "Det Matrix 3x3 bench" << wne::endl;
     {
         float result;
         auto start = std::chrono::high_resolution_clock::now();
@@ -215,13 +214,13 @@ void benchDet3x3(wne::Matrix3x3 m)
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "Result: " << diff.count() << " s\n";
+        wne::Logger::log << "Result: " << diff.count() << " s" << wne::endl;
     }
 }
 
 void benchDet4x4(wne::Matrix4x4 m)
 {
-    std::cout << "Det Matrix 4x4 bench" << std::endl;
+    wne::Logger::log << "Det Matrix 4x4 bench" << wne::endl;
     {
         float result;
         auto start = std::chrono::high_resolution_clock::now();
@@ -232,13 +231,13 @@ void benchDet4x4(wne::Matrix4x4 m)
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "Result: " << diff.count() << " s\n";
+        wne::Logger::log << "Result: " << diff.count() << " s" << wne::endl;
     }
 }
 
 void benchInverse3x3(wne::Matrix3x3 m)
 {
-    std::cout << "Inverse Matrix 3x3 bench" << std::endl;
+    wne::Logger::log << "Inverse Matrix 3x3 bench" << wne::endl;
     {
         auto start = std::chrono::high_resolution_clock::now();
         wne::Matrix3x3 result = wne::Matrix3x3::identity();
@@ -249,13 +248,13 @@ void benchInverse3x3(wne::Matrix3x3 m)
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "Result: " << diff.count() << " s\n";
+        wne::Logger::log << "Result: " << diff.count() << " s" << wne::endl;
     }
 }
 
 void benchInverse4x4(wne::Matrix4x4 m)
 {
-    std::cout << "Inverse Matrix 4x4 bench" << std::endl;
+    wne::Logger::log << "Inverse Matrix 4x4 bench" << wne::endl;
     {
         wne::Matrix4x4 result = wne::Matrix4x4::identity();
         auto start = std::chrono::high_resolution_clock::now();
@@ -266,6 +265,6 @@ void benchInverse4x4(wne::Matrix4x4 m)
         auto end = std::chrono::high_resolution_clock::now();
         doNotOptimize(result);
         std::chrono::duration<double> diff = end - start;
-        std::cout << "Result: " << diff.count() << " s\n";
+        wne::Logger::log << "Result: " << diff.count() << " s" << wne::endl;
     }
 }

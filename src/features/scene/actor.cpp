@@ -1,7 +1,7 @@
 #include "features/scene/actor.h"
 #include "features/renderer/renderer.h"
+#include "features/logger/logger.h"
 #include <memory>
-#include <iostream>
 
 using namespace wne;
 
@@ -53,7 +53,7 @@ void Actor::setScene(Scene *scene)
 {
     if (currentScene && scene && (scene->getRenderer() != currentScene->getRenderer()))
     {
-        std::cout << "Error: you can't change actor's scene to a scene with a different renderer" << std::endl;
+        Logger::log << "Error: you can't change actor's scene to a scene with a different renderer" << endl;
         return;
     }
     Scene *oldScene = this->currentScene;

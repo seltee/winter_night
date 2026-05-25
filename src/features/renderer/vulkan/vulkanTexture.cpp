@@ -1,8 +1,8 @@
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 
 using namespace wne;
 
@@ -30,7 +30,7 @@ bool VulkanTexture::setup(void *pixels, uint32 width, uint32 height)
             stagingBuffer,
             stagingBufferMemory))
     {
-        std::cout << "failed to create texture buffer" << std::endl;
+        Logger::log << "failed to create texture buffer" << endl;
         return false;
     }
     void *bufferData;
@@ -48,7 +48,7 @@ bool VulkanTexture::setup(void *pixels, uint32 width, uint32 height)
             &textureImage,
             &textureImageMemory))
     {
-        std::cout << "failed to create image" << std::endl;
+        Logger::log << "failed to create image" << endl;
         return false;
     }
 
@@ -64,7 +64,7 @@ bool VulkanTexture::setup(void *pixels, uint32 width, uint32 height)
     vulkanImageView = std::make_unique<VulkanImageView>(vulkanUtils->getVulkanDevice());
     if (!vulkanImageView->setup(textureImage, VK_FORMAT_R8G8B8A8_SRGB))
     {
-        std::cout << "failed to create image view" << std::endl;
+        Logger::log << "failed to create image view" << endl;
         return false;
     }
     imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -76,7 +76,7 @@ bool VulkanTexture::setup(VkImageView vkImageView)
     vulkanImageView = std::make_unique<VulkanImageView>(vulkanUtils->getVulkanDevice());
     if (!vulkanImageView->setup(vkImageView))
     {
-        std::cout << "failed to create image view" << std::endl;
+        Logger::log << "failed to create image view" << endl;
         return false;
     }
     imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
@@ -88,7 +88,7 @@ std::shared_ptr<VulkanTexture> VulkanTexture::create(std::shared_ptr<Image> imag
     auto texture = std::make_shared<VulkanTexture>(vulkanUtils);
     if (!texture->setup(image->getImageData(), image->getWidth(), image->getHeight()))
     {
-        std::cout << "failed to make texture" << std::endl;
+        Logger::log << "failed to make texture" << endl;
         return nullptr;
     }
     return texture;

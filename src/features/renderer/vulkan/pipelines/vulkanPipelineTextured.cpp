@@ -3,11 +3,11 @@
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanDescriptorLayout.h"
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
+#include "features/logger/logger.h"
 #include "core/data.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <vector>
-#include <iostream>
 #include <array>
 
 using namespace wne;
@@ -45,28 +45,28 @@ bool VulkanPipelineTextured::setupParametred(VulkanRenderPass *renderPass, bool 
 {
     if (!(enableLights ? buildShaderColor() : buildShaderColorNoLights()))
     {
-        std::cout << "Unable to build shader" << std::endl;
+        Logger::log << "Unable to build shader" << endl;
         return false;
     }
 
     descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
     if (!descriptorSetLayoutPipeline->setupTexturedColor())
     {
-        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        Logger::log << "Unable to setup textured color pipeline" << endl;
         return false;
     }
 
     descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
     if (!descriptorSetLayoutSampler->setupSampler())
     {
-        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        Logger::log << "Unable to setup textured color pipeline" << endl;
         return false;
     }
 
     // if solid then it's solid stage and depth is prepared so op is equal
     if (!buildPipeline(2, true, false, true, true, false, blending == ColorBlending::Solid, MSAASmapleCountBit, blending, renderPass))
     {
-        std::cout << "Unable to build pipeline" << std::endl;
+        Logger::log << "Unable to build pipeline" << endl;
         return false;
     }
 
@@ -77,21 +77,21 @@ bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass, uint64 MSAA
 {
     if (!buildShaderDepth())
     {
-        std::cout << "Unable to build shader" << std::endl;
+        Logger::log << "Unable to build shader" << endl;
         return false;
     }
 
     descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
     if (!descriptorSetLayoutPipeline->setupTexturedDepth())
     {
-        std::cout << "Unable to setup textured depth pipeline" << std::endl;
+        Logger::log << "Unable to setup textured depth pipeline" << endl;
         return false;
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
     if (!buildPipeline(1, false, true, true, false, false, false, MSAASmapleCountBit, ColorBlending::Solid, depthPass))
     {
-        std::cout << "Unable to build pipeline" << std::endl;
+        Logger::log << "Unable to build pipeline" << endl;
         return false;
     }
 
@@ -102,28 +102,28 @@ bool VulkanPipelineTextured::setupMaskedDepth(VulkanRenderPass *depthPass, uint6
 {
     if (!buildShaderMaskedDepth())
     {
-        std::cout << "Unable to build shader" << std::endl;
+        Logger::log << "Unable to build shader" << endl;
         return false;
     }
 
     descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
     if (!descriptorSetLayoutPipeline->setupTexturedDepth())
     {
-        std::cout << "Unable to setup textured depth pipeline" << std::endl;
+        Logger::log << "Unable to setup textured depth pipeline" << endl;
         return false;
     }
 
     descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
     if (!descriptorSetLayoutSampler->setupSampler())
     {
-        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        Logger::log << "Unable to setup textured color pipeline" << endl;
         return false;
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
     if (!buildPipeline(2, false, true, true, true, false, false, MSAASmapleCountBit, ColorBlending::Solid, depthPass))
     {
-        std::cout << "Unable to build pipeline" << std::endl;
+        Logger::log << "Unable to build pipeline" << endl;
         return false;
     }
 
@@ -134,21 +134,21 @@ bool VulkanPipelineTextured::setupDepthShadow(VulkanRenderPass *depthPass)
 {
     if (!buildShaderDepth())
     {
-        std::cout << "Unable to build shader" << std::endl;
+        Logger::log << "Unable to build shader" << endl;
         return false;
     }
 
     descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
     if (!descriptorSetLayoutPipeline->setupTexturedDepth())
     {
-        std::cout << "Unable to setup textured depth pipeline" << std::endl;
+        Logger::log << "Unable to setup textured depth pipeline" << endl;
         return false;
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
     if (!buildPipeline(1, false, true, true, false, false, false, 1, ColorBlending::Solid, depthPass))
     {
-        std::cout << "Unable to build pipeline" << std::endl;
+        Logger::log << "Unable to build pipeline" << endl;
         return false;
     }
 
@@ -159,28 +159,28 @@ bool VulkanPipelineTextured::setupMaskedDepthShadow(VulkanRenderPass *depthPass)
 {
     if (!buildShaderMaskedDepth())
     {
-        std::cout << "Unable to build shader" << std::endl;
+        Logger::log << "Unable to build shader" << endl;
         return false;
     }
 
     descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
     if (!descriptorSetLayoutPipeline->setupTexturedDepth())
     {
-        std::cout << "Unable to setup textured depth pipeline" << std::endl;
+        Logger::log << "Unable to setup textured depth pipeline" << endl;
         return false;
     }
 
     descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
     if (!descriptorSetLayoutSampler->setupSampler())
     {
-        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        Logger::log << "Unable to setup textured color pipeline" << endl;
         return false;
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
     if (!buildPipeline(2, false, true, true, true, false, false, 1, ColorBlending::Solid, depthPass))
     {
-        std::cout << "Unable to build pipeline" << std::endl;
+        Logger::log << "Unable to build pipeline" << endl;
         return false;
     }
 
@@ -191,27 +191,27 @@ bool VulkanPipelineTextured::setupAtmosphere(VulkanRenderPass *renderPass, uint6
 {
     if (!buildShaderAtmosphere())
     {
-        std::cout << "Unable to build shader" << std::endl;
+        Logger::log << "Unable to build shader" << endl;
         return false;
     }
 
     descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
     if (!descriptorSetLayoutPipeline->setupTexturedColor())
     {
-        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        Logger::log << "Unable to setup textured color pipeline" << endl;
         return false;
     }
 
     descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
     if (!descriptorSetLayoutSampler->setupSampler())
     {
-        std::cout << "Unable to setup textured color pipeline" << std::endl;
+        Logger::log << "Unable to setup textured color pipeline" << endl;
         return false;
     }
 
     if (!buildPipeline(2, true, false, false, true, true, false, MSAASmapleCountBit, ColorBlending::Solid, renderPass))
     {
-        std::cout << "Unable to build pipeline" << std::endl;
+        Logger::log << "Unable to build pipeline" << endl;
         return false;
     }
 
@@ -234,7 +234,7 @@ bool VulkanPipelineTextured::buildShaderColor()
     shader = std::make_unique<VulkanShader>();
     if (!shader->makeFromFiles("./shaders/shaderTextured.vert.spv", "./shaders/shaderTextured.frag.spv", device))
     {
-        std::cout << "Unable to compile textured shader" << std::endl;
+        Logger::log << "Unable to compile textured shader" << endl;
         return false;
     }
     return true;
@@ -246,7 +246,7 @@ bool VulkanPipelineTextured::buildShaderColorNoLights()
     shader = std::make_unique<VulkanShader>();
     if (!shader->makeFromFiles("./shaders/shaderTexturedNoLight.vert.spv", "./shaders/shaderTexturedNoLight.frag.spv", device))
     {
-        std::cout << "Unable to compile textured shader" << std::endl;
+        Logger::log << "Unable to compile textured shader" << endl;
         return false;
     }
     return true;
@@ -258,7 +258,7 @@ bool VulkanPipelineTextured::buildShaderDepth()
     shader = std::make_unique<VulkanShader>();
     if (!shader->makeFromFiles("./shaders/shaderTexturedDepth.vert.spv", "./shaders/shaderTexturedDepth.frag.spv", device))
     {
-        std::cout << "Unable to compile textured shader" << std::endl;
+        Logger::log << "Unable to compile textured shader" << endl;
         return false;
     }
     return true;
@@ -270,7 +270,7 @@ bool VulkanPipelineTextured::buildShaderMaskedDepth()
     shader = std::make_unique<VulkanShader>();
     if (!shader->makeFromFiles("./shaders/shaderTexturedDepth.vert.spv", "./shaders/shaderTexturedMaskedDepth.frag.spv", device))
     {
-        std::cout << "Unable to compile textured shader" << std::endl;
+        Logger::log << "Unable to compile textured shader" << endl;
         return false;
     }
     return true;
@@ -282,7 +282,7 @@ bool VulkanPipelineTextured::buildShaderAtmosphere()
     shader = std::make_unique<VulkanShader>();
     if (!shader->makeFromFiles("./shaders/shaderAtmosphere.vert.spv", "./shaders/shaderAtmosphere.frag.spv", device))
     {
-        std::cout << "Unable to compile textured shader" << std::endl;
+        Logger::log << "Unable to compile textured shader" << endl;
         return false;
     }
     return true;
@@ -453,7 +453,7 @@ bool VulkanPipelineTextured::buildPipeline(
 
         if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
         {
-            std::cout << "unable to create pipeline layout" << std::endl;
+            Logger::log << "unable to create pipeline layout" << endl;
             return false;
         }
     }
@@ -470,7 +470,7 @@ bool VulkanPipelineTextured::buildPipeline(
 
         if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
         {
-            std::cout << "unable to create pipeline layout" << std::endl;
+            Logger::log << "unable to create pipeline layout" << endl;
             return false;
         }
     }
@@ -507,11 +507,11 @@ bool VulkanPipelineTextured::buildPipeline(
 
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
     {
-        std::cout << "Unable to create graphics pipeline" << std::endl;
+        Logger::log << "Unable to create graphics pipeline" << endl;
         return false;
     }
     if (graphicsPipeline == VK_NULL_HANDLE)
-        std::cout << "Pipeline is null!" << std::endl;
+        Logger::log << "Pipeline is null!" << endl;
 
     return true;
 }

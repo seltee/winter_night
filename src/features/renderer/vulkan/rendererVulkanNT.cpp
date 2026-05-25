@@ -53,8 +53,6 @@ void RendererVulkanNT::update(float delta)
 void RendererVulkanNT::render()
 {
     instance->startRendering();
-    for (const auto &scene : scenes)
-        scene->renderShadows();
 
     instance->beginDepthPass();
     for (const auto &scene : scenes)
@@ -64,6 +62,9 @@ void RendererVulkanNT::render()
         scene->renderDepth();
     }
     instance->finishDepthPass();
+
+    for (const auto &scene : scenes)
+        scene->renderShadows();
 
     instance->getVulkanUtils()->updatePipelineShadowMaps();
     instance->beginRenderPass();

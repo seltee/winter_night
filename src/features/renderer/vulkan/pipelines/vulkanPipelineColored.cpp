@@ -3,11 +3,11 @@
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanDescriptorLayout.h"
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
+#include "features/logger/logger.h"
 #include "core/data.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <vector>
-#include <iostream>
 #include <array>
 
 using namespace wne;
@@ -55,13 +55,13 @@ bool VulkanPipelineColored::setupColor(
 
     if (!buildShader())
     {
-        std::cout << "Unable to build shader" << std::endl;
+        Logger::log << "Unable to build shader" << endl;
         return false;
     }
 
     if (!createLayouts())
     {
-        std::cout << "Unable to create layouts" << std::endl;
+        Logger::log << "Unable to create layouts" << endl;
         return false;
     }
 
@@ -185,7 +185,7 @@ bool VulkanPipelineColored::setupColor(
 
     if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)
     {
-        std::cout << "unable to create descriptor set" << std::endl;
+        Logger::log << "unable to create descriptor set" << endl;
         return false;
     }
     updateDescriptorSet(vulkanObjectBuffers);
@@ -199,7 +199,7 @@ bool VulkanPipelineColored::setupColor(
 
     if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
     {
-        std::cout << "unable to create pipeline layout" << std::endl;
+        Logger::log << "unable to create pipeline layout" << endl;
         return false;
     }
 
@@ -237,11 +237,11 @@ bool VulkanPipelineColored::setupColor(
 
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
     {
-        std::cout << "Unable to create graphics pipeline" << std::endl;
+        Logger::log << "Unable to create graphics pipeline" << endl;
         return false;
     }
     if (graphicsPipeline == VK_NULL_HANDLE)
-        std::cout << "Pipeline is null!" << std::endl;
+        Logger::log << "Pipeline is null!" << endl;
     return true;
 }
 
@@ -254,13 +254,13 @@ bool VulkanPipelineColored::setupDepth(
 
     if (!buildShader())
     {
-        std::cout << "Unable to build shader" << std::endl;
+        Logger::log << "Unable to build shader" << endl;
         return false;
     }
 
     if (!createLayouts())
     {
-        std::cout << "Unable to create layouts" << std::endl;
+        Logger::log << "Unable to create layouts" << endl;
         return false;
     }
 
@@ -384,7 +384,7 @@ bool VulkanPipelineColored::setupDepth(
 
     if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)
     {
-        std::cout << "unable to create descriptor set" << std::endl;
+        Logger::log << "unable to create descriptor set" << endl;
         return false;
     }
     updateDescriptorSet(vulkanObjectBuffers);
@@ -398,7 +398,7 @@ bool VulkanPipelineColored::setupDepth(
 
     if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
     {
-        std::cout << "unable to create pipeline layout" << std::endl;
+        Logger::log << "unable to create pipeline layout" << endl;
         return false;
     }
 
@@ -436,11 +436,11 @@ bool VulkanPipelineColored::setupDepth(
 
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
     {
-        std::cout << "Unable to create graphics pipeline" << std::endl;
+        Logger::log << "Unable to create graphics pipeline" << endl;
         return false;
     }
     if (graphicsPipeline == VK_NULL_HANDLE)
-        std::cout << "Pipeline is null!" << std::endl;
+        Logger::log << "Pipeline is null!" << endl;
     return true;
 }
 
@@ -518,7 +518,7 @@ bool VulkanPipelineColored::buildShader()
     shader = std::make_unique<VulkanShader>();
     if (!shader->makeFromFiles("./shaders/shaderColored.vert.spv", "./shaders/shaderColored.frag.spv", device))
     {
-        std::cout << "Unable to compile colored shader" << std::endl;
+        Logger::log << "Unable to compile colored shader" << endl;
         return false;
     }
     return true;
@@ -571,7 +571,7 @@ bool VulkanPipelineColored::createLayouts()
 
     if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayoutPipeline) != VK_SUCCESS)
     {
-        std::cout << "failed to create descriptor set layout!" << std::endl;
+        Logger::log << "failed to create descriptor set layout!" << endl;
         return false;
     }
     return true;

@@ -1,11 +1,11 @@
 #include "features/renderer/vulkan/vulkanInstance.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <vector>
 #include <set>
 #include <optional>
 #include <algorithm>
-#include <iostream>
 
 using namespace wne;
 
@@ -38,7 +38,7 @@ bool VulkanInstance::initNT(void *hWnd)
 {
     if (!initInstance())
     {
-        std::cout << "Unable to init instance" << std::endl;
+        Logger::log << "Unable to init instance" << endl;
         return false;
     }
 
@@ -51,8 +51,7 @@ bool VulkanInstance::initNT(void *hWnd)
     VkResult result = vkCreateWin32SurfaceKHR(instance, &surfaceCreateInfo, nullptr, &surface);
     if (result != VK_SUCCESS)
     {
-        std::cout << "failed to create window surface" << std::endl;
-        std::cout << "%i" << result << std::endl;
+        Logger::log << "failed to create window surface " << result << endl;
         return false;
     }
 
@@ -68,7 +67,7 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
     if (!vulkanDevice->setup())
     {
         vulkanDevice.reset();
-        std::cout << "Unable to create device" << std::endl;
+        Logger::log << "Unable to create device" << endl;
         return false;
     }
     VkPhysicalDevice physicalDevice = vulkanDevice->getPhysicalDevice();
@@ -82,7 +81,7 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
     VulkanQueueFamilies vulkanQueueFamilies;
     if (!vulkanQueueFamilies.setup(physicalDevice, surface))
     {
-        std::cout << "Unable to setup queue families" << std::endl;
+        Logger::log << "Unable to setup queue families" << endl;
         return false;
     }
 
@@ -92,7 +91,7 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
     commandPool = std::make_unique<VulkanCommandPool>(device, physicalDevice);
     if (!commandPool->setup(surface))
     {
-        std::cout << "failed to create command pool" << std::endl;
+        Logger::log << "failed to create command pool" << endl;
         return false;
     }
 
@@ -103,35 +102,36 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
         presentQueue);
     if (!vulkanUtils->setup())
     {
-        std::cout << "Unable to create utils" << std::endl;
+        Logger::log << "Unable to create utils" << endl;
         return false;
     }
+    vulkanUtils->logSystemData();
 
     swapChain = std::make_unique<VulkanSwapChain>(vulkanUtils.get());
     if (!swapChain->setup(width, height, surface, !isImmidiateSwap, MSAASampleCount))
     {
-        std::cout << "Unable to create swap chain" << std::endl;
+        Logger::log << "Unable to create swap chain" << endl;
         return false;
     }
 
     renderPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
     if (!renderPass->setupColor(swapChain->getImageFormat(), vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount)))
     {
-        std::cout << "Unable to create render pass" << std::endl;
+        Logger::log << "Unable to create render pass" << endl;
         return false;
     }
 
     depthPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
     if (!depthPass->setupDepth(true, vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount)))
     {
-        std::cout << "Unable to create depth pass" << std::endl;
+        Logger::log << "Unable to create depth pass" << endl;
         return false;
     }
 
     shadowDepthPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
     if (!shadowDepthPass->setupDepth(true, 1))
     {
-        std::cout << "Unable to create depth pass" << std::endl;
+        Logger::log << "Unable to create depth pass" << endl;
         return false;
     }
     vulkanUtils->rebuildPipelines(swapChain.get(), renderPass.get(), depthPass.get(), shadowDepthPass.get(), MSAASampleCount);
@@ -139,21 +139,21 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
     depthBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils.get());
     if (!depthBuffer->setup(width, height, vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount), true))
     {
-        std::cout << "unable to create depth buffer" << std::endl;
+        Logger::log << "unable to create depth buffer" << endl;
         return false;
     }
 
     frameColorBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameColorBuffer->setupColor(swapChain.get(), renderPass.get(), depthBuffer.get(), MSAASampleCount))
     {
-        std::cout << "Unable to create vulkan frame buffer" << std::endl;
+        Logger::log << "Unable to create vulkan frame buffer" << endl;
         return false;
     }
 
     frameDepthBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameDepthBuffer->setupDepth(swapChain.get(), depthPass.get(), depthBuffer.get(), MSAASampleCount))
     {
-        std::cout << "Unable to create vulkan frame buffer" << std::endl;
+        Logger::log << "Unable to create vulkan frame buffer" << endl;
         return false;
     }
 
@@ -162,7 +162,7 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
         auto frame = std::make_unique<VulkanFrame>(vulkanDevice.get(), swapChain.get());
         if (!frame->setup(commandPool.get(), vulkanUtils.get()))
         {
-            std::cout << "Unable to create frame " << i << std::endl;
+            Logger::log << "Unable to create frame " << i << endl;
             return false;
         }
         frames.emplace_back(std::move(frame));
@@ -195,28 +195,28 @@ void VulkanInstance::changeSize()
     swapChain = std::make_unique<VulkanSwapChain>(vulkanUtils.get());
     if (!swapChain->setup(width, height, surface, !isImmidiateSwap, MSAASampleCount))
     {
-        std::cout << "Unable to create swap chain" << std::endl;
+        Logger::log << "Unable to create swap chain" << endl;
         throw std::runtime_error("failed to recreate swap chain");
     }
 
     renderPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
     if (!renderPass->setupColor(swapChain->getImageFormat(), vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount)))
     {
-        std::cout << "Unable to create render pass" << std::endl;
+        Logger::log << "Unable to create render pass" << endl;
         throw std::runtime_error("failed to recreate render pass");
     }
 
     depthPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
     if (!depthPass->setupDepth(true, vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount)))
     {
-        std::cout << "Unable to create depth pass" << std::endl;
+        Logger::log << "Unable to create depth pass" << endl;
         throw std::runtime_error("failed to recreate depth pass");
     }
 
     shadowDepthPass = std::make_unique<VulkanRenderPass>(vulkanUtils.get());
     if (!shadowDepthPass->setupDepth(true, 1))
     {
-        std::cout << "Unable to create shadow depth pass" << std::endl;
+        Logger::log << "Unable to create shadow depth pass" << endl;
         throw std::runtime_error("failed to recreate shadow depth pass");
     }
 
@@ -225,21 +225,21 @@ void VulkanInstance::changeSize()
     depthBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils.get());
     if (!depthBuffer->setup(width, height, vulkanUtils->getVkSampleCountFlagBits(MSAASampleCount), true))
     {
-        std::cout << "unable to create depth buffer" << std::endl;
+        Logger::log << "unable to create depth buffer" << endl;
         throw std::runtime_error("unable to create depth buffer");
     }
 
     frameColorBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameColorBuffer->setupColor(swapChain.get(), renderPass.get(), depthBuffer.get(), MSAASampleCount))
     {
-        std::cout << "Unable to create vulkan frame buffer" << std::endl;
+        Logger::log << "Unable to create vulkan frame buffer" << endl;
         throw std::runtime_error("failed to recreate swap chain");
     }
 
     frameDepthBuffer = std::make_unique<VulkanFrameBuffer>(device);
     if (!frameDepthBuffer->setupDepth(swapChain.get(), depthPass.get(), depthBuffer.get(), MSAASampleCount))
     {
-        std::cout << "Unable to create vulkan frame buffer" << std::endl;
+        Logger::log << "Unable to create vulkan frame buffer" << endl;
         throw std::runtime_error("Unable to create vulkan frame buffer");
     }
 
@@ -248,7 +248,7 @@ void VulkanInstance::changeSize()
         auto frame = std::make_unique<VulkanFrame>(vulkanDevice.get(), swapChain.get());
         if (!frame->setup(commandPool.get(), vulkanUtils.get()))
         {
-            std::cout << "Unable to create frame " << i << std::endl;
+            Logger::log << "Unable to create frame " << i << endl;
             throw std::runtime_error("failed to recreate frame");
         }
         frames.emplace_back(std::move(frame));
@@ -313,7 +313,7 @@ bool VulkanInstance::initInstance()
     vulkanInstanceExtensions = new VulkanInstanceExtensions();
     if (!vulkanInstanceExtensions->hasExtension("VK_KHR_surface") || !vulkanInstanceExtensions->hasExtension("VK_KHR_win32_surface"))
     {
-        std::cout << "Required extensions missing" << std::endl;
+        Logger::log << "Required extensions missing" << endl;
         return false;
     }
 
@@ -341,7 +341,7 @@ bool VulkanInstance::initInstance()
     VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
     if (result != VK_SUCCESS)
     {
-        std::cout << "Unable to create Vulkan instance" << std::endl;
+        Logger::log << "Unable to create Vulkan instance" << endl;
         return false;
     }
     return true;

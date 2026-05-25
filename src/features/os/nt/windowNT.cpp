@@ -1,7 +1,7 @@
 #include "features/os/nt/windowNT.h"
 #include "features/renderer/vulkan/rendererVulkanNT.h"
+#include "features/logger/logger.h"
 #include <windows.h>
-#include <iostream>
 
 using namespace wne;
 
@@ -80,7 +80,8 @@ bool WindowNT::setup(uint width, uint height, WindowType type)
         CloseWindow(hWnd);
         return false;
     }
-    std::cout << "Window and renderer succesfully created" << std::endl;
+
+    Logger::log << "Window and Vulkan renderer succesfully created " << width << "x" << height << endl;
 
     ShowWindow(hWnd, true);
     UpdateWindow(hWnd);

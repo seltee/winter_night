@@ -34,6 +34,11 @@ void Engine::unregisterWindow(Window *window)
         windows.end());
 }
 
+void Engine::enableLogger()
+{
+    Logger::setLoggingState(true);
+}
+
 float Engine::update()
 {
     auto now = std::chrono::high_resolution_clock::now();

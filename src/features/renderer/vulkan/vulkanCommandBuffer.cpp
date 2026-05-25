@@ -13,9 +13,9 @@ In addition, this allows command recording to happen in multiple threads if so d
 #include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
 #include "features/renderer/vulkan/vulkanCommandPool.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 #include <array>
 
 using namespace wne;
@@ -43,7 +43,7 @@ bool VulkanCommandBuffer::setup()
 
     if (vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer) != VK_SUCCESS)
     {
-        std::cout << "failed to allocate command buffers" << std::endl;
+        Logger::log << "failed to allocate command buffers" << endl;
         return false;
     }
 
@@ -60,7 +60,7 @@ void VulkanCommandBuffer::recordCommandBuffer()
 
     if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
     {
-        std::cout << "failed to begin recording command buffer" << std::endl;
+        Logger::log << "failed to begin recording command buffer" << endl;
         throw std::runtime_error("failed to begin recording command buffer");
     }
 }
@@ -118,7 +118,7 @@ void VulkanCommandBuffer::endCommandBuffer()
 {
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
     {
-        std::cout << "failed to record command buffer!" << std::endl;
+        Logger::log << "failed to record command buffer!" << endl;
         throw std::runtime_error("failed to record command buffer!");
     }
 }

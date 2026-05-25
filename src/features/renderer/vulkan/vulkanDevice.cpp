@@ -3,10 +3,9 @@
 #include "features/renderer/vulkan/vulkanShader.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanQueueFamilies.h"
-
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 
 using namespace wne;
 
@@ -36,7 +35,7 @@ bool VulkanDevice::setup()
     vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
     if (deviceCount == 0)
     {
-        std::cout << "No suitable Vulkan devices found" << std::endl;
+        Logger::log << "No suitable Vulkan devices found" << endl;
         return false;
     }
 
@@ -52,7 +51,7 @@ bool VulkanDevice::setup()
     }
     if (pickedDevices.size() == 0)
     {
-        std::cout << "No suitable Vulkan device found" << std::endl;
+        Logger::log << "No suitable Vulkan device found" << endl;
         return false;
     }
 
@@ -60,10 +59,18 @@ bool VulkanDevice::setup()
               { return a.score > b.score; });
     physicalDevice = pickedDevices.at(0).device;
 
+    Logger::log << "Video device list:" << endl;
+    for (const auto &device : pickedDevices)
+    {
+        VkPhysicalDeviceProperties deviceProperties;
+        vkGetPhysicalDeviceProperties(device.device, &deviceProperties);
+        Logger::log << deviceProperties.deviceName << " API: " << deviceProperties.apiVersion << " Score: " << device.score << endl;
+    }
+
     VulkanQueueFamilies vulkanQueueFamilies;
     if (!vulkanQueueFamilies.setup(physicalDevice, surface))
     {
-        std::cout << "Unable to setup queue families" << std::endl;
+        Logger::log << "Unable to setup queue families" << endl;
         return false;
     }
 
@@ -102,7 +109,7 @@ bool VulkanDevice::setup()
     VkResult result = vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device);
     if (result != VK_SUCCESS)
     {
-        std::cout << "Unable to create physical device " << result << std::endl;
+        Logger::log << "Unable to create physical device " << result << endl;
         return false;
     }
 

@@ -1,8 +1,8 @@
 #include "features/renderer/vulkan/vulkanImageView.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 
 using namespace wne;
 
@@ -32,7 +32,7 @@ bool VulkanImageView::setup(VkImage image, uint64 format)
 
     if (vkCreateImageView(vulkanDevice->getDevice(), &viewInfo, nullptr, &imageView) != VK_SUCCESS)
     {
-        std::cout << "failed to create image view" << std::endl;
+        Logger::log << "failed to create image view" << endl;
         return false;
     }
     return true;

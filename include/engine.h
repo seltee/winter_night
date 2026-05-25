@@ -21,6 +21,7 @@
 #include "features/camera/cameraOrtho.h"
 #include "features/camera/cameraPerspective.h"
 #include "features/loaders/loader3d.h"
+#include "features/logger/logger.h"
 #include "utils/primitives.h"
 
 namespace wne
@@ -40,6 +41,8 @@ namespace wne
 
         void registerWindow(Window *window);
         void unregisterWindow(Window *window);
+
+        void enableLogger();
 
         float update();
     };

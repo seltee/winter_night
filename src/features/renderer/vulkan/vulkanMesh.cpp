@@ -3,7 +3,7 @@
 #include "features/renderer/vulkan/vulkanFrame.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
 #include "features/renderer/vulkan/vulkanObjectBuffers.h"
-#include <iostream>
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 
@@ -168,7 +168,7 @@ bool VulkanMesh::allocateVertexBuffer(uint64 bufferSize, void *data)
             stagingBuffer,
             stagingBufferMemory))
     {
-        std::cout << "Error creating buffer" << std::endl;
+        Logger::log << "Error creating buffer" << endl;
         return false;
     }
 
@@ -184,7 +184,7 @@ bool VulkanMesh::allocateVertexBuffer(uint64 bufferSize, void *data)
             vertexBuffer,
             vertexBufferMemory))
     {
-        std::cout << "Error creating local GPU vertex buffer" << std::endl;
+        Logger::log << "Error creating local GPU vertex buffer" << endl;
         return false;
     }
 
@@ -218,7 +218,7 @@ bool VulkanMesh::allocateIndexBuffer(uint64 bufferSize, void *data)
             indexBuffer,
             indexBufferMemory))
     {
-        std::cout << "Error creating local GPU index buffer" << std::endl;
+        Logger::log << "Error creating local GPU index buffer" << endl;
         return false;
     }
 

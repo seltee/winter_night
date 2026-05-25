@@ -10,9 +10,9 @@ That means that we have to create a framebuffer for all of the images in the swa
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanDepthBuffer.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 #include <array>
 
 using namespace wne;
@@ -65,7 +65,7 @@ bool VulkanFrameBuffer::setupColor(VulkanSwapChain *swapChain, VulkanRenderPass 
 
         if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &frameBuffers[i]) != VK_SUCCESS)
         {
-            std::cout << "Failed creating vulkan frame buffer" << std::endl;
+            Logger::log << "Failed creating vulkan frame buffer" << endl;
             return false;
         }
     }
@@ -94,7 +94,7 @@ bool VulkanFrameBuffer::setupDepth(VulkanSwapChain *swapChain, VulkanRenderPass 
 
         if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &frameBuffers[i]) != VK_SUCCESS)
         {
-            std::cout << "Failed creating vulkan frame buffer" << std::endl;
+            Logger::log << "Failed creating vulkan frame buffer" << endl;
             return false;
         }
     }
@@ -118,7 +118,7 @@ bool VulkanFrameBuffer::setup(VulkanRenderPass *depthPass, VulkanDepthBuffer *de
     frameBuffers.resize(1);
     if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &frameBuffers[0]) != VK_SUCCESS)
     {
-        std::cout << "Failed creating vulkan frame buffer" << std::endl;
+        Logger::log << "Failed creating vulkan frame buffer" << endl;
         return false;
     }
 

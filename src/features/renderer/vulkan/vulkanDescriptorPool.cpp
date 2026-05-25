@@ -5,9 +5,9 @@
 
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 #include <array>
 
 using namespace wne;
@@ -31,8 +31,7 @@ bool VulkanDescriptorPool::setup()
     poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     poolSizes[1].descriptorCount = 512;
 
- 
-    VkDescriptorPoolCreateInfo poolInfo{};
+     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
     poolInfo.pPoolSizes = poolSizes.data();
@@ -40,7 +39,7 @@ bool VulkanDescriptorPool::setup()
 
     if (vkCreateDescriptorPool(vulkanDevice->getDevice(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
     {
-        std::cout << "failed to create descriptor pool!" << std::endl;
+        Logger::log << "failed to create descriptor pool!" << endl;
         return false;
     }
 

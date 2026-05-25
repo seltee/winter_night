@@ -2,9 +2,9 @@
 #include "features/renderer/vulkan/vulkanQueueFamilies.h"
 #include "features/renderer/vulkan/vulkanDeviceExtensions.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 
 using namespace wne;
 
@@ -46,7 +46,7 @@ bool VulkanSwapChain::setup(int width, int height, VkSurfaceKHR surface, bool is
     swapChain = createSwapChain(surface, width, height, &swapChainImageFormat, &unImageCount, isImmidiateSwap);
     if (!swapChain)
     {
-        std::cout << "Unable to create swap chain" << std::endl;
+        Logger::log << "Unable to create swap chain" << endl;
         return false;
     }
 
@@ -57,7 +57,7 @@ bool VulkanSwapChain::setup(int width, int height, VkSurfaceKHR surface, bool is
 
     if (!createSwapChainImages(swapChain, unImageCount, (VkFormat)swapChainImageFormat, &swapChainImages))
     {
-        std::cout << "Unable to create swap chain images" << std::endl;
+        Logger::log << "Unable to create swap chain images" << endl;
         return false;
     }
 
@@ -82,7 +82,7 @@ bool VulkanSwapChain::setup(int width, int height, VkSurfaceKHR surface, bool is
             auto vulkanImagePtr = std::make_unique<VulkanImageView>(vulkanDevice);
             if (!vulkanImagePtr->setup(swapChainSampledImages[i], (VkFormat)swapChainImageFormat))
             {
-                std::cout << "Failed to create MSAA color image view" << std::endl;
+                Logger::log << "Failed to create MSAA color image view" << endl;
                 return false;
             }
             swapChainSampledImageViews[i] = std::move(vulkanImagePtr);
@@ -176,7 +176,7 @@ bool VulkanSwapChain::createSwapChainImages(
         auto vulkanImagePtr = std::make_unique<VulkanImageView>(vulkanDevice);
         if (!vulkanImagePtr->setup(swapChainImages->at(i), swapChainImageFormat))
         {
-            std::cout << "Unable to create swap chain image" << std::endl;
+            Logger::log << "Unable to create swap chain image" << endl;
             return false;
         }
         swapChainImageViews.emplace_back(std::move(vulkanImagePtr));

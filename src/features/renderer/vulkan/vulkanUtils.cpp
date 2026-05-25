@@ -7,6 +7,7 @@
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/pipelines/vulkanDescriptorSets.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <iostream>
@@ -40,28 +41,28 @@ bool VulkanUtils::setup()
     vulkanSampler = std::make_unique<VulkanSampler>(this);
     if (!vulkanSampler->setup(true))
     {
-        std::cout << "Unable to create sampler" << std::endl;
+        Logger::log << "Unable to create sampler" << endl;
         return false;
     }
 
     vulkanShadowSampler = std::make_unique<VulkanSampler>(this);
     if (!vulkanShadowSampler->setup(false))
     {
-        std::cout << "Unable to create sampler" << std::endl;
+        Logger::log << "Unable to create sampler" << endl;
         return false;
     }
 
     vulkanDescriptorPool = std::make_unique<VulkanDescriptorPool>(vulkanDevice);
     if (!vulkanDescriptorPool->setup())
     {
-        std::cout << "Unable to create descriptor pool" << std::endl;
+        Logger::log << "Unable to create descriptor pool" << endl;
         return false;
     }
 
     vulkanObjectBuffers = std::make_unique<VulkanObjectBuffers>(this);
     if (!vulkanObjectBuffers->setup(MAX_FRAMES_IN_FLIGHT))
     {
-        std::cout << "Unable to create objects buffer" << std::endl;
+        Logger::log << "Unable to create objects buffer" << endl;
         return false;
     }
 
@@ -74,6 +75,13 @@ bool VulkanUtils::setup()
     dummyTexture->setup(pixels, 2, 2);
 
     return true;
+}
+
+void VulkanUtils::logSystemData()
+{
+    Logger::log << "Depth format " << findDepthFormat(false) << endl;
+    Logger::log << "Depth format sampled " << findDepthFormat(true) << endl;
+    Logger::log << "MSAA max sample count " << getMSAAUsableSampleCount() << endl;
 }
 
 int64 VulkanUtils::findMemoryType(uint32 typeFilter, uint64 properties) noexcept
@@ -112,6 +120,14 @@ VulkanFormat VulkanUtils::findSupportedFormat(const std::vector<VulkanFormat> &c
     return VkFormat::VK_FORMAT_UNDEFINED;
 }
 
+VulkanFormat VulkanUtils::findDepthFormat(bool isSampled)
+{
+    return findSupportedFormat(
+        {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
+        VK_IMAGE_TILING_OPTIMAL,
+        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | (isSampled ? VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT : 0));
+}
+
 uint VulkanUtils::getMSAAUsableSampleCount()
 {
     VkPhysicalDeviceProperties physicalDeviceProperties;
@@ -144,7 +160,7 @@ bool VulkanUtils::createBuffer(uint64 size, uint32 usage, uint32 properties, VkB
 
     if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
     {
-        std::cout << "failed to create buffer" << std::endl;
+        Logger::log << "failed to create buffer" << endl;
         return false;
     }
 
@@ -158,7 +174,7 @@ bool VulkanUtils::createBuffer(uint64 size, uint32 usage, uint32 properties, VkB
 
     if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
     {
-        std::cout << "failed to allocate buffer memory" << std::endl;
+        Logger::log << "failed to allocate buffer memory" << endl;
         return false;
     }
 
@@ -368,7 +384,7 @@ bool VulkanUtils::createImage(
 
     if (vkCreateImage(device, &imageInfo, nullptr, pImage) != VK_SUCCESS)
     {
-        std::cout << "failed to create image" << std::endl;
+        Logger::log << "failed to create image" << endl;
         return false;
     }
 
@@ -383,7 +399,7 @@ bool VulkanUtils::createImage(
     if (vkAllocateMemory(device, &allocInfo, nullptr, pMemory) != VK_SUCCESS)
     {
         vkDestroyImage(device, *pImage, nullptr);
-        std::cout << "failed to allocate image memory" << std::endl;
+        Logger::log << "failed to allocate image memory" << endl;
         return false;
     }
 
@@ -406,7 +422,7 @@ bool VulkanUtils::createImageView(VkImage image, VulkanFormat format, VulkanImag
 
     if (vkCreateImageView(vulkanDevice->getDevice(), &viewInfo, nullptr, imageView) != VK_SUCCESS)
     {
-        std::cout << "failed to create image view" << std::endl;
+        Logger::log << "failed to create image view" << endl;
         return false;
     }
     return true;

@@ -33,9 +33,11 @@ namespace wne
             VkQueue presentQueue);
         ~VulkanUtils();
         bool setup();
+        void logSystemData();
 
         int64 findMemoryType(uint32 typeFilter, uint64 properties) noexcept;
         VulkanFormat findSupportedFormat(const std::vector<VulkanFormat> &candidates, VulkanImageTiling tiling, VulkanFormatFeatureFlags features) noexcept;
+        VulkanFormat findDepthFormat(bool isSampled);
 
         uint getMSAAUsableSampleCount();
 

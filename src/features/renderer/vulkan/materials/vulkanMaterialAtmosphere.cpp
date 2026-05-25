@@ -2,10 +2,10 @@
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
 #include "features/renderer/vulkan/lights/vulkanLightCascadeData.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <array>
-#include <iostream>
 
 using namespace wne;
 
@@ -66,8 +66,10 @@ VkDescriptorSet VulkanMaterialAtmosphere::getDescriptorSetAtmoTexture()
     auto pipeline = vulkanUtils->getCurrentPipeline();
 
     auto descriptorSetLayout = pipeline->getDescriptorSetLayoutSampler();
-    if (!descriptorSetLayout)
+    if (!descriptorSetLayout){
+        Logger::log << "Unable to get descriptor set layout" << endl;
         return nullptr;
+    }
 
     VkDescriptorSetLayout vkDescriptorSetLayout = descriptorSetLayout->getDescriptorSetLayout();
     VkDescriptorSetAllocateInfo allocInfo{};
@@ -78,7 +80,7 @@ VkDescriptorSet VulkanMaterialAtmosphere::getDescriptorSetAtmoTexture()
 
     if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)
     {
-        std::cout << "failed to allocate descriptor sets!" << std::endl;
+        Logger::log << "failed to allocate descriptor sets!" << endl;
         return nullptr;
     }
 

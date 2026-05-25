@@ -1,8 +1,8 @@
 #include "features/renderer/vulkan/pipelines/vulkanDescriptorSetLayout.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 
 using namespace wne;
 
@@ -36,7 +36,7 @@ bool VulkanDescriptorSetLayout::setupTexturedDepth()
 
     if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayout) != VK_SUCCESS)
     {
-        std::cout << "failed to create descriptor set layout!" << std::endl;
+        Logger::log << "failed to create descriptor set layout!" << endl;
         return false;
     }
 
@@ -112,7 +112,7 @@ bool VulkanDescriptorSetLayout::setupTexturedColor()
 
     if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayout) != VK_SUCCESS)
     {
-        std::cout << "failed to create descriptor set layout!" << std::endl;
+        Logger::log << "failed to create descriptor set layout!" << endl;
         return false;
     }
 
@@ -138,7 +138,7 @@ bool VulkanDescriptorSetLayout::setupSampler()
 
     if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoSampler, nullptr, &descriptorSetLayout) != VK_SUCCESS)
     {
-        std::cout << "failed to create descriptor set layout!" << std::endl;
+        Logger::log << "failed to create descriptor set layout!" << endl;
         return false;
     }
 

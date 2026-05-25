@@ -54,7 +54,6 @@ namespace wne
         VkDeviceMemory depthImageMemory = nullptr;
         VkImageView depthImageView = nullptr;
 
-        VulkanFormat findDepthFormat(bool isSampled);
         bool hasStencilComponent(VulkanFormat format);
     };
 };

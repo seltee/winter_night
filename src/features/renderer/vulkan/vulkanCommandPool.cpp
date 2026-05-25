@@ -2,6 +2,7 @@
 #include "features/renderer/vulkan/vulkanQueueFamilies.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 
@@ -30,7 +31,7 @@ bool VulkanCommandPool::setup(VkSurfaceKHR surface)
 
     if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
     {
-        std::cout << "Failed to create command pool" << std::endl;
+        Logger::log << "Failed to create command pool" << endl;
         return false;
     }
 

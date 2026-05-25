@@ -21,8 +21,6 @@ namespace wne
         }
 
     protected:
-        VulkanFormat findDepthFormat(bool isSampled);
-
         VkRenderPass renderPass = nullptr;
 
         VulkanUtils *vulkanUtils = nullptr;

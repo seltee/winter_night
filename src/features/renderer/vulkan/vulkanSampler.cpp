@@ -1,7 +1,7 @@
 #include "features/renderer/vulkan/vulkanSampler.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 #include <array>
 
 using namespace wne;
@@ -60,7 +60,7 @@ bool VulkanSampler::setup(bool UVRepeat)
 
     if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS)
     {
-        std::cout << "failed to create texture sampler" << std::endl;
+        Logger::log << "failed to create texture sampler" << endl;
         return false;
     }
 

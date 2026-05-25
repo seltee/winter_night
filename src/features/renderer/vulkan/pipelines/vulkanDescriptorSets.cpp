@@ -8,9 +8,9 @@
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 #include <array>
 #include <cmath>
 
@@ -141,7 +141,7 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedDepth(
 
     if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSet) != VK_SUCCESS)
     {
-        std::cout << "unable to create descriptor set" << std::endl;
+        Logger::log << "unable to create descriptor set" << endl;
         return false;
     }
 
@@ -182,7 +182,7 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedColor(
 
     if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSet) != VK_SUCCESS)
     {
-        std::cout << "unable to create descriptor set" << std::endl;
+        Logger::log << "unable to create descriptor set" << endl;
         return false;
     }
 

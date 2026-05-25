@@ -1,9 +1,9 @@
 #include "features/renderer/vulkan/lights/vulkanLightCascadeData.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
+#include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include <iostream>
 #include <array>
 
 using namespace wne;
@@ -34,7 +34,7 @@ bool VulkanLightCascadeData::setup(uint32 resolution)
         frames[frameNum].vulkanDepthBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils);
         if (!frames[frameNum].vulkanDepthBuffer->setup(resolution, resolution, 1, true))
         {
-            std::cout << "unable to create depth buffer" << std::endl;
+            Logger::log << "unable to create depth buffer" << endl;
             return false;
         }
         frames[frameNum].vulkanDepthBuffer->transitionToDefined();
@@ -113,7 +113,7 @@ VkDescriptorSet VulkanLightCascadeData::getDescriptorSet(
 
     if (vkAllocateDescriptorSets(device, &allocInfo, &(frames[frameNum].descriptorSetTextured)) != VK_SUCCESS)
     {
-        std::cout << "unable to create descriptor set" << std::endl;
+        Logger::log << "unable to create descriptor set" << endl;
         return nullptr;
     }
 

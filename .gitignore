@@ -11,6 +11,7 @@ bin/**/*.spv
 bin/**/*.spv
 bin/**/*.dll
 lib/**/*.dll.a
+bin/logs
 .DS_Store
 *.so
 *.exe
