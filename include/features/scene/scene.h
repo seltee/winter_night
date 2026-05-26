@@ -50,6 +50,7 @@ namespace wne
             auto actor = std::make_shared<T>(
                 renderer,
                 std::forward<Args>(args)...);
+            actor->eventCreated();
             addActor(actor);
             return actor;
         }

@@ -61,10 +61,18 @@ void Actor::setScene(Scene *scene)
     eventSetScene(oldScene, this->currentScene);
 }
 
+void Actor::eventCreated()
+{
+}
+
 void Actor::eventSetScene(Scene *oldScene, Scene *newScene)
 {
 }
 
 void Actor::eventUpdate(float delta)
+{
+}
+
+void Actor::eventDestroyed()
 {
 }

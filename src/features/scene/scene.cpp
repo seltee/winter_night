@@ -18,10 +18,22 @@ std::shared_ptr<Scene> Scene::create(Renderer *renderer)
 
 void Scene::update(float delta)
 {
-    for (const auto &actor : actors)
+    for (uint i = 0; i < actors.size();)
     {
-        actor->update(delta);
+        auto actor = actors[i];
+        if (actor->isDestroyed())
+        {
+            actor->eventDestroyed();
+            actors[i] = actors[actors.size() - 1];
+            actors.pop_back();
+        }
+        else
+        {
+            actor->update(delta);
+            i++;
+        }
     }
+
     if (actorCamera)
     {
         for (const auto &light : lights)

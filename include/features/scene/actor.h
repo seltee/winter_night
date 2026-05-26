@@ -37,8 +37,10 @@ namespace wne
 
         void setScene(Scene *scene);
 
+        virtual void eventCreated();
         virtual void eventSetScene(Scene *oldScene, Scene *newScene);
         virtual void eventUpdate(float delta);
+        virtual void eventDestroyed();
 
         inline bool hasShadow()
         {
@@ -50,9 +52,20 @@ namespace wne
             isShadowEnabled = isEnabled;
         }
 
+        inline void destroy()
+        {
+            isDestroyedFlag = true;
+        }
+
+        inline bool isDestroyed()
+        {
+            return isDestroyedFlag;
+        }
+
     protected:
         bool isDirtyNormalsFlag = true;
         bool isShadowEnabled = true;
+        bool isDestroyedFlag = false;
 
         Matrix3x3 mNormal = Matrix3x3::identity();
 
