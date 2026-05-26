@@ -82,6 +82,11 @@ void VulkanUtils::logSystemData()
     Logger::log << "Depth format " << findDepthFormat(false) << endl;
     Logger::log << "Depth format sampled " << findDepthFormat(true) << endl;
     Logger::log << "MSAA max sample count " << getMSAAUsableSampleCount() << endl;
+
+    VkPhysicalDeviceProperties properties;
+    vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+
+    Logger::log << "UBO max size " << properties.limits.maxUniformBufferRange << endl;
 }
 
 int64 VulkanUtils::findMemoryType(uint32 typeFilter, uint64 properties) noexcept

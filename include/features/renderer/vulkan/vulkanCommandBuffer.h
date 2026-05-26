@@ -32,6 +32,8 @@ namespace wne
         }
 
     protected:
+        VulkanPipeline *currentPipeline = nullptr;
+        
         uint16 passWidth, passHeight;
 
         VkPhysicalDevice physicalDevice;

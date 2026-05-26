@@ -3,6 +3,7 @@
 #include <chrono>
 #include "core/api.h"
 #include "core/math.h"
+#include "core/jobQueue.h"
 #include "features/os/window.h"
 #include "features/data/model.h"
 #include "features/scene/scene.h"
@@ -35,15 +36,20 @@ namespace wne
         std::chrono::_V2::system_clock::time_point timePoint;
         float fpsCounter = 0.0f;
         int framesCounter = 0;
+        JobQueue jobQueue;
 
     public:
         static Engine *getInstance();
-
         void registerWindow(Window *window);
         void unregisterWindow(Window *window);
 
         void enableLogger();
 
         float update();
+
+        inline JobQueue &getJobQueue()
+        {
+            return jobQueue;
+        }
     };
 }

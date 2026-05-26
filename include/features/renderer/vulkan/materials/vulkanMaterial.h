@@ -39,5 +39,6 @@ namespace wne
 
     protected:
         VulkanUtils *vulkanUtils = nullptr;
+        static VulkanMaterial *lastDescriptorColorBond;
     };
 };

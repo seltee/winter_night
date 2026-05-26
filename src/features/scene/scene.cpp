@@ -1,10 +1,13 @@
 #include "features/scene/scene.h"
 #include "features/renderer/renderer.h"
 #include "features/data/light.h"
+#include "engine.h"
 #include <algorithm>
 #include <iostream>
 
 using namespace wne;
+
+void _actorsUpdate(float delta, uint from, uint to, std::vector<std::shared_ptr<wne::Actor>> *actors);
 
 Scene::Scene(Renderer *renderer)
 {
@@ -18,22 +21,31 @@ std::shared_ptr<Scene> Scene::create(Renderer *renderer)
 
 void Scene::update(float delta)
 {
+    // update all actors multithreaded
+    const uint actorsPerJob = 16;
+    for (uint i = 0; i < actors.size(); i += actorsPerJob)
+    {
+        uint to = std::min((uint)(i + actorsPerJob), (uint)actors.size());
+        auto pActors = &actors;
+        Engine::getInstance()->getJobQueue().queueJob([delta, i, to, pActors]
+                                                      { _actorsUpdate(delta, i, to, pActors); });
+    }
+    Engine::getInstance()->getJobQueue().waitJobs();
+
+    // remove destroyed actors
     for (uint i = 0; i < actors.size();)
     {
-        auto actor = actors[i];
-        if (actor->isDestroyed())
+        if (actors[i]->isDestroyed())
         {
-            actor->eventDestroyed();
+            actors[i]->eventDestroyed();
             actors[i] = actors[actors.size() - 1];
             actors.pop_back();
         }
         else
-        {
-            actor->update(delta);
             i++;
-        }
     }
 
+    // prepare light
     if (actorCamera)
     {
         for (const auto &light : lights)
@@ -81,7 +93,7 @@ void Scene::render()
         renderer->renderAtmosphereMap(atmoMaterial);
     }
 
-    std::vector<Actor *> blendingPass;
+    blendingPass.clear();
     blendingPass.reserve(actors.size());
 
     // color pass
@@ -175,4 +187,12 @@ void Scene::unregisterLight(Light *light)
 {
     if (light)
         lights.erase(std::remove(lights.begin(), lights.end(), light), lights.end());
+}
+
+void _actorsUpdate(float delta, uint from, uint to, std::vector<std::shared_ptr<wne::Actor>> *actors)
+{
+    for (uint i = from; i < to; i++)
+    {
+        (*actors)[i]->update(delta);
+    }
 }

@@ -12,6 +12,8 @@
 
 using namespace wne;
 
+VulkanMaterial *VulkanMaterial::lastDescriptorColorBond = nullptr;
+
 VulkanMaterial::VulkanMaterial(VulkanUtils *vulkanUtils)
 {
     this->vulkanUtils = vulkanUtils;

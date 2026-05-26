@@ -24,6 +24,10 @@ void VulkanMaterialAtmosphere::selectPipelineColor(ModelDataType dataType)
 
 void VulkanMaterialAtmosphere::selectDescriptorColor(ModelDataType dataType)
 {
+    if (lastDescriptorColorBond == this)
+        return;
+    lastDescriptorColorBond = this;
+
     auto descriptorSets = vulkanUtils->getDescriptorSets();
     if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
     {
@@ -66,7 +70,8 @@ VkDescriptorSet VulkanMaterialAtmosphere::getDescriptorSetAtmoTexture()
     auto pipeline = vulkanUtils->getCurrentPipeline();
 
     auto descriptorSetLayout = pipeline->getDescriptorSetLayoutSampler();
-    if (!descriptorSetLayout){
+    if (!descriptorSetLayout)
+    {
         Logger::log << "Unable to get descriptor set layout" << endl;
         return nullptr;
     }

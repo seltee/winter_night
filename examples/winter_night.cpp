@@ -32,6 +32,7 @@ public:
         setScale(0.12f);
         genNewPosition();
     }
+
     static std::shared_ptr<ActorSnowflake> create(wne::Renderer *renderer, wne::ActorTerrain *actorTerrain)
     {
         return std::make_shared<ActorSnowflake>(renderer, actorTerrain);

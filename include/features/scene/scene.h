@@ -88,6 +88,7 @@ namespace wne
         std::vector<std::shared_ptr<Actor>> actors;
         std::vector<Light *> lights;
         std::shared_ptr<ActorCamera> actorCamera;
+        std::vector<Actor *> blendingPass;
 
         std::shared_ptr<Texture> atmosphereMap;
         std::shared_ptr<Texture> atmosphereRadiance;
