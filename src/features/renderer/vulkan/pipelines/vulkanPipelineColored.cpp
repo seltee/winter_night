@@ -477,21 +477,21 @@ void VulkanPipelineColored::updateDescriptorSet(VulkanObjectBuffers *vulkanObjec
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = descriptorSet;
     writes[0].dstBinding = 0;
-    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     writes[0].descriptorCount = 1;
     writes[0].pBufferInfo = &bufferModelInfo;
 
     writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[1].dstSet = descriptorSet;
     writes[1].dstBinding = 1;
-    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     writes[1].descriptorCount = 1;
     writes[1].pBufferInfo = &bufferMVPInfo;
 
     writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[2].dstSet = descriptorSet;
     writes[2].dstBinding = 2;
-    writes[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     writes[2].descriptorCount = 1;
     writes[2].pBufferInfo = &bufferNormalInfo;
 
@@ -532,21 +532,21 @@ bool VulkanPipelineColored::createLayouts()
     // model matrices
     pipelineBinding[0].binding = 0;
     pipelineBinding[0].descriptorCount = 1;
-    pipelineBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     pipelineBinding[0].pImmutableSamplers = nullptr;
     pipelineBinding[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     // mvp matrices
     pipelineBinding[1].binding = 1;
     pipelineBinding[1].descriptorCount = 1;
-    pipelineBinding[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     pipelineBinding[1].pImmutableSamplers = nullptr;
     pipelineBinding[1].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     // normal transform matrices
     pipelineBinding[2].binding = 2;
     pipelineBinding[2].descriptorCount = 1;
-    pipelineBinding[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     pipelineBinding[2].pImmutableSamplers = nullptr;
     pipelineBinding[2].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 

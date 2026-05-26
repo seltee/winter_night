@@ -136,7 +136,7 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
     {
         if (!vulkanUtils->createBuffer(
                 matrixBufferSize,
-                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                 bufferModelMatrices[i],
                 bufferModelMatricesMemory[i]))
@@ -147,7 +147,7 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
 
         if (!vulkanUtils->createBuffer(
                 matrixBufferSize,
-                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                 bufferMVPMatrices[i],
                 bufferMVPMatricesMemory[i]))
@@ -158,7 +158,7 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
 
         if (!vulkanUtils->createBuffer(
                 matrixBufferSize,
-                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                 bufferNormalMatrices[i],
                 bufferNormalMatricesMemory[i]))

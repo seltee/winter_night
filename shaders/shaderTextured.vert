@@ -15,15 +15,15 @@ layout(push_constant) uniform PushConstants {
     uint lightIds[12];
 } objectData;
 
-layout(set = 0, binding = 0) uniform BufferMVPs {
+layout(set = 0, binding = 0, std430) readonly buffer BufferMVPs {
      mat4 matrix[8192];
 } mMVPs;
 
-layout(set = 0, binding = 1) uniform BufferObjects {
+layout(set = 0, binding = 1, std430) readonly buffer BufferObjects {
      mat4 matrix[8192];
 } mModels;
 
-layout(set = 0, binding = 2) uniform BufferNormals {
+layout(set = 0, binding = 2, std430) readonly buffer BufferNormals {
      mat4 matrix[8192];
 } mNormals;
 

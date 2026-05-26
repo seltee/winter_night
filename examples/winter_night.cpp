@@ -193,7 +193,7 @@ int main()
     spawnTree(36.0f, -72.0f, actorTerrain.get(), scene.get(), treeMesh, materialTreeBark);
     spawnTree(-49.0f, -69.0f, actorTerrain.get(), scene.get(), treeMesh, materialTreeBark);
 
-    const uint AmountOfSnowflakes = 1000;
+    const uint AmountOfSnowflakes = 1600;
     for (uint i = 0; i < AmountOfSnowflakes; i++)
         scene->createActor<ActorSnowflake>(actorTerrain.get());
 

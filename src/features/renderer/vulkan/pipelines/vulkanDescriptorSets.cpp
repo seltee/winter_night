@@ -154,7 +154,7 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedDepth(
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = *descriptorSet;
     writes[0].dstBinding = 0;
-    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     writes[0].descriptorCount = 1;
     writes[0].pBufferInfo = &bufferMVPInfo;
 
@@ -220,21 +220,21 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedColor(
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = *descriptorSet;
     writes[0].dstBinding = 0;
-    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     writes[0].descriptorCount = 1;
     writes[0].pBufferInfo = &bufferMVPInfo;
 
     writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[1].dstSet = *descriptorSet;
     writes[1].dstBinding = 1;
-    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     writes[1].descriptorCount = 1;
     writes[1].pBufferInfo = &bufferModelInfo;
 
     writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[2].dstSet = *descriptorSet;
     writes[2].dstBinding = 2;
-    writes[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     writes[2].descriptorCount = 1;
     writes[2].pBufferInfo = &bufferNormalInfo;
 

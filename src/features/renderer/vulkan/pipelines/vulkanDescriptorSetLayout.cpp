@@ -25,7 +25,7 @@ bool VulkanDescriptorSetLayout::setupTexturedDepth()
     // mvp matrices
     pipelineBinding[0].binding = 0;
     pipelineBinding[0].descriptorCount = 1;
-    pipelineBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     pipelineBinding[0].pImmutableSamplers = nullptr;
     pipelineBinding[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
@@ -52,21 +52,21 @@ bool VulkanDescriptorSetLayout::setupTexturedColor()
     // mvp matrices
     pipelineBinding[0].binding = 0;
     pipelineBinding[0].descriptorCount = 1;
-    pipelineBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     pipelineBinding[0].pImmutableSamplers = nullptr;
     pipelineBinding[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     // model matrices
     pipelineBinding[1].binding = 1;
     pipelineBinding[1].descriptorCount = 1;
-    pipelineBinding[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     pipelineBinding[1].pImmutableSamplers = nullptr;
     pipelineBinding[1].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     // normal transform matrices
     pipelineBinding[2].binding = 2;
     pipelineBinding[2].descriptorCount = 1;
-    pipelineBinding[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pipelineBinding[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     pipelineBinding[2].pImmutableSamplers = nullptr;
     pipelineBinding[2].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 

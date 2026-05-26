@@ -86,7 +86,8 @@ void VulkanUtils::logSystemData()
     VkPhysicalDeviceProperties properties;
     vkGetPhysicalDeviceProperties(physicalDevice, &properties);
 
-    Logger::log << "UBO max size " << properties.limits.maxUniformBufferRange << endl;
+    Logger::log << "UBO max range " << properties.limits.maxUniformBufferRange << endl;
+    Logger::log << "SSBO max range " << properties.limits.maxStorageBufferRange << endl;
 }
 
 int64 VulkanUtils::findMemoryType(uint32 typeFilter, uint64 properties) noexcept
@@ -160,7 +161,7 @@ bool VulkanUtils::createBuffer(uint64 size, uint32 usage, uint32 properties, VkB
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = size;
-    bufferInfo.usage = usage;
+    bufferInfo.usage = usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)

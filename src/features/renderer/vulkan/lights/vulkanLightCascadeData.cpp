@@ -43,7 +43,7 @@ bool VulkanLightCascadeData::setup(uint32 resolution)
         const uint matrixBufferSize = sizeof(Matrix4x4) * VulkanObjectBuffers::AMOUNT_OF_OBJECTS;
         if (!vulkanUtils->createBuffer(
                 matrixBufferSize,
-                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                 frames[frameNum].objectBufferMVP,
                 frames[frameNum].objectBufferMVPMemory))
@@ -127,7 +127,7 @@ VkDescriptorSet VulkanLightCascadeData::getDescriptorSet(
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = frames[frameNum].descriptorSetTextured;
     writes[0].dstBinding = 0;
-    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     writes[0].descriptorCount = 1;
     writes[0].pBufferInfo = &bufferMVPInfo;
 

@@ -12,7 +12,7 @@ layout(push_constant) uniform PushConstants {
     uint lightIds[12];
 } objectData;
 
-layout(set = 0, binding = 0) uniform BufferMVPs {
+layout(set = 0, binding = 0, std430) readonly buffer BufferMVPs {
      mat4 matrix[8192];
 } mMVPs;
 
