@@ -34,12 +34,12 @@ std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, Vul
     {
         if (model->is32bitIndicides())
         {
-            if (mesh->setup(model->getAsVertexColored(), model->getAsIndex32()))
+            if (mesh->setup(model->getAsVertexColored(), model->getAsIndex32(), model->getBoundingRadius()))
                 return mesh;
         }
         else
         {
-            if (mesh->setup(model->getAsVertexColored(), model->getAsIndex16()))
+            if (mesh->setup(model->getAsVertexColored(), model->getAsIndex16(), model->getBoundingRadius()))
                 return mesh;
         }
         return nullptr;
@@ -48,12 +48,12 @@ std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, Vul
     {
         if (model->is32bitIndicides())
         {
-            if (mesh->setup(model->getAsVertexTextured(), model->getAsIndex32()))
+            if (mesh->setup(model->getAsVertexTextured(), model->getAsIndex32(), model->getBoundingRadius()))
                 return mesh;
         }
         else
         {
-            if (mesh->setup(model->getAsVertexTextured(), model->getAsIndex16()))
+            if (mesh->setup(model->getAsVertexTextured(), model->getAsIndex16(), model->getBoundingRadius()))
                 return mesh;
         }
         return nullptr;
@@ -62,7 +62,7 @@ std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, Vul
     return nullptr;
 }
 
-bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint16> &indexData)
+bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint16> &indexData, float boundingRadius)
 {
     uint64 bufferSize = sizeof(VertexColored) * vertexData.size();
     if (!allocateVertexBuffer(bufferSize, vertexData.data()))
@@ -77,12 +77,11 @@ bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint1
     amountOfPolygons = amountOfIndices / 3;
     dataType = ModelDataType::VertexColoredInd16;
     vulkanIndexType = VK_INDEX_TYPE_UINT16;
-    for (auto const &vertex : vertexData)
-        boundingRadius = fmaxf(boundingRadius, sqrtf(vertex.pos.x * vertex.pos.x + vertex.pos.y * vertex.pos.y + vertex.pos.z * vertex.pos.z));
+    this->boundingRadius = boundingRadius;
     return true;
 }
 
-bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint32> &indexData)
+bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint32> &indexData, float boundingRadius)
 {
     uint64 vertexBufferSize = sizeof(VertexColored) * vertexData.size();
     if (!allocateVertexBuffer(vertexBufferSize, vertexData.data()))
@@ -97,12 +96,11 @@ bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint3
     amountOfPolygons = amountOfIndices / 3;
     dataType = ModelDataType::VertexColoredInd32;
     vulkanIndexType = VK_INDEX_TYPE_UINT32;
-    for (auto const &vertex : vertexData)
-        boundingRadius = fmaxf(boundingRadius, sqrtf(vertex.pos.x * vertex.pos.x + vertex.pos.y * vertex.pos.y + vertex.pos.z * vertex.pos.z));
+    this->boundingRadius = boundingRadius;
     return true;
 }
 
-bool VulkanMesh::setup(std::vector<VertexTextured> &vertexData, std::vector<uint16> &indexData)
+bool VulkanMesh::setup(std::vector<VertexTextured> &vertexData, std::vector<uint16> &indexData, float boundingRadius)
 {
     uint64 bufferSize = sizeof(VertexTextured) * vertexData.size();
     if (!allocateVertexBuffer(bufferSize, vertexData.data()))
@@ -117,12 +115,11 @@ bool VulkanMesh::setup(std::vector<VertexTextured> &vertexData, std::vector<uint
     amountOfPolygons = amountOfIndices / 3;
     dataType = ModelDataType::VertexTexturedInd16;
     vulkanIndexType = VK_INDEX_TYPE_UINT16;
-    for (auto const &vertex : vertexData)
-        boundingRadius = fmaxf(boundingRadius, sqrtf(vertex.pos.x * vertex.pos.x + vertex.pos.y * vertex.pos.y + vertex.pos.z * vertex.pos.z));
+    this->boundingRadius = boundingRadius;
     return true;
 }
 
-bool VulkanMesh::setup(std::vector<VertexTextured> &vertexData, std::vector<uint32> &indexData)
+bool VulkanMesh::setup(std::vector<VertexTextured> &vertexData, std::vector<uint32> &indexData, float boundingRadius)
 {
     uint64 bufferSize = sizeof(VertexTextured) * vertexData.size();
     if (!allocateVertexBuffer(bufferSize, vertexData.data()))
@@ -137,8 +134,7 @@ bool VulkanMesh::setup(std::vector<VertexTextured> &vertexData, std::vector<uint
     amountOfPolygons = amountOfIndices / 3;
     dataType = ModelDataType::VertexTexturedInd32;
     vulkanIndexType = VK_INDEX_TYPE_UINT32;
-    for (auto const &vertex : vertexData)
-        boundingRadius = fmaxf(boundingRadius, sqrtf(vertex.pos.x * vertex.pos.x + vertex.pos.y * vertex.pos.y + vertex.pos.z * vertex.pos.z));
+    this->boundingRadius = boundingRadius;
     return true;
 }
 

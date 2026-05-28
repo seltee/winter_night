@@ -20,10 +20,10 @@ namespace wne
 
         static std::shared_ptr<VulkanMesh> create(std::shared_ptr<Model> model, VulkanUtils *vulkanUtils);
 
-        bool setup(std::vector<VertexColored> &vertexData, std::vector<uint16> &indexData);
-        bool setup(std::vector<VertexColored> &vertexData, std::vector<uint32> &indexData);
-        bool setup(std::vector<VertexTextured> &vertexData, std::vector<uint16> &indexData);
-        bool setup(std::vector<VertexTextured> &vertexData, std::vector<uint32> &indexData);
+        bool setup(std::vector<VertexColored> &vertexData, std::vector<uint16> &indexData, float boundingRadius);
+        bool setup(std::vector<VertexColored> &vertexData, std::vector<uint32> &indexData, float boundingRadius);
+        bool setup(std::vector<VertexTextured> &vertexData, std::vector<uint16> &indexData, float boundingRadius);
+        bool setup(std::vector<VertexTextured> &vertexData, std::vector<uint32> &indexData, float boundingRadius);
 
         void render(void *frameRenderData) override final;
 

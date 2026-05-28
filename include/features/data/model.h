@@ -37,6 +37,7 @@ namespace wne
         ModelVertexData vertexData;
         ModelIndexData indexData;
         ModelDataType dataType;
+        float boundingRadius = 0.0f;
 
     public:
         Model(ModelVertexData vertexData, ModelIndexData indexData, ModelDataType type);
@@ -77,6 +78,11 @@ namespace wne
         inline std::vector<uint32> &getAsIndex32()
         {
             return *indexData.ind32;
+        }
+
+        inline float getBoundingRadius()
+        {
+            return boundingRadius;
         }
     };
 
