@@ -7,7 +7,7 @@ using namespace wne;
 
 ActorSprite::ActorSprite(Renderer *renderer) : Actor(renderer)
 {
-    mesh = renderer->getDefaultPlain();
+    mesh = renderer->getDefaultPlane();
     objectId = mesh->genNewObjectId();
     isShadowEnabled = false;
 }
@@ -90,4 +90,10 @@ void ActorSprite::renderColor()
 Actor::RenderPass ActorSprite::getRenderPass()
 {
     return (!material || material->getColorBlending() == ColorBlending::Solid) ? RenderPass::Main : RenderPass::Blended;
+}
+
+float ActorSprite::getBoundingRadius()
+{
+    float size = getHighestAxisValue(scale);
+    return sqrtf(size * size + size * size);
 }

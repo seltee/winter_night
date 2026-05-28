@@ -119,4 +119,6 @@ void ActorCameraFlying::update(float delta)
         isDirtyFlag = true;
     }
     eventUpdate(delta);
+
+    updateClippingPlanes();
 }

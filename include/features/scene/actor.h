@@ -8,6 +8,7 @@ namespace wne
 {
     class Renderer;
     class Scene;
+    class ActorCamera;
 
     class WNE_API Actor : public Object, public Positionable
     {
@@ -21,6 +22,8 @@ namespace wne
         Actor(Renderer *renderer);
 
         virtual void update(float delta);
+
+        virtual void updateRenderFlag(ActorCamera *camera);
 
         // build depth buffer for light's shadow
         virtual void renderDepthShadow();
@@ -41,6 +44,7 @@ namespace wne
         virtual void eventSetScene(Scene *oldScene, Scene *newScene);
         virtual void eventUpdate(float delta);
         virtual void eventDestroyed();
+        virtual float getBoundingRadius();
 
         inline bool hasShadow()
         {
@@ -62,11 +66,15 @@ namespace wne
             return isDestroyedFlag;
         }
 
+        inline bool isRendered(){
+            return isRenderedFlag;
+        }
+
     protected:
         bool isDirtyNormalsFlag = true;
         bool isShadowEnabled = true;
         bool isDestroyedFlag = false;
-
+        bool isRenderedFlag = false;
         Matrix3x3 mNormal = Matrix3x3::identity();
 
         Scene *currentScene = nullptr;

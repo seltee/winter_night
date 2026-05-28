@@ -7,6 +7,7 @@
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/pipelines/vulkanDescriptorSets.h"
+#include "features/renderer/vulkan/materials/vulkanMaterial.h"
 #include "features/logger/logger.h"
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
@@ -466,6 +467,11 @@ void VulkanUtils::endSingleTimeCommands(VkCommandBuffer commandBuffer)
     vkQueueWaitIdle(graphicsQueue);
 
     vkFreeCommandBuffers(device, vulkanCommandPool->getCommandPool(), 1, &commandBuffer);
+}
+
+void VulkanUtils::clearPreviousStates()
+{
+    VulkanMaterial::clearLastDescriptorColorBond();
 }
 
 uint64 VulkanUtils::getVkSampleCountFlagBits(uint64 sampleCount)

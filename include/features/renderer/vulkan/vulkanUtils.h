@@ -70,6 +70,8 @@ namespace wne
         VkCommandBuffer beginSingleTimeCommands();
         void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
+        void clearPreviousStates();
+
         uint64 getVkSampleCountFlagBits(uint64 sampleCount);
 
         inline void swapSets()

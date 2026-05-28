@@ -21,6 +21,7 @@ namespace wne
         void renderColor() override final;
 
         RenderPass getRenderPass() override final;
+        float getBoundingRadius() override final;
 
         inline uint64 getObjectId()
         {

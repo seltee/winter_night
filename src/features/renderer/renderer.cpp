@@ -87,9 +87,13 @@ std::shared_ptr<wne::Material> Renderer::getDefaultMaterial()
     return nullptr;
 }
 
-std::shared_ptr<wne::Mesh> Renderer::getDefaultPlain()
+std::shared_ptr<wne::Mesh> Renderer::getDefaultPlane()
 {
     return nullptr;
+}
+
+void Renderer::prepareRenderingState()
+{
 }
 
 void Renderer::setMSAASampleCount(uint sampleCount)

@@ -77,6 +77,8 @@ bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint1
     amountOfPolygons = amountOfIndices / 3;
     dataType = ModelDataType::VertexColoredInd16;
     vulkanIndexType = VK_INDEX_TYPE_UINT16;
+    for (auto const &vertex : vertexData)
+        boundingRadius = fmaxf(boundingRadius, sqrtf(vertex.pos.x * vertex.pos.x + vertex.pos.y * vertex.pos.y + vertex.pos.z * vertex.pos.z));
     return true;
 }
 
@@ -95,6 +97,8 @@ bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint3
     amountOfPolygons = amountOfIndices / 3;
     dataType = ModelDataType::VertexColoredInd32;
     vulkanIndexType = VK_INDEX_TYPE_UINT32;
+    for (auto const &vertex : vertexData)
+        boundingRadius = fmaxf(boundingRadius, sqrtf(vertex.pos.x * vertex.pos.x + vertex.pos.y * vertex.pos.y + vertex.pos.z * vertex.pos.z));
     return true;
 }
 
@@ -113,6 +117,8 @@ bool VulkanMesh::setup(std::vector<VertexTextured> &vertexData, std::vector<uint
     amountOfPolygons = amountOfIndices / 3;
     dataType = ModelDataType::VertexTexturedInd16;
     vulkanIndexType = VK_INDEX_TYPE_UINT16;
+    for (auto const &vertex : vertexData)
+        boundingRadius = fmaxf(boundingRadius, sqrtf(vertex.pos.x * vertex.pos.x + vertex.pos.y * vertex.pos.y + vertex.pos.z * vertex.pos.z));
     return true;
 }
 
@@ -131,6 +137,8 @@ bool VulkanMesh::setup(std::vector<VertexTextured> &vertexData, std::vector<uint
     amountOfPolygons = amountOfIndices / 3;
     dataType = ModelDataType::VertexTexturedInd32;
     vulkanIndexType = VK_INDEX_TYPE_UINT32;
+    for (auto const &vertex : vertexData)
+        boundingRadius = fmaxf(boundingRadius, sqrtf(vertex.pos.x * vertex.pos.x + vertex.pos.y * vertex.pos.y + vertex.pos.z * vertex.pos.z));
     return true;
 }
 

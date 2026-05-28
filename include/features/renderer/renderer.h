@@ -45,7 +45,9 @@ namespace wne
         virtual std::shared_ptr<Light> createLightSpot();
 
         virtual std::shared_ptr<Material> getDefaultMaterial();
-        virtual std::shared_ptr<Mesh> getDefaultPlain();
+        virtual std::shared_ptr<Mesh> getDefaultPlane();
+
+        virtual void prepareRenderingState();
 
         virtual void setMSAASampleCount(uint sampleCount);
         uint getMSAASampleCount();

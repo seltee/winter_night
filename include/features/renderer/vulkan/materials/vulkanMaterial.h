@@ -37,6 +37,11 @@ namespace wne
         virtual void selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData);
         virtual void setPCData(uint64 objectId, const AffectingLights &lights);
 
+        inline static void clearLastDescriptorColorBond()
+        {
+            lastDescriptorColorBond = nullptr;
+        }
+
     protected:
         VulkanUtils *vulkanUtils = nullptr;
         static VulkanMaterial *lastDescriptorColorBond;

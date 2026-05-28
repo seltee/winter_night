@@ -65,8 +65,9 @@ void ActorTerrain::updateGrid()
 
 void ActorTerrain::updateMesh()
 {
-    float startX = -size * 0.5f;
-    float startZ = -size * 0.5f;
+    float halfSize = size * 0.5f;
+    float startX = -halfSize;
+    float startZ = -halfSize;
     float partSize = 1.0f / (float)(resolution - 1);
 
     std::vector<wne::VertexTextured> vertices;
@@ -116,6 +117,8 @@ void ActorTerrain::updateMesh()
 
     if (objectId == 0xffffffff)
         objectId = mesh->genNewObjectId();
+
+    boundingRadius = sqrtf(halfSize * halfSize + halfSize * halfSize);
 }
 
 void ActorTerrain::setMaterial(std::shared_ptr<Material> material)
@@ -137,6 +140,11 @@ float ActorTerrain::getHeightLocal(float x, float y)
 float ActorTerrain::getHeightGlobal(float x, float y)
 {
     return getHeightLocal((x + size * 0.5f) / size, (y + size * 0.5f) / size);
+}
+
+float ActorTerrain::getBoundingRadius()
+{
+    return boundingRadius;
 }
 
 void ActorTerrain::renderDepthShadow()

@@ -109,9 +109,14 @@ std::shared_ptr<wne::Material> RendererVulkanNT::getDefaultMaterial()
     return defaultMaterial;
 }
 
-std::shared_ptr<Mesh> RendererVulkanNT::getDefaultPlain()
+std::shared_ptr<Mesh> RendererVulkanNT::getDefaultPlane()
 {
-    return defaultPlain;
+    return defaultPlane;
+}
+
+void RendererVulkanNT::prepareRenderingState()
+{
+    instance->getVulkanUtils()->clearPreviousStates();
 }
 
 void RendererVulkanNT::changeWindowSize(uint32 width, uint32 height)
@@ -202,8 +207,8 @@ bool RendererVulkanNT::setup(void *hWnd)
     auto defaultTexture = createTexture(std::make_shared<Image>(textureData, defaultWidth, defaultHeight, 4));
     defaultMaterial = createFlatMaterial(defaultTexture);
 
-    auto plainModel = Primitives::createPlain(1.0f, Vector3::forward());
-    defaultPlain = createMesh(plainModel);
+    auto planeModel = Primitives::createPlane(1.0f, Vector3::forward());
+    defaultPlane = createMesh(planeModel);
 
     return true;
 }

@@ -33,6 +33,8 @@ namespace wne
         // -size - size
         float getHeightGlobal(float x, float y);
 
+        float getBoundingRadius() override final;
+
         void renderDepthShadow() override final;
         void renderDepth() override final;
         void renderColor() override final;
@@ -48,5 +50,6 @@ namespace wne
 
         int resolution = 10;
         float size = 10.0f;
+        float boundingRadius = 1.0f;
     };
 }

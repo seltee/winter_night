@@ -7,7 +7,7 @@
 
 using namespace wne;
 
-void _actorsUpdate(float delta, uint from, uint to, std::vector<std::shared_ptr<wne::Actor>> *actors);
+void _actorsUpdate(float delta, uint from, uint to, std::vector<std::shared_ptr<wne::Actor>> *actors, ActorCamera *actorCamera);
 
 Scene::Scene(Renderer *renderer)
 {
@@ -27,8 +27,9 @@ void Scene::update(float delta)
     {
         uint to = std::min((uint)(i + actorsPerJob), (uint)actors.size());
         auto pActors = &actors;
-        Engine::getInstance()->getJobQueue().queueJob([delta, i, to, pActors]
-                                                      { _actorsUpdate(delta, i, to, pActors); });
+        ActorCamera *currentCamera = actorCamera.get();
+        Engine::getInstance()->getJobQueue().queueJob([delta, i, to, pActors, currentCamera]
+                                                      { _actorsUpdate(delta, i, to, pActors, currentCamera); });
     }
     Engine::getInstance()->getJobQueue().waitJobs();
 
@@ -79,12 +80,15 @@ void Scene::renderDepth()
     // depth pass
     for (const auto &object : actors)
     {
-        object->renderDepth();
+        if (object->isRendered())
+            object->renderDepth();
     }
 }
 
 void Scene::render()
 {
+    renderer->prepareRenderingState();    
+
     // render atmosphere if set
     if (this->atmosphereMap)
     {
@@ -99,10 +103,13 @@ void Scene::render()
     // color pass
     for (const auto &object : actors)
     {
-        if (object->getRenderPass() == Actor::RenderPass::Main)
-            object->renderColor();
-        else
-            blendingPass.push_back(object.get());
+        if (object->isRendered())
+        {
+            if (object->getRenderPass() == Actor::RenderPass::Main)
+                object->renderColor();
+            else
+                blendingPass.push_back(object.get());
+        }
     }
 
     // blending pass
@@ -189,10 +196,11 @@ void Scene::unregisterLight(Light *light)
         lights.erase(std::remove(lights.begin(), lights.end(), light), lights.end());
 }
 
-void _actorsUpdate(float delta, uint from, uint to, std::vector<std::shared_ptr<wne::Actor>> *actors)
+void _actorsUpdate(float delta, uint from, uint to, std::vector<std::shared_ptr<wne::Actor>> *actors, ActorCamera *actorCamera)
 {
     for (uint i = from; i < to; i++)
     {
         (*actors)[i]->update(delta);
+        (*actors)[i]->updateRenderFlag(actorCamera);
     }
 }

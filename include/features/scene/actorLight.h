@@ -16,6 +16,8 @@ namespace wne
         
         void update(float delta);
 
+        void updateRenderFlag(ActorCamera *camera) override;
+        
         inline std::shared_ptr<Light> getLight()
         {
             return light;

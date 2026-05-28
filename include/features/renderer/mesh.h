@@ -12,6 +12,11 @@ namespace wne
         virtual uint64 genNewObjectId();
         virtual void freeObjectId(uint64 objectId);
 
+        inline float getBoundingRadius()
+        {
+            return boundingRadius;
+        }
+
         inline ModelDataType getDataType()
         {
             return dataType;
@@ -19,5 +24,6 @@ namespace wne
 
     protected:
         ModelDataType dataType = ModelDataType::Unknown;
+        float boundingRadius = 0.0f;
     };
 }

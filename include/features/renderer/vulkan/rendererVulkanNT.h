@@ -29,7 +29,8 @@ namespace wne
         uint getMaxMSAASampleCount() override final;
 
         std::shared_ptr<wne::Material> getDefaultMaterial() override final;
-        std::shared_ptr<Mesh> getDefaultPlain() override final;
+        std::shared_ptr<Mesh> getDefaultPlane() override final;
+        void prepareRenderingState() override final;
 
         void changeWindowSize(uint32 width, uint32 height) override final;
         std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model) override final;
@@ -52,7 +53,7 @@ namespace wne
         uint64 atmoSphereMeshId = 0xffffffff;
 
         std::shared_ptr<Material> defaultMaterial;
-        std::shared_ptr<Mesh> defaultPlain;
+        std::shared_ptr<Mesh> defaultPlane;
 
         uint MSAASampleCount = 1;
     };

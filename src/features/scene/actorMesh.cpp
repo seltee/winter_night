@@ -58,3 +58,9 @@ Actor::RenderPass ActorMesh::getRenderPass()
 {
     return (!material || material->getColorBlending() == ColorBlending::Solid) ? RenderPass::Main : RenderPass::Blended;
 }
+
+float ActorMesh::getBoundingRadius()
+{
+    float size = getHighestAxisValue(scale);
+    return mesh->getBoundingRadius() * size;
+}

@@ -3,12 +3,12 @@
 
 using namespace wne;
 
-std::shared_ptr<Model> Primitives::createPlain(float halfSize)
+std::shared_ptr<Model> Primitives::createPlane(float halfSize)
 {
-    return createPlain(halfSize, Vector3::up());
+    return createPlane(halfSize, Vector3::up());
 }
 
-std::shared_ptr<Model> Primitives::createPlain(float halfSize, const Vector3 &normal)
+std::shared_ptr<Model> Primitives::createPlane(float halfSize, const Vector3 &normal)
 {
     Vector3 up = fabs(normal.y) < 0.999f
                      ? Vector3{0, 1, 0}

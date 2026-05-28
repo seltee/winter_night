@@ -63,11 +63,11 @@ int main()
     actorMesh3->setMaterial(materialEx);
     actorMesh3->setPosition(-8.0f, 8.0f, 20.0f);
 
-    auto plainModel = wne::Primitives::createPlain(4.0f, wne::normalize(wne::Vector3(-1.0f, 1.0f, -1.0f)));
-    auto plainMesh = renderer->createMesh(plainModel);
-    auto actorPlain = scene->createActor<wne::ActorMesh>(plainMesh);
-    actorPlain->setMaterial(materialBox);
-    actorPlain->setPosition(12.0f, -4.0f, 12.0f);
+    auto planeModel = wne::Primitives::createPlane(4.0f, wne::normalize(wne::Vector3(-1.0f, 1.0f, -1.0f)));
+    auto planeMesh = renderer->createMesh(planeModel);
+    auto actorPlane = scene->createActor<wne::ActorMesh>(planeMesh);
+    actorPlane->setMaterial(materialBox);
+    actorPlane->setPosition(12.0f, -4.0f, 12.0f);
 
     auto actorSprite = scene->createActor<wne::ActorSprite>();
     actorSprite->setMaterial(materialExplosion);

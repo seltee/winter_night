@@ -1,4 +1,5 @@
 #include "features/scene/actor.h"
+#include "features/scene/actorCamera.h"
 #include "features/renderer/renderer.h"
 #include "features/logger/logger.h"
 #include <memory>
@@ -14,6 +15,20 @@ Actor::Actor(Renderer *renderer)
 void Actor::update(float delta)
 {
     eventUpdate(delta);
+}
+
+void Actor::updateRenderFlag(ActorCamera *camera)
+{
+    if (camera)
+    {
+        Vector4 position = getModelMatrix() * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+        position = position / position.w;
+        isRenderedFlag = camera->checkFrustrum(position.xyz(), getBoundingRadius());
+    }
+    else
+    {
+        isRenderedFlag = false;
+    }
 }
 
 void Actor::renderDepthShadow()
@@ -75,4 +90,9 @@ void Actor::eventUpdate(float delta)
 
 void Actor::eventDestroyed()
 {
+}
+
+float Actor::getBoundingRadius()
+{
+    return 1.0f;
 }

@@ -25,3 +25,8 @@ void ActorLight::update(float delta)
     light->updateTransformation(getModelMatrix());
     eventUpdate(delta);
 }
+
+void ActorLight::updateRenderFlag(ActorCamera *camera)
+{
+    isRenderedFlag = false;
+}

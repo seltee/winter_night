@@ -25,6 +25,8 @@ namespace wne
 
         RenderPass getRenderPass() override final;
 
+        float getBoundingRadius() override final;
+
         inline uint64 getObjectId()
         {
             return objectId;

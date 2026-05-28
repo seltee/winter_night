@@ -31,7 +31,7 @@ namespace wne
 
     inline Quat normalize(const Quat &q)
     {
-        float norm = std::sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
+        float norm = std::sqrtf(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
         if (norm < 1e-12)
             return {1.0, 0.0, 0.0, 0.0};
         return {q.x / norm, q.y / norm, q.z / norm, q.w / norm};
@@ -39,7 +39,7 @@ namespace wne
 
     inline Vector3 normalize(const Vector3 &vec)
     {
-        float norm = std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+        float norm = std::sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
         if (norm < 1e-12)
             return {1.0, 0.0, 0.0};
         return {vec.x / norm, vec.y / norm, vec.z / norm};
@@ -105,6 +105,26 @@ namespace wne
         float difY = to.y - from.y;
         float difZ = to.z - from.z;
         return sqrtf(difX * difX + difY * difY + difZ * difZ);
+    }
+
+    inline float distance(const Plane &plane, const Vector3 &point)
+    {
+        return plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;
+    }
+
+    inline float getHighestAxisValue(const Vector4 &vec)
+    {
+        return fmaxf(fmaxf(fmaxf(vec.x, vec.y), vec.z), vec.w);
+    }
+
+    inline float getHighestAxisValue(const Vector3 &vec)
+    {
+        return fmaxf(fmaxf(vec.x, vec.y), vec.z);
+    }
+
+    inline float getHighestAxisValue(const Vector2 &vec)
+    {
+        return fmaxf(vec.x, vec.y);
     }
 
 };
