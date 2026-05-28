@@ -2,6 +2,7 @@
 #include "core/api.h"
 #include "features/renderer/renderer.h"
 #include "features/os/windowEvents.h"
+#include "features/os/gamepad.h"
 #include <memory>
 #include <vector>
 #include <mutex>
@@ -29,6 +30,8 @@ namespace wne
         std::unique_ptr<Renderer> renderer;
         std::mutex mutex;
 
+        std::vector<std::shared_ptr<Gamepad>> gamepads;
+
         std::weak_ptr<WindowEvents> subscribers[MAX_SUBSCIRBERS];
         int subscribersAmount = 0;
 
@@ -49,10 +52,15 @@ namespace wne
         virtual void close();
 
         std::shared_ptr<WindowEvents> subscribe();
-        void emitEventKey(bool isDown, uint16 keyCode);
+        void emitEventKey(bool isPressed, uint16 keyCode);
         void emitEventMouseMove(int16 shiftX, int16 shiftY);
-        void emitEventMouseClick(bool isDown, uint16 mouseButton);
+        void emitEventMouseClick(bool isPressed, uint16 mouseButton);
         void emitEventFocusChanged(bool newFocusState);
+        void emitEventGamepadPlugged(std::shared_ptr<Gamepad> gamepad);
+        void emitEventGamepadUnplugged(std::shared_ptr<Gamepad> gamepad);
+        void emitEventGamepadButton(std::shared_ptr<Gamepad> gamepad, uint16 buttonCode, bool isPressed);
+        void emitEventGamepadAxes(std::shared_ptr<Gamepad> gamepad, uint16 axisCode, float axisValue);
+        void emitEventGamepadDirectionPad(std::shared_ptr<Gamepad> gamepad, uint16 value);
 
         inline Renderer *getRenderer()
         {

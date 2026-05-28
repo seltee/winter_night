@@ -4,7 +4,7 @@ LD = g++
 
 CXX_FLAGS = -DWNE_BUILD_DLL -Iinclude -I../vulkan/Include -Wall -MMD -std=c++20 -mfpmath=sse -g -O2
 
-LIBRARIES = -lkernel32 -luser32 -lgdi32 -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lvulkan-1
+LIBRARIES = -lkernel32 -luser32 -lgdi32 -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lvulkan-1 -lsetupapi -lhid
 
 EXT = ".exe"
 

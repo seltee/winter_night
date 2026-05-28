@@ -2,6 +2,12 @@
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 #include "features/logger/logger.h"
 #include <windows.h>
+#include <hidsdi.h>
+#include <hidusage.h>
+#include <hidpi.h>
+#include <algorithm>
+#include <shellscalingapi.h>
+#include <string>
 
 using namespace wne;
 
@@ -10,6 +16,8 @@ using namespace wne;
 typedef BOOL(WINAPI *SetProcessDPIAwareFunc)();
 
 LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+GamepadReport _parseHidReport(HANDLE hDevice, PHIDP_PREPARSED_DATA pPreparsedData, char *report, UINT reportLength);
 
 bool WindowNT::setup(uint width, uint height, WindowType type)
 {
@@ -86,7 +94,9 @@ bool WindowNT::setup(uint width, uint height, WindowType type)
     ShowWindow(hWnd, true);
     UpdateWindow(hWnd);
     SetActiveWindow(hWnd);
+    enableGamepadInput();
 
+    prepareGamepadList();
     return true;
 }
 
@@ -163,6 +173,68 @@ void WindowNT::setFocused(bool state)
     emitEventFocusChanged(state);
 }
 
+void WindowNT::handleDevicePlugged(void *handle)
+{
+    if (!findGamepad(handle))
+    {
+        gamepads.emplace_back(std::make_shared<GamepadNT>(handle));
+        emitEventGamepadPlugged(gamepads.back());
+    }
+}
+
+void WindowNT::handleDeviceUnplugged(void *handle)
+{
+    auto toRemove = findGamepad(handle);
+    if (toRemove)
+    {
+        toRemove->setUnplugged();
+        std::erase_if(gamepads, [&](const std::shared_ptr<wne::Gamepad> &gamepad)
+                      { return gamepad.get() == toRemove.get(); });
+        emitEventGamepadUnplugged(toRemove);
+    }
+}
+
+std::shared_ptr<Gamepad> WindowNT::findGamepad(void *handle)
+{
+    for (auto &gamepad : gamepads)
+    {
+        if (static_cast<GamepadNT *>(gamepad.get())->getHandle() == handle)
+            return gamepad;
+    }
+    return nullptr;
+}
+
+void WindowNT::prepareGamepadList()
+{
+    unsigned int deviceCount = 0;
+    GetRawInputDeviceList(nullptr, &deviceCount, sizeof(RAWINPUTDEVICELIST));
+
+    // Allocate memory for the device list
+    std::vector<RAWINPUTDEVICELIST> deviceList;
+    deviceList.resize(deviceCount);
+    GetRawInputDeviceList(deviceList.data(), &deviceCount, sizeof(RAWINPUTDEVICELIST));
+
+    // Iterate over all devices
+    for (unsigned int i = 0; i < deviceCount; ++i)
+    {
+        // Check if the device is a gamepad (or joystick)
+        if (deviceList[i].dwType == RIM_TYPEHID)
+        {
+            RID_DEVICE_INFO rdi;
+            rdi.cbSize = sizeof(rdi);
+            unsigned int rdiSize = sizeof(rdi);
+            GetRawInputDeviceInfo(deviceList[i].hDevice, RIDI_DEVICEINFO, &rdi, &rdiSize);
+
+            // Check for gamepad based on usage page and usage ID
+            if (rdi.hid.usUsagePage == 0x01 && (rdi.hid.usUsage == 0x04 || rdi.hid.usUsage == 0x05))
+            {
+                // gamepads.emplace_back(std::make_shared<GamepadNT>(deviceList[i].hDevice));
+                handleDevicePlugged(deviceList[i].hDevice);
+            }
+        }
+    }
+}
+
 void WindowNT::setProcessDPIAware()
 {
     HMODULE user32 = LoadLibraryA("user32.dll");
@@ -180,6 +252,18 @@ void WindowNT::setProcessDPIAware()
 
     // Free the library
     FreeLibrary(user32);
+}
+
+void WindowNT::enableGamepadInput()
+{
+    RAWINPUTDEVICE rid;
+    rid.usUsagePage = 0x01;
+    rid.usUsage = 0x05;
+    rid.dwFlags = RIDEV_INPUTSINK | RIDEV_DEVNOTIFY;
+    rid.hwndTarget = hWnd;
+
+    if (RegisterRawInputDevices(&rid, 1, sizeof(rid)) == false)
+        Logger::log << "Unable to register raw input devices for Windows" << endl;
 }
 
 int WindowNT::getStyleForState(WindowType type)
@@ -300,9 +384,125 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         // window->updateMouseOverWindow(false);
         break;
 
+    case WM_INPUT:
+    {
+        UINT dwSize;
+        GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
+        if (dwSize == 0)
+            break;
+        std::vector<uint8> lpb;
+        lpb.resize(dwSize);
+
+        auto rawInputDataSize = GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb.data(), &dwSize, sizeof(RAWINPUTHEADER));
+        if (rawInputDataSize != dwSize)
+        {
+            std::cout << "GetRawInputData does not return correct size! " << rawInputDataSize << " vs " << dwSize << std::endl;
+            break;
+        }
+
+        RAWINPUT *raw = (RAWINPUT *)lpb.data();
+        if (raw->header.dwType == RIM_TYPEHID)
+        {
+            // Get preparsed data
+            UINT preparsedDataSize;
+            GetRawInputDeviceInfo(raw->header.hDevice, RIDI_PREPARSEDDATA, nullptr, &preparsedDataSize);
+            std::vector<uint8> preparcedData;
+            preparcedData.resize(preparsedDataSize);
+            GetRawInputDeviceInfo(raw->header.hDevice, RIDI_PREPARSEDDATA, preparcedData.data(), &preparsedDataSize);
+
+            // Gamepad data
+            RID_DEVICE_INFO rdi;
+            rdi.cbSize = sizeof(rdi);
+            unsigned int rdiSize = sizeof(rdi);
+            GetRawInputDeviceInfo(raw->header.hDevice, RIDI_DEVICEINFO, &rdi, &rdiSize);
+
+            auto gamepad = window->findGamepad(raw->header.hDevice);
+            if (gamepad)
+            {
+                static_cast<Gamepad *>(gamepad.get());
+
+                GamepadReport report = _parseHidReport(
+                    raw->header.hDevice,
+                    (PHIDP_PREPARSED_DATA)preparcedData.data(),
+                    (char *)raw->data.hid.bRawData,
+                    raw->data.hid.dwSizeHid);
+
+                auto buttonChanges = gamepad->processReportButtons(report);
+                auto axisChanges = gamepad->processReportAxises(report);
+                auto directionPadChanges = gamepad->processReportDirectionPad(report);
+
+                for (const auto &change : buttonChanges)
+                    window->emitEventGamepadButton(gamepad, change.keyId, change.isPressed);
+                for (const auto &change : axisChanges)
+                    window->emitEventGamepadAxes(gamepad, change.axisId, change.value);
+                for (const auto &change : directionPadChanges)
+                    window->emitEventGamepadDirectionPad(gamepad, change.value);
+            }
+        }
+    }
+    break;
+
+    case WM_INPUT_DEVICE_CHANGE:
+        if (wParam == GIDC_ARRIVAL)
+        {
+            window->handleDevicePlugged((HANDLE)lParam);
+        }
+        else if (wParam == GIDC_REMOVAL)
+        {
+            window->handleDeviceUnplugged((HANDLE)lParam);
+        }
+        break;
+
     default:
         return DefWindowProcW(hWnd, message, wParam, lParam);
     }
 
     return DefWindowProcW(hWnd, message, wParam, lParam);
+}
+
+GamepadReport _parseHidReport(HANDLE hDevice, PHIDP_PREPARSED_DATA pPreparsedData, char *report, UINT reportLength)
+{
+    GamepadReport gamepadReport;
+    memset(&gamepadReport, 0, sizeof(GamepadReport));
+
+    HIDP_CAPS caps;
+    HidP_GetCaps(pPreparsedData, &caps);
+
+    // Example: Handling Button Inputs
+    unsigned short numButtonCaps = caps.NumberInputButtonCaps;
+    HIDP_BUTTON_CAPS buttonCaps[numButtonCaps];
+    HidP_GetButtonCaps(HidP_Input, buttonCaps, &numButtonCaps, pPreparsedData);
+
+    unsigned long numUsages = Gamepad::MaxButtons; // Adjust based on expected number of buttons
+    unsigned short usageList[Gamepad::MaxButtons];
+    HidP_GetUsages(HidP_Input, buttonCaps[0].UsagePage, 0, usageList, &numUsages, pPreparsedData, report, reportLength);
+
+    for (unsigned long i = 0; i < numUsages; i++)
+    {
+        gamepadReport.buttons[usageList[i]] = true;
+    }
+
+    // Example: Handling Axis Inputs
+    unsigned short numValueCaps = caps.NumberInputValueCaps;
+    HIDP_VALUE_CAPS valueCaps[numValueCaps];
+    HidP_GetValueCaps(HidP_Input, valueCaps, &numValueCaps, pPreparsedData);
+
+    for (USHORT i = 0; i < numValueCaps; i++)
+    {
+        unsigned short usage = valueCaps[i].NotRange.Usage;
+        unsigned short page = valueCaps[i].UsagePage;
+
+        unsigned long value;
+        HidP_GetUsageValue(HidP_Input, page, 0, usage, &value, pPreparsedData, report, reportLength);
+        float fValue = fminf(fmaxf((static_cast<float>(value) / static_cast<float>(0xffff / 2)) - 1.0f, -1.0f), 1.0f);
+
+        if (usage >= 0 && usage < Gamepad::MaxAxises)
+            gamepadReport.axises[usage] = fValue;
+
+        // DPAD
+        if (usage == 57)
+            gamepadReport.directionPad = value;
+    }
+
+    return gamepadReport;
 }

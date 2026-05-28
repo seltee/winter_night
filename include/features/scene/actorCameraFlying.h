@@ -27,12 +27,15 @@ namespace wne
         }
 
     protected:
-        std::shared_ptr<wne::WindowEvents> eventsSubscription;
+        void addCameraRotation(float addYaw, float pitch);
 
-        bool moveForward = false, moveBackward = false, moveUp = false, moveDown = false, moveLeft = false, moveRight = false;
+        float moveForward = 0, moveUp = 0, moveRight = 0;
+        float rotateYaw = 0, rotatePitch = 0;
         float speed = 40.0f;
 
-        float yaw = 0.0f; 
+        float yaw = 0.0f;
         float pitch = 0.0f;
+        
+        std::shared_ptr<wne::WindowEvents> eventsSubscription;
     };
 };

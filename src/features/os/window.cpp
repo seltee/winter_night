@@ -76,7 +76,7 @@ std::shared_ptr<WindowEvents> Window::subscribe()
     return sub;
 }
 
-void Window::emitEventKey(bool isDown, uint16 keyCode)
+void Window::emitEventKey(bool isPressed, uint16 keyCode)
 {
     std::lock_guard<std::mutex> lock(mutex);
     for (int i = 0; i < subscribersAmount;)
@@ -84,7 +84,7 @@ void Window::emitEventKey(bool isDown, uint16 keyCode)
         auto subscriber = subscribers[i].lock();
         if (subscriber)
         {
-            subscriber->pushEventKey(isDown, keyCode);
+            subscriber->pushEventKey(isPressed, keyCode);
             i++;
         }
         else
@@ -114,7 +114,7 @@ void Window::emitEventMouseMove(int16 shiftX, int16 shiftY)
     }
 }
 
-void Window::emitEventMouseClick(bool isDown, uint16 mouseButton)
+void Window::emitEventMouseClick(bool isPressed, uint16 mouseButton)
 {
     std::lock_guard<std::mutex> lock(mutex);
     for (int i = 0; i < subscribersAmount;)
@@ -122,7 +122,7 @@ void Window::emitEventMouseClick(bool isDown, uint16 mouseButton)
         auto subscriber = subscribers[i].lock();
         if (subscriber)
         {
-            subscriber->pushEventMouseClick(isDown, mouseButton);
+            subscriber->pushEventMouseClick(isPressed, mouseButton);
             i++;
         }
         else
@@ -142,6 +142,101 @@ void Window::emitEventFocusChanged(bool newFocusState)
         if (subscriber)
         {
             subscriber->pushEventWindowFocusChanged(newFocusState);
+            i++;
+        }
+        else
+        {
+            subscribersAmount--;
+            subscribers[i] = subscribers[subscribersAmount];
+        }
+    }
+}
+
+void Window::emitEventGamepadPlugged(std::shared_ptr<Gamepad> gamepad)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    for (int i = 0; i < subscribersAmount;)
+    {
+        auto subscriber = subscribers[i].lock();
+        if (subscriber)
+        {
+            subscriber->pushEventGamepadPlugged(gamepad);
+            i++;
+        }
+        else
+        {
+            subscribersAmount--;
+            subscribers[i] = subscribers[subscribersAmount];
+        }
+    }
+}
+
+void Window::emitEventGamepadUnplugged(std::shared_ptr<Gamepad> gamepad)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    for (int i = 0; i < subscribersAmount;)
+    {
+        auto subscriber = subscribers[i].lock();
+        if (subscriber)
+        {
+            subscriber->pushEventGamepadUnplugged(gamepad);
+            i++;
+        }
+        else
+        {
+            subscribersAmount--;
+            subscribers[i] = subscribers[subscribersAmount];
+        }
+    }
+}
+
+void Window::emitEventGamepadButton(std::shared_ptr<Gamepad> gamepad, uint16 buttonCode, bool isPressed)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    for (int i = 0; i < subscribersAmount;)
+    {
+        auto subscriber = subscribers[i].lock();
+        if (subscriber)
+        {
+            subscriber->pushEventGamepadButton(gamepad, buttonCode, isPressed);
+            i++;
+        }
+        else
+        {
+            subscribersAmount--;
+            subscribers[i] = subscribers[subscribersAmount];
+        }
+    }
+}
+
+void Window::emitEventGamepadAxes(std::shared_ptr<Gamepad> gamepad, uint16 axisCode, float axisValue)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    for (int i = 0; i < subscribersAmount;)
+    {
+        auto subscriber = subscribers[i].lock();
+        if (subscriber)
+        {
+            subscriber->pushEventGamepadAxis(gamepad, axisCode, axisValue);
+            i++;
+        }
+        else
+        {
+            subscribersAmount--;
+            subscribers[i] = subscribers[subscribersAmount];
+        }
+    }
+}
+
+void Window::emitEventGamepadDirectionPad(std::shared_ptr<Gamepad> gamepad, uint16 value)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    for (int i = 0; i < subscribersAmount;)
+    {
+        auto subscriber = subscribers[i].lock();
+        if (subscriber)
+        {
+            subscriber->pushEventGamepadDirectionPad(gamepad, value);
             i++;
         }
         else

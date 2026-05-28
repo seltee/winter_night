@@ -216,6 +216,7 @@ int main()
     auto camera = wne::CameraPerspective::create(window);
     camera->setFarPlane(160.0f);
     auto actorCamera = scene->createActor<wne::ActorCameraFlying>(camera, window);
+    actorCamera->setPosition(0, 16.0f, 0);
     scene->setCamera(actorCamera);
 
     float translate = 0.0f;

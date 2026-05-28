@@ -1,5 +1,7 @@
 #include "features/os/window.h"
+#include "features/os/nt/gamepadNT.h"
 #include "core/api.h"
+#include <memory>
 
 class HWND__;
 
@@ -19,11 +21,16 @@ namespace wne
         void close() override final;
 
         void setFocused(bool state);
+        void handleDevicePlugged(void *handle);
+        void handleDeviceUnplugged(void *handle);
+        std::shared_ptr<Gamepad> findGamepad(void *handle);
 
     private:
         HWND__ *hWnd;
 
+        void prepareGamepadList();
         void setProcessDPIAware();
+        void enableGamepadInput();
         int getStyleForState(WindowType type);
         float getAdditionalWindowWidth();
         float getAdditionalWindowHeight();

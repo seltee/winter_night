@@ -1,12 +1,13 @@
 #include "features/os/windowEvents.h"
 #include <string>
+#include <iostream>
 
 using namespace wne;
 
 void WindowEvents::pushEventKey(bool isDown, uint16 keyCode)
 {
     std::lock_guard<std::mutex> lock(mutex);
-    events[lastEventWrote].type = isDown ? WindowEventType::KEY_DOWN : WindowEventType::KEY_UP;
+    events[lastEventWrote].type = isDown ? WindowEventType::KEY_PRESS : WindowEventType::KEY_RELEASE;
     events[lastEventWrote].key.scancode = keyCode;
     lastEventWrote = (lastEventWrote + 1) % WINDOW_EVENTS_MAX;
 }
@@ -32,6 +33,45 @@ void WindowEvents::pushEventWindowFocusChanged(bool newFocusState)
 {
     std::lock_guard<std::mutex> lock(mutex);
     events[lastEventWrote].type = newFocusState ? WindowEventType::WINDOW_FOCUSED : WindowEventType::WINDOW_UNFOCUSED;
+    lastEventWrote = (lastEventWrote + 1) % WINDOW_EVENTS_MAX;
+}
+
+void WindowEvents::pushEventGamepadPlugged(std::shared_ptr<Gamepad> gamepad)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    events[lastEventWrote].type = WindowEventType::GAMEPAD_PLUGGED;
+    lastEventWrote = (lastEventWrote + 1) % WINDOW_EVENTS_MAX;
+}
+
+void WindowEvents::pushEventGamepadUnplugged(std::shared_ptr<Gamepad> gamepad)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    events[lastEventWrote].type = WindowEventType::GAMEPAD_UNPLUGGED;
+    lastEventWrote = (lastEventWrote + 1) % WINDOW_EVENTS_MAX;
+}
+
+void WindowEvents::pushEventGamepadButton(std::shared_ptr<Gamepad> gamepad, uint buttonCode, bool isPressed)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    events[lastEventWrote].type = isPressed ? WindowEventType::GAMEPAD_BUTTON_PRESS : WindowEventType::GAMEPAD_BUTTON_RELEASE;
+    events[lastEventWrote].gamepadButton.button = buttonCode;
+    lastEventWrote = (lastEventWrote + 1) % WINDOW_EVENTS_MAX;
+}
+
+void WindowEvents::pushEventGamepadAxis(std::shared_ptr<Gamepad> gamepad, uint axisCode, float value)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    events[lastEventWrote].type = WindowEventType::GAMEPAD_AXIS;
+    events[lastEventWrote].gamepadAxis.value = value;
+    events[lastEventWrote].gamepadAxis.code = axisCode;
+    lastEventWrote = (lastEventWrote + 1) % WINDOW_EVENTS_MAX;
+}
+
+void WindowEvents::pushEventGamepadDirectionPad(std::shared_ptr<Gamepad> gamepad, uint value)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    events[lastEventWrote].type = WindowEventType::GAMEPAD_DIRECTION_PAD;
+    events[lastEventWrote].gamepadDirectionPad.direction = value;
     lastEventWrote = (lastEventWrote + 1) % WINDOW_EVENTS_MAX;
 }
 
