@@ -24,6 +24,7 @@ namespace wne
 
         virtual std::shared_ptr<Texture> getTexture();
         virtual void update();
+        virtual float getProportion();
 
         std::unique_ptr<TextRowData> createBitmap();
 

@@ -47,10 +47,10 @@ void ActorCamera::updateClippingPlanes()
     bottomClippingPlane.normalize();
 
     nearClippingPlane = Plane(
-        viewProjection[0][3],
-        viewProjection[1][3],
-        viewProjection[2][3],
-        viewProjection[3][3]);
+        viewProjection[0][2],
+        viewProjection[1][2],
+        viewProjection[2][2],
+        viewProjection[3][2]);
     nearClippingPlane.normalize();
 
     farClippingPlane = Plane(

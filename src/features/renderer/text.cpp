@@ -35,6 +35,11 @@ void Text::update()
 {
 }
 
+float Text::getProportion()
+{
+    return 1.0f;
+}
+
 std::unique_ptr<Text::TextRowData> Text::createBitmap()
 {
     if (text.length() == 0)
@@ -64,13 +69,17 @@ std::unique_ptr<Text::TextRowData> Text::createBitmap()
             {
                 for (uint x = 0; x < glyphWidth; x++)
                 {
-                    uint32 pixelShift = yPos * width + x;
-                    ((uint32 *)&data[glyphShift])[pixelShift] = color;
-                    data[glyphShift + pixelShift * 4 + 3] = glyph->bitmap[y * glyphWidth + x];
+                    uint lineShift = x + glyphShift + glyph->shiftX;
+                    if (lineShift >= width)
+                        break;
+
+                    uint32 pixelShift = (yPos * width + lineShift) * 4;
+                    *((uint32 *)&data[pixelShift]) = color;
+                    data[pixelShift + 3] = glyph->bitmap[y * glyphWidth + x];
                 }
             }
         }
-        glyphShift += glyphWidth * 4;
+        glyphShift += glyph->width;
     }
 
     return std::make_unique<Text::TextRowData>(data, width, height);

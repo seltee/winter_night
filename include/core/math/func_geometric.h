@@ -41,7 +41,7 @@ namespace wne
     {
         float norm = std::sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
         if (norm < 1e-12)
-            return {1.0, 0.0, 0.0};
+            return {0.0, 0.0, -1.0};
         return {vec.x / norm, vec.y / norm, vec.z / norm};
     }
 

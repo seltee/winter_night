@@ -74,7 +74,7 @@ namespace wne
         Base base = Base::None;
         float baseValue = 1.0f;
 
-        float near = 0.0f;
+        float near = -10.0f;
         float far = 10.0f;
     };
 };

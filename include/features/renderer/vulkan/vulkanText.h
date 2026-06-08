@@ -15,9 +15,11 @@ namespace wne
 
         std::shared_ptr<Texture> getTexture() override final;
         void update() override final;
+        float getProportion() override final;
 
     protected:
         VulkanUtils *vulkanUtils;
         std::shared_ptr<Texture> texture;
+        float proportion = 1.0f;
     };
 };

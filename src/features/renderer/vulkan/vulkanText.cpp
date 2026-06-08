@@ -31,5 +31,16 @@ void VulkanText::update()
     if (!texture->setup(bitmapData->bitmap, bitmapData->width, bitmapData->height))
     {
         Logger::log << "failed to make text texture" << endl;
+        return;
     }
+
+    if (bitmapData->width > 0 && bitmapData->height > 0)
+    {
+        proportion = (float)bitmapData->width / (float)bitmapData->height;
+    }
+}
+
+float VulkanText::getProportion()
+{
+    return proportion;
 }
