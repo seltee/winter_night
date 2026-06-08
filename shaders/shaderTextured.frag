@@ -53,7 +53,8 @@ layout(set = 0, binding = 6) uniform sampler2D shadowTextures[16];
 vec2 sampleSphericalMap(vec3 v);
 
 void main() {
-    vec3 color = texture(albedoTexSampler, UV).xyz;
+    vec4 textureColor = texture(albedoTexSampler, UV);
+    vec3 color = textureColor.xyz;
 
     // ambient + radiance
     vec3 ambientColor = globalData.ambientColor.xyz;
@@ -140,7 +141,7 @@ void main() {
 
     vec3 result = (light + ambientColor) * color;
     vec3 gammaResult = vec3(pow(result.r, 1.0 / 1.2), pow(result.g, 1.0 / 1.2), pow(result.b, 1.0 / 1.2));
-    outColor = vec4(gammaResult, 1.0);
+    outColor = vec4(gammaResult, textureColor.a);
 
     // outColor = vec4(normal, 1.0);
     // outColor = texture(texSampler, UV);

@@ -414,6 +414,15 @@ bool VulkanPipelineTextured::buildPipeline(
             colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
             colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_SUBTRACT;
         }
+        else if (blending == ColorBlending::Alpha)
+        {
+            colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+            colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+            colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+            colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+            colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+            colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
+        }
 
         colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
         colorBlending.logicOpEnable = VK_FALSE;

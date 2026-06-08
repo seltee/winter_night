@@ -29,7 +29,8 @@ namespace wne
         Solid = 0,
         Addition = 1,
         Substraction = 2,
-        Total = 3
+        Alpha = 3,
+        Total = 4
     };
 
     enum class LightState : uint8

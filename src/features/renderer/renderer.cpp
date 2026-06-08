@@ -30,6 +30,11 @@ std::shared_ptr<Texture> Renderer::createTexture(std::shared_ptr<Image> image)
     return nullptr;
 }
 
+std::shared_ptr<Text> Renderer::createText(std::shared_ptr<Font> font)
+{
+    return nullptr;
+}
+
 std::shared_ptr<Material> Renderer::createFlatMaterial(std::shared_ptr<Texture> texture)
 {
     return nullptr;

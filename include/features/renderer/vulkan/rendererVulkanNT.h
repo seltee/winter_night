@@ -1,6 +1,7 @@
 #pragma once
 #include "features/renderer/renderer.h"
 #include "features/renderer/vulkan/vulkanInstance.h"
+#include "features/renderer/vulkan/vulkanText.h"
 #include "core/core.h"
 #include <memory>
 
@@ -35,6 +36,7 @@ namespace wne
         void changeWindowSize(uint32 width, uint32 height) override final;
         std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model) override final;
         std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image) override final;
+        std::shared_ptr<Text> createText(std::shared_ptr<Font> font) override final;
         std::shared_ptr<Material> createFlatMaterial(std::shared_ptr<Texture> texture) override final;
         std::shared_ptr<Material> createAtmosphereMaterial(std::shared_ptr<Texture> texture) override final;
 

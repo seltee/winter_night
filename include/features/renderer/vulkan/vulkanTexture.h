@@ -16,7 +16,7 @@ namespace wne
     public:
         VulkanTexture(VulkanUtils *vulkanUtils);
         ~VulkanTexture();
-        bool setup(void *pixels, uint32 width, uint32 height);
+        bool setup(void *pixels, uint32 width, uint32 height) override final;
         bool setup(VkImageView vkImageView);
 
         static std::shared_ptr<VulkanTexture> create(std::shared_ptr<Image> image, VulkanUtils *vulkanUtils);

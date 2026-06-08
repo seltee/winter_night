@@ -23,6 +23,17 @@ VulkanTexture::~VulkanTexture()
 bool VulkanTexture::setup(void *pixels, uint32 width, uint32 height)
 {
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
+    if (textureImage)
+    {
+        vkDestroyImage(device, textureImage, nullptr);
+        textureImage = nullptr;
+    }
+    if (textureImageMemory)
+    {
+        vkFreeMemory(device, textureImageMemory, nullptr);
+        textureImageMemory = nullptr;
+    }
+
     uint64 imageSize = width * height * 4;
     if (!vulkanUtils->createBuffer(
             imageSize,

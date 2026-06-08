@@ -134,6 +134,11 @@ std::shared_ptr<Texture> RendererVulkanNT::createTexture(std::shared_ptr<Image> 
     return VulkanTexture::create(image, instance->getVulkanUtils());
 }
 
+std::shared_ptr<Text> RendererVulkanNT::createText(std::shared_ptr<Font> font)
+{
+    return VulkanText::create(font, instance->getVulkanUtils());
+}
+
 std::shared_ptr<Material> RendererVulkanNT::createFlatMaterial(std::shared_ptr<Texture> texture)
 {
     return VulkanMaterial::createFlat(instance->getVulkanUtils(), texture);

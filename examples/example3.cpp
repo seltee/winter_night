@@ -56,16 +56,19 @@ int main()
     actorCamera->setPosition(wne::Vector3(0, 9.0f, 0));
     scene->setCamera(actorCamera);
 
-    wne::Font font("Roboto-Medium.ttf");
-    Glyph *glyph = font.getGlyph('A', 24);
-    for (uint y = 0; y < glyph->height; y++)
-    {
-        for (uint x = 0; x < glyph->width; x++)
-        {
-            std::cout << (int)glyph->bitmap[y * glyph->width + x] << " ";
-        }
-        std::cout << std::endl;
-    }
+    auto font = wne::Font::create("Roboto-Medium.ttf");
+    auto text = renderer->createText(font);
+    text->setText("Some text");
+    text->setFontSize(80);
+    text->update();
+    auto materialText = renderer->createFlatMaterial(text->getTexture());
+    materialText->setColorBlending(wne::ColorBlending::Alpha);
+    materialText->setLighted(false);
+
+    auto actorSprite = scene->createActor<wne::ActorSprite>();
+    actorSprite->setMaterial(materialText);
+    actorSprite->setScale(12.0f, 4.0f, 1.0f);
+    actorSprite->setPosition(0.0f, 16.0f, 12.0f);
 
     float translate = 0.0f;
     while (!window->isCloseRequested())

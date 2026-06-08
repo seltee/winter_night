@@ -10,7 +10,9 @@ namespace wne
     class WNE_API VulkanText : public Text
     {
     public:
-        VulkanText(VulkanUtils *vulkanUtils);
+        VulkanText(std::shared_ptr<Font> font, VulkanUtils *vulkanUtils);
+        static std::shared_ptr<wne::VulkanText> create(std::shared_ptr<Font> font, VulkanUtils *vulkanUtils);
+
         std::shared_ptr<Texture> getTexture() override final;
         void update() override final;
 
