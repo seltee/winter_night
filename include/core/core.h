@@ -1,4 +1,6 @@
 #pragma once
+#include "core/api.h"
+#include "core/utils.h"
 #include <cstdint>
 #include <utility>
 

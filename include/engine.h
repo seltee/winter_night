@@ -6,6 +6,7 @@
 #include "core/jobQueue.h"
 #include "features/os/window.h"
 #include "features/data/model.h"
+#include "features/data/font.h"
 #include "features/scene/scene.h"
 #include "features/scene/object.h"
 #include "features/scene/actor.h"
@@ -23,6 +24,7 @@
 #include "features/camera/cameraPerspective.h"
 #include "features/loaders/loader3d.h"
 #include "features/logger/logger.h"
+#include "features/renderer/text.h"
 #include "utils/primitives.h"
 
 namespace wne
