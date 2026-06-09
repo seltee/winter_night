@@ -48,10 +48,32 @@ namespace wne
             return fontSize;
         }
 
+        inline uint getTextureWidth()
+        {
+            return textureWidth;
+        }
+
+        inline uint getTextureHeight()
+        {
+            return textureHeight;
+        }
+
+        inline uint getTextWidth()
+        {
+            return textWidth;
+        }
+
+        inline uint getTextHeight()
+        {
+            return textHeight;
+        }
+
     protected:
         std::string text;
         std::shared_ptr<Font> font;
         uint fontSize = 24;
         uint color = 0xffffffff;
+        uint textureWidth = 0, textureHeight = 0;
+        uint textWidth = 0, textHeight = 0;
     };
 };

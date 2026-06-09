@@ -50,17 +50,21 @@ std::unique_ptr<Text::TextRowData> Text::createBitmap()
     uint length = text32.length();
 
     uint width = nextPowerOfTwo(font->measureWidth(text, fontSize) + 2);
-    uint height = nextPowerOfTwo(font->measureHeight(text, fontSize) + 2);
+    uint height = nextPowerOfTwo(font->measureHeight(text, fontSize) + 8);
     uint bitmapSize = width * height * 4;
     uint8 *data = new uint8[bitmapSize];
     memset(data, 0, bitmapSize);
 
+    textHeight = 0;
     uint glyphShift = 0;
     for (uint i = 0; i < length; i++)
     {
         Glyph *glyph = font->getGlyph(text32[i], fontSize);
         uint glyphWidth = glyph->width;
         uint glyphHeight = glyph->height;
+        uint glyphFullHeight = fontSize + glyphHeight + glyph->shiftY;
+        if (textHeight < glyphFullHeight)
+            textHeight = glyphFullHeight;
 
         for (uint y = 0; y < glyphHeight; y++)
         {
@@ -81,6 +85,9 @@ std::unique_ptr<Text::TextRowData> Text::createBitmap()
         }
         glyphShift += glyph->width;
     }
+    textWidth = glyphShift;
 
+    this->textureWidth = width;
+    this->textureHeight = height;
     return std::make_unique<Text::TextRowData>(data, width, height);
 }

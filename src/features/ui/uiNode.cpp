@@ -2,10 +2,28 @@
 
 using namespace wne;
 
-void UINode::update(uint16 width, uint16 height)
+UINode::UINode()
 {
 }
 
-void UINode::render()
+UINode::~UINode()
 {
+}
+
+void UINode::update(int x, int y, uint width, uint height)
+{
+}
+
+void UINode::render(Context &context)
+{
+}
+
+uint UINode::getWidth()
+{
+    return 0;
+}
+
+uint UINode::getHeight()
+{
+    return 0;
 }

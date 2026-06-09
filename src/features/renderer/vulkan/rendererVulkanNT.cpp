@@ -216,7 +216,7 @@ bool RendererVulkanNT::setup(void *hWnd)
     auto defaultTexture = createTexture(std::make_shared<Image>(textureData, defaultWidth, defaultHeight, 4));
     defaultMaterial = createFlatMaterial(defaultTexture);
 
-    auto planeModel = Primitives::createPlane(1.0f, Vector3::forward());
+    auto planeModel = Primitives::createPlane(0.5f, Vector3::forward());
     defaultPlane = createMesh(planeModel);
 
     return true;

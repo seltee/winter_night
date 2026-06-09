@@ -3,10 +3,25 @@
 
 namespace wne
 {
-    class UINode
+    class Renderer;
+    class WNE_API UINode
     {
-        public:
-            virtual void update(uint16 width, uint16 height);
-            virtual void render();
+    public:
+        struct Context
+        {
+            Renderer *renderer;
+        };
+        
+
+        UINode(const UINode &) = delete;
+        UINode &operator=(const UINode &) = delete;
+
+        UINode();
+        virtual ~UINode();
+        virtual void update(int x, int y, uint width, uint height);
+        virtual void render(Context &context);
+
+        virtual uint getWidth();
+        virtual uint getHeight();
     };
 };

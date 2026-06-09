@@ -74,23 +74,14 @@ int main()
     auto ui = renderer->createScene();
 
     auto cameraUI = wne::CameraOrtho::create(window);
-    cameraUI->setSize(20, 15);
     auto actorUICamera = ui->createActor<wne::ActorCamera>(cameraUI);
-    // auto actorUICamera = ui->createActor<wne::ActorCameraFlying>(cameraUI, window);
     ui->setCamera(actorUICamera);
 
-    auto textUI = renderer->createText(font);
-    textUI->setText("Text on the screen");
-    textUI->setFontSize(120);
-    textUI->update();
-    auto materialTextUI = renderer->createFlatMaterial(textUI->getTexture());
-    materialTextUI->setColorBlending(wne::ColorBlending::Alpha);
-    materialTextUI->setLighted(false);
-
-    auto actorUISprite = ui->createActor<wne::ActorSprite>();
-    actorUISprite->setMaterial(materialTextUI);
-    actorUISprite->setScale(32.0f * textUI->getProportion(), 32.0f, 1.0f);
-    actorUISprite->setPosition(0.0f, 0.0f, 0.0f);
+    auto actorUI = ui->createActor<wne::ActorUI>(2560, 1440);
+    auto root = &actorUI->getRoot();
+    root->setChild(
+        wne::UINodeCenter::create(
+            wne::UINodeText::create(font, "Centered text", 70)));
 
     float translate = 0.0f;
     while (!window->isCloseRequested())
