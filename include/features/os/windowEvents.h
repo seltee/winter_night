@@ -39,6 +39,8 @@ namespace wne
             WindowEventType type;
             int16 shiftX;
             int16 shiftY;
+            int16 positionX;
+            int16 positionY;
         };
 
         struct WindowEventMouseButton
@@ -78,7 +80,7 @@ namespace wne
         };
 
         void pushEventKey(bool isPressed, uint16 keyCode);
-        void pushEventMouseMove(int16 shiftX, int16 shiftY);
+        void pushEventMouseMove(int16 shiftX, int16 shiftY, int16 positionX, int16 positionY);
         void pushEventMouseClick(bool isPressed, uint16 mouseButton);
         void pushEventWindowFocusChanged(bool newFocusState);
         void pushEventGamepadPlugged(std::shared_ptr<Gamepad> gamepad);

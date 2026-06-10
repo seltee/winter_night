@@ -39,17 +39,23 @@ std::shared_ptr<UINodeText> UINodeText::create(std::shared_ptr<Font> font, const
     return std::make_shared<UINodeText>(font, text, fontSize);
 }
 
-void UINodeText::update(int x, int y, uint width, uint height)
+UINode::ContextTreeNode UINodeText::update(const ContextUpdate &context)
 {
+    prepareNewState();
     float texWidth = (float)text->getTextureWidth();
     float texHeight = (float)text->getTextureHeight();
 
-    Matrix4x4 newModel = Matrix4x4::translation((float)x + texWidth * 0.5f, (float)y - texHeight * 0.5f + (float)text->getTextHeight(), 0);
+    Matrix4x4 newModel = Matrix4x4::translation(
+        (float)context.x + texWidth * 0.5f,
+        (float)context.y - texHeight * 0.5f + (float)text->getTextHeight(),
+        0);
     newModel = newModel * Matrix4x4::rotationY(PI);
     mModel = newModel * Matrix4x4::scale(Vector3(texWidth, texHeight, 1.0f));
+
+    return {isContextHovered(context)};
 }
 
-void UINodeText::render(Context &context)
+void UINodeText::render(const ContextRender &context)
 {
     if (renderer != context.renderer)
     {

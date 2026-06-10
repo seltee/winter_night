@@ -36,24 +36,25 @@ std::shared_ptr<UINodeColumn> UINodeColumn::create(std::vector<std::shared_ptr<U
     return node;
 }
 
-void UINodeColumn::update(int x, int y, uint width, uint height)
+UINode::ContextTreeNode UINodeColumn::update(const ContextUpdate &context)
 {
+    prepareNewState();
     if (children.size() == 0)
-        return;
+        return {false};
 
     uint childrenHeight = 0;
     for (auto &child : children)
     {
         childrenHeight += child->getHeight();
     }
-    uint leftHeight = std::max((int)height - (int)childrenHeight, 0);
+    uint leftHeight = std::max((int)context.height - (int)childrenHeight, 0);
     int shift = -childrenHeight;
     uint shiftAddition = 0;
 
     if (layout == Layout::Middle)
-        shift = leftHeight / 2 - height;
+        shift = leftHeight / 2 - context.height;
     if (layout == Layout::End)
-        shift = -height;
+        shift = -context.height;
     if (layout == Layout::SpaceBetween)
         shiftAddition = leftHeight / (children.size() - 1);
     if (layout == Layout::SpaceAround)
@@ -62,20 +63,35 @@ void UINodeColumn::update(int x, int y, uint width, uint height)
         shift = shiftAddition;
     }
 
+    std::shared_ptr<wne::UINode> *hoveredChild = nullptr;
+    std::vector<std::shared_ptr<UINode>> hoveredLine;
     for (auto &child : children)
     {
         int xShift = 0;
         if (position == Position::Middle)
-            xShift = ((int)width - (int)child->getWidth()) / 2;
+            xShift = ((int)context.width - (int)child->getWidth()) / 2;
         if (position == Position::Right)
-            xShift = ((int)width - (int)child->getWidth());
+            xShift = ((int)context.width - (int)child->getWidth());
 
-        child->update(x + xShift, y - shift, width, height);
+        ContextUpdate nextContext = {context.contextGlobal};
+        nextContext.x = context.x + xShift;
+        nextContext.y = context.y - shift;
+        nextContext.width = child->getWidth() ? child->getWidth() : context.width;
+        nextContext.height = child->getHeight() ? child->getHeight() : context.height / children.size();
+        auto result = child->update(nextContext);
+        if (result.hovered && !hoveredChild)
+        {
+            hoveredChild = &child;
+            hoveredLine = std::move(result.hoveredLine);
+        }
         shift += child->getHeight() + shiftAddition;
     }
+    if (hoveredChild)
+        return propagateHoverState(std::move(hoveredLine), *hoveredChild);
+    return {isContextHovered(context)};
 }
 
-void UINodeColumn::render(Context &context)
+void UINodeColumn::render(const ContextRender &context)
 {
     for (auto &child : children)
     {

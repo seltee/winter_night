@@ -95,7 +95,7 @@ void Window::emitEventKey(bool isPressed, uint16 keyCode)
     }
 }
 
-void Window::emitEventMouseMove(int16 shiftX, int16 shiftY)
+void Window::emitEventMouseMove(int16 shiftX, int16 shiftY, int16 positionX, int16 positionY)
 {
     std::lock_guard<std::mutex> lock(mutex);
     for (int i = 0; i < subscribersAmount;)
@@ -103,7 +103,7 @@ void Window::emitEventMouseMove(int16 shiftX, int16 shiftY)
         auto subscriber = subscribers[i].lock();
         if (subscriber)
         {
-            subscriber->pushEventMouseMove(shiftX, shiftY);
+            subscriber->pushEventMouseMove(shiftX, shiftY, positionX, positionY);
             i++;
         }
         else

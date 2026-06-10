@@ -17,8 +17,8 @@ namespace wne
         static std::shared_ptr<UINodeCenter> create(std::shared_ptr<UINode> child);
         static std::shared_ptr<UINodeCenter> create(std::shared_ptr<UINode> child, uint width, uint height);
 
-        void update(int x, int y, uint width, uint height) override;
-        void render(Context &context) override;
+        ContextTreeNode update(const ContextUpdate &context) override;
+        void render(const ContextRender &context) override;
 
         uint getWidth() override;
         uint getHeight() override;

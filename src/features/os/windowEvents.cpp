@@ -12,12 +12,14 @@ void WindowEvents::pushEventKey(bool isDown, uint16 keyCode)
     lastEventWrote = (lastEventWrote + 1) % WINDOW_EVENTS_MAX;
 }
 
-void WindowEvents::pushEventMouseMove(int16 shiftX, int16 shiftY)
+void WindowEvents::pushEventMouseMove(int16 shiftX, int16 shiftY, int16 positionX, int16 positionY)
 {
     std::lock_guard<std::mutex> lock(mutex);
     events[lastEventWrote].type = WindowEventType::MOUSE_MOVE;
     events[lastEventWrote].mouseMove.shiftX = shiftX;
     events[lastEventWrote].mouseMove.shiftY = shiftY;
+    events[lastEventWrote].mouseMove.positionX = positionX;
+    events[lastEventWrote].mouseMove.positionY = positionY;
     lastEventWrote = (lastEventWrote + 1) % WINDOW_EVENTS_MAX;
 }
 

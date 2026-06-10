@@ -25,8 +25,8 @@ namespace wne
         static std::shared_ptr<UINodeText> create(std::shared_ptr<Font> font, const char *text);
         static std::shared_ptr<UINodeText> create(std::shared_ptr<Font> font, const char *text, uint32 fontSize);
 
-        void update(int x, int y, uint width, uint height) override final;
-        void render(Context &context) override final;
+        ContextTreeNode update(const ContextUpdate &context) override;
+        void render(const ContextRender &context) override;
 
         uint getWidth() override final;
         uint getHeight() override final;

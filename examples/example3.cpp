@@ -8,7 +8,6 @@ int main()
     if (!window)
         return 1;
 
-    window->setMouseCapture(true);
     auto renderer = window->getRenderer();
     renderer->setSyncState(false);
 
@@ -77,7 +76,7 @@ int main()
     auto actorUICamera = ui->createActor<wne::ActorCamera>(cameraUI);
     ui->setCamera(actorUICamera);
 
-    auto actorUI = ui->createActor<wne::ActorUI>(2560, 1440);
+    auto actorUI = ui->createActor<wne::ActorUI>(window, 2560, 1440);
     auto root = &actorUI->getRoot();
 
     // clang-format off

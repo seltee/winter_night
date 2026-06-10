@@ -340,7 +340,12 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         mousePositionY = (int16)(lParam >> 16);
         if (window->mousePositionX != 0 && window->mousePositionY != 0)
         {
-            window->emitEventMouseMove((int16)(lParam & 0xffff) - window->mousePositionX, (int16)(lParam >> 16) - window->mousePositionY);
+            window->emitEventMouseMove(
+                (int16)(lParam & 0xffff) - window->mousePositionX, 
+                (int16)(lParam >> 16) - window->mousePositionY,
+                mousePositionX,
+                mousePositionY
+            );
         }
         window->mousePositionX = mousePositionX;
         window->mousePositionY = mousePositionY;

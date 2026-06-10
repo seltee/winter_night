@@ -1,27 +1,60 @@
 #include "features/scene/actorUI.h"
 #include "features/scene/actorCamera.h"
 #include "features/scene/scene.h"
+#include <iostream>
 
 using namespace wne;
 
-ActorUI::ActorUI(Renderer *renderer) : Actor(renderer)
+ActorUI::ActorUI(Renderer *renderer, std::shared_ptr<Window> eventWindow) : Actor(renderer)
 {
+    ActorUI(renderer, eventWindow, 1280, 720);
 }
 
-ActorUI::ActorUI(Renderer *renderer, float rootWidth, float rootHeight) : Actor(renderer)
+ActorUI::ActorUI(Renderer *renderer, std::shared_ptr<Window> eventWindow, uint rootWidth, uint rootHeight) : Actor(renderer)
 {
+    eventsSubscription = eventWindow->subscribe();
     this->rootWidth = rootWidth;
     this->rootHeight = rootHeight;
 }
 
 void ActorUI::update(float delta)
 {
-    root.update(-rootWidth / 2, -rootHeight / 2 - 48, rootWidth, rootHeight);
+    if (!eventsSubscription)
+        return;
+
+    WindowEvents::WindowEvent event;
+    while (eventsSubscription->getEvent(&event))
+    {
+        if (event.type == WindowEvents::WindowEventType::MOUSE_MOVE)
+        {
+            mouseX = event.mouseMove.positionX;
+            mouseY = event.mouseMove.positionY;
+        }
+    }
+
+    UINode::ContextGlobal contextGlobal;
+    UINode::ContextUpdate contextUpdate;
+
+    contextGlobal.mouseX = mouseX - (int)rootWidth / 2;
+    contextGlobal.mouseY = (int)rootHeight - mouseY - (int)rootHeight / 2;
+
+    contextUpdate.contextGlobal = &contextGlobal;
+    contextUpdate.x = -(int)rootWidth / 2;
+    contextUpdate.y = -(int)rootHeight / 2 - 48;
+    contextUpdate.width = rootWidth;
+    contextUpdate.height = rootHeight;
+
+    auto result = root.update(contextUpdate);
+
+    for (auto &node : result.hoveredLine)
+    {
+        node->setStateHovered(true);
+    }
 }
 
 void ActorUI::renderColor()
 {
-    UINode::Context context;
+    UINode::ContextRender context;
     context.renderer = renderer;
     root.render(context);
 }
@@ -33,5 +66,5 @@ Actor::RenderPass ActorUI::getRenderPass()
 
 float ActorUI::getBoundingRadius()
 {
-    return 10.0f;
+    return 8.0f;
 }

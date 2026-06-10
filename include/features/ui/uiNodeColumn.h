@@ -34,8 +34,8 @@ namespace wne
         static std::shared_ptr<UINodeColumn> create(std::vector<std::shared_ptr<UINode>> children, Layout layout);
         static std::shared_ptr<UINodeColumn> create(std::vector<std::shared_ptr<UINode>> children, Layout layout, Position position);
 
-        void update(int x, int y, uint width, uint height) override;
-        void render(Context &context) override;
+        ContextTreeNode update(const ContextUpdate &context) override;
+        void render(const ContextRender &context) override;
 
         inline void setLayout(Layout layout)
         {

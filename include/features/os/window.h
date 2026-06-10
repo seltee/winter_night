@@ -53,7 +53,7 @@ namespace wne
 
         std::shared_ptr<WindowEvents> subscribe();
         void emitEventKey(bool isPressed, uint16 keyCode);
-        void emitEventMouseMove(int16 shiftX, int16 shiftY);
+        void emitEventMouseMove(int16 shiftX, int16 shiftY, int16 positionX, int16 positionY);
         void emitEventMouseClick(bool isPressed, uint16 mouseButton);
         void emitEventFocusChanged(bool newFocusState);
         void emitEventGamepadPlugged(std::shared_ptr<Gamepad> gamepad);

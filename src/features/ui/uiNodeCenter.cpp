@@ -1,4 +1,5 @@
 #include "features/ui/uiNodeCenter.h"
+#include <iostream>
 
 using namespace wne;
 
@@ -26,8 +27,9 @@ std::shared_ptr<UINodeCenter> UINodeCenter::create(std::shared_ptr<UINode> child
     return node;
 }
 
-void UINodeCenter::update(int x, int y, uint width, uint height)
+UINode::ContextTreeNode UINodeCenter::update(const ContextUpdate &context)
 {
+    prepareNewState();
     if (child)
     {
         uint selfWidth = this->width ? this->width : width;
@@ -35,11 +37,22 @@ void UINodeCenter::update(int x, int y, uint width, uint height)
 
         uint proptWidth = child->getWidth() ? child->getWidth() : selfWidth;
         uint proptHeight = child->getHeight() ? child->getHeight() : selfHeight;
-        child->update(x + ((int)selfWidth - (int)proptWidth) / 2, y + ((int)selfHeight - (int)proptHeight) / 2, proptWidth, proptHeight);
+
+        ContextUpdate nextContext = {context.contextGlobal};
+        nextContext.x = context.x + ((int)selfWidth - (int)proptWidth) / 2;
+        nextContext.y = context.y + ((int)selfHeight - (int)proptHeight) / 2;
+        nextContext.width = proptWidth;
+        nextContext.height = proptHeight;
+
+        auto result = child->update(nextContext);
+        if (result.hovered)
+            return propagateHoverState(std::move(result.hoveredLine), child);
+        return {isContextHovered(context)};
     }
+    return {isContextHovered(context)};
 }
 
-void UINodeCenter::render(Context &context)
+void UINodeCenter::render(const ContextRender &context)
 {
     if (child)
         child->render(context);

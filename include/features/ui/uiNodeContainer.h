@@ -14,8 +14,8 @@ namespace wne
         UINodeContainer();
         UINodeContainer(UINode *child);
 
-        void update(int x, int y, uint width, uint height) override;
-        void render(Context &context) override;
+        ContextTreeNode update(const ContextUpdate &context) override;
+        void render(const ContextRender &context) override;
 
         inline void setChild(std::shared_ptr<UINode> child)
         {

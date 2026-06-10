@@ -1,4 +1,5 @@
 #include "features/ui/uiNodeContainer.h"
+#include <iostream>
 
 using namespace wne;
 
@@ -10,17 +11,25 @@ UINodeContainer::UINodeContainer(UINode *child)
 {
 }
 
-void UINodeContainer::update(int x, int y, uint width, uint height)
+UINode::ContextTreeNode UINodeContainer::update(const ContextUpdate &context)
 {
+    prepareNewState();
     if (this->child)
     {
-        uint proptWidth = child->getWidth() ? child->getWidth() : width;
-        uint proptHeight = child->getHeight() ? child->getHeight() : height;
-        this->child->update(x, y, proptWidth, proptHeight);
+        ContextUpdate nextContext = {context.contextGlobal};
+        nextContext.x = context.x;
+        nextContext.y = context.y;
+        nextContext.width = child->getWidth() ? child->getWidth() : context.width;
+        nextContext.height = child->getHeight() ? child->getHeight() : context.height;
+
+        auto result = this->child->update(nextContext);
+        if (result.hovered)
+            return propagateHoverState(std::move(result.hoveredLine), this->child);
     }
+    return {isContextHovered(context)};
 }
 
-void UINodeContainer::render(Context &context)
+void UINodeContainer::render(const ContextRender &context)
 {
     if (this->child)
         this->child->render(context);
