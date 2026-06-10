@@ -16,7 +16,7 @@ ActorUI::ActorUI(Renderer *renderer, float rootWidth, float rootHeight) : Actor(
 
 void ActorUI::update(float delta)
 {
-    root.update(-rootWidth / 2, -rootHeight / 2, rootWidth, rootHeight);
+    root.update(-rootWidth / 2, -rootHeight / 2 - 48, rootWidth, rootHeight);
 }
 
 void ActorUI::renderColor()

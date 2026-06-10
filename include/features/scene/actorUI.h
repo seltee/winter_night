@@ -2,7 +2,8 @@
 #include "features/scene/actor.h"
 #include "features/ui/uiNode.h"
 #include "features/ui/uiNodeContainer.h"
-#include "features/ui/uiNodeList.h"
+#include "features/ui/uiNodeColumn.h"
+#include "features/ui/uiNodeRow.h"
 #include "features/ui/uiNodeCenter.h"
 #include "features/ui/uiNodeText.h"
 

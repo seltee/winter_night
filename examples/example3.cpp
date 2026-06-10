@@ -79,9 +79,26 @@ int main()
 
     auto actorUI = ui->createActor<wne::ActorUI>(2560, 1440);
     auto root = &actorUI->getRoot();
+
+    // clang-format off
     root->setChild(
-        wne::UINodeCenter::create(
-            wne::UINodeText::create(font, "Centered text", 70)));
+        wne::UINodeColumn::create(
+            {
+            wne::UINodeCenter::create(
+                 wne::UINodeText::create(font, "Centered text", 70),
+                 400, 72),
+            wne::UINodeCenter::create(
+                 wne::UINodeText::create(font, "Second line", 70),
+                 400, 72),
+            wne::UINodeCenter::create(
+                 wne::UINodeText::create(font, "Ending", 70),
+                 400, 72)
+            },
+            wne::UINodeColumn::Layout::Middle,
+            wne::UINodeColumn::Position::Middle
+        )
+    );
+    // clang-format on
 
     float translate = 0.0f;
     while (!window->isCloseRequested())
