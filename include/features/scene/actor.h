@@ -66,8 +66,27 @@ namespace wne
             return isDestroyedFlag;
         }
 
-        inline bool isRendered(){
+        inline bool isRendered()
+        {
             return isRenderedFlag;
+        }
+
+        inline void moveForward(float distance)
+        {
+            Vector3 forward = rotation * Vector3::forward();
+            position += forward * distance;
+        }
+
+        inline void moveRight(float distance)
+        {
+            Vector3 right = rotation * Vector3::right();
+            position += right * distance;
+        }
+
+        inline void moveUp(float distance)
+        {
+            Vector3 up = rotation * Vector3::up();
+            position += up * distance;
         }
 
     protected:

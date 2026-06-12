@@ -23,12 +23,28 @@ void ActorUI::update(float delta)
         return;
 
     WindowEvents::WindowEvent event;
+    bool clickRegistered = false;
+    bool releaseRegistered = false;
     while (eventsSubscription->getEvent(&event))
     {
         if (event.type == WindowEvents::WindowEventType::MOUSE_MOVE)
         {
             mouseX = event.mouseMove.positionX;
             mouseY = event.mouseMove.positionY;
+        }
+        else if (event.type == WindowEvents::WindowEventType::MOUSE_BUTTON_DOWN)
+        {
+            if (event.mouseButton.button == 0)
+            {
+                clickRegistered = true;
+            }
+        }
+        else if (event.type == WindowEvents::WindowEventType::MOUSE_BUTTON_UP)
+        {
+            if (event.mouseButton.button == 0)
+            {
+                releaseRegistered = true;
+            }
         }
     }
 
@@ -49,6 +65,23 @@ void ActorUI::update(float delta)
     for (auto &node : result.hoveredLine)
     {
         node->setStateHovered(true);
+    }
+
+    if (clickRegistered)
+    {
+        for (auto &node : result.hoveredLine)
+        {
+            if (!node->pressLeftMouseButton())
+                break;
+        }
+    }
+    if (releaseRegistered)
+    {
+        for (auto &node : result.hoveredLine)
+        {
+            if (!node->releaseLeftMouseButton())
+                break;
+        }
     }
 }
 

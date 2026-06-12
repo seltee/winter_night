@@ -50,6 +50,9 @@ namespace wne
         virtual uint getWidth();
         virtual uint getHeight();
 
+        virtual bool pressLeftMouseButton();
+        virtual bool releaseLeftMouseButton();
+
         inline void setStateHovered(bool state)
         {
             stateHovered = state;

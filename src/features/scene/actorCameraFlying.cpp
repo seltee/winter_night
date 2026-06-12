@@ -31,42 +31,42 @@ void ActorCameraFlying::update(float delta)
         if (event.type == WindowEvents::WindowEventType::KEY_PRESS)
         {
             if (event.key.scancode == 87)
-                moveForward = 1.0f;
+                moveCameraForward = 1.0f;
             else if (event.key.scancode == 83)
-                moveForward = -1.0f;
+                moveCameraForward = -1.0f;
             else if (event.key.scancode == 65)
-                moveRight = -1.0f;
+                moveCameraRight = -1.0f;
             else if (event.key.scancode == 68)
-                moveRight = 1.0f;
+                moveCameraRight = 1.0f;
             else if (event.key.scancode == 81)
-                moveUp = -1.0f;
+                moveCameraUp = -1.0f;
             else if (event.key.scancode == 69)
-                moveUp = 1.0f;
+                moveCameraUp = 1.0f;
         }
         else if (event.type == WindowEvents::WindowEventType::KEY_RELEASE)
         {
-            if (event.key.scancode == 87 && moveForward > 0)
-                moveForward = 0;
-            else if (event.key.scancode == 83 && moveForward < 0)
-                moveForward = 0;
-            else if (event.key.scancode == 65 && moveRight < 0)
-                moveRight = 0;
-            else if (event.key.scancode == 68 && moveRight > 0)
-                moveRight = 0;
-            else if (event.key.scancode == 81 && moveUp < 0)
-                moveUp = 0;
-            else if (event.key.scancode == 69 && moveUp > 0)
-                moveUp = 0;
+            if (event.key.scancode == 87 && moveCameraForward > 0)
+                moveCameraForward = 0;
+            else if (event.key.scancode == 83 && moveCameraForward < 0)
+                moveCameraForward = 0;
+            else if (event.key.scancode == 65 && moveCameraRight < 0)
+                moveCameraRight = 0;
+            else if (event.key.scancode == 68 && moveCameraRight > 0)
+                moveCameraRight = 0;
+            else if (event.key.scancode == 81 && moveCameraUp < 0)
+                moveCameraUp = 0;
+            else if (event.key.scancode == 69 && moveCameraUp > 0)
+                moveCameraUp = 0;
         }
         else if (event.type == WindowEvents::WindowEventType::GAMEPAD_AXIS)
         {
             if (event.gamepadAxis.code == 48)
             {
-                moveRight = event.gamepadAxis.value;
+                moveCameraRight = event.gamepadAxis.value;
             }
             else if (event.gamepadAxis.code == 49)
             {
-                moveForward = -event.gamepadAxis.value;
+                moveCameraForward = -event.gamepadAxis.value;
             }
             else if (event.gamepadAxis.code == 51)
             {
@@ -85,19 +85,16 @@ void ActorCameraFlying::update(float delta)
         }
         else if (event.type == WindowEvents::WindowEventType::WINDOW_FOCUSED || event.type == WindowEvents::WindowEventType::WINDOW_UNFOCUSED)
         {
-            moveForward = 0;
-            moveRight = 0;
-            moveUp = 0;
+            moveCameraForward = 0;
+            moveCameraRight = 0;
+            moveCameraUp = 0;
         }
     }
 
-    Vector3 forward = rotation * Vector3::forward();
-    Vector3 right = rotation * Vector3::right();
-    Vector3 up = rotation * Vector3::up();
+    moveForward(delta * speed * moveCameraForward);
+    moveRight(delta * speed * moveCameraRight);
+    moveUp(delta * speed * moveCameraUp);
 
-    position += forward * delta * speed * moveForward;
-    position += right * delta * speed * moveRight;
-    position += up * delta * speed * moveUp;
     if (rotateYaw != 0.0f || rotatePitch != 0.0f)
         addCameraRotation(rotateYaw, rotatePitch);
     isDirtyFlag = true;

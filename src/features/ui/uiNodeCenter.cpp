@@ -32,8 +32,8 @@ UINode::ContextTreeNode UINodeCenter::update(const ContextUpdate &context)
     prepareNewState();
     if (child)
     {
-        uint selfWidth = this->width ? this->width : width;
-        uint selfHeight = this->height ? this->height : height;
+        uint selfWidth = width ? width : context.width;
+        uint selfHeight = height ? height : context.height;
 
         uint proptWidth = child->getWidth() ? child->getWidth() : selfWidth;
         uint proptHeight = child->getHeight() ? child->getHeight() : selfHeight;
@@ -62,8 +62,6 @@ uint UINodeCenter::getWidth()
 {
     if (width)
         return width;
-    if (child)
-        return child->getWidth();
     return 0;
 }
 
@@ -71,7 +69,5 @@ uint UINodeCenter::getHeight()
 {
     if (height)
         return height;
-    if (child)
-        return child->getHeight();
     return 0;
 }

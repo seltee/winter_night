@@ -81,20 +81,58 @@ int main()
 
     // clang-format off
     root->setChild(
-        wne::UINodeColumn::create(
-            {
-            wne::UINodeCenter::create(
-                 wne::UINodeText::create(font, "Centered text", 70),
-                 400, 72),
-            wne::UINodeCenter::create(
-                 wne::UINodeText::create(font, "Second line", 70),
-                 400, 72),
-            wne::UINodeCenter::create(
-                 wne::UINodeText::create(font, "Ending", 70),
-                 400, 72)
-            },
-            wne::UINodeColumn::Layout::Middle,
-            wne::UINodeColumn::Position::Middle
+        wne::UINodeCenter::create(
+            wne::UINodeColumn::create(
+                {
+                wne::UINodeCenter::create(
+                    wne::UINodeButton::create(
+                        wne::UINodeText::create(font, "Forward", 70, 0xff999999),
+                        wne::UINodeText::create(font, "Forward", 70, 0xffffffff),
+                        [&](wne::UINodeButton *button){
+                            std::cout << "Forward" << std::endl;
+                            actorCamera->moveForward(8.0f);
+                        }
+                    ),
+                    240, 96),
+                wne::UINodeRow::create(
+                    {
+                        wne::UINodeCenter::create(
+                            wne::UINodeButton::create(
+                                wne::UINodeText::create(font, "Left", 70, 0xff999999),
+                                wne::UINodeText::create(font, "Left", 70, 0xffffffff),
+                                [&](wne::UINodeButton *button){
+                                    std::cout << "Left" << std::endl;
+                                    actorCamera->moveRight(-8.0f);
+                                }
+                            ),
+                        240, 96),
+                        wne::UINodeCenter::create(
+                            wne::UINodeButton::create(
+                                wne::UINodeText::create(font, "Right", 70, 0xff999999),
+                                wne::UINodeText::create(font, "Right", 70, 0xffffffff),
+                                [&](wne::UINodeButton *button){
+                                    std::cout << "Right" << std::endl;
+                                    actorCamera->moveRight(8.0f);
+                                }
+                            ),
+                        240, 96),
+                    },
+                    wne::UINodeRow::Layout::Middle
+                ),
+                wne::UINodeCenter::create(
+                    wne::UINodeButton::create(
+                        wne::UINodeText::create(font, "Backward", 70, 0xff999999),
+                        wne::UINodeText::create(font, "Backward", 70, 0xffffffff),
+                        [&](wne::UINodeButton *button){
+                            std::cout << "Backward" << std::endl;
+                            actorCamera->moveForward(-8.0f);
+                        }
+                    ),
+                    240, 96)
+                },
+                wne::UINodeColumn::Layout::Middle,
+                wne::UINodeColumn::Position::Middle
+            )
         )
     );
     // clang-format on

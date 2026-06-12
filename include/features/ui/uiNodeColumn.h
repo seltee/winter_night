@@ -37,6 +37,9 @@ namespace wne
         ContextTreeNode update(const ContextUpdate &context) override;
         void render(const ContextRender &context) override;
 
+        uint getWidth() override final;
+        uint getHeight() override final;
+
         inline void setLayout(Layout layout)
         {
             this->layout = layout;

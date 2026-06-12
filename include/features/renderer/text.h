@@ -48,6 +48,16 @@ namespace wne
             return fontSize;
         }
 
+        inline void setTextColor(uint32 color)
+        {
+            this->color = color;
+        }
+
+        inline uint32 getTextColor()
+        {
+            return color;
+        }
+
         inline uint getTextureWidth()
         {
             return textureWidth;

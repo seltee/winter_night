@@ -62,7 +62,7 @@ std::unique_ptr<Text::TextRowData> Text::createBitmap()
         Glyph *glyph = font->getGlyph(text32[i], fontSize);
         uint glyphWidth = glyph->width;
         uint glyphHeight = glyph->height;
-        uint glyphFullHeight = fontSize + glyphHeight + glyph->shiftY;
+        uint glyphFullHeight = glyphHeight - glyph->shiftY;
         if (textHeight < glyphFullHeight)
             textHeight = glyphFullHeight;
 
@@ -85,7 +85,7 @@ std::unique_ptr<Text::TextRowData> Text::createBitmap()
         }
         glyphShift += glyph->width;
     }
-    textWidth = glyphShift;
+    textWidth = glyphShift + 8;
 
     this->textureWidth = width;
     this->textureHeight = height;

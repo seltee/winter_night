@@ -9,21 +9,6 @@ UINodeText::UINodeText(std::shared_ptr<Font> font)
     this->text = std::make_shared<Text>(font);
 }
 
-UINodeText::UINodeText(std::shared_ptr<Font> font, const char *text)
-{
-    this->font = font;
-    this->text = std::make_shared<Text>(font);
-    this->text->setText(text);
-}
-
-UINodeText::UINodeText(std::shared_ptr<Font> font, const char *text, uint32 fontSize)
-{
-    this->font = font;
-    this->text = std::make_shared<Text>(font);
-    this->text->setText(text);
-    this->text->setFontSize(fontSize);
-}
-
 std::shared_ptr<UINodeText> UINodeText::create(std::shared_ptr<Font> font)
 {
     return std::make_shared<UINodeText>(font);
@@ -31,12 +16,26 @@ std::shared_ptr<UINodeText> UINodeText::create(std::shared_ptr<Font> font)
 
 std::shared_ptr<UINodeText> UINodeText::create(std::shared_ptr<Font> font, const char *text)
 {
-    return std::make_shared<UINodeText>(font, text);
+    auto textNode = std::make_shared<UINodeText>(font);
+    textNode->setText(text);
+    return textNode;
 }
 
 std::shared_ptr<UINodeText> UINodeText::create(std::shared_ptr<Font> font, const char *text, uint32 fontSize)
 {
-    return std::make_shared<UINodeText>(font, text, fontSize);
+    auto textNode = std::make_shared<UINodeText>(font);
+    textNode->setText(text);
+    textNode->setTextSize(fontSize);
+    return textNode;
+}
+
+std::shared_ptr<UINodeText> UINodeText::create(std::shared_ptr<Font> font, const char *text, uint32 fontSize, uint32 color)
+{
+    auto textNode = std::make_shared<UINodeText>(font);
+    textNode->setText(text);
+    textNode->setTextSize(fontSize);
+    textNode->setTextColor(color);
+    return textNode;
 }
 
 UINode::ContextTreeNode UINodeText::update(const ContextUpdate &context)
@@ -52,7 +51,12 @@ UINode::ContextTreeNode UINodeText::update(const ContextUpdate &context)
     newModel = newModel * Matrix4x4::rotationY(PI);
     mModel = newModel * Matrix4x4::scale(Vector3(texWidth, texHeight, 1.0f));
 
-    return {isContextHovered(context)};
+    bool hovered = context.contextGlobal->mouseX >= context.x &&
+                   context.contextGlobal->mouseY >= context.y &&
+                   context.contextGlobal->mouseX < context.x + (int)text->getTextWidth() &&
+                   context.contextGlobal->mouseY < context.y + (int)text->getTextHeight();
+
+    return {hovered};
 }
 
 void UINodeText::render(const ContextRender &context)
@@ -63,6 +67,7 @@ void UINodeText::render(const ContextRender &context)
         auto newText = renderer->createText(font);
         newText->setFontSize(text->getFontSize());
         newText->setText(text->getText());
+        newText->setTextColor(text->getTextColor());
         text = newText;
 
         if (mesh)
@@ -74,12 +79,12 @@ void UINodeText::render(const ContextRender &context)
         material->setColorBlending(wne::ColorBlending::Alpha);
         material->setLighted(false);
 
-        needsUpdate = false;
+        isDirtyFlag = false;
     }
 
-    if (needsUpdate)
+    if (isDirtyFlag)
     {
-        needsUpdate = false;
+        isDirtyFlag = false;
         text->update();
     }
 

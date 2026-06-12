@@ -50,3 +50,13 @@ uint UINode::getHeight()
 {
     return 0;
 }
+
+bool UINode::pressLeftMouseButton()
+{
+    return true;
+}
+
+bool UINode::releaseLeftMouseButton()
+{
+    return true;
+}

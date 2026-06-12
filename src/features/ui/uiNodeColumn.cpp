@@ -98,3 +98,23 @@ void UINodeColumn::render(const ContextRender &context)
         child->render(context);
     }
 }
+
+uint UINodeColumn::getWidth()
+{
+    uint width = 0;
+    for (auto &child : children)
+    {
+        width = std::max(width, child->getWidth());
+    }
+    return width;
+}
+
+uint UINodeColumn::getHeight()
+{
+    uint height = 0;
+    for (auto &child : children)
+    {
+        height += child->getHeight();
+    }
+    return height;
+}
