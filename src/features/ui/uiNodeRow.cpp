@@ -73,7 +73,7 @@ UINode::ContextTreeNode UINodeRow::update(const ContextUpdate &context)
         if (position == Position::Bottom)
             yShift = ((int)containerHeight - (int)child->getHeight());
 
-        ContextUpdate nextContext = {context.contextGlobal};
+        ContextUpdate nextContext = {context.contextGlobal, context.visible};
         nextContext.x = context.x + shift;
         nextContext.y = context.y - yShift;
         nextContext.width = child->getWidth() ? child->getWidth() : context.width / children.size();

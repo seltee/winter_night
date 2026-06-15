@@ -16,7 +16,7 @@ UINode::ContextTreeNode UINodeContainer::update(const ContextUpdate &context)
     prepareNewState();
     if (this->child)
     {
-        ContextUpdate nextContext = {context.contextGlobal};
+        ContextUpdate nextContext = {context.contextGlobal, context.visible};
         nextContext.x = context.x;
         nextContext.y = context.y;
         nextContext.width = child->getWidth() ? child->getWidth() : context.width;

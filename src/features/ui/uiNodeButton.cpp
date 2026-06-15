@@ -74,10 +74,10 @@ std::shared_ptr<UINodeButton> UINodeButton::create(
 UINode::ContextTreeNode UINodeButton::update(const ContextUpdate &context)
 {
     prepareNewState();
-    auto activeNode = getCurrentStateNode();
+    auto activeNode = getCurrentStateNode(context.visible);
     if (activeNode)
     {
-        ContextUpdate nextContext = {context.contextGlobal};
+        ContextUpdate nextContext = {context.contextGlobal, context.visible};
         nextContext.x = context.x;
         nextContext.y = context.y;
         nextContext.width = activeNode->getWidth() ? activeNode->getWidth() : context.width;
@@ -85,9 +85,15 @@ UINode::ContextTreeNode UINodeButton::update(const ContextUpdate &context)
 
         auto result = activeNode->update(nextContext);
         if (nodeHover && activeNode != nodeHover)
+        {
+            nextContext.visible = false;
             nodeHover->update(nextContext);
+        }
 
-        if (result.hovered)
+        if (context.visible)
+            context.contextGlobal->selectableNodes.push_back({this, nextContext.x + (int)nextContext.width / 2, nextContext.y + (int)nextContext.height / 2});
+
+        if (result.hovered && context.visible)
             return propagateHoverState(std::move(result.hoveredLine), activeNode);
     }
     return {isContextHovered(context)};
@@ -95,19 +101,19 @@ UINode::ContextTreeNode UINodeButton::update(const ContextUpdate &context)
 
 void UINodeButton::render(const ContextRender &context)
 {
-    auto activeNode = getCurrentStateNode();
+    auto activeNode = getCurrentStateNode(stateHovered);
     if (activeNode)
         activeNode->render(context);
 }
 
 uint UINodeButton::getWidth()
 {
-    return getCurrentStateNode()->getWidth();
+    return getCurrentStateNode(stateHovered)->getWidth();
 }
 
 uint UINodeButton::getHeight()
 {
-    return getCurrentStateNode()->getHeight();
+    return getCurrentStateNode(stateHovered)->getHeight();
 }
 
 bool UINodeButton::pressLeftMouseButton()
@@ -124,11 +130,11 @@ bool UINodeButton::releaseLeftMouseButton()
     return false;
 }
 
-std::shared_ptr<UINode> UINodeButton::getCurrentStateNode()
+std::shared_ptr<UINode> UINodeButton::getCurrentStateNode(bool visible)
 {
     if (stateDisabled)
         return nodeDisabled ? nodeDisabled : nodeMain;
-    if (stateHovered)
+    if (stateHovered && visible)
         return nodeHover ? nodeHover : nodeMain;
     return nodeMain;
 }

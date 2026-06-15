@@ -73,7 +73,7 @@ UINode::ContextTreeNode UINodeColumn::update(const ContextUpdate &context)
         if (position == Position::Right)
             xShift = ((int)context.width - (int)child->getWidth());
 
-        ContextUpdate nextContext = {context.contextGlobal};
+        ContextUpdate nextContext = {context.contextGlobal, context.visible};
         nextContext.x = context.x + xShift;
         nextContext.y = context.y - shift;
         nextContext.width = child->getWidth() ? child->getWidth() : context.width;

@@ -23,6 +23,8 @@ namespace wne
 
         float getBoundingRadius() override final;
 
+        bool isNodeExists(std::vector<UINode::ContextSelectableNode> &nodes, UINode *nodeToCheck);
+
         inline UINodeContainer &getRoot()
         {
             return root;
@@ -35,8 +37,13 @@ namespace wne
         }
 
     protected:
+        UINode *moveFocusVertical(bool up, std::vector<UINode::ContextSelectableNode> &nodes, UINode *selectedNode);
+        UINode *moveFocusHorizontal(bool right, std::vector<UINode::ContextSelectableNode> &nodes, UINode *selectedNode);
+
         std::shared_ptr<wne::WindowEvents> eventsSubscription;
+
         UINodeContainer root;
+        UINode *selectedNode = nullptr;
 
         uint rootWidth = 1280;
         uint rootHeight = 720;

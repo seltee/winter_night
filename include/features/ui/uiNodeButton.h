@@ -50,7 +50,7 @@ namespace wne
         bool pressLeftMouseButton() override;
         bool releaseLeftMouseButton() override;
 
-        std::shared_ptr<UINode> getCurrentStateNode();
+        std::shared_ptr<UINode> getCurrentStateNode(bool visible);
 
         inline void setDisabled(bool stateDisabled)
         {

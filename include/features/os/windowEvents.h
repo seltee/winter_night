@@ -28,6 +28,13 @@ namespace wne
             GAMEPAD_DIRECTION_PAD
         };
 
+        enum class LastInputDevice
+        {
+            Mouse,
+            Keyboard,
+            Gamepad
+        };
+
         struct WindowEventKey
         {
             WindowEventType type;
@@ -91,7 +98,13 @@ namespace wne
 
         bool getEvent(WindowEvent *event);
 
+        static inline LastInputDevice getLastInputDevice()
+        {
+            return lastInputDevice;
+        }
+
     protected:
+        static LastInputDevice lastInputDevice;
         WindowEvent events[WINDOW_EVENTS_MAX];
         uint32 lastEventRead = 0;
         uint32 lastEventWrote = 0;

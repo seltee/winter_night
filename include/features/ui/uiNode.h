@@ -14,14 +14,22 @@ namespace wne
             Renderer *renderer;
         };
 
+        struct ContextSelectableNode
+        {
+            UINode *node;
+            int centerX, centerY;
+        };
+
         struct ContextGlobal
         {
             int mouseX, mouseY;
+            std::vector<ContextSelectableNode> selectableNodes;
         };
 
         struct ContextUpdate
         {
             ContextGlobal *contextGlobal;
+            bool visible;
             int x;
             int y;
             uint width;
