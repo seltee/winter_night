@@ -1,4 +1,6 @@
 #include "features/os/nt/gamepadNT.h"
+
+#if defined(OS_WINDOWS)
 #include "features/os/nt/utilsNT.h"
 #include <iostream>
 #include <windows.h>
@@ -142,3 +144,4 @@ std::string GamepadNT::getInternalDisplayName()
     delete[] deviceName;
     return out;
 }
+#endif

@@ -2,29 +2,42 @@ CXX = g++
 CC = gcc
 LD = g++
 
-CXX_FLAGS = -DWNE_BUILD_DLL -Iinclude -I../vulkan/Include -Wall -MMD -std=c++20 -mfpmath=sse -g -O2
-
-LIBRARIES = -lkernel32 -luser32 -lgdi32 -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lvulkan-1 -lsetupapi -lhid
-
-EXT = ".exe"
-
-L_FLAGS = -shared -Wall -g -L"../vulkan/Lib"
-
-TARGET = bin/libwne.dll
-IMPLIB = lib/libwne.dll.a
-COPY = xcopy /Y
-MOVE = move
-
-EXAMPLE_FLAGS = -L./ -lwne
-
 SHADERS_DIR = shaders
 SRCDIR = src
+INCDIR = include
 EXMDIR = examples
 OBJDIR = objects
 BINDIR = bin
 EXDIR  = examples
 EXOBJ  = objects/examples
 SHADER_OUTPUT_DIR := $(BINDIR)/shaders
+
+ifeq ($(OS),Windows_NT)
+CXX_FLAGS = -DWNE_BUILD_DLL -I$(INCDIR) -I../vulkan/Include -Wall -MMD -std=c++20 -mfpmath=sse -g -O2
+LIBRARIES = -lkernel32 -luser32 -lgdi32 -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lvulkan-1 -lsetupapi -lhid
+EXT = ".exe"
+EXLFLAGS = -Wall -g -v -L"x86_64-w64-mingw32/lib" -L"lib" -L$(BINDIR)
+EXLIBRARIES = -lkernel32 -luser32 -lshell32 -lwne
+TARGET = bin/libwne.dll
+IMPLIB = lib/libwne.dll.a
+L_FLAGS = -shared -Wall -g -L"../vulkan/Lib" -Wl,--out-implib,$(IMPLIB)
+else
+CXX_FLAGS = -I$(INCDIR) -Wall -c -std=c++20 -fPIC -g -O2
+LIBRARIES = -lvulkan -lwayland-client
+EXT = ""
+EXLFLAGS = -Wall -g -v -L$(BINDIR) -Wl,-rpath,'$$ORIGIN'
+EXLIBRARIES = -lwne
+TARGET = bin/libwne.so
+IMPLIB = lib/libwne.so
+L_FLAGS = -shared -Wall -g
+endif
+
+
+COPY = xcopy /Y
+MOVE = move
+
+EXAMPLE_FLAGS = -L./ -lwne
+
 
 # Source and object files
 SOURCES := $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/**/*.cpp) $(wildcard $(SRCDIR)/**/**/*.cpp) $(wildcard $(SRCDIR)/**/**/**/*.cpp) $(wildcard $(SRCDIR)/**/**/**/**/*.cpp)
@@ -42,13 +55,11 @@ EXSOURCES := $(wildcard $(EXDIR)/*.cpp)
 EXOBJECTS := $(patsubst $(EXDIR)/%.cpp,$(EXOBJ)/%.o,$(EXSOURCES))
 EXBINARIES := $(patsubst $(EXDIR)/%.cpp,$(BINDIR)/%,$(EXSOURCES))
 
-EXLFLAGS = -Wall -g -v -L"x86_64-w64-mingw32/lib" -L"lib" -L$(BINDIR)
-EXLIBRARIES = -lkernel32 -luser32 -lshell32 -lwne
-
 $(info SOURCES = $(SOURCES))
 $(info OBJECTS = $(OBJ_FILES))
 $(info VERT SHADERS = $(VERTEX_SHADER_SOURCES))
 $(info FRAG SHADERS = $(FRAGMENT_SHADER_SOURCES))
+$(info LIBRARIES = $(LIBRARIES))
 
 DEP_FILES := $(OBJ_FILES:.o=.d)
 
@@ -64,7 +75,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 
 $(TARGET): $(OBJ_FILES)
 	@echo Linking $@
-	$(LD) -o $@ $^ $(LIBRARIES) $(L_FLAGS) -Wl,--out-implib,$(IMPLIB)
+	$(LD) -o $@ $^ $(L_FLAGS) $(LIBRARIES) 
 
 -include $(DEP_FILES)
 

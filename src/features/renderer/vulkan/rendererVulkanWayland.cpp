@@ -1,4 +1,4 @@
-#include "features/renderer/vulkan/rendererVulkanNT.h"
+#include "features/renderer/vulkan/rendererVulkanWayland.h"
 #include "features/renderer/vulkan/vulkanMesh.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/vulkanRendererState.h"
@@ -16,18 +16,18 @@
 
 using namespace wne;
 
-std::unique_ptr<RendererVulkanNT> RendererVulkanNT::create(void *hwnd)
+std::unique_ptr<RendererVulkanWayland> RendererVulkanWayland::create(void *wlDisplay, void *wlSurface)
 {
-    auto instance = std::unique_ptr<RendererVulkanNT>(new RendererVulkanNT());
-    if (!instance->setup(hwnd))
+    auto instance = std::unique_ptr<RendererVulkanWayland>(new RendererVulkanWayland());
+    if (!instance->setup(wlDisplay, wlSurface))
         return nullptr;
     return instance;
 }
 
-bool RendererVulkanNT::setup(void *hWnd)
+bool RendererVulkanWayland::setup(void *wlDisplay, void *wlSurface)
 {
     state = new VulkanRendererState();
-    instance = VulkanInstance::createNT(hWnd);
+    instance = VulkanInstance::createLinuxWayland(wlDisplay, wlSurface);
     if (!instance)
         return false;
 

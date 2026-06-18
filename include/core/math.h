@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 
 #include "core/math/vector2.h"
 #include "core/math/vector3.h"

@@ -1,5 +1,5 @@
 #include "features/os/windowEvents.h"
-#include <string>
+#include <cstring>
 #include <iostream>
 
 using namespace wne;

@@ -5,7 +5,7 @@
 #include "features/data/font.h"
 #include "features/loaders/stb_truetype.h"
 #include "core/core.h"
-#include <stdio.h>
+#include <cstring>
 #include <string>
 #include <locale>
 #include <codecvt>

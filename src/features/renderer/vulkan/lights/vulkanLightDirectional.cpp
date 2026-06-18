@@ -5,10 +5,10 @@
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanRendererState.h"
 #include "features/renderer/vulkan/rendererVulkanNT.h"
+#include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/logger/logger.h"
 #include "features/renderer/renderer.h"
 #include "features/scene/scene.h"
-#define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <array>
 

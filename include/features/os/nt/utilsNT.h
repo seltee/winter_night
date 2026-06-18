@@ -1,4 +1,7 @@
 #pragma once
+#include "core/platform.h"
+
+#if defined(OS_WINDOWS)
 #include <string>
 #include <algorithm>
 #include <shellscalingapi.h>
@@ -31,3 +34,4 @@ namespace wne
         return str;
     }
 };
+#endif

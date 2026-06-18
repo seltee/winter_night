@@ -3,9 +3,8 @@
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanDescriptorLayout.h"
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
+#include "features/renderer/vulkan/vulkanDefines.h"
 #include "core/data.h"
-
-#define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <vector>
 #include <iostream>

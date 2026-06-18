@@ -5,8 +5,8 @@
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
 #include "features/renderer/vulkan/vulkanSwapChain.h"
 #include "features/renderer/vulkan/vulkanUtils.h"
+#include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/logger/logger.h"
-#define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <array>
 

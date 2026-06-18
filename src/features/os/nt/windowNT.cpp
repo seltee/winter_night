@@ -1,4 +1,6 @@
 #include "features/os/nt/windowNT.h"
+
+#if defined(OS_WINDOWS)
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 #include "features/logger/logger.h"
 #include <windows.h>
@@ -341,11 +343,10 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         if (window->mousePositionX != 0 && window->mousePositionY != 0)
         {
             window->emitEventMouseMove(
-                (int16)(lParam & 0xffff) - window->mousePositionX, 
+                (int16)(lParam & 0xffff) - window->mousePositionX,
                 (int16)(lParam >> 16) - window->mousePositionY,
                 mousePositionX,
-                mousePositionY
-            );
+                mousePositionY);
         }
         window->mousePositionX = mousePositionX;
         window->mousePositionY = mousePositionY;
@@ -511,3 +512,4 @@ GamepadReport _parseHidReport(HANDLE hDevice, PHIDP_PREPARSED_DATA pPreparsedDat
 
     return gamepadReport;
 }
+#endif

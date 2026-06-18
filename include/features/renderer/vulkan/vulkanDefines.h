@@ -1,6 +1,14 @@
 #pragma once
 #include "core/core.h"
 #include "core/math.h"
+#include "core/platform.h"
+
+#if defined(OS_WINDOWS)
+    #define VK_USE_PLATFORM_WIN32_KHR
+#elif defined(OS_LINUX)
+    #define VK_USE_PLATFORM_WAYLAND_KHR
+    #define VK_USE_PLATFORM_XCB_KHR
+#endif
 
 typedef struct VkInstance_T *VkInstance;
 typedef struct VkPhysicalDevice_T *VkPhysicalDevice;

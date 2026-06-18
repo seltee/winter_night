@@ -1,5 +1,6 @@
 #pragma once
 #include "core/api.h"
+#include "core/platform.h"
 #include "features/renderer/renderer.h"
 #include "features/os/windowEvents.h"
 #include "features/os/gamepad.h"
@@ -36,6 +37,7 @@ namespace wne
         int subscribersAmount = 0;
 
         Window();
+        static std::shared_ptr<Window> createWindow();
 
     public:
         virtual ~Window();
@@ -45,6 +47,7 @@ namespace wne
         static std::shared_ptr<Window> createBorderless(uint width, uint height);
         static std::shared_ptr<Window> createResizable(uint width, uint height);
 
+        virtual bool setup(uint width, uint height, WindowType type);
         virtual void update(float delta);
         virtual void render();
         virtual void updateWindowSize();

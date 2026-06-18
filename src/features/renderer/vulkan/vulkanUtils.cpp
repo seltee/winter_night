@@ -8,8 +8,8 @@
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/pipelines/vulkanDescriptorSets.h"
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
+#include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/logger/logger.h"
-#define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <iostream>
 
