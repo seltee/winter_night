@@ -1,6 +1,7 @@
 #pragma once
 #include "core/api.h"
 #include "features/renderer/renderer.h"
+#include "features/sound/soundSystem.h"
 #include "features/os/windowEvents.h"
 #include "features/os/gamepad.h"
 #include <memory>
@@ -28,6 +29,7 @@ namespace wne
         bool flagCloseRequested = false;
         bool flagMouseCapture = false;
         std::unique_ptr<Renderer> renderer;
+        std::shared_ptr<SoundSystem> soundSystem;
         std::mutex mutex;
 
         std::vector<std::shared_ptr<Gamepad>> gamepads;
@@ -65,6 +67,11 @@ namespace wne
         inline Renderer *getRenderer()
         {
             return renderer.get();
+        }
+
+        inline SoundSystem *getSoundSystem()
+        {
+            return soundSystem.get();
         }
 
         inline uint getWidth()

@@ -1,5 +1,6 @@
 #include "features/os/nt/windowNT.h"
 #include "features/renderer/vulkan/rendererVulkanNT.h"
+#include "features/sound/nt/soundSystemNT.h"
 #include "features/logger/logger.h"
 #include <windows.h>
 #include <hidsdi.h>
@@ -90,6 +91,15 @@ bool WindowNT::setup(uint width, uint height, WindowType type)
     }
 
     Logger::log << "Window and Vulkan renderer succesfully created " << width << "x" << height << endl;
+
+    soundSystem = SoundSystemNT::create();
+    if (!soundSystem)
+    {
+        CloseWindow(hWnd);
+        return false;
+    }
+
+    Logger::log << "Windows NT sound system initializaed" << endl;
 
     ShowWindow(hWnd, true);
     UpdateWindow(hWnd);
@@ -341,11 +351,10 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         if (window->mousePositionX != 0 && window->mousePositionY != 0)
         {
             window->emitEventMouseMove(
-                (int16)(lParam & 0xffff) - window->mousePositionX, 
+                (int16)(lParam & 0xffff) - window->mousePositionX,
                 (int16)(lParam >> 16) - window->mousePositionY,
                 mousePositionX,
-                mousePositionY
-            );
+                mousePositionY);
         }
         window->mousePositionX = mousePositionX;
         window->mousePositionY = mousePositionY;
