@@ -13,8 +13,8 @@ In addition, this allows command recording to happen in multiple threads if so d
 #include "features/renderer/vulkan/pipelines/vulkanPipeline.h"
 #include "features/renderer/vulkan/vulkanCommandPool.h"
 #include "features/renderer/vulkan/vulkanDevice.h"
+#include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/logger/logger.h"
-#define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <array>
 

@@ -8,6 +8,8 @@ bin/*.so
 bin/*.ini
 bin/*.ilk
 bin/**/*.spv
+bin/example*
+bin/winter_night
 bin/**/*.spv
 bin/**/*.dll
 lib/**/*.dll.a

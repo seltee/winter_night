@@ -1,4 +1,6 @@
 #include "features/os/nt/windowNT.h"
+
+#if defined(OS_WINDOWS)
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 #include "features/sound/nt/soundSystemNT.h"
 #include "features/logger/logger.h"
@@ -520,3 +522,4 @@ GamepadReport _parseHidReport(HANDLE hDevice, PHIDP_PREPARSED_DATA pPreparsedDat
 
     return gamepadReport;
 }
+#endif

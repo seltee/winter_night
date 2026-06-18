@@ -1,5 +1,6 @@
 #include "features/os/window.h"
 #include "features/os/nt/windowNT.h"
+#include "features/os/wayland/windowWayland.h"
 #include "engine.h"
 #include <iostream>
 
@@ -16,36 +17,51 @@ Window::~Window()
     Engine::getInstance()->unregisterWindow(this);
 }
 
+std::shared_ptr<Window> Window::createWindow()
+{
+#if defined(OS_WINDOWS)
+    return std::make_shared<WindowNT>();
+#elif defined(OS_LINUX)
+    return std::make_shared<WindowWayland>();
+#endif
+    return nullptr;
+}
+
 std::shared_ptr<Window> Window::create(uint width, uint height)
 {
-    std::shared_ptr<WindowNT> window = std::make_shared<WindowNT>();
-    if (window->setup(width, height, WindowType::Windowed))
-        return window;
-    return nullptr;
+    auto window = createWindow();
+    if (window)
+        window->setup(width, height, WindowType::Windowed);
+    return window;
 }
 
 std::shared_ptr<Window> Window::createFullscreen(uint width, uint height)
 {
-    std::shared_ptr<WindowNT> window = std::make_shared<WindowNT>();
-    if (window->setup(width, height, WindowType::Fullscreen))
-        return window;
-    return nullptr;
+    auto window = createWindow();
+    if (window)
+        window->setup(width, height, WindowType::Fullscreen);
+    return window;
 }
 
 std::shared_ptr<Window> Window::createBorderless(uint width, uint height)
 {
-    std::shared_ptr<WindowNT> window = std::make_shared<WindowNT>();
-    if (window->setup(width, height, WindowType::Borderless))
-        return window;
-    return nullptr;
+    auto window = createWindow();
+    if (window)
+        window->setup(width, height, WindowType::Borderless);
+    return window;
 }
 
 std::shared_ptr<Window> Window::createResizable(uint width, uint height)
 {
-    std::shared_ptr<WindowNT> window = std::make_shared<WindowNT>();
-    if (window->setup(width, height, WindowType::Resizable))
-        return window;
-    return nullptr;
+    auto window = createWindow();
+    if (window)
+        window->setup(width, height, WindowType::Resizable);
+    return window;
+}
+
+bool Window::setup(uint width, uint height, WindowType type)
+{
+    return false;
 }
 
 void Window::update(float delta)

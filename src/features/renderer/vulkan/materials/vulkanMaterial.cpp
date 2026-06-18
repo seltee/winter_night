@@ -5,7 +5,7 @@
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/vulkanRendererState.h"
 #include "features/renderer/vulkan/rendererVulkanNT.h"
-#define VK_USE_PLATFORM_WIN32_KHR
+#include "features/renderer/vulkan/vulkanDefines.h"
 #include "vulkan/vulkan.h"
 #include <array>
 #include <iostream>

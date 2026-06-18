@@ -8,14 +8,14 @@
 
 namespace wne
 {
-    class WNE_API RendererVulkanNT : public RendererVulkan
+    class WNE_API RendererVulkanWayland : public RendererVulkan
     {
     public:
-        static std::unique_ptr<RendererVulkanNT> create(void *hwnd);
-       
+        static std::unique_ptr<RendererVulkanWayland> create(void *wlDisplay, void *wlSurface);
 
     protected:
-        bool setup(void *hWnd);
-        void *hWnd = nullptr;
+        bool setup(void *wlDisplay, void *wlSurface);
+        void *wlDisplay = nullptr;
+        void *wlSurface = nullptr;
     };
 }

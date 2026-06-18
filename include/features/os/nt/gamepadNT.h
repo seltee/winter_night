@@ -1,4 +1,7 @@
 #pragma once
+#include "core/platform.h"
+
+#if defined(OS_WINDOWS)
 #include "features/os/gamepad.h"
 #include "core/core.h"
 #include <string>
@@ -32,3 +35,4 @@ namespace wne
         char uniqueCode[16];
     };
 };
+#endif

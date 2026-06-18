@@ -31,7 +31,7 @@ namespace wne
 
     inline Quat normalize(const Quat &q)
     {
-        float norm = std::sqrtf(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
+        float norm = std::sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
         if (norm < 1e-12)
             return {1.0, 0.0, 0.0, 0.0};
         return {q.x / norm, q.y / norm, q.z / norm, q.w / norm};
@@ -39,7 +39,7 @@ namespace wne
 
     inline Vector3 normalize(const Vector3 &vec)
     {
-        float norm = std::sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+        float norm = std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
         if (norm < 1e-12)
             return {0.0, 0.0, -1.0};
         return {vec.x / norm, vec.y / norm, vec.z / norm};

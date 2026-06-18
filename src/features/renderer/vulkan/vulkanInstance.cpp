@@ -1,6 +1,6 @@
 #include "features/renderer/vulkan/vulkanInstance.h"
+#include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/logger/logger.h"
-#define VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
 #include <vector>
 #include <set>
@@ -26,7 +26,7 @@ VulkanInstance::~VulkanInstance()
         delete vulkanInstanceExtensions;
 }
 
-std::unique_ptr<VulkanInstance> VulkanInstance::create(void *hwnd)
+std::unique_ptr<VulkanInstance> VulkanInstance::createNT(void *hwnd)
 {
     auto instance = std::unique_ptr<VulkanInstance>(new VulkanInstance());
     if (!instance->initNT(hwnd))
@@ -34,8 +34,17 @@ std::unique_ptr<VulkanInstance> VulkanInstance::create(void *hwnd)
     return instance;
 }
 
+std::unique_ptr<VulkanInstance> VulkanInstance::createLinuxWayland(void *wlDisplay, void *wlSurface)
+{
+    auto instance = std::unique_ptr<VulkanInstance>(new VulkanInstance());
+    if (!instance->initLinuxWayland(wlDisplay, wlSurface))
+        return nullptr;
+    return instance;
+}
+
 bool VulkanInstance::initNT(void *hWnd)
 {
+#if defined(OS_WINDOWS)
     if (!initInstance())
     {
         Logger::log << "Unable to init instance" << endl;
@@ -56,6 +65,35 @@ bool VulkanInstance::initNT(void *hWnd)
     }
 
     return init(surface);
+#else
+    return false;
+#endif
+}
+
+bool VulkanInstance::initLinuxWayland(void *wlDisplay, void *wlSurface)
+{
+#if defined(OS_LINUX)
+    if (!initInstance())
+    {
+        Logger::log << "Unable to init instance" << endl;
+        return false;
+    }
+    VkWaylandSurfaceCreateInfoKHR surfaceCreateInfo{};
+    surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.display = (wl_display *)wlDisplay; // struct wl_display*
+    surfaceCreateInfo.surface = (wl_surface *)wlSurface; // struct wl_surface*
+
+    VkSurfaceKHR surface;
+    VkResult result = vkCreateWaylandSurfaceKHR(
+        instance,
+        &surfaceCreateInfo,
+        nullptr,
+        &surface);
+
+    return init(surface);
+#else
+    return false;
+#endif
 }
 
 bool VulkanInstance::init(VkSurfaceKHR surface)

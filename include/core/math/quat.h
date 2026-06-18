@@ -48,24 +48,24 @@ namespace wne
         static Quat aroundWorldX(float angle)
         {
             float half = angle * 0.5;
-            float cosHalf = std::cosf(half);
-            float sinHalf = std::sinf(half);
+            float cosHalf = std::cos(half);
+            float sinHalf = std::sin(half);
             return {sinHalf, 0.0f, 0.0f, cosHalf};
         }
 
         static Quat aroundWorldY(float angle)
         {
             float half = angle * 0.5;
-            float cosHalf = std::cosf(half);
-            float sinHalf = std::sinf(half);
+            float cosHalf = std::cos(half);
+            float sinHalf = std::sin(half);
             return {0.0f, sinHalf, 0.0f, cosHalf};
         }
 
         static Quat aroundWorldZ(float angle)
         {
             float half = angle * 0.5;
-            float cosHalf = std::cosf(half);
-            float sinHalf = std::sinf(half);
+            float cosHalf = std::cos(half);
+            float sinHalf = std::sin(half);
             return {0.0, 0.0, sinHalf, cosHalf};
         }
     };
