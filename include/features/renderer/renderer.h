@@ -24,7 +24,7 @@ namespace wne
         virtual void update(float delta);
         virtual void render();
 
-        virtual void changeWindowSize(uint32 width, uint32 height);
+        virtual void changeWindowSize(int32 width, int32 height);
         virtual std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model);
         virtual std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image);
         virtual std::shared_ptr<Text> createText(std::shared_ptr<Font> font);

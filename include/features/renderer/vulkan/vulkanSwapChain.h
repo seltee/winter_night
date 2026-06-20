@@ -19,7 +19,7 @@ namespace wne
     public:
         VulkanSwapChain(VulkanUtils *vulkanUtils);
         ~VulkanSwapChain();
-        bool setup(int width, int height, VkSurfaceKHR surface, bool isImmidiateSwap, uint MSAASampleCount);
+        bool setup(int width, int height, VkSurfaceKHR vulkanSurface, bool isImmidiateSwap, uint MSAASampleCount);
 
         inline unsigned int getImageFormat()
         {
@@ -64,10 +64,10 @@ namespace wne
 
         VkSwapchainKHR createSwapChain(
             VkSurfaceKHR surface,
-            int nWindowWidth,
-            int nWindowHeight,
-            unsigned int *swapChainImageFormat,
-            unsigned int *punImageCount,
+            int windowWidth,
+            int windowHeight,
+            uint *swapChainImageFormat,
+            uint *punImageCount,
             bool isImmidiateSwap);
 
         bool createSwapChainImages(

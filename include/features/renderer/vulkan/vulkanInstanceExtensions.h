@@ -13,6 +13,7 @@ namespace wne
         int getExtensionsCount();
         char **getExtensionsData();
         bool hasExtension(const char *name);
+        void dumpExtensions();
 
     protected:
         std::vector<char *> extNames;

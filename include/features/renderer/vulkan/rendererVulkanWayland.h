@@ -11,10 +11,10 @@ namespace wne
     class WNE_API RendererVulkanWayland : public RendererVulkan
     {
     public:
-        static std::unique_ptr<RendererVulkanWayland> create(void *wlDisplay, void *wlSurface);
+        static std::unique_ptr<RendererVulkanWayland> create(void *wlDisplay, void *wlSurface, int32 width, int32 height);
 
     protected:
-        bool setup(void *wlDisplay, void *wlSurface);
+        bool setup(void *wlDisplay, void *wlSurface, int32 width, int32 height);
         void *wlDisplay = nullptr;
         void *wlSurface = nullptr;
     };

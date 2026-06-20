@@ -16,18 +16,18 @@
 
 using namespace wne;
 
-std::unique_ptr<RendererVulkanWayland> RendererVulkanWayland::create(void *wlDisplay, void *wlSurface)
+std::unique_ptr<RendererVulkanWayland> RendererVulkanWayland::create(void *wlDisplay, void *wlSurface, int32 width, int32 height)
 {
     auto instance = std::unique_ptr<RendererVulkanWayland>(new RendererVulkanWayland());
-    if (!instance->setup(wlDisplay, wlSurface))
+    if (!instance->setup(wlDisplay, wlSurface, width, height))
         return nullptr;
     return instance;
 }
 
-bool RendererVulkanWayland::setup(void *wlDisplay, void *wlSurface)
+bool RendererVulkanWayland::setup(void *wlDisplay, void *wlSurface, int32 width, int32 height)
 {
     state = new VulkanRendererState();
-    instance = VulkanInstance::createLinuxWayland(wlDisplay, wlSurface);
+    instance = VulkanInstance::createLinuxWayland(wlDisplay, wlSurface, width, height);
     if (!instance)
         return false;
 

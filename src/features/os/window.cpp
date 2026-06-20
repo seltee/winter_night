@@ -27,7 +27,7 @@ std::shared_ptr<Window> Window::createWindow()
     return nullptr;
 }
 
-std::shared_ptr<Window> Window::create(uint width, uint height)
+std::shared_ptr<Window> Window::create(int32 width, int32 height)
 {
     auto window = createWindow();
     if (window)
@@ -35,7 +35,7 @@ std::shared_ptr<Window> Window::create(uint width, uint height)
     return window;
 }
 
-std::shared_ptr<Window> Window::createFullscreen(uint width, uint height)
+std::shared_ptr<Window> Window::createFullscreen(int32 width, int32 height)
 {
     auto window = createWindow();
     if (window)
@@ -43,7 +43,7 @@ std::shared_ptr<Window> Window::createFullscreen(uint width, uint height)
     return window;
 }
 
-std::shared_ptr<Window> Window::createBorderless(uint width, uint height)
+std::shared_ptr<Window> Window::createBorderless(int32 width, int32 height)
 {
     auto window = createWindow();
     if (window)
@@ -51,7 +51,7 @@ std::shared_ptr<Window> Window::createBorderless(uint width, uint height)
     return window;
 }
 
-std::shared_ptr<Window> Window::createResizable(uint width, uint height)
+std::shared_ptr<Window> Window::createResizable(int32 width, int32 height)
 {
     auto window = createWindow();
     if (window)
@@ -59,7 +59,7 @@ std::shared_ptr<Window> Window::createResizable(uint width, uint height)
     return window;
 }
 
-bool Window::setup(uint width, uint height, WindowType type)
+bool Window::setup(int32 width, int32 height, WindowType type)
 {
     return false;
 }

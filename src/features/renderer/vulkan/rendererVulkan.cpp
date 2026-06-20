@@ -115,9 +115,9 @@ void RendererVulkan::prepareRenderingState()
     instance->getVulkanUtils()->clearPreviousStates();
 }
 
-void RendererVulkan::changeWindowSize(uint32 width, uint32 height)
+void RendererVulkan::changeWindowSize(int32 width, int32 height)
 {
-    instance->changeSize();
+    instance->changeSize(width, height);
 }
 
 std::shared_ptr<Mesh> RendererVulkan::createMesh(std::shared_ptr<Model> model)

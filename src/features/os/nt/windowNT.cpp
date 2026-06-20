@@ -22,7 +22,7 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
 GamepadReport _parseHidReport(HANDLE hDevice, PHIDP_PREPARSED_DATA pPreparsedData, char *report, UINT reportLength);
 
-bool WindowNT::setup(uint width, uint height, WindowType type)
+bool WindowNT::setup(int32 width, int32 height, WindowType type)
 {
     setProcessDPIAware();
 

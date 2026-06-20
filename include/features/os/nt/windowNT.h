@@ -13,7 +13,7 @@ namespace wne
         uint16 mousePositionX = 0;
         uint16 mousePositionY = 0;
 
-        bool setup(uint width, uint height, WindowType type);
+        bool setup(int32 width, int32 height, WindowType type) override final;
 
         void update(float delta) override final;
         void render() override final;

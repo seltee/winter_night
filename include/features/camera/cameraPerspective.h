@@ -73,7 +73,7 @@ namespace wne
         }
 
     protected:
-        uint32 width = 0, height = 0;
+        int32 width = 0, height = 0;
         std::shared_ptr<Window> window;
 
         float fov = PI / 2.0f;

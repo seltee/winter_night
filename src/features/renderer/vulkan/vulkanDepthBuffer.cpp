@@ -20,7 +20,7 @@ VulkanDepthBuffer::~VulkanDepthBuffer()
         vkDestroyImage(device, depthImage, nullptr);
 }
 
-bool VulkanDepthBuffer::setup(uint16 width, uint16 height, uint64 sampledCountBit, bool isSampled)
+bool VulkanDepthBuffer::setup(int width, int height, uint64 sampledCountBit, bool isSampled)
 {
     this->width = width;
     this->height = height;

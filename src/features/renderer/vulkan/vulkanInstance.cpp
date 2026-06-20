@@ -18,8 +18,8 @@ VulkanInstance::~VulkanInstance()
         VkDevice device = vulkanDevice->getDevice();
         vkDeviceWaitIdle(device);
     }
-    if (surface)
-        vkDestroySurfaceKHR(instance, surface, nullptr);
+    if (vulkanSurface)
+        vkDestroySurfaceKHR(instance, vulkanSurface, nullptr);
     if (instance)
         vkDestroyInstance(instance, nullptr);
     if (vulkanInstanceExtensions)
@@ -34,10 +34,10 @@ std::unique_ptr<VulkanInstance> VulkanInstance::createNT(void *hwnd)
     return instance;
 }
 
-std::unique_ptr<VulkanInstance> VulkanInstance::createLinuxWayland(void *wlDisplay, void *wlSurface)
+std::unique_ptr<VulkanInstance> VulkanInstance::createLinuxWayland(void *wlDisplay, void *wlSurface, int32 width, int32 height)
 {
     auto instance = std::unique_ptr<VulkanInstance>(new VulkanInstance());
-    if (!instance->initLinuxWayland(wlDisplay, wlSurface))
+    if (!instance->initLinuxWayland(wlDisplay, wlSurface, width, height))
         return nullptr;
     return instance;
 }
@@ -64,13 +64,23 @@ bool VulkanInstance::initNT(void *hWnd)
         return false;
     }
 
-    return init(surface);
+    VkSurfaceCapabilitiesKHR caps;
+    VkResult res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, vulkanSurface, &caps);
+    if (res != VK_SUCCESS)
+    {
+        Logger::log << "Unable to get surface data" << endl;
+        return false;
+    }
+    width = caps.currentExtent.width;
+    height = caps.currentExtent.height;
+
+    return init(surface, width, height);
 #else
     return false;
 #endif
 }
 
-bool VulkanInstance::initLinuxWayland(void *wlDisplay, void *wlSurface)
+bool VulkanInstance::initLinuxWayland(void *wlDisplay, void *wlSurface, int32 width, int32 height)
 {
 #if defined(OS_LINUX)
     if (!initInstance())
@@ -78,6 +88,7 @@ bool VulkanInstance::initLinuxWayland(void *wlDisplay, void *wlSurface)
         Logger::log << "Unable to init instance" << endl;
         return false;
     }
+
     VkWaylandSurfaceCreateInfoKHR surfaceCreateInfo{};
     surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
     surfaceCreateInfo.display = (wl_display *)wlDisplay; // struct wl_display*
@@ -89,19 +100,29 @@ bool VulkanInstance::initLinuxWayland(void *wlDisplay, void *wlSurface)
         &surfaceCreateInfo,
         nullptr,
         &surface);
+    if (result != VK_SUCCESS)
+    {
+        Logger::log << "Unable to create Vulkan surface for Wayland" << endl;
+        return false;
+    }
 
-    return init(surface);
+    return init(surface, width, height);
 #else
     return false;
 #endif
 }
 
-bool VulkanInstance::init(VkSurfaceKHR surface)
+bool VulkanInstance::init(VkSurfaceKHR vulkanSurface, int32 width, int32 height)
 {
     // get rid of throw
-    this->surface = surface;
+    this->vulkanSurface = vulkanSurface;
+    if (!vulkanSurface)
+    {
+        Logger::log << "Vulkan surface wasn't provided" << endl;
+        return false;
+    }
 
-    vulkanDevice = std::make_unique<VulkanDevice>(instance, surface);
+    vulkanDevice = std::make_unique<VulkanDevice>(instance, vulkanSurface);
     if (!vulkanDevice->setup())
     {
         vulkanDevice.reset();
@@ -111,13 +132,11 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
     VkPhysicalDevice physicalDevice = vulkanDevice->getPhysicalDevice();
     VkDevice device = vulkanDevice->getDevice();
 
-    VkSurfaceCapabilitiesKHR caps;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &caps);
-    width = caps.currentExtent.width;
-    height = caps.currentExtent.height;
+    this->width = width;
+    this->height = height;
 
     VulkanQueueFamilies vulkanQueueFamilies;
-    if (!vulkanQueueFamilies.setup(physicalDevice, surface))
+    if (!vulkanQueueFamilies.setup(physicalDevice, vulkanSurface))
     {
         Logger::log << "Unable to setup queue families" << endl;
         return false;
@@ -126,8 +145,21 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
     vkGetDeviceQueue(device, vulkanQueueFamilies.getGraphicsFamily().value(), 0, &graphicsQueue);
     vkGetDeviceQueue(device, vulkanQueueFamilies.getPresentFamily().value(), 0, &presentQueue);
 
+    VkBool32 supported = VK_FALSE;
+    VkResult result;
+    result = vkGetPhysicalDeviceSurfaceSupportKHR(
+        physicalDevice,
+        vulkanQueueFamilies.getPresentFamily().value(),
+        vulkanSurface,
+        &supported);
+    if (result != VK_SUCCESS)
+    {
+        Logger::log << "Created surface is not supported for rendering" << endl;
+        return false;
+    }
+
     commandPool = std::make_unique<VulkanCommandPool>(device, physicalDevice);
-    if (!commandPool->setup(surface))
+    if (!commandPool->setup(vulkanSurface))
     {
         Logger::log << "failed to create command pool" << endl;
         return false;
@@ -146,7 +178,7 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
     vulkanUtils->logSystemData();
 
     swapChain = std::make_unique<VulkanSwapChain>(vulkanUtils.get());
-    if (!swapChain->setup(width, height, surface, !isImmidiateSwap, MSAASampleCount))
+    if (!swapChain->setup(width, height, vulkanSurface, !isImmidiateSwap, MSAASampleCount))
     {
         Logger::log << "Unable to create swap chain" << endl;
         return false;
@@ -209,7 +241,7 @@ bool VulkanInstance::init(VkSurfaceKHR surface)
     return true;
 }
 
-void VulkanInstance::changeSize()
+void VulkanInstance::changeSize(int32 width, int32 height)
 {
     VkDevice device = vulkanDevice->getDevice();
 
@@ -225,13 +257,11 @@ void VulkanInstance::changeSize()
     swapChain.reset();
     vkDeviceWaitIdle(device);
 
-    VkSurfaceCapabilitiesKHR caps{};
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkanDevice->getPhysicalDevice(), surface, &caps);
-    width = caps.currentExtent.width;
-    height = caps.currentExtent.height;
+    this->width = width;
+    this->height = height;
 
     swapChain = std::make_unique<VulkanSwapChain>(vulkanUtils.get());
-    if (!swapChain->setup(width, height, surface, !isImmidiateSwap, MSAASampleCount))
+    if (!swapChain->setup(width, height, vulkanSurface, !isImmidiateSwap, MSAASampleCount))
     {
         Logger::log << "Unable to create swap chain" << endl;
         throw std::runtime_error("failed to recreate swap chain");
@@ -296,7 +326,7 @@ void VulkanInstance::changeSize()
 void VulkanInstance::setSyncState(bool syncEnabled)
 {
     isImmidiateSwap = syncEnabled;
-    changeSize();
+    changeSize(width, height);
 }
 
 bool VulkanInstance::getSyncState()
@@ -343,17 +373,22 @@ void VulkanInstance::waitIdle()
 void VulkanInstance::updateMSAASampleCount(uint MSAASampleCount)
 {
     this->MSAASampleCount = MSAASampleCount;
-    changeSize();
+    changeSize(width, height);
 }
 
 bool VulkanInstance::initInstance()
 {
     vulkanInstanceExtensions = new VulkanInstanceExtensions();
-    if (!vulkanInstanceExtensions->hasExtension("VK_KHR_surface") || !vulkanInstanceExtensions->hasExtension("VK_KHR_win32_surface"))
+    if (!vulkanInstanceExtensions->hasExtension("VK_KHR_surface") || !vulkanInstanceExtensions->hasExtension(getOSSurfaceExtensionName()))
     {
         Logger::log << "Required extensions missing" << endl;
+        vulkanInstanceExtensions->dumpExtensions();
         return false;
     }
+
+    const char *const instanceExtNames[VULKAN_INSTANCE_REQUIRED_EXTENSIONS] = {
+        "VK_KHR_surface",
+        getOSSurfaceExtensionName()};
 
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -369,8 +404,12 @@ bool VulkanInstance::initInstance()
     createInfo.enabledExtensionCount = VULKAN_INSTANCE_REQUIRED_EXTENSIONS;
     createInfo.ppEnabledExtensionNames = instanceExtNames;
 
-    const std::vector<const char *> validationLayers = {
-        "VK_LAYER_KHRONOS_validation"};
+    // validation layers
+    VulkanLayers vulkanLayers;
+    std::vector<const char *> validationLayers;
+    if (vulkanLayers.hasLayer("VK_LAYER_KHRONOS_validation"))
+        validationLayers.push_back("VK_LAYER_KHRONOS_validation");
+
     createInfo.enabledLayerCount =
         static_cast<uint32_t>(validationLayers.size());
     createInfo.ppEnabledLayerNames =
@@ -379,8 +418,17 @@ bool VulkanInstance::initInstance()
     VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
     if (result != VK_SUCCESS)
     {
-        Logger::log << "Unable to create Vulkan instance" << endl;
+        Logger::log << "Unable to create Vulkan instance, error " << result << endl;
         return false;
     }
     return true;
+}
+
+const char *VulkanInstance::getOSSurfaceExtensionName()
+{
+#if defined(OS_WINDOWS)
+    return "VK_KHR_win32_surface";
+#else
+    return "VK_KHR_wayland_surface";
+#endif
 }

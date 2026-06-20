@@ -93,40 +93,45 @@ bool VulkanSwapChain::setup(int width, int height, VkSurfaceKHR surface, bool is
 }
 
 VkSwapchainKHR VulkanSwapChain::createSwapChain(
-    VkSurfaceKHR surface,
-    int nWindowWidth,
-    int nWindowHeight,
-    unsigned int *swapChainImageFormat,
-    unsigned int *punImageCount,
+    VkSurfaceKHR vulkanSurface,
+    int windowWidth,
+    int windowHeight,
+    uint *swapChainImageFormat,
+    uint *punImageCount,
     bool isImmidiateSwap)
 {
+    VkResult result;
     auto physicalDevice = vulkanDevice->getPhysicalDevice();
     auto device = vulkanDevice->getDevice();
-    SwapChainSupportDetails swapChainSupport = _querySwapChainSupport(physicalDevice, surface);
 
+    VkSurfaceCapabilitiesKHR capabilities;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, vulkanSurface, &capabilities);
+
+    SwapChainSupportDetails swapChainSupport = _querySwapChainSupport(physicalDevice, vulkanSurface);
     VkSurfaceFormatKHR surfaceFormat = _chooseSwapSurfaceFormat(swapChainSupport.formats);
     VkPresentModeKHR presentMode = _chooseSwapPresentMode(swapChainSupport.presentModes, isImmidiateSwap);
 
-    VkExtent2D extent = _chooseSwapExtent(nWindowWidth, nWindowHeight);
+    int imageCount = capabilities.minImageCount + 1 < capabilities.maxImageCount
+                         ? capabilities.minImageCount + 1
+                         : capabilities.minImageCount;
 
-    uint32_t unImageCount = swapChainSupport.capabilities.minImageCount + 1;
-    if (swapChainSupport.capabilities.maxImageCount > 0 && unImageCount > swapChainSupport.capabilities.maxImageCount)
-        unImageCount = swapChainSupport.capabilities.maxImageCount;
-
-    VkSwapchainCreateInfoKHR createInfo{};
+    VkSwapchainCreateInfoKHR createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = surface;
-
-    createInfo.minImageCount = unImageCount;
+    createInfo.surface = vulkanSurface;
+    createInfo.minImageCount = imageCount;
     createInfo.imageFormat = surfaceFormat.format;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
-    createInfo.imageExtent = extent;
+    createInfo.imageExtent.width = windowWidth;
+    createInfo.imageExtent.height = windowHeight;
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    createInfo.preTransform = capabilities.currentTransform;
+    createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    createInfo.presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+    createInfo.clipped = 1;
 
-    VulkanQueueFamilies vulkanQueueFamilies;
-    vulkanQueueFamilies.setup(physicalDevice, surface);
-
+    /*
     uint32_t queueFamilyIndices[] = {vulkanQueueFamilies.getGraphicsFamily().value(), vulkanQueueFamilies.getPresentFamily().value()};
 
     if (vulkanQueueFamilies.getGraphicsFamily() != vulkanQueueFamilies.getPresentFamily())
@@ -141,20 +146,19 @@ VkSwapchainKHR VulkanSwapChain::createSwapChain(
         createInfo.queueFamilyIndexCount = 0;     // Optional
         createInfo.pQueueFamilyIndices = nullptr; // Optional
     }
-
-    createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
-    createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    createInfo.presentMode = presentMode;
-    createInfo.clipped = VK_TRUE;
-    createInfo.oldSwapchain = VK_NULL_HANDLE;
+    */
 
     VkSwapchainKHR swapChain;
-    VkResult result = vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain);
+    result = vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain);
     if (result != VK_SUCCESS)
+    {
+        Logger::log << "Unable to create swapchain" << endl;
         return nullptr;
+    }
+
     *swapChainImageFormat = surfaceFormat.format;
-    memcpy(&swapChainExtent, &extent, sizeof(extent));
-    *punImageCount = unImageCount;
+    swapChainExtent.width = windowWidth;
+    swapChainExtent.height = windowHeight;
 
     return swapChain;
 }
@@ -210,8 +214,10 @@ SwapChainSupportDetails _querySwapChainSupport(VkPhysicalDevice device, VkSurfac
     SwapChainSupportDetails details;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
 
-    uint32_t formatCount;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+    uint32_t formatCount = 0;
+    VkResult result = vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+    if (result != VK_SUCCESS || formatCount == 0)
+        Logger::log << "Failed to get physical device surface formats, count: " << formatCount << endl;
 
     if (formatCount != 0)
     {
@@ -245,6 +251,9 @@ VkSurfaceFormatKHR _chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR
 
 VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes, bool isImmidiateSwap)
 {
+#if defined(OS_LINUX)
+    return VK_PRESENT_MODE_MAILBOX_KHR;
+#else
     if (isImmidiateSwap)
     {
         return VK_PRESENT_MODE_IMMEDIATE_KHR;
@@ -253,6 +262,7 @@ VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &ava
     {
         return VK_PRESENT_MODE_FIFO_KHR;
     }
+#endif
 
     // todo
     // VK_PRESENT_MODE_MAILBOX_KHR for desctop devices, VK_PRESENT_MODE_FIFO_KHR is for mobile

@@ -5,6 +5,7 @@
 #include "features/renderer/vulkan/vulkanCommandPool.h"
 #include "features/renderer/vulkan/vulkanInstanceExtensions.h"
 #include "features/renderer/vulkan/vulkanDeviceExtensions.h"
+#include "features/renderer/vulkan/vulkanLayers.h"
 #include "features/renderer/vulkan/vulkanShader.h"
 #include "features/renderer/vulkan/vulkanRenderPass.h"
 #include "features/renderer/vulkan/vulkanFrameBuffer.h"
@@ -31,9 +32,9 @@ namespace wne
     public:
         ~VulkanInstance();
         static std::unique_ptr<VulkanInstance> createNT(void *hwnd);
-        static std::unique_ptr<VulkanInstance> createLinuxWayland(void *wlDisplay, void *wlSurface);
+        static std::unique_ptr<VulkanInstance> createLinuxWayland(void *wlDisplay, void *wlSurface, int32 width, int32 height);
 
-        void changeSize();
+        void changeSize(int32 width, int32 height);
 
         void setSyncState(bool syncEnabled);
         bool getSyncState();
@@ -64,14 +65,14 @@ namespace wne
         }
 
     protected:
-        uint32 width = 0,
-               height = 0;
+        int32 width = 0,
+              height = 0;
         bool isImmidiateSwap = false;
 
         VulkanInstanceExtensions *vulkanInstanceExtensions = nullptr;
 
         VkInstance instance = nullptr;
-        VkSurfaceKHR surface = nullptr;
+        VkSurfaceKHR vulkanSurface = nullptr;
         VkQueue graphicsQueue = nullptr;
         VkQueue presentQueue = nullptr;
 
@@ -87,15 +88,12 @@ namespace wne
         std::unique_ptr<VulkanUtils> vulkanUtils = nullptr;
         std::vector<std::unique_ptr<VulkanFrame>> frames;
 
-        const char *const instanceExtNames[VULKAN_INSTANCE_REQUIRED_EXTENSIONS] = {
-            "VK_KHR_surface",
-            "VK_KHR_win32_surface"};
-
         VulkanInstance() = default;
         bool initNT(void *hWnd);
-        bool initLinuxWayland(void *wlDisplay, void *wlSurface);
-        bool init(VkSurfaceKHR surface);
+        bool initLinuxWayland(void *wlDisplay, void *wlSurface, int32 width, int32 height);
+        bool init(VkSurfaceKHR surface, int32 width, int32 height);
         bool initInstance();
+        const char *getOSSurfaceExtensionName();
 
         uint MSAASampleCount = 1;
     };

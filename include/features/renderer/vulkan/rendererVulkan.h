@@ -32,7 +32,7 @@ namespace wne
         std::shared_ptr<Mesh> getDefaultPlane() override final;
         void prepareRenderingState() override final;
 
-        void changeWindowSize(uint32 width, uint32 height) override final;
+        void changeWindowSize(int32 width, int32 height) override final;
         std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model) override final;
         std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image) override final;
         std::shared_ptr<Text> createText(std::shared_ptr<Font> font) override final;

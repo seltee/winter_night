@@ -24,7 +24,7 @@ namespace wne
     protected:
         const static int MAX_SUBSCIRBERS = 100;
 
-        uint width, height;
+        int32 width, height;
         WindowType windowType;
         bool flagFocused = false;
         bool flagCloseRequested = false;
@@ -44,12 +44,12 @@ namespace wne
     public:
         virtual ~Window();
 
-        static std::shared_ptr<Window> create(uint width, uint height);
-        static std::shared_ptr<Window> createFullscreen(uint width, uint height);
-        static std::shared_ptr<Window> createBorderless(uint width, uint height);
-        static std::shared_ptr<Window> createResizable(uint width, uint height);
+        static std::shared_ptr<Window> create(int32 width, int32 height);
+        static std::shared_ptr<Window> createFullscreen(int32 width, int32 height);
+        static std::shared_ptr<Window> createBorderless(int32 width, int32 height);
+        static std::shared_ptr<Window> createResizable(int32 width, int32 height);
 
-        virtual bool setup(uint width, uint height, WindowType type);
+        virtual bool setup(int32 width, int32 height, WindowType type);
         virtual void update(float delta);
         virtual void render();
         virtual void updateWindowSize();
@@ -77,12 +77,12 @@ namespace wne
             return soundSystem.get();
         }
 
-        inline uint getWidth()
+        inline int32 getWidth()
         {
             return width;
         }
 
-        inline uint getHeight()
+        inline int32 getHeight()
         {
             return height;
         }

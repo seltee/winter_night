@@ -16,7 +16,7 @@ void Renderer::render()
 {
 }
 
-void Renderer::changeWindowSize(uint32 width, uint32 height)
+void Renderer::changeWindowSize(int32 width, int32 height)
 {
 }
 
