@@ -14,7 +14,7 @@ SHADER_OUTPUT_DIR := $(BINDIR)/shaders
 
 ifeq ($(OS),Windows_NT)
 CXX_FLAGS = -DWNE_BUILD_DLL -I$(INCDIR) -I../vulkan/Include -Wall -MMD -std=c++20 -mfpmath=sse -g -O2
-LIBRARIES = -lkernel32 -luser32 -lgdi32 -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lvulkan-1 -lsetupapi -lhid
+LIBRARIES = -lkernel32 -luser32 -lgdi32 -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lvulkan-1 -lsetupapi -lhid -ldsound
 EXT = ".exe"
 EXLFLAGS = -Wall -g -v -L"x86_64-w64-mingw32/lib" -L"lib" -L$(BINDIR)
 EXLIBRARIES = -lkernel32 -luser32 -lshell32 -lwne

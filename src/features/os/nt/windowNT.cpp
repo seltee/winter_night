@@ -85,7 +85,7 @@ bool WindowNT::setup(int32 width, int32 height, WindowType type)
         return false;
     }
 
-    renderer = RendererVulkanNT::create(hWnd);
+    renderer = RendererVulkanNT::create(hWnd, width, height);
     if (!renderer)
     {
         CloseWindow(hWnd);
@@ -94,7 +94,7 @@ bool WindowNT::setup(int32 width, int32 height, WindowType type)
 
     Logger::log << "Window and Vulkan renderer succesfully created " << width << "x" << height << endl;
 
-    soundSystem = SoundSystemNT::create();
+    soundSystem = SoundSystemNT::create(hWnd);
     if (!soundSystem)
     {
         CloseWindow(hWnd);
@@ -132,8 +132,8 @@ void WindowNT::update(float delta)
     // You can detect maximization of the window, but when you go backwards WM_RESTORE
     // is shared among other actions like changing the window size
     // The most reliable way is still to just check the window size manually
-    uint newWidth = rect.right - rect.left;
-    uint newHeight = rect.bottom - rect.top;
+    int32 newWidth = rect.right - rect.left;
+    int32 newHeight = rect.bottom - rect.top;
     if ((width != newWidth || height != newHeight) && IsWindow(hWnd))
     {
         width = newWidth;
@@ -151,6 +151,7 @@ void WindowNT::update(float delta)
     }
 
     renderer->update(delta);
+    soundSystem->update();
 }
 
 void WindowNT::render()

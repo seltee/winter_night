@@ -19,6 +19,13 @@ namespace wne
         virtual void update();
 
     protected:
+        virtual void updateBuffers();
+        virtual void provideBuffer(float *data, uint sampleCount);
+        void setupBuffer(uint sampleCount);
+        void fillBuffer();
+
         std::vector<std::shared_ptr<SoundSource>> sources;
+        std::vector<float> buffer;
+        uint sampleCount = 0;
     };
 }

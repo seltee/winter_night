@@ -16,18 +16,18 @@
 
 using namespace wne;
 
-std::unique_ptr<RendererVulkanNT> RendererVulkanNT::create(void *hwnd)
+std::unique_ptr<RendererVulkanNT> RendererVulkanNT::create(void *hwnd, int32 width, int32 height)
 {
     auto instance = std::unique_ptr<RendererVulkanNT>(new RendererVulkanNT());
-    if (!instance->setup(hwnd))
+    if (!instance->setup(hwnd, width, height))
         return nullptr;
     return instance;
 }
 
-bool RendererVulkanNT::setup(void *hWnd)
+bool RendererVulkanNT::setup(void *hWnd, int32 width, int32 height)
 {
     state = new VulkanRendererState();
-    instance = VulkanInstance::createNT(hWnd);
+    instance = VulkanInstance::createNT(hWnd, width, height);
     if (!instance)
         return false;
 

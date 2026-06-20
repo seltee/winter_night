@@ -26,10 +26,10 @@ VulkanInstance::~VulkanInstance()
         delete vulkanInstanceExtensions;
 }
 
-std::unique_ptr<VulkanInstance> VulkanInstance::createNT(void *hwnd)
+std::unique_ptr<VulkanInstance> VulkanInstance::createNT(void *hwnd, int32 width, int32 height)
 {
     auto instance = std::unique_ptr<VulkanInstance>(new VulkanInstance());
-    if (!instance->initNT(hwnd))
+    if (!instance->initNT(hwnd, width, height))
         return nullptr;
     return instance;
 }
@@ -42,7 +42,7 @@ std::unique_ptr<VulkanInstance> VulkanInstance::createLinuxWayland(void *wlDispl
     return instance;
 }
 
-bool VulkanInstance::initNT(void *hWnd)
+bool VulkanInstance::initNT(void *hWnd, int32 width, int32 height)
 {
 #if defined(OS_WINDOWS)
     if (!initInstance())
@@ -63,16 +63,6 @@ bool VulkanInstance::initNT(void *hWnd)
         Logger::log << "failed to create window surface " << result << endl;
         return false;
     }
-
-    VkSurfaceCapabilitiesKHR caps;
-    VkResult res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, vulkanSurface, &caps);
-    if (res != VK_SUCCESS)
-    {
-        Logger::log << "Unable to get surface data" << endl;
-        return false;
-    }
-    width = caps.currentExtent.width;
-    height = caps.currentExtent.height;
 
     return init(surface, width, height);
 #else
@@ -131,6 +121,18 @@ bool VulkanInstance::init(VkSurfaceKHR vulkanSurface, int32 width, int32 height)
     }
     VkPhysicalDevice physicalDevice = vulkanDevice->getPhysicalDevice();
     VkDevice device = vulkanDevice->getDevice();
+
+    VkSurfaceCapabilitiesKHR caps;
+    VkResult res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, vulkanSurface, &caps);
+    if (res != VK_SUCCESS)
+    {
+        Logger::log << "Unable to get surface data" << endl;
+        return false;
+    }
+    if (width < (int)caps.minImageExtent.width || width > (int)caps.maxImageExtent.width)
+        width = (int)caps.currentExtent.width;
+    if (height < (int)caps.minImageExtent.height || height > (int)caps.maxImageExtent.height)
+        height = (int)caps.currentExtent.height;
 
     this->width = width;
     this->height = height;
@@ -257,6 +259,15 @@ void VulkanInstance::changeSize(int32 width, int32 height)
     swapChain.reset();
     vkDeviceWaitIdle(device);
 
+    VkSurfaceCapabilitiesKHR caps;
+    VkResult res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkanUtils->getVulkanDevice()->getPhysicalDevice(), vulkanSurface, &caps);
+    if (res == VK_SUCCESS)
+    {
+        if (width < (int)caps.minImageExtent.width || width > (int)caps.maxImageExtent.width)
+            width = (int)caps.currentExtent.width;
+        if (height < (int)caps.minImageExtent.height || height > (int)caps.maxImageExtent.height)
+            height = (int)caps.currentExtent.height;
+    }
     this->width = width;
     this->height = height;
 

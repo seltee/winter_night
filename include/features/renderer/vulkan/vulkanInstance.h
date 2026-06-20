@@ -31,7 +31,7 @@ namespace wne
     {
     public:
         ~VulkanInstance();
-        static std::unique_ptr<VulkanInstance> createNT(void *hwnd);
+        static std::unique_ptr<VulkanInstance> createNT(void *hwnd, int32 width, int32 height);
         static std::unique_ptr<VulkanInstance> createLinuxWayland(void *wlDisplay, void *wlSurface, int32 width, int32 height);
 
         void changeSize(int32 width, int32 height);
@@ -89,7 +89,7 @@ namespace wne
         std::vector<std::unique_ptr<VulkanFrame>> frames;
 
         VulkanInstance() = default;
-        bool initNT(void *hWnd);
+        bool initNT(void *hWnd, int32 width, int32 height);
         bool initLinuxWayland(void *wlDisplay, void *wlSurface, int32 width, int32 height);
         bool init(VkSurfaceKHR surface, int32 width, int32 height);
         bool initInstance();
