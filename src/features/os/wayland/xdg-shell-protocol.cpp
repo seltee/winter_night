@@ -28,13 +28,13 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include "core/platform.h"
 #if defined(OS_LINUX)
 
 #include <stdlib.h>
 #include <stdint.h>
 #include "wayland-util.h"
 #include "features/os/wayland/windowWayland.h"
-#include "core/platform.h"
 
 
 #ifndef __has_attribute

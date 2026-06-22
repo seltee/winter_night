@@ -3,6 +3,11 @@
 
 using namespace wne;
 
+std::shared_ptr<SoundSystem> SoundSystem::create()
+{
+    return std::make_shared<SoundSystem>();
+}
+
 std::shared_ptr<SoundSource> SoundSystem::playSound(Sound *sound, bool loop)
 {
     auto source = std::make_shared<SoundSource>(sound, loop);
