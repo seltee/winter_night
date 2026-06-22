@@ -16,7 +16,9 @@ namespace wne
         bool getSyncState() override final;
 
         void update(float delta) override final;
-        void render() override final;
+        void renderStart() override final;
+        void renderScenes() override final;
+        void renderFinish() override final;
 
         void renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial) override final;
         void provideSceneData(

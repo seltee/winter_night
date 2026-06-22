@@ -156,7 +156,9 @@ void WindowNT::update(float delta)
 
 void WindowNT::render()
 {
-    renderer->render();
+    renderer->renderStart();
+    renderer->renderScenes();
+    renderer->renderFinish();
 }
 
 void WindowNT::updateWindowSize()

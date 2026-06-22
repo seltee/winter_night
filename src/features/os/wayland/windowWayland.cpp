@@ -2,6 +2,9 @@
 
 #if defined(OS_LINUX)
 #include "features/renderer/vulkan/rendererVulkanWayland.h"
+#include "features/scene/actorCamera.h"
+#include "features/camera/cameraOrtho.h"
+#include "features/scene/actorUI.h"
 #include "features/logger/logger.h"
 #include <algorithm>
 #include <string>
@@ -10,6 +13,9 @@ using namespace wne;
 
 bool WindowWayland::setup(int32 width, int32 height, WindowType type)
 {
+    if (type == WindowType::Resizable || type == WindowType::Windowed)
+        flagShowTitlebar = true;
+
     display_ = wl_display_connect(NULL);
     if (!display_)
     {
@@ -18,7 +24,7 @@ bool WindowWayland::setup(int32 width, int32 height, WindowType type)
     }
 
     wl_registry *registry = wl_display_get_registry(display_);
-    const struct wl_registry_listener registry_listener = {
+    const wl_registry_listener registry_listener = {
         WindowWayland::onRegistry, WindowWayland::onRemoveRegistry};
     wl_registry_add_listener(registry, &registry_listener, this);
     wl_display_roundtrip(display_);
@@ -27,6 +33,11 @@ bool WindowWayland::setup(int32 width, int32 height, WindowType type)
         Logger::log << "Wayland compositor is not set" << endl;
         return false;
     }
+
+    static const wl_seat_listener seatListener = {
+        .capabilities = handleSeatCapabilities,
+        .name = handleSeatName};
+    wl_seat_add_listener(seat_, &seatListener, this);
 
     surface_ = wl_compositor_create_surface(compositor_);
     if (!surface_)
@@ -92,12 +103,24 @@ bool WindowWayland::setup(int32 width, int32 height, WindowType type)
 
 void WindowWayland::update(float delta)
 {
-    wl_display_roundtrip(display_);
+    wl_display_dispatch_pending(display_);
+    wl_display_flush(display_);
+    renderer->update(delta);
+    soundSystem->update();
 }
 
 void WindowWayland::render()
 {
-    renderer->render();
+    renderer->renderStart();
+    renderer->renderScenes();
+    if (flagShowTitlebar)
+    {
+        if (!uiScene)
+            uiScene = createUIScene();
+        uiScene->provideSceneMVP();
+        uiScene->render();
+    }
+    renderer->renderFinish();
 }
 
 void WindowWayland::updateWindowSize()
@@ -125,6 +148,54 @@ void WindowWayland::setScaleFactor(int32 scaleFactor)
     wl_surface_set_buffer_scale(surface_, scaleFactor);
 }
 
+void WindowWayland::subscribePointer(wl_pointer *pointer)
+{
+
+    static const wl_pointer_listener pointerListener = {
+        .enter = handlePointerEnter,
+        .leave = handlePointerLeave,
+        .motion = handlePointerMotion,
+        .button = handlePointerButton,
+        .axis = handlePointerAxis};
+
+    wl_pointer_add_listener(pointer, &pointerListener, this);
+}
+
+void WindowWayland::provideMousePosition(float x, float y)
+{
+    int32 mouseX = (int32)(x * (float)scaleFactor);
+    int32 mouseY = (int32)(y * (float)scaleFactor);
+    int32 mouseDiffX = mouseX - this->mouseX;
+    int32 mouseDiffY = mouseY - this->mouseY;
+
+    emitEventMouseMove(mouseDiffX, mouseDiffY, mouseX, mouseY);
+    this->mouseX = mouseX;
+    this->mouseY = mouseY;
+}
+
+std::shared_ptr<Scene> WindowWayland::createUIScene()
+{
+    auto sceneUI = Scene::create(renderer.get());
+
+    auto cameraUI = CameraOrtho::create(256, 256);
+    auto actorUICamera = sceneUI->createActor<ActorCamera>(cameraUI);
+    sceneUI->setCamera(actorUICamera);
+
+    auto actorUI = sceneUI->createActor<ActorUI>(this, 256, 256);
+    auto root = &actorUI->getRoot();
+
+    auto font = Font::create("Roboto-Medium.ttf");
+    // clang-format off
+    root->setChild(
+        wne::UINodeCenter::create(
+            wne::UINodeText::create(font, "Application", 70, 0xff999999)
+        )  
+    );
+    // clang-format on
+
+    return sceneUI;
+}
+
 void WindowWayland::handleToplevelConfigure(
     void *data,
     xdg_toplevel *toplevel,
@@ -139,18 +210,18 @@ void WindowWayland::handleToplevelConfigure(
     }
 }
 
-void WindowWayland::handleToplevelClose(void *data, struct xdg_toplevel *toplevel)
+void WindowWayland::handleToplevelClose(void *data, xdg_toplevel *toplevel)
 {
     WindowWayland *window = static_cast<WindowWayland *>(data);
     window->close();
 }
 
-void WindowWayland::handleShellPing(void *data, struct xdg_wm_base *shell, uint32_t serial)
+void WindowWayland::handleShellPing(void *data, xdg_wm_base *shell, uint32_t serial)
 {
     xdg_wm_base_pong(shell, serial);
 }
 
-void WindowWayland::handleShellSurfaceConfigure(void *data, struct xdg_surface *shellSurface, uint32_t serial)
+void WindowWayland::handleShellSurfaceConfigure(void *data, xdg_surface *shellSurface, uint32_t serial)
 {
     xdg_surface_ack_configure(shellSurface, serial);
 }
@@ -190,12 +261,86 @@ void WindowWayland::handleOutputScale(void *data,
     window->setScaleFactor(factor);
 }
 
-void WindowWayland::onRemoveRegistry(void *a, struct wl_registry *b, uint32_t c)
+void WindowWayland::handleSeatCapabilities(
+    void *data,
+    wl_seat *seat,
+    uint32 capabilities)
+{
+    WindowWayland *window = static_cast<WindowWayland *>(data);
+    if (capabilities & WL_SEAT_CAPABILITY_POINTER)
+    {
+        Logger::log << "Pointer" << endl;
+        wl_pointer *pointer = wl_seat_get_pointer(seat);
+        window->subscribePointer(pointer);
+    }
+
+    if (capabilities & WL_SEAT_CAPABILITY_KEYBOARD)
+    {
+        Logger::log << "Keyboard" << endl;
+        wl_keyboard *keyboard = wl_seat_get_keyboard(seat);
+        // wl_keyboard_add_listener(keyboard, &keyboard_listener, data);
+    }
+}
+
+void WindowWayland::handleSeatName(
+    void *data,
+    wl_seat *seat,
+    const char *name)
+{
+    // Logger::log << "Seat name: " << name << endl;
+}
+
+void WindowWayland::handlePointerEnter(void *data,
+                                       wl_pointer *wl_pointer,
+                                       uint32 serial,
+                                       wl_surface *surface,
+                                       wl_fixed_t surfaceX,
+                                       wl_fixed_t surfaceY)
+{
+}
+
+void WindowWayland::handlePointerLeave(void *data,
+                                       wl_pointer *wl_pointer,
+                                       uint32 serial,
+                                       wl_surface *surface)
+{
+}
+
+void WindowWayland::handlePointerMotion(void *data,
+                                        wl_pointer *wl_pointer,
+                                        uint32 time,
+                                        wl_fixed_t surfaceX,
+                                        wl_fixed_t surfaceY)
+{
+    WindowWayland *window = static_cast<WindowWayland *>(data);
+    float x = (float)wl_fixed_to_double(surfaceX);
+    float y = (float)wl_fixed_to_double(surfaceY);
+    window->provideMousePosition(x, y);
+}
+
+void WindowWayland::handlePointerButton(void *data,
+                                        wl_pointer *wl_pointer,
+                                        uint32 serial,
+                                        uint32 time,
+                                        uint32 button,
+                                        uint32 state)
+{
+}
+
+void WindowWayland::handlePointerAxis(void *data,
+                                      wl_pointer *wl_pointer,
+                                      uint32 time,
+                                      uint32 axis,
+                                      wl_fixed_t value)
+{
+}
+
+void WindowWayland::onRemoveRegistry(void *a, wl_registry *b, uint32_t c)
 {
 }
 
 void WindowWayland::onRegistry(void *data,
-                               struct wl_registry *registry,
+                               wl_registry *registry,
                                uint32 name,
                                const char *interface,
                                uint32 version)
@@ -222,6 +367,14 @@ void WindowWayland::onRegistry(void *data,
                 name,
                 &wl_output_interface,
                 2));
+    }
+    else if (strcmp(interface, "wl_seat") == 0)
+    {
+        window->seat_ = static_cast<wl_seat *>(wl_registry_bind(
+            registry,
+            name,
+            &wl_seat_interface,
+            1));
     }
 }
 

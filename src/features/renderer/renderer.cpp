@@ -12,7 +12,15 @@ void Renderer::update(float delta)
 {
 }
 
-void Renderer::render()
+void Renderer::renderStart()
+{
+}
+
+void Renderer::renderScenes()
+{
+}
+
+void Renderer::renderFinish()
 {
 }
 

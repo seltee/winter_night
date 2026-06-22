@@ -5,6 +5,7 @@
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
 #include "features/renderer/vulkan/lights/vulkanLight.h"
 #include "features/renderer/vulkan/lights/vulkanLightDirectional.h"
+#include "features/logger/logger.h"
 #include "features/data/image.h"
 #include "utils/primitives.h"
 #include "core/core.h"
@@ -42,11 +43,15 @@ void RendererVulkan::update(float delta)
     }
 }
 
-void RendererVulkan::render()
+void RendererVulkan::renderStart()
+{
+    instance->startRendering();
+}
+
+void RendererVulkan::renderScenes()
 {
     if (scenes.size() == 0)
         return;
-    instance->startRendering();
 
     instance->beginDepthPass();
     for (const auto &scene : scenes)
@@ -69,7 +74,10 @@ void RendererVulkan::render()
         scene->provideSceneMVP();
         scene->render();
     }
+}
 
+void RendererVulkan::renderFinish()
+{
     instance->finishRendering();
 }
 

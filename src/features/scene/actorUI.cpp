@@ -7,10 +7,20 @@ using namespace wne;
 
 ActorUI::ActorUI(Renderer *renderer, std::shared_ptr<Window> eventWindow) : Actor(renderer)
 {
+    ActorUI(renderer, eventWindow.get(), 1280, 720);
+}
+
+ActorUI::ActorUI(Renderer *renderer, Window *eventWindow) : Actor(renderer)
+{
     ActorUI(renderer, eventWindow, 1280, 720);
 }
 
 ActorUI::ActorUI(Renderer *renderer, std::shared_ptr<Window> eventWindow, uint rootWidth, uint rootHeight) : Actor(renderer)
+{
+    ActorUI(renderer, eventWindow.get(), rootWidth, rootHeight);
+}
+
+ActorUI::ActorUI(Renderer *renderer, Window *eventWindow, uint rootWidth, uint rootHeight) : Actor(renderer)
 {
     eventsSubscription = eventWindow->subscribe();
     this->rootWidth = rootWidth;

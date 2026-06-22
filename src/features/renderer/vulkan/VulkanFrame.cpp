@@ -127,5 +127,9 @@ void VulkanFrame::finishFrame(VkQueue graphicsQueue, VkQueue presentQueue)
     presentInfo.pImageIndices = &imageIndex;
     presentInfo.pResults = nullptr; // Optional
 
-    vkQueuePresentKHR(presentQueue, &presentInfo);
+    VkResult result = vkQueuePresentKHR(presentQueue, &presentInfo);
+    if (result != VK_SUCCESS)
+    {
+        Logger::log << "Present failed with error " << result << endl;
+    }
 }

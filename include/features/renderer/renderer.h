@@ -22,7 +22,9 @@ namespace wne
     public:
         virtual ~Renderer();
         virtual void update(float delta);
-        virtual void render();
+        virtual void renderStart();
+        virtual void renderScenes();
+        virtual void renderFinish();
 
         virtual void changeWindowSize(int32 width, int32 height);
         virtual std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model);

@@ -15,7 +15,9 @@ namespace wne
     {
     public:
         ActorUI(Renderer *renderer, std::shared_ptr<Window> eventWindow);
+        ActorUI(Renderer *renderer, Window *eventWindow);
         ActorUI(Renderer *renderer, std::shared_ptr<Window> eventWindow, uint rootWidth, uint rootHeight);
+        ActorUI(Renderer *renderer, Window *eventWindow, uint rootWidth, uint rootHeight);
 
         void update(float delta) override final;
         void renderColor() override final;
@@ -40,7 +42,7 @@ namespace wne
         UINode *moveFocusVertical(bool up, std::vector<UINode::ContextSelectableNode> &nodes, UINode *selectedNode);
         UINode *moveFocusHorizontal(bool right, std::vector<UINode::ContextSelectableNode> &nodes, UINode *selectedNode);
 
-        std::shared_ptr<wne::WindowEvents> eventsSubscription;
+        std::shared_ptr<WindowEvents> eventsSubscription;
 
         UINodeContainer root;
         UINode *selectedNode = nullptr;
