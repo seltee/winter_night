@@ -1,6 +1,7 @@
 #include "features/sound/sound.h"
 #include "features/sound/soundHelpers.h"
 #include "features/sound/soundSystem.h"
+#include "features/logger/logger.h"
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
@@ -11,7 +12,7 @@ Sound::Sound(SoundSystem *soundSystem, const char *path, bool loadImmidiately, b
 {
     this->soundSystem = soundSystem;
     this->path = std::string(path);
-    this->isStreaming = isStreaming;
+    this->flagIsStreaming = isStreaming;
     detectFormat();
 
     if (loadImmidiately)
@@ -24,17 +25,17 @@ Sound::~Sound()
 
 std::shared_ptr<wne::SoundSource> Sound::play()
 {
-    return soundSystem->playSound(this, false);
+    return soundSystem->playSound(*this, false);
 }
 
 std::shared_ptr<wne::SoundSource> Sound::play(bool loop)
 {
-    return soundSystem->playSound(this, loop);
+    return soundSystem->playSound(*this, loop);
 }
 
 bool Sound::load()
 {
-    if (isStreaming)
+    if (flagIsStreaming)
         return false;
     if (loaded)
         return true;
@@ -86,9 +87,9 @@ bool Sound::loadWav()
     WavHeader wavHeader;
     fread(&wavHeader, sizeof(WavHeader), 1, file);
 
-    printf("wav loader - %s\nformat %i, num of channels %i, sampleRate %i, byteRate %i, bytesPerSample %i, bitsPerSample %i\n",
-           path.c_str(), wavHeader.format, wavHeader.numOfChannels, wavHeader.sampleRate, wavHeader.byteRate, wavHeader.bytesPerSample,
-           wavHeader.bitsPerSample);
+    // printf("wav loader - %s\nformat %i, num of channels %i, sampleRate %i, byteRate %i, bytesPerSample %i, bitsPerSample %i\n",
+    //       path.c_str(), wavHeader.format, wavHeader.numOfChannels, wavHeader.sampleRate, wavHeader.byteRate, wavHeader.bytesPerSample,
+    //       wavHeader.bitsPerSample);
 
     int bitsPerSample = wavHeader.bitsPerSample;
     int numOfChannels = wavHeader.numOfChannels;
@@ -127,24 +128,26 @@ bool Sound::loadWav()
     {
         if (numOfChannels == 2)
         {
-            std::cout << "stereo float" << std::endl;
-            uint sampleCount = dataSize / 8;
+            sampleCount = dataSize / 8;
             for (uint i = 0; i < sampleCount; i++)
             {
                 data.push_back(*((float *)(&rawData.data()[i * 8])));
                 data.push_back(*((float *)(&rawData.data()[i * 8 + 4])));
             }
+            this->sampleCount = sampleCount;
+            flagIsStereo = true;
         }
         else
         {
-            std::cout << "mono float" << std::endl;
-            uint sampleCount = dataSize / 4;
+            sampleCount = dataSize / 4;
             for (uint i = 0; i < sampleCount; i++)
                 data.push_back(*((float *)(&rawData.data()[i * 4])));
+            flagIsStereo = false;
         }
     }
     else
     {
+        Logger::log << "Only 44100hz float format mono/stereo is supported" << endl;
         return false;
     }
     return true;

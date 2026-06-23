@@ -27,6 +27,26 @@ namespace wne
 
         bool load();
 
+        inline uint getSampleCount()
+        {
+            return sampleCount;
+        }
+
+        inline float *getData()
+        {
+            return data.data();
+        }
+
+        inline bool isStereo()
+        {
+            return flagIsStereo;
+        }
+
+        inline bool isStreaming()
+        {
+            return flagIsStreaming;
+        }
+
         inline FileFormat getFormat()
         {
             return format;
@@ -36,10 +56,11 @@ namespace wne
         void detectFormat();
         bool loadWav();
 
-        bool isStreaming = false;
+        bool flagIsStreaming = false;
+        bool flagIsStereo = false;
         bool loaded = false;
-        bool isStereo = false;
-        uint8 bytesPerSample = false;
+
+        uint sampleCount = 0;
 
         std::string path;
         FileFormat format;

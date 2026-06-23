@@ -12,7 +12,7 @@ using namespace wne;
 #endif
 
 #define FREQ (44100)
-#define FREQ_PART (FREQ / 10)
+#define FREQ_PART (FREQ / 15)
 #define CHANNELS_AMOUNT 2
 #define BUFFER_SIZE (FREQ_PART * 2 * sizeof(float))
 

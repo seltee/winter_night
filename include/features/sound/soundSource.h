@@ -10,8 +10,8 @@ namespace wne
     class SoundSource
     {
     public:
-        SoundSource(Sound *sound);
-        SoundSource(Sound *sound, bool isLooping);
+        SoundSource(Sound &sound);
+        SoundSource(Sound &sound, bool isLooping);
 
         void addToBuffer(float *buffer, uint amountOfSamples);
 
@@ -30,6 +30,7 @@ namespace wne
         bool flagIsPlaying = false;
         bool flagIsLooping = false;
         bool flagIsStreamed = false;
+        uint position;
         Sound *sound = nullptr;
         Vector3 source{};
     };

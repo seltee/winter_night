@@ -8,14 +8,14 @@ std::shared_ptr<SoundSystem> SoundSystem::create()
     return std::make_shared<SoundSystem>();
 }
 
-std::shared_ptr<SoundSource> SoundSystem::playSound(Sound *sound, bool loop)
+std::shared_ptr<SoundSource> SoundSystem::playSound(Sound &sound, bool loop)
 {
     auto source = std::make_shared<SoundSource>(sound, loop);
     sources.push_back(source);
     return source;
 }
 
-std::shared_ptr<SoundSource> SoundSystem::playSound3d(Sound *sound, const Vector3 source, std::shared_ptr<Positionable> listener, bool loop)
+std::shared_ptr<SoundSource> SoundSystem::playSound3d(Sound &sound, const Vector3 source, std::shared_ptr<Positionable> listener, bool loop)
 {
     return nullptr;
 }
