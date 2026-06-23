@@ -10,6 +10,8 @@ namespace wne
     class WNE_API WindowNT : public Window
     {
     public:
+        WindowNT(const char *windowCaption) : Window(windowCaption) {}
+
         uint16 mousePositionX = 0;
         uint16 mousePositionY = 0;
 

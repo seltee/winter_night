@@ -21,6 +21,7 @@ typedef BOOL(WINAPI *SetProcessDPIAwareFunc)();
 LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 GamepadReport _parseHidReport(HANDLE hDevice, PHIDP_PREPARSED_DATA pPreparsedData, char *report, UINT reportLength);
+std::wstring utf8ToWide(const std::string &utf8Str);
 
 bool WindowNT::setup(int32 width, int32 height, WindowType type)
 {
@@ -66,12 +67,14 @@ bool WindowNT::setup(int32 width, int32 height, WindowType type)
 
     int style = getStyleForState(type);
 
+    auto wideCaption = utf8ToWide(caption);
+
     // CreateWindowHandle
     hWnd = CreateWindowExW(
-        0,               // Optional window styles.
-        CLASS_NAME,      // Window class
-        L"Window Title", // Window text
-        style,           // Window style
+        0,                   // Optional window styles.
+        CLASS_NAME,          // Window class
+        wideCaption.c_str(), // Window text
+        style,               // Window style
         // position and size
         positionX, positionY, width + getAdditionalWindowWidth(), height + getAdditionalWindowHeight(),
         NULL,      // Parent window
@@ -525,4 +528,40 @@ GamepadReport _parseHidReport(HANDLE hDevice, PHIDP_PREPARSED_DATA pPreparsedDat
 
     return gamepadReport;
 }
+
+std::wstring utf8ToWide(const std::string &utf8Str)
+{
+    if (utf8Str.empty())
+        return L"";
+
+    int targetSize = MultiByteToWideChar(
+        CP_UTF8,                            // Source code page (UTF-8)
+        0,                                  // Flags (must be 0 for CP_UTF8)
+        utf8Str.c_str(),                    // Pointer to source string
+        static_cast<int>(utf8Str.length()), // Source string length in bytes
+        nullptr,                            // Target buffer pointer (null to calculate size)
+        0                                   // Target buffer size (0 to calculate size)
+    );
+
+    if (targetSize == 0)
+    {
+        throw std::system_error(
+            GetLastError(),
+            std::system_category(),
+            "Failed to convert UTF-8 string to wide string");
+    }
+
+    std::wstring wideStr(targetSize, L'\0');
+
+    MultiByteToWideChar(
+        CP_UTF8,
+        0,
+        utf8Str.c_str(),
+        static_cast<int>(utf8Str.length()),
+        &wideStr[0], // Pointer to internal wstring buffer
+        targetSize);
+
+    return wideStr;
+}
+
 #endif

@@ -71,8 +71,8 @@ bool WindowWayland::setup(int32 width, int32 height, WindowType type)
     toplevel_ = xdg_surface_get_toplevel(shellSurface_);
     xdg_toplevel_add_listener(toplevel_, &toplevelListener, this);
 
-    xdg_toplevel_set_title(toplevel_, "Wow");
-    xdg_toplevel_set_app_id(toplevel_, "Wow");
+    xdg_toplevel_set_title(toplevel_, caption.c_str());
+    xdg_toplevel_set_app_id(toplevel_, caption.c_str());
 
     wl_surface_commit(surface_);
     wl_display_roundtrip(display_);

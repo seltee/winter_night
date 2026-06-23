@@ -14,6 +14,7 @@ namespace wne
     class WNE_API WindowWayland : public Window
     {
     public:
+        WindowWayland(const char *windowCaption) : Window(windowCaption) {}
         bool setup(int32 width, int32 height, WindowType type) override final;
 
         void update(float delta) override final;

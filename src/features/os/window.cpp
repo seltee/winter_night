@@ -6,8 +6,9 @@
 
 using namespace wne;
 
-Window::Window()
+Window::Window(const char *windowCaption)
 {
+    this->caption = std::string(windowCaption);
     Engine::getInstance()->registerWindow(this);
 }
 
@@ -17,43 +18,43 @@ Window::~Window()
     Engine::getInstance()->unregisterWindow(this);
 }
 
-std::shared_ptr<Window> Window::createWindow()
+std::shared_ptr<Window> Window::createWindow(const char *windowCaption)
 {
 #if defined(OS_WINDOWS)
-    return std::make_shared<WindowNT>();
+    return std::make_shared<WindowNT>(windowCaption);
 #elif defined(OS_LINUX)
-    return std::make_shared<WindowWayland>();
+    return std::make_shared<WindowWayland>(windowCaption);
 #endif
     return nullptr;
 }
 
-std::shared_ptr<Window> Window::create(int32 width, int32 height)
+std::shared_ptr<Window> Window::create(const char *windowCaption, int32 width, int32 height)
 {
-    auto window = createWindow();
+    auto window = createWindow(windowCaption);
     if (window)
         window->setup(width, height, WindowType::Windowed);
     return window;
 }
 
-std::shared_ptr<Window> Window::createFullscreen(int32 width, int32 height)
+std::shared_ptr<Window> Window::createFullscreen(const char *windowCaption, int32 width, int32 height)
 {
-    auto window = createWindow();
+    auto window = createWindow(windowCaption);
     if (window)
         window->setup(width, height, WindowType::Fullscreen);
     return window;
 }
 
-std::shared_ptr<Window> Window::createBorderless(int32 width, int32 height)
+std::shared_ptr<Window> Window::createBorderless(const char *windowCaption, int32 width, int32 height)
 {
-    auto window = createWindow();
+    auto window = createWindow(windowCaption);
     if (window)
         window->setup(width, height, WindowType::Borderless);
     return window;
 }
 
-std::shared_ptr<Window> Window::createResizable(int32 width, int32 height)
+std::shared_ptr<Window> Window::createResizable(const char *windowCaption, int32 width, int32 height)
 {
-    auto window = createWindow();
+    auto window = createWindow(windowCaption);
     if (window)
         window->setup(width, height, WindowType::Resizable);
     return window;

@@ -10,6 +10,7 @@
 #include <memory>
 #include <vector>
 #include <mutex>
+#include <string>
 
 namespace wne
 {
@@ -34,22 +35,23 @@ namespace wne
         std::unique_ptr<Renderer> renderer;
         std::shared_ptr<SoundSystem> soundSystem;
         std::mutex mutex;
+        std::string caption = "Window Caption";
 
         std::vector<std::shared_ptr<Gamepad>> gamepads;
 
         std::weak_ptr<WindowEvents> subscribers[MAX_SUBSCIRBERS];
         int subscribersAmount = 0;
 
-        Window();
-        static std::shared_ptr<Window> createWindow();
+        Window(const char *windowCaption);
+        static std::shared_ptr<Window> createWindow(const char *windowCaption);
 
     public:
         virtual ~Window();
 
-        static std::shared_ptr<Window> create(int32 width, int32 height);
-        static std::shared_ptr<Window> createFullscreen(int32 width, int32 height);
-        static std::shared_ptr<Window> createBorderless(int32 width, int32 height);
-        static std::shared_ptr<Window> createResizable(int32 width, int32 height);
+        static std::shared_ptr<Window> create(const char *windowCaption, int32 width, int32 height);
+        static std::shared_ptr<Window> createFullscreen(const char *windowCaption, int32 width, int32 height);
+        static std::shared_ptr<Window> createBorderless(const char *windowCaption, int32 width, int32 height);
+        static std::shared_ptr<Window> createResizable(const char *windowCaption, int32 width, int32 height);
 
         virtual bool setup(int32 width, int32 height, WindowType type);
         virtual void update(float delta);

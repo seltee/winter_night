@@ -70,7 +70,7 @@ int main()
 {
     wne::Engine::getInstance()->enableLogger();
 
-    auto window = wne::Window::create(2560, 1440);
+    auto window = wne::Window::create("Winter Night", 2560, 1440);
     if (!window)
         return 1;
 
