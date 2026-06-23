@@ -11,6 +11,7 @@ void WindowEvents::pushEventKey(bool isDown, uint16 keyCode)
     std::lock_guard<std::mutex> lock(mutex);
     events[lastEventWrote].type = isDown ? WindowEventType::KEY_PRESS : WindowEventType::KEY_RELEASE;
     events[lastEventWrote].key.scancode = keyCode;
+    events[lastEventWrote].key.code = (Key)keyCode;
     lastEventWrote = (lastEventWrote + 1) % WINDOW_EVENTS_MAX;
     lastInputDevice = WindowEvents::LastInputDevice::Keyboard;
 }
@@ -26,7 +27,7 @@ void WindowEvents::pushEventMouseMove(int16 shiftX, int16 shiftY, int16 position
     lastEventWrote = (lastEventWrote + 1) % WINDOW_EVENTS_MAX;
 }
 
-void WindowEvents::pushEventMouseClick(bool isDown, uint16 mouseButton)
+void WindowEvents::pushEventMouseClick(bool isDown, MouseButton mouseButton)
 {
     std::lock_guard<std::mutex> lock(mutex);
     events[lastEventWrote].type = isDown ? WindowEventType::MOUSE_BUTTON_DOWN : WindowEventType::MOUSE_BUTTON_UP;

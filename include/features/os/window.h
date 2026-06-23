@@ -5,6 +5,8 @@
 #include "features/sound/soundSystem.h"
 #include "features/os/windowEvents.h"
 #include "features/os/gamepad.h"
+#include "features/os/windowDefines.h"
+#include "features/os/windowKeys.h"
 #include <memory>
 #include <vector>
 #include <mutex>
@@ -59,7 +61,7 @@ namespace wne
         std::shared_ptr<WindowEvents> subscribe();
         void emitEventKey(bool isPressed, uint16 keyCode);
         void emitEventMouseMove(int16 shiftX, int16 shiftY, int16 positionX, int16 positionY);
-        void emitEventMouseClick(bool isPressed, uint16 mouseButton);
+        void emitEventMouseClick(bool isPressed, MouseButton mouseButton);
         void emitEventFocusChanged(bool newFocusState);
         void emitEventGamepadPlugged(std::shared_ptr<Gamepad> gamepad);
         void emitEventGamepadUnplugged(std::shared_ptr<Gamepad> gamepad);

@@ -1,6 +1,8 @@
 #pragma once
 #include "core/core.h"
 #include "features/os/gamepad.h"
+#include "features/os/windowKeys.h"
+#include "features/os/windowDefines.h"
 #include <mutex>
 #include <memory>
 
@@ -39,6 +41,7 @@ namespace wne
         {
             WindowEventType type;
             uint16 scancode;
+            Key code;
         };
 
         struct WindowEventMouseMove
@@ -53,7 +56,7 @@ namespace wne
         struct WindowEventMouseButton
         {
             WindowEventType type;
-            uint16 button;
+            MouseButton button;
         };
 
         struct WindowEventGamepadButton
@@ -88,7 +91,7 @@ namespace wne
 
         void pushEventKey(bool isPressed, uint16 keyCode);
         void pushEventMouseMove(int16 shiftX, int16 shiftY, int16 positionX, int16 positionY);
-        void pushEventMouseClick(bool isPressed, uint16 mouseButton);
+        void pushEventMouseClick(bool isPressed, MouseButton mouseButton);
         void pushEventWindowFocusChanged(bool newFocusState);
         void pushEventGamepadPlugged(std::shared_ptr<Gamepad> gamepad);
         void pushEventGamepadUnplugged(std::shared_ptr<Gamepad> gamepad);

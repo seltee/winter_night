@@ -25,8 +25,11 @@ namespace wne
         void setScaleFactor(int32 scaleFactor);
 
         void subscribePointer(wl_pointer *pointer);
+        void subscribeKeyboard(wl_keyboard *keyboard);
 
         void provideMousePosition(float x, float y);
+        void provideMouseButton(MouseButton button, bool state);
+        void provideKeyboardKey(uint16 key, bool state);
 
         wl_compositor *compositor_ = nullptr;
         xdg_wm_base *shell_ = nullptr;
@@ -109,6 +112,38 @@ namespace wne
                                       uint32 time,
                                       uint32 axis,
                                       wl_fixed_t value);
+
+        static void hanldeKeyboardKeyMap(void *data,
+                                         wl_keyboard *wl_keyboard,
+                                         uint32 format,
+                                         int32 fd,
+                                         uint32 size);
+        static void handleKeyboardEnter(void *data,
+                                        wl_keyboard *wl_keyboard,
+                                        uint32 serial,
+                                        wl_surface *surface,
+                                        wl_array *keys);
+        static void handleKeyboardLeave(void *data,
+                                        struct wl_keyboard *wl_keyboard,
+                                        uint32 serial,
+                                        struct wl_surface *surface);
+        static void handleKeyboardKey(void *data,
+                                      wl_keyboard *wl_keyboard,
+                                      uint32 serial,
+                                      uint32 time,
+                                      uint32 key,
+                                      uint32 state);
+        static void handleKeyboardModifiers(void *data,
+                                            struct wl_keyboard *wl_keyboard,
+                                            uint32 serial,
+                                            uint32 mods_depressed,
+                                            uint32 mods_latched,
+                                            uint32 mods_locked,
+                                            uint32 group);
+        static void handleKeyboardRepeatInfo(void *data,
+                                             struct wl_keyboard *wl_keyboard,
+                                             int32 rate,
+                                             int32 delay);
 
         static void onRemoveRegistry(void *a, wl_registry *b, uint32_t c);
         static void onRegistry(void *data,

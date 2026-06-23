@@ -130,7 +130,7 @@ void Window::emitEventMouseMove(int16 shiftX, int16 shiftY, int16 positionX, int
     }
 }
 
-void Window::emitEventMouseClick(bool isPressed, uint16 mouseButton)
+void Window::emitEventMouseClick(bool isPressed, MouseButton mouseButton)
 {
     std::lock_guard<std::mutex> lock(mutex);
     for (int i = 0; i < subscribersAmount;)

@@ -44,14 +44,14 @@ void ActorUI::update(float delta)
         }
         else if (event.type == WindowEvents::WindowEventType::MOUSE_BUTTON_DOWN)
         {
-            if (event.mouseButton.button == 0)
+            if (event.mouseButton.button == MouseButton::LeftMouseButton)
             {
                 clickRegistered = true;
             }
         }
         else if (event.type == WindowEvents::WindowEventType::MOUSE_BUTTON_UP)
         {
-            if (event.mouseButton.button == 0)
+            if (event.mouseButton.button == MouseButton::LeftMouseButton)
             {
                 releaseRegistered = true;
             }

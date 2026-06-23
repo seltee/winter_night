@@ -366,27 +366,27 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         break;
 
     case WM_LBUTTONDOWN:
-        window->emitEventMouseClick(true, 0);
+        window->emitEventMouseClick(true, MouseButton::LeftMouseButton);
         break;
 
     case WM_LBUTTONUP:
-        window->emitEventMouseClick(false, 0);
+        window->emitEventMouseClick(false, MouseButton::LeftMouseButton);
         break;
 
     case WM_RBUTTONDOWN:
-        window->emitEventMouseClick(true, 1);
+        window->emitEventMouseClick(true, MouseButton::RightMouseButton);
         break;
 
     case WM_RBUTTONUP:
-        window->emitEventMouseClick(false, 1);
+        window->emitEventMouseClick(false, MouseButton::RightMouseButton);
         break;
 
     case WM_MBUTTONDOWN:
-        window->emitEventMouseClick(true, 2);
+        window->emitEventMouseClick(true, MouseButton::MiddleMouseButton);
         break;
 
     case WM_MBUTTONUP:
-        window->emitEventMouseClick(true, 2);
+        window->emitEventMouseClick(true, MouseButton::MiddleMouseButton);
         break;
 
     case WM_MOUSEWHEEL:

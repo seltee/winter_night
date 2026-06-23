@@ -161,6 +161,19 @@ void WindowWayland::subscribePointer(wl_pointer *pointer)
     wl_pointer_add_listener(pointer, &pointerListener, this);
 }
 
+void WindowWayland::subscribeKeyboard(wl_keyboard *keyboard)
+{
+    static const wl_keyboard_listener keyboardListener = {
+        .keymap = hanldeKeyboardKeyMap,
+        .enter = handleKeyboardEnter,
+        .leave = handleKeyboardLeave,
+        .key = handleKeyboardKey,
+        .modifiers = handleKeyboardModifiers,
+        .repeat_info = handleKeyboardRepeatInfo};
+
+    wl_keyboard_add_listener(keyboard, &keyboardListener, this);
+}
+
 void WindowWayland::provideMousePosition(float x, float y)
 {
     int32 mouseX = (int32)(x * (float)scaleFactor);
@@ -171,6 +184,16 @@ void WindowWayland::provideMousePosition(float x, float y)
     emitEventMouseMove(mouseDiffX, mouseDiffY, mouseX, mouseY);
     this->mouseX = mouseX;
     this->mouseY = mouseY;
+}
+
+void WindowWayland::provideMouseButton(MouseButton button, bool state)
+{
+    emitEventMouseClick(state, button);
+}
+
+void WindowWayland::provideKeyboardKey(uint16 key, bool state)
+{
+    emitEventKey(state, key);
 }
 
 std::shared_ptr<Scene> WindowWayland::createUIScene()
@@ -278,7 +301,7 @@ void WindowWayland::handleSeatCapabilities(
     {
         Logger::log << "Keyboard" << endl;
         wl_keyboard *keyboard = wl_seat_get_keyboard(seat);
-        // wl_keyboard_add_listener(keyboard, &keyboard_listener, data);
+        window->subscribeKeyboard(keyboard);
     }
 }
 
@@ -325,6 +348,13 @@ void WindowWayland::handlePointerButton(void *data,
                                         uint32 button,
                                         uint32 state)
 {
+    WindowWayland *window = static_cast<WindowWayland *>(data);
+    if (button == 272)
+        window->provideMouseButton(MouseButton::LeftMouseButton, state ? true : false);
+    if (button == 273)
+        window->provideMouseButton(MouseButton::RightMouseButton, state ? true : false);
+    if (button == 274)
+        window->provideMouseButton(MouseButton::MiddleMouseButton, state ? true : false);
 }
 
 void WindowWayland::handlePointerAxis(void *data,
@@ -332,6 +362,58 @@ void WindowWayland::handlePointerAxis(void *data,
                                       uint32 time,
                                       uint32 axis,
                                       wl_fixed_t value)
+{
+}
+
+void WindowWayland::hanldeKeyboardKeyMap(void *data,
+                                         wl_keyboard *wl_keyboard,
+                                         uint32 format,
+                                         int32 fd,
+                                         uint32 size)
+{
+    ::close(fd);
+}
+
+void WindowWayland::handleKeyboardEnter(void *data,
+                                        wl_keyboard *wl_keyboard,
+                                        uint32 serial,
+                                        wl_surface *surface,
+                                        wl_array *keys)
+{
+}
+
+void WindowWayland::handleKeyboardLeave(void *data,
+                                        struct wl_keyboard *wl_keyboard,
+                                        uint32 serial,
+                                        struct wl_surface *surface)
+{
+}
+
+void WindowWayland::handleKeyboardKey(void *data,
+                                      wl_keyboard *wl_keyboard,
+                                      uint32 serial,
+                                      uint32 time,
+                                      uint32 key,
+                                      uint32 state)
+{
+    WindowWayland *window = static_cast<WindowWayland *>(data);
+    window->provideKeyboardKey(key, state ? true : false);
+}
+
+void WindowWayland::handleKeyboardModifiers(void *data,
+                                            struct wl_keyboard *wl_keyboard,
+                                            uint32 serial,
+                                            uint32 mods_depressed,
+                                            uint32 mods_latched,
+                                            uint32 mods_locked,
+                                            uint32 group)
+{
+}
+
+void WindowWayland::handleKeyboardRepeatInfo(void *data,
+                                             struct wl_keyboard *wl_keyboard,
+                                             int32 rate,
+                                             int32 delay)
 {
 }
 
