@@ -23,14 +23,24 @@ Sound::~Sound()
 {
 }
 
-std::shared_ptr<wne::SoundSource> Sound::play()
+std::shared_ptr<SoundSource> Sound::play()
 {
     return soundSystem->playSound(*this, false);
 }
 
-std::shared_ptr<wne::SoundSource> Sound::play(bool loop)
+std::shared_ptr<SoundSource> Sound::play(bool loop)
 {
     return soundSystem->playSound(*this, loop);
+}
+
+std::shared_ptr<SoundSource> Sound::play3d(std::shared_ptr<Positionable> listener, const Vector3 &source)
+{
+    return soundSystem->playSound3d(*this, source, listener, false);
+}
+
+std::shared_ptr<SoundSource> Sound::play3d(std::shared_ptr<Positionable> listener, const Vector3 &source, bool loop)
+{
+    return soundSystem->playSound3d(*this, source, listener, loop);
 }
 
 bool Sound::load()

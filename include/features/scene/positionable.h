@@ -14,6 +14,30 @@ namespace wne
         virtual Matrix4x4 getInvModelMatrix();
         virtual void modelMatrixChanged();
 
+        inline Vector3 getForwardVector()
+        {
+            Quat p(0.0f, 0.0f, -1.0f, 0.0f);
+            Quat qInv(-rotation.x, -rotation.y, -rotation.z, rotation.w);
+            Quat result = rotation * p * qInv;
+            return normalize(Vector3(result.x, result.y, result.z));
+        }
+
+        inline Vector3 getRightVector()
+        {
+            Quat p(1.0f, 0.0f, 0.0f, 0.0f);
+            Quat qInv(-rotation.x, -rotation.y, -rotation.z, rotation.w);
+            Quat result = rotation * p * qInv;
+            return normalize(Vector3(result.x, result.y, result.z));
+        }
+
+        inline Vector3 getUpVector()
+        {
+            Quat p(0.0f, 1.0f, 0.0f, 0.0f);
+            Quat qInv(-rotation.x, -rotation.y, -rotation.z, rotation.w);
+            Quat result = rotation * p * qInv;
+            return normalize(Vector3(result.x, result.y, result.z));
+        }
+
         inline void setPosition(float x, float y, float z)
         {
             makeDirty();

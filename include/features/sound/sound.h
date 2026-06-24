@@ -1,5 +1,6 @@
 #pragma once
 #include "core/core.h"
+#include "features/scene/positionable.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -22,8 +23,10 @@ namespace wne
         Sound(SoundSystem *soundSystem, const char *path, bool loadImmidiately, bool isStreaming);
         ~Sound();
 
-        std::shared_ptr<wne::SoundSource> play();
-        std::shared_ptr<wne::SoundSource> play(bool loop);
+        std::shared_ptr<SoundSource> play();
+        std::shared_ptr<SoundSource> play(bool loop);
+        std::shared_ptr<SoundSource> play3d(std::shared_ptr<Positionable> listener, const Vector3 &source);
+        std::shared_ptr<SoundSource> play3d(std::shared_ptr<Positionable> listener, const Vector3 &source, bool loop);
 
         bool load();
 

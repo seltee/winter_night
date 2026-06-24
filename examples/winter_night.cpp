@@ -79,6 +79,9 @@ int main()
     renderer->setSyncState(false);
     renderer->setMSAASampleCount(4);
 
+    auto soundSystem = window->getSoundSystem();
+    auto shootFloat = soundSystem->loadSound("./data/snow_float.wav");
+
     const std::vector<wne::VertexTextured> vertices = {
         {{-5.0f, -5.0f, 0.0f}, {0.0f, 1.0f}, {0, 0, -1.0f}},
         {{5.0f, -5.0f, 0.0f}, {1.0f, 1.0f}, {0, 0, -1.0f}},
@@ -218,6 +221,8 @@ int main()
     auto actorCamera = scene->createActor<wne::ActorCameraFlying>(camera, window);
     actorCamera->setPosition(0, 16.0f, 0);
     scene->setCamera(actorCamera);
+
+    shootFloat->play3d(actorCamera, wne::Vector3(0, 0, -48.0f), true);
 
     float translate = 0.0f;
     while (!window->isCloseRequested())

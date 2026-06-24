@@ -15,9 +15,20 @@ std::shared_ptr<SoundSource> SoundSystem::playSound(Sound &sound, bool loop)
     return source;
 }
 
-std::shared_ptr<SoundSource> SoundSystem::playSound3d(Sound &sound, const Vector3 source, std::shared_ptr<Positionable> listener, bool loop)
+std::shared_ptr<SoundSource> SoundSystem::playSound3d(Sound &sound, const Vector3 &position, std::shared_ptr<Positionable> listener, bool loop)
 {
-    return nullptr;
+    auto source = std::make_shared<SoundSource>(sound, loop);
+    source->turn3d(std::move(listener), position, 121.0f);
+    sources.push_back(source);
+    return source;
+}
+
+std::shared_ptr<SoundSource> SoundSystem::playSound3d(Sound &sound, const Vector3 &position, std::shared_ptr<Positionable> listener, float maxDistance, bool loop)
+{
+    auto source = std::make_shared<SoundSource>(sound, loop);
+    source->turn3d(std::move(listener), position, maxDistance);
+    sources.push_back(source);
+    return source;
 }
 
 std::shared_ptr<Sound> SoundSystem::loadSound(const char *path)
@@ -74,69 +85,7 @@ void SoundSystem::fillBuffer()
     {
         if (it->isPlaying())
         {
-            if (it->is3d())
-            {
-            }
-            else
-            {
-                it->addToBuffer(data, sampleCount);
-            }
-            /*
-            if (it->is3dPositioned())
-            {
-                // Check if source is in sound range
-                Vector3 localPosition = it->getPosition() - vPosition;
-                float maxDistance = it->getMaxDistance();
-                float distance = glm::length(localPosition);
-
-                if (distance > maxDistance)
-                    continue;
-
-                // Calc left/right relations
-                Vector3 vSide = glm::cross(vDirection, vUpDirection);
-
-                float sideProjection = glm::dot(vSide, glm::normalize(localPosition));
-                float mainValue = 1.0f - fabsf(sideProjection);
-                float lVolume, rVolume;
-                if (sideProjection < 0.0f)
-                {
-                    lVolume = mainValue;
-                    rVolume = mainValue + fabsf(sideProjection);
-                }
-                else
-                {
-                    lVolume = mainValue + fabsf(sideProjection);
-                    rVolume = mainValue;
-                }
-
-                // Volume based on distance
-                float distanceVolume = 1.0f;
-                float refDistance = it->getReferenceDistance();
-
-                if (distance > refDistance)
-                {
-                    distanceVolume = 1.0f - (distance - refDistance) / (maxDistance - refDistance);
-                }
-                lVolume *= distanceVolume;
-                rVolume *= distanceVolume;
-
-                it->fillBuffer(pShiftBuffer, FREQ_PART);
-                for (int i = 0; i < BUFFER_SIZE / 4; i += 2)
-                {
-                    pfDataBuffer[i] += pfShiftBuffer[i] * lVolume;
-                    pfDataBuffer[i + 1] += pfShiftBuffer[i + 1] * rVolume;
-                }
-            }
-            else
-            {
-                it->fillBuffer(pShiftBuffer, FREQ_PART);
-                for (int i = 0; i < BUFFER_SIZE / 4; i += 2)
-                {
-                    pfDataBuffer[i] += pfShiftBuffer[i];
-                    pfDataBuffer[i + 1] += pfShiftBuffer[i + 1];
-                }
-            }
-            */
+            it->addToBuffer(data, sampleCount);
         }
     }
 

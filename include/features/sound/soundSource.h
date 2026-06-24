@@ -2,6 +2,7 @@
 #include <memory>
 #include "core/math.h"
 #include "core/core.h"
+#include "features/scene/positionable.h"
 
 namespace wne
 {
@@ -14,6 +15,8 @@ namespace wne
         SoundSource(Sound &sound, bool isLooping);
 
         void addToBuffer(float *buffer, uint amountOfSamples);
+
+        void turn3d(std::shared_ptr<Positionable> listener, const Vector3 &source, float maxDistance);
 
         inline bool isPlaying()
         {
@@ -30,8 +33,14 @@ namespace wne
         bool flagIsPlaying = false;
         bool flagIsLooping = false;
         bool flagIsStreamed = false;
-        uint position;
+
+        uint soundSampleShift = 0;
         Sound *sound = nullptr;
         Vector3 source{};
+
+        std::shared_ptr<Positionable> listener;
+        Vector3 position{};
+        float maxDistance = 0.0f;
+        float maxDistance2 = 0.0f;
     };
 }

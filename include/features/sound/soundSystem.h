@@ -14,7 +14,8 @@ namespace wne
         static std::shared_ptr<SoundSystem> create();
 
         std::shared_ptr<SoundSource> playSound(Sound &sound, bool loop = false);
-        std::shared_ptr<SoundSource> playSound3d(Sound &sound, const Vector3 source, std::shared_ptr<Positionable> listener, bool loop = false);
+        std::shared_ptr<SoundSource> playSound3d(Sound &sound, const Vector3 &position, std::shared_ptr<Positionable> listener, bool loop = false);
+        std::shared_ptr<SoundSource> playSound3d(Sound &sound, const Vector3 &position, std::shared_ptr<Positionable> listener, float maxDistance, bool loop = false);
         std::shared_ptr<Sound> loadSound(const char *path);
         std::shared_ptr<Sound> loadMusic(const char *path);
 
