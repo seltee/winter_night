@@ -57,6 +57,7 @@ namespace wne
         virtual void update(float delta);
         virtual void render();
         virtual void updateWindowSize();
+        virtual void checkWindowLock();
 
         virtual void close();
 
@@ -109,6 +110,7 @@ namespace wne
         inline void setMouseCapture(bool state)
         {
             flagMouseCapture = state;
+            checkWindowLock();
         }
 
         inline bool idMouseCaptured()

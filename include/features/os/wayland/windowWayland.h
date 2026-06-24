@@ -3,11 +3,14 @@
 
 #if defined(OS_LINUX)
 #include "features/os/window.h"
+#include "features/os/wayland/xdg-shell-client-protocol.h"
+#include "features/os/wayland/pointer-constraints-unstable-v1-client-protocol.h"
+#include "features/os/wayland/relative-pointer-unstable-v1-client-protocol.h"
+#include "features/os/wayland/waylandUIScene.h"
 #include "core/api.h"
 #include "core/core.h"
 #include <memory>
 #include <wayland-client.h>
-#include "features/os/wayland/xdg-shell-client-protocol.h"
 
 namespace wne
 {
@@ -21,6 +24,7 @@ namespace wne
         void render() override final;
         void updateWindowSize() override final;
         void close() override final;
+        void checkWindowLock() override final;
 
         void updateWindowSizeExt(int32 width, int32 height);
         void setScaleFactor(int32 scaleFactor);
@@ -29,8 +33,14 @@ namespace wne
         void subscribeKeyboard(wl_keyboard *keyboard);
 
         void provideMousePosition(float x, float y);
+        void provideMouseShift(float shiftX, float shiftY);
         void provideMouseButton(MouseButton button, bool state);
         void provideKeyboardKey(uint16 key, bool state);
+
+        void providePointerDataOnEnter(
+            wl_surface *surface,
+            wl_pointer *wl_pointer,
+            uint32 serial);
 
         wl_compositor *compositor_ = nullptr;
         xdg_wm_base *shell_ = nullptr;
@@ -38,23 +48,28 @@ namespace wne
         wl_output *output_ = nullptr;
         wl_seat *seat_ = nullptr;
         xdg_toplevel *toplevel_ = nullptr;
+        zwp_pointer_constraints_v1 *constraints_ = nullptr;
+        zwp_relative_pointer_manager_v1 *relativePointerManager_ = nullptr;
+        zwp_relative_pointer_v1 *relativePointer_ = nullptr;
+        zwp_locked_pointer_v1 *locked = nullptr;
 
     private:
         wl_display *display_ = nullptr;
         wl_surface *surface_ = nullptr;
+        wl_pointer *pointer_ = nullptr;
+        uint32 serial_;
         int32 scaleFactor = 1;
         int32 mouseX = 0;
         int32 mouseY = 0;
         bool flagShowTitlebar = false;
+        bool flagMouseLocked = false;
 
         std::shared_ptr<Scene> uiScene;
 
-        std::shared_ptr<Scene> createUIScene();
-
         static void handleToplevelConfigure(void *data,
                                             xdg_toplevel *toplevel,
-                                            int32_t width,
-                                            int32_t height,
+                                            int32 width,
+                                            int32 height,
                                             wl_array *states);
         static void handleToplevelClose(void *data, xdg_toplevel *toplevel);
         static void handleShellPing(void *data, xdg_wm_base *shell, uint32_t serial);
@@ -113,7 +128,14 @@ namespace wne
                                       uint32 time,
                                       uint32 axis,
                                       wl_fixed_t value);
-
+        static void handlePointerRelativeMotion(void *data,
+                                                zwp_relative_pointer_v1 *relative_pointer,
+                                                uint32 utime_hi,
+                                                uint32 utime_lo,
+                                                wl_fixed_t dx,
+                                                wl_fixed_t dy,
+                                                wl_fixed_t dx_unaccel,
+                                                wl_fixed_t dy_unaccel);
         static void hanldeKeyboardKeyMap(void *data,
                                          wl_keyboard *wl_keyboard,
                                          uint32 format,

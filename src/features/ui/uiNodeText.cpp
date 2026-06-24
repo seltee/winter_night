@@ -1,5 +1,6 @@
 #include "features/ui/uiNodeText.h"
 #include "features/renderer/renderer.h"
+#include "features/logger/logger.h"
 
 using namespace wne;
 
