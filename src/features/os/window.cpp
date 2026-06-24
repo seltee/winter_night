@@ -77,6 +77,10 @@ void Window::updateWindowSize()
 {
 }
 
+void Window::checkWindowLock()
+{
+}
+
 void Window::close()
 {
 }

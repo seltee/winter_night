@@ -1,6 +1,7 @@
 #include "features/scene/actorUI.h"
 #include "features/scene/actorCamera.h"
 #include "features/scene/scene.h"
+#include "features/logger/logger.h"
 #include <iostream>
 
 using namespace wne;
@@ -29,55 +30,55 @@ ActorUI::ActorUI(Renderer *renderer, Window *eventWindow, uint rootWidth, uint r
 
 void ActorUI::update(float delta)
 {
-    if (!eventsSubscription)
-        return;
-
-    WindowEvents::WindowEvent event;
     bool clickRegistered = false, releaseRegistered = false, moveUp = false, moveDown = false, moveLeft = false, moveRight = false;
 
-    while (eventsSubscription->getEvent(&event))
+    if (eventsSubscription)
     {
-        if (event.type == WindowEvents::WindowEventType::MOUSE_MOVE)
+        WindowEvents::WindowEvent event;
+        while (eventsSubscription->getEvent(&event))
         {
-            mouseX = event.mouseMove.positionX;
-            mouseY = event.mouseMove.positionY;
-        }
-        else if (event.type == WindowEvents::WindowEventType::MOUSE_BUTTON_DOWN)
-        {
-            if (event.mouseButton.button == MouseButton::LeftMouseButton)
+            if (event.type == WindowEvents::WindowEventType::MOUSE_MOVE)
             {
-                clickRegistered = true;
+                mouseX = event.mouseMove.positionX;
+                mouseY = event.mouseMove.positionY;
             }
-        }
-        else if (event.type == WindowEvents::WindowEventType::MOUSE_BUTTON_UP)
-        {
-            if (event.mouseButton.button == MouseButton::LeftMouseButton)
+            else if (event.type == WindowEvents::WindowEventType::MOUSE_BUTTON_DOWN)
             {
-                releaseRegistered = true;
+                if (event.mouseButton.button == MouseButton::LeftMouseButton)
+                {
+                    clickRegistered = true;
+                }
             }
-        }
-        else if (event.type == WindowEvents::WindowEventType::KEY_PRESS)
-        {
-            if (event.key.scancode == 38)
-                moveUp = true;
-            if (event.key.scancode == 40)
-                moveDown = true;
-            if (event.key.scancode == 37)
-                moveLeft = true;
-            if (event.key.scancode == 39)
-                moveRight = true;
-        }
-        else if (event.type == WindowEvents::WindowEventType::GAMEPAD_DIRECTION_PAD)
-        {
-            auto dir = event.gamepadDirectionPad.direction;
-            if (dir == 1 || dir == 2 || dir == 8)
-                moveUp = true;
-            if (dir == 2 || dir == 3 || dir == 4)
-                moveRight = true;
-            if (dir == 4 || dir == 5 || dir == 6)
-                moveDown = true;
-            if (dir == 6 || dir == 7 || dir == 8)
-                moveLeft = true;
+            else if (event.type == WindowEvents::WindowEventType::MOUSE_BUTTON_UP)
+            {
+                if (event.mouseButton.button == MouseButton::LeftMouseButton)
+                {
+                    releaseRegistered = true;
+                }
+            }
+            else if (event.type == WindowEvents::WindowEventType::KEY_PRESS)
+            {
+                if (event.key.code == Key::KeyW)
+                    moveUp = true;
+                if (event.key.code == Key::KeyS)
+                    moveDown = true;
+                if (event.key.code == Key::KeyA)
+                    moveLeft = true;
+                if (event.key.code == Key::KeyD)
+                    moveRight = true;
+            }
+            else if (event.type == WindowEvents::WindowEventType::GAMEPAD_DIRECTION_PAD)
+            {
+                auto dir = event.gamepadDirectionPad.direction;
+                if (dir == 1 || dir == 2 || dir == 8)
+                    moveUp = true;
+                if (dir == 2 || dir == 3 || dir == 4)
+                    moveRight = true;
+                if (dir == 4 || dir == 5 || dir == 6)
+                    moveDown = true;
+                if (dir == 6 || dir == 7 || dir == 8)
+                    moveLeft = true;
+            }
         }
     }
 

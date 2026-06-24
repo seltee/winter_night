@@ -106,6 +106,12 @@ void WindowWayland::update(float delta)
     wl_display_dispatch_pending(display_);
     wl_display_flush(display_);
     renderer->update(delta);
+    if (flagShowTitlebar)
+    {
+        if (!uiScene)
+            uiScene = createWaylandUIScene(renderer.get(), this);
+        uiScene->update(delta);
+    }
     soundSystem->update();
 }
 
@@ -113,10 +119,8 @@ void WindowWayland::render()
 {
     renderer->renderStart();
     renderer->renderScenes();
-    if (flagShowTitlebar)
+    if (flagShowTitlebar && uiScene)
     {
-        if (!uiScene)
-            uiScene = createUIScene();
         uiScene->provideSceneMVP();
         uiScene->render();
     }
@@ -130,6 +134,29 @@ void WindowWayland::updateWindowSize()
 void WindowWayland::close()
 {
     flagCloseRequested = true;
+}
+
+void WindowWayland::checkWindowLock()
+{
+    if (constraints_ && pointer_ && flagMouseCapture && !flagMouseLocked)
+    {
+        flagMouseLocked = true;
+
+        locked =
+            zwp_pointer_constraints_v1_lock_pointer(
+                constraints_,
+                surface_,
+                pointer_,
+                nullptr, // region
+                ZWP_POINTER_CONSTRAINTS_V1_LIFETIME_PERSISTENT);
+
+        wl_pointer_set_cursor(
+            pointer_,
+            serial_,
+            nullptr, // no cursor surface
+            0,
+            0);
+    }
 }
 
 void WindowWayland::updateWindowSizeExt(int32 width, int32 height)
@@ -150,7 +177,7 @@ void WindowWayland::setScaleFactor(int32 scaleFactor)
 
 void WindowWayland::subscribePointer(wl_pointer *pointer)
 {
-
+    this->pointer_ = pointer;
     static const wl_pointer_listener pointerListener = {
         .enter = handlePointerEnter,
         .leave = handlePointerLeave,
@@ -159,6 +186,20 @@ void WindowWayland::subscribePointer(wl_pointer *pointer)
         .axis = handlePointerAxis};
 
     wl_pointer_add_listener(pointer, &pointerListener, this);
+
+    relativePointer_ =
+        zwp_relative_pointer_manager_v1_get_relative_pointer(
+            relativePointerManager_,
+            pointer);
+
+    static const zwp_relative_pointer_v1_listener
+        relativePointerListener = {
+            .relative_motion = handlePointerRelativeMotion};
+
+    zwp_relative_pointer_v1_add_listener(
+        relativePointer_,
+        &relativePointerListener,
+        this);
 }
 
 void WindowWayland::subscribeKeyboard(wl_keyboard *keyboard)
@@ -178,12 +219,18 @@ void WindowWayland::provideMousePosition(float x, float y)
 {
     int32 mouseX = (int32)(x * (float)scaleFactor);
     int32 mouseY = (int32)(y * (float)scaleFactor);
-    int32 mouseDiffX = mouseX - this->mouseX;
-    int32 mouseDiffY = mouseY - this->mouseY;
 
-    emitEventMouseMove(mouseDiffX, mouseDiffY, mouseX, mouseY);
+    emitEventMouseMove(0, 0, mouseX, mouseY);
     this->mouseX = mouseX;
     this->mouseY = mouseY;
+}
+
+void WindowWayland::provideMouseShift(float shiftX, float shiftY)
+{
+    int32 intShiftX = (int32)(shiftX * (float)scaleFactor);
+    int32 intShiftY = (int32)(shiftY * (float)scaleFactor);
+
+    emitEventMouseMove(intShiftX, intShiftY, mouseX, mouseY);
 }
 
 void WindowWayland::provideMouseButton(MouseButton button, bool state)
@@ -196,27 +243,14 @@ void WindowWayland::provideKeyboardKey(uint16 key, bool state)
     emitEventKey(state, key);
 }
 
-std::shared_ptr<Scene> WindowWayland::createUIScene()
+void WindowWayland::providePointerDataOnEnter(
+    wl_surface *surface,
+    wl_pointer *wl_pointer,
+    uint32 serial)
 {
-    auto sceneUI = Scene::create(renderer.get());
-
-    auto cameraUI = CameraOrtho::create(256, 256);
-    auto actorUICamera = sceneUI->createActor<ActorCamera>(cameraUI);
-    sceneUI->setCamera(actorUICamera);
-
-    auto actorUI = sceneUI->createActor<ActorUI>(this, 256, 256);
-    auto root = &actorUI->getRoot();
-
-    auto font = Font::create("Roboto-Medium.ttf");
-    // clang-format off
-    root->setChild(
-        wne::UINodeCenter::create(
-            wne::UINodeText::create(font, "Application", 70, 0xff999999)
-        )  
-    );
-    // clang-format on
-
-    return sceneUI;
+    this->pointer_ = wl_pointer;
+    this->serial_ = serial;
+    checkWindowLock();
 }
 
 void WindowWayland::handleToplevelConfigure(
@@ -320,6 +354,8 @@ void WindowWayland::handlePointerEnter(void *data,
                                        wl_fixed_t surfaceX,
                                        wl_fixed_t surfaceY)
 {
+    WindowWayland *window = static_cast<WindowWayland *>(data);
+    window->providePointerDataOnEnter(surface, wl_pointer, serial);
 }
 
 void WindowWayland::handlePointerLeave(void *data,
@@ -363,6 +399,22 @@ void WindowWayland::handlePointerAxis(void *data,
                                       uint32 axis,
                                       wl_fixed_t value)
 {
+}
+
+void WindowWayland::handlePointerRelativeMotion(void *data,
+                                                zwp_relative_pointer_v1 *relative_pointer,
+                                                uint32 utime_hi,
+                                                uint32 utime_lo,
+                                                wl_fixed_t dx,
+                                                wl_fixed_t dy,
+                                                wl_fixed_t dx_unaccel,
+                                                wl_fixed_t dy_unaccel)
+{
+    WindowWayland *window = static_cast<WindowWayland *>(data);
+    float x = (float)wl_fixed_to_double(dx_unaccel);
+    float y = (float)wl_fixed_to_double(dy_unaccel);
+
+    window->provideMouseShift(x, y);
 }
 
 void WindowWayland::hanldeKeyboardKeyMap(void *data,
@@ -450,13 +502,33 @@ void WindowWayland::onRegistry(void *data,
                 &wl_output_interface,
                 2));
     }
-    else if (strcmp(interface, "wl_seat") == 0)
+    else if (!strcmp(interface, "wl_seat"))
     {
         window->seat_ = static_cast<wl_seat *>(wl_registry_bind(
             registry,
             name,
             &wl_seat_interface,
             1));
+    }
+    else if (!strcmp(interface, "zwp_pointer_constraints_v1"))
+    {
+        window->constraints_ =
+            static_cast<zwp_pointer_constraints_v1 *>(
+                wl_registry_bind(
+                    registry,
+                    name,
+                    &zwp_pointer_constraints_v1_interface,
+                    1));
+    }
+    else if (!strcmp(interface, "zwp_relative_pointer_manager_v1"))
+    {
+        window->relativePointerManager_ =
+            static_cast<zwp_relative_pointer_manager_v1 *>(
+                wl_registry_bind(
+                    registry,
+                    name,
+                    &zwp_relative_pointer_manager_v1_interface,
+                    1));
     }
 }
 
