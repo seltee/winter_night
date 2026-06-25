@@ -85,6 +85,7 @@ void ActorUI::update(float delta)
     UINode::ContextGlobal contextGlobal;
     UINode::ContextUpdate contextUpdate;
 
+    contextGlobal.renderer = renderer;
     contextGlobal.mouseX = mouseX - (int)rootWidth / 2;
     contextGlobal.mouseY = (int)rootHeight - mouseY - (int)rootHeight / 2;
 

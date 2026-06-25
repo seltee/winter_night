@@ -22,6 +22,7 @@ namespace wne
 
         struct ContextGlobal
         {
+            Renderer *renderer;
             int mouseX, mouseY;
             std::vector<ContextSelectableNode> selectableNodes;
         };
