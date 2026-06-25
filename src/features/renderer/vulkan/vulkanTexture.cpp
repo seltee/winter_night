@@ -22,6 +22,9 @@ VulkanTexture::~VulkanTexture()
 
 bool VulkanTexture::setup(void *pixels, uint32 width, uint32 height)
 {
+    this->width = width;
+    this->height = height;
+
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
     if (textureImage)
     {

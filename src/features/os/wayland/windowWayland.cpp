@@ -326,14 +326,12 @@ void WindowWayland::handleSeatCapabilities(
     WindowWayland *window = static_cast<WindowWayland *>(data);
     if (capabilities & WL_SEAT_CAPABILITY_POINTER)
     {
-        Logger::log << "Pointer" << endl;
         wl_pointer *pointer = wl_seat_get_pointer(seat);
         window->subscribePointer(pointer);
     }
 
     if (capabilities & WL_SEAT_CAPABILITY_KEYBOARD)
     {
-        Logger::log << "Keyboard" << endl;
         wl_keyboard *keyboard = wl_seat_get_keyboard(seat);
         window->subscribeKeyboard(keyboard);
     }

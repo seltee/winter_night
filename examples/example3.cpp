@@ -56,9 +56,8 @@ int main()
         renderer->createTexture(imageAtmosphere),
         renderer->createTexture(imageAtmosphere->getAtmosphereAsImage()));
 
-    auto imageEx = wne::Image::create("./ex.png");
-    auto textureEx = renderer->createTexture(imageEx);
-    auto materialEx = renderer->createFlatMaterial(textureEx);
+    auto imageCog = wne::Image::create("./cog.png");
+    auto textureCog = renderer->createTexture(imageCog);
 
     auto imageBox = wne::Image::create("./box.png");
     auto textureBox = renderer->createTexture(imageBox);
@@ -153,6 +152,8 @@ int main()
                             actorCamera->moveForward(-8.0f);
                         }
                     ),
+                    wne::UINodeContainer::create(padding, padding),
+                    wne::UINodeImage::create(textureCog)
                 },
                 wne::UINodeColumn::Layout::Middle,
                 wne::UINodeColumn::Position::Middle

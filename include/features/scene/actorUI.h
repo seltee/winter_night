@@ -8,6 +8,7 @@
 #include "features/ui/uiNodeCenter.h"
 #include "features/ui/uiNodeText.h"
 #include "features/ui/uiNodeButton.h"
+#include "features/ui/uiNodeImage.h"
 
 namespace wne
 {
