@@ -33,7 +33,7 @@ namespace wne
             return root;
         }
 
-        inline void setDimensions(float rootWidth, float rootHeight)
+        inline void setDimensions(uint rootWidth, uint rootHeight)
         {
             this->rootWidth = rootWidth;
             this->rootHeight = rootHeight;
@@ -48,8 +48,7 @@ namespace wne
         UINodeContainer root;
         UINode *selectedNode = nullptr;
 
-        uint rootWidth = 1280;
-        uint rootHeight = 720;
+        uint rootWidth, rootHeight;
         int16 mouseX = 0, mouseY = 0;
     };
 };

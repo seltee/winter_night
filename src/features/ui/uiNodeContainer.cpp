@@ -106,7 +106,8 @@ UINode::ContextTreeNode UINodeContainer::update(const ContextUpdate &context)
     uint selfWidth = width ? width : context.width;
     uint selfHeight = height ? height : context.height;
 
-    if (this->child)
+    ContextTreeNode childTreeNode{};
+    if (child)
     {
         selfWidth = (!width && child->getWidth()) ? child->getWidth() : selfWidth;
         selfHeight = (!height && child->getHeight()) ? child->getHeight() : selfHeight;
@@ -117,9 +118,7 @@ UINode::ContextTreeNode UINodeContainer::update(const ContextUpdate &context)
         nextContext.width = selfWidth;
         nextContext.height = selfHeight;
 
-        auto result = this->child->update(nextContext);
-        if (result.hovered)
-            return propagateHoverState(std::move(result.hoveredLine), this->child);
+        childTreeNode = this->child->update(nextContext);
     }
 
     if (backgroundMaterial)
@@ -135,7 +134,15 @@ UINode::ContextTreeNode UINodeContainer::update(const ContextUpdate &context)
         mBackgroung = newModel * Matrix4x4::scale(Vector3(texWidth, texHeight, 1.0f));
     }
 
-    return {isContextHovered(context)};
+    if (child && childTreeNode.hovered)
+        return propagateHoverState(std::move(childTreeNode.hoveredLine), child);
+
+    bool hovered = context.contextGlobal->mouseX >= context.x &&
+                   context.contextGlobal->mouseY >= context.y &&
+                   context.contextGlobal->mouseX < context.x + (int)selfWidth &&
+                   context.contextGlobal->mouseY < context.y + (int)selfHeight;
+
+    return {hovered};
 }
 
 void UINodeContainer::render(const ContextRender &context)

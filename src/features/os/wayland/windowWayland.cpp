@@ -217,12 +217,10 @@ void WindowWayland::subscribeKeyboard(wl_keyboard *keyboard)
 
 void WindowWayland::provideMousePosition(float x, float y)
 {
-    int32 mouseX = (int32)(x * (float)scaleFactor);
-    int32 mouseY = (int32)(y * (float)scaleFactor);
+    mouseX = (int32)(x * (float)scaleFactor);
+    mouseY = (int32)(y * (float)scaleFactor);
 
     emitEventMouseMove(0, 0, mouseX, mouseY);
-    this->mouseX = mouseX;
-    this->mouseY = mouseY;
 }
 
 void WindowWayland::provideMouseShift(float shiftX, float shiftY)

@@ -4,11 +4,15 @@ namespace wne
 {
     enum class Key
     {
-        KeyW = 17,
-        KeyA = 30,
-        KeyS = 31,
-        KeyD = 32,
-        KeyQ = 16,
-        KeyE = 18
+        W = 17,
+        A = 30,
+        S = 31,
+        D = 32,
+        Q = 16,
+        E = 18,
+        Arrowleft = 105,
+        ArrowRight = 106,
+        ArrowUp = 103,
+        ArrowDown = 108
     };
 }

@@ -8,24 +8,26 @@ using namespace wne;
 
 ActorUI::ActorUI(Renderer *renderer, std::shared_ptr<Window> eventWindow) : Actor(renderer)
 {
-    ActorUI(renderer, eventWindow.get(), 1280, 720);
+    eventsSubscription = eventWindow->subscribe();
+    setDimensions(1280, 720);
 }
 
 ActorUI::ActorUI(Renderer *renderer, Window *eventWindow) : Actor(renderer)
 {
-    ActorUI(renderer, eventWindow, 1280, 720);
+    eventsSubscription = eventWindow->subscribe();
+    setDimensions(1280, 720);
 }
 
 ActorUI::ActorUI(Renderer *renderer, std::shared_ptr<Window> eventWindow, uint rootWidth, uint rootHeight) : Actor(renderer)
 {
-    ActorUI(renderer, eventWindow.get(), rootWidth, rootHeight);
+    eventsSubscription = eventWindow->subscribe();
+    setDimensions(rootWidth, rootHeight);
 }
 
 ActorUI::ActorUI(Renderer *renderer, Window *eventWindow, uint rootWidth, uint rootHeight) : Actor(renderer)
 {
     eventsSubscription = eventWindow->subscribe();
-    this->rootWidth = rootWidth;
-    this->rootHeight = rootHeight;
+    setDimensions(rootWidth, rootHeight);
 }
 
 void ActorUI::update(float delta)
@@ -58,13 +60,13 @@ void ActorUI::update(float delta)
             }
             else if (event.type == WindowEvents::WindowEventType::KEY_PRESS)
             {
-                if (event.key.code == Key::KeyW)
+                if (event.key.code == Key::ArrowUp)
                     moveUp = true;
-                if (event.key.code == Key::KeyS)
+                if (event.key.code == Key::ArrowDown)
                     moveDown = true;
-                if (event.key.code == Key::KeyA)
+                if (event.key.code == Key::Arrowleft)
                     moveLeft = true;
-                if (event.key.code == Key::KeyD)
+                if (event.key.code == Key::ArrowRight)
                     moveRight = true;
             }
             else if (event.type == WindowEvents::WindowEventType::GAMEPAD_DIRECTION_PAD)

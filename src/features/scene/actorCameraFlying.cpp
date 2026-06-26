@@ -30,32 +30,32 @@ void ActorCameraFlying::update(float delta)
     {
         if (event.type == WindowEvents::WindowEventType::KEY_PRESS)
         {
-            if (event.key.code == Key::KeyW)
+            if (event.key.code == Key::W)
                 moveCameraForward = 1.0f;
-            else if (event.key.code == Key::KeyS)
+            else if (event.key.code == Key::S)
                 moveCameraForward = -1.0f;
-            else if (event.key.code == Key::KeyA)
+            else if (event.key.code == Key::A)
                 moveCameraRight = -1.0f;
-            else if (event.key.code == Key::KeyD)
+            else if (event.key.code == Key::D)
                 moveCameraRight = 1.0f;
-            else if (event.key.code == Key::KeyQ)
+            else if (event.key.code == Key::Q)
                 moveCameraUp = -1.0f;
-            else if (event.key.code == Key::KeyE)
+            else if (event.key.code == Key::E)
                 moveCameraUp = 1.0f;
         }
         else if (event.type == WindowEvents::WindowEventType::KEY_RELEASE)
         {
-            if (event.key.code == Key::KeyW && moveCameraForward > 0)
+            if (event.key.code == Key::W && moveCameraForward > 0)
                 moveCameraForward = 0;
-            else if (event.key.code == Key::KeyS && moveCameraForward < 0)
+            else if (event.key.code == Key::S && moveCameraForward < 0)
                 moveCameraForward = 0;
-            else if (event.key.code == Key::KeyA && moveCameraRight < 0)
+            else if (event.key.code == Key::A && moveCameraRight < 0)
                 moveCameraRight = 0;
-            else if (event.key.code == Key::KeyD && moveCameraRight > 0)
+            else if (event.key.code == Key::D && moveCameraRight > 0)
                 moveCameraRight = 0;
-            else if (event.key.code == Key::KeyQ && moveCameraUp < 0)
+            else if (event.key.code == Key::Q && moveCameraUp < 0)
                 moveCameraUp = 0;
-            else if (event.key.code == Key::KeyE && moveCameraUp > 0)
+            else if (event.key.code == Key::E && moveCameraUp > 0)
                 moveCameraUp = 0;
         }
         else if (event.type == WindowEvents::WindowEventType::GAMEPAD_AXIS)
