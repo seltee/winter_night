@@ -6,7 +6,7 @@
 
 using namespace wne;
 
-std::shared_ptr<Scene> wne::createWaylandUIScene(Renderer *renderer, Window *window)
+WaylandUIScene wne::createWaylandUIScene(Renderer *renderer, Window *window)
 {
     auto sceneUI = Scene::create(renderer);
 
@@ -19,13 +19,29 @@ std::shared_ptr<Scene> wne::createWaylandUIScene(Renderer *renderer, Window *win
 
     auto font = Font::create("Roboto-Medium.ttf");
 
+    const wne::UINodeContainer::Decoration decorationTitleBar{
+        .useBackgroundColor = true,
+        .backgroundColor = 0xff44444a};
+
+    auto caption = wne::UINodeText::create(font, "Application", 44, 0xff999999);
+
     // clang-format off
     root->setChild(
-        wne::UINodeCenter::create(
-            wne::UINodeText::create(font, "Application", 70, 0xff999999)
-        )  
+        wne::UINodeContainer::create(
+            wne::UINodeCenter::create(
+                {
+                    caption
+                }
+            ),
+            0, 56,
+            decorationTitleBar
+        )
     );
     // clang-format on
 
-    return sceneUI;
+    return {
+        sceneUI,
+        cameraUI,
+        actorUI,
+        caption};
 }

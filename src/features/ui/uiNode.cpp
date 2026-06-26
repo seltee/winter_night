@@ -13,9 +13,9 @@ UINode::~UINode()
 bool UINode::isContextHovered(const ContextUpdate &context)
 {
     return context.contextGlobal->mouseX >= context.x &&
-           context.contextGlobal->mouseY >= context.y &&
+           context.contextGlobal->mouseY <= context.y &&
            context.contextGlobal->mouseX < context.x + (int)context.width &&
-           context.contextGlobal->mouseY < context.y + (int)context.height;
+           context.contextGlobal->mouseY > context.y - (int)context.height;
 }
 
 void UINode::prepareNewState()

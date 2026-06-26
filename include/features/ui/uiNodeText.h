@@ -30,6 +30,11 @@ namespace wne
         uint getWidth() override final;
         uint getHeight() override final;
 
+        inline bool isText(const char *text)
+        {
+            return !strcmp(this->text->getText().c_str(), text);
+        }
+
         inline void setText(const char *text)
         {
             this->text->setText(text);

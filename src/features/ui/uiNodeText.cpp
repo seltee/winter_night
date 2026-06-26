@@ -47,15 +47,15 @@ UINode::ContextTreeNode UINodeText::update(const ContextUpdate &context)
 
     Matrix4x4 newModel = Matrix4x4::translation(
         (float)context.x + texWidth * 0.5f,
-        (float)context.y - texHeight * 0.5f + (float)text->getTextHeight(),
+        (float)context.y - texHeight * 0.5f,
         0);
     newModel = newModel * Matrix4x4::rotationY(PI);
     mModel = newModel * Matrix4x4::scale(Vector3(texWidth, texHeight, 1.0f));
 
     bool hovered = context.contextGlobal->mouseX >= context.x &&
-                   context.contextGlobal->mouseY >= context.y &&
+                   context.contextGlobal->mouseY <= context.y &&
                    context.contextGlobal->mouseX < context.x + (int)text->getTextWidth() &&
-                   context.contextGlobal->mouseY < context.y + (int)text->getTextHeight();
+                   context.contextGlobal->mouseY > context.y - (int)text->getTextHeight();
 
     return {hovered};
 }

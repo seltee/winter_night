@@ -62,9 +62,9 @@ UINode::ContextTreeNode UINodeImage::update(const ContextUpdate &context)
 
 
     bool hovered = context.contextGlobal->mouseX >= context.x &&
-                   context.contextGlobal->mouseY >= context.y &&
+                   context.contextGlobal->mouseY <= context.y &&
                    context.contextGlobal->mouseX < context.x + (int)image->getWidth() &&
-                   context.contextGlobal->mouseY < context.y + (int)image->getHeight();
+                   context.contextGlobal->mouseY > context.y - (int)image->getHeight();
 
     return {hovered};
 }

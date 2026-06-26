@@ -128,7 +128,7 @@ UINode::ContextTreeNode UINodeContainer::update(const ContextUpdate &context)
 
         Matrix4x4 newModel = Matrix4x4::translation(
             (float)context.x + texWidth * 0.5f,
-            (float)context.y + texHeight * 0.5f,
+            (float)context.y - texHeight * 0.5f,
             0);
         newModel = newModel * Matrix4x4::rotationY(PI);
         mBackgroung = newModel * Matrix4x4::scale(Vector3(texWidth, texHeight, 1.0f));
@@ -138,9 +138,9 @@ UINode::ContextTreeNode UINodeContainer::update(const ContextUpdate &context)
         return propagateHoverState(std::move(childTreeNode.hoveredLine), child);
 
     bool hovered = context.contextGlobal->mouseX >= context.x &&
-                   context.contextGlobal->mouseY >= context.y &&
+                   context.contextGlobal->mouseY <= context.y &&
                    context.contextGlobal->mouseX < context.x + (int)selfWidth &&
-                   context.contextGlobal->mouseY < context.y + (int)selfHeight;
+                   context.contextGlobal->mouseY > context.y - (int)selfHeight;
 
     return {hovered};
 }

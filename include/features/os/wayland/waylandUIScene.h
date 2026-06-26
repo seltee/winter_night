@@ -8,5 +8,15 @@ namespace wne
 {
     class Renderer;
     class Window;
-    std::shared_ptr<Scene> createWaylandUIScene(Renderer *renderer, Window *window);
+    class CameraOrtho;
+    class ActorUI;
+    class UINodeText;
+
+    struct WaylandUIScene{
+        std::shared_ptr<Scene> scene;
+        std::shared_ptr<CameraOrtho> camera;
+        std::shared_ptr<ActorUI> actor;
+        std::shared_ptr<UINodeText> caption;
+    };
+    WaylandUIScene createWaylandUIScene(Renderer *renderer, Window *window);
 }

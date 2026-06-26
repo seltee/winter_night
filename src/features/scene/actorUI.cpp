@@ -91,10 +91,16 @@ void ActorUI::update(float delta)
     contextGlobal.mouseX = mouseX - (int)rootWidth / 2;
     contextGlobal.mouseY = (int)rootHeight - mouseY - (int)rootHeight / 2;
 
+    #if defined(OS_WINDOWS)
+        const uint shiftTop = -48;
+    #else
+        const uint shiftTop = 0;
+    #endif
+    
     contextUpdate.contextGlobal = &contextGlobal;
     contextUpdate.visible = true;
     contextUpdate.x = -(int)rootWidth / 2;
-    contextUpdate.y = -(int)rootHeight / 2 - 48;
+    contextUpdate.y = (int)rootHeight / 2 + shiftTop;
     contextUpdate.width = rootWidth;
     contextUpdate.height = rootHeight;
 

@@ -40,7 +40,7 @@ UINode::ContextTreeNode UINodeCenter::update(const ContextUpdate &context)
 
         ContextUpdate nextContext = {context.contextGlobal, context.visible};
         nextContext.x = context.x + ((int)selfWidth - (int)proptWidth) / 2;
-        nextContext.y = context.y + ((int)selfHeight - (int)proptHeight) / 2;
+        nextContext.y = context.y - ((int)selfHeight - (int)proptHeight) / 2;
         nextContext.width = proptWidth;
         nextContext.height = proptHeight;
 

@@ -108,9 +108,13 @@ void WindowWayland::update(float delta)
     renderer->update(delta);
     if (flagShowTitlebar)
     {
-        if (!uiScene)
-            uiScene = createWaylandUIScene(renderer.get(), this);
-        uiScene->update(delta);
+        if (!uiSceneData.actor)
+            uiSceneData = createWaylandUIScene(renderer.get(), this);
+        if (!uiSceneData.caption->isText(caption.c_str()))
+            uiSceneData.caption->setText(caption.c_str());
+        uiSceneData.actor->setDimensions(width, height);
+        uiSceneData.camera->setSize(width, height);
+        uiSceneData.scene->update(delta);
     }
     soundSystem->update();
 }
@@ -119,10 +123,11 @@ void WindowWayland::render()
 {
     renderer->renderStart();
     renderer->renderScenes();
-    if (flagShowTitlebar && uiScene)
+    if (flagShowTitlebar && uiSceneData.scene)
     {
-        uiScene->provideSceneMVP();
-        uiScene->render();
+        uiSceneData.scene->calcSceneMVP();
+        uiSceneData.scene->provideSceneMVP();
+        uiSceneData.scene->render();
     }
     renderer->renderFinish();
 }

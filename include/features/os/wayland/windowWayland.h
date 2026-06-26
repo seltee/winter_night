@@ -64,7 +64,7 @@ namespace wne
         bool flagShowTitlebar = false;
         bool flagMouseLocked = false;
 
-        std::shared_ptr<Scene> uiScene;
+        WaylandUIScene uiSceneData{};
 
         static void handleToplevelConfigure(void *data,
                                             xdg_toplevel *toplevel,

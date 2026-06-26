@@ -48,13 +48,13 @@ UINode::ContextTreeNode UINodeColumn::update(const ContextUpdate &context)
         childrenHeight += child->getHeight();
     }
     uint leftHeight = std::max((int)context.height - (int)childrenHeight, 0);
-    int shift = -childrenHeight;
+    int shift = 0;
     uint shiftAddition = 0;
 
     if (layout == Layout::Middle)
-        shift = leftHeight / 2 - context.height;
+        shift = -leftHeight / 2;
     if (layout == Layout::End)
-        shift = -context.height;
+        shift = -leftHeight;
     if (layout == Layout::SpaceBetween)
         shiftAddition = leftHeight / (children.size() - 1);
     if (layout == Layout::SpaceAround)
