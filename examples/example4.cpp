@@ -12,8 +12,10 @@ int main()
     renderer->setSyncState(false);
 
     auto soundSystem = window->getSoundSystem();
-    auto shootFloat = soundSystem->loadSound("./data/shoot_float.wav");
-    shootFloat->play(true);
+     auto shootFloat = soundSystem->loadSound("./data/shoot_float.wav");
+     shootFloat->play(true);
+
+    auto music = soundSystem->loadMusic("./data/streamable.ogg");
 
     // scene
     auto scene = renderer->createScene();
@@ -72,6 +74,8 @@ int main()
     actorSprite->setMaterial(materialText);
     actorSprite->setScale(4.0f * text->getProportion(), 4.0f, 1.0f);
     actorSprite->setPosition(0.0f, 16.0f, 12.0f);
+
+    music->play3d(actorCamera, wne::Vector3(0,0,0));
 
     // ui
     auto ui = renderer->createScene();

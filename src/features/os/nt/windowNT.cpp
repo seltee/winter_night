@@ -338,11 +338,11 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         break;
 
     case WM_KEYDOWN:
-        window->emitEventKey(true, wParam);
+        window->emitEventKey(true, (lParam >> 16) & 0xFF);
         break;
 
     case WM_KEYUP:
-        window->emitEventKey(false, wParam);
+        window->emitEventKey(false, (lParam >> 16) & 0xFF);
         break;
 
         // case WM_SETCURSOR:

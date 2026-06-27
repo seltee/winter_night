@@ -28,6 +28,10 @@ namespace wne
         std::shared_ptr<SoundSource> play3d(std::shared_ptr<Positionable> listener, const Vector3 &source);
         std::shared_ptr<SoundSource> play3d(std::shared_ptr<Positionable> listener, const Vector3 &source, bool loop);
 
+        void *createStreamData();
+        void destroyStreamData(void *streamData);
+        uint fillStreamData(void *streamData, float *data, uint sampleCount, bool isStereo);
+
         bool load();
 
         inline uint getSampleCount()

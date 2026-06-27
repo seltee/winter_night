@@ -13,8 +13,11 @@ namespace wne
     public:
         SoundSource(Sound &sound);
         SoundSource(Sound &sound, bool isLooping);
+        ~SoundSource();
 
         void addToBuffer(float *buffer, uint amountOfSamples);
+        void addToBufferStream(float *buffer, uint amountOfSamples);
+        void addToBufferData(float *buffer, uint amountOfSamples);
 
         void turn3d(std::shared_ptr<Positionable> listener, const Vector3 &source, float maxDistance);
 
@@ -42,5 +45,8 @@ namespace wne
         Vector3 position{};
         float maxDistance = 0.0f;
         float maxDistance2 = 0.0f;
+
+        void *streamData = nullptr;
+        std::vector<float> streamReader;
     };
 }

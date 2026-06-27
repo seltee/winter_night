@@ -2,11 +2,23 @@
 #include "features/sound/soundHelpers.h"
 #include "features/sound/soundSystem.h"
 #include "features/logger/logger.h"
+#include "features/loaders/stb_vorbis.h"
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
 
 using namespace wne;
+
+struct StreamDataOGG
+{
+    stb_vorbis *vorbis;
+    bool isStereo;
+};
+
+union StreamData
+{
+    StreamDataOGG *ogg;
+};
 
 Sound::Sound(SoundSystem *soundSystem, const char *path, bool loadImmidiately, bool isStreaming)
 {
@@ -41,6 +53,56 @@ std::shared_ptr<SoundSource> Sound::play3d(std::shared_ptr<Positionable> listene
 std::shared_ptr<SoundSource> Sound::play3d(std::shared_ptr<Positionable> listener, const Vector3 &source, bool loop)
 {
     return soundSystem->playSound3d(*this, source, listener, loop);
+}
+
+void *Sound::createStreamData()
+{
+    if (format != FileFormat::OGG)
+        return nullptr;
+
+    StreamData *data = new StreamData();
+
+    data->ogg = new StreamDataOGG();
+    int error = 0;
+    data->ogg->vorbis = stb_vorbis_open_filename(path.c_str(), &error, nullptr);
+    if (error != 0)
+    {
+        data->ogg->vorbis = nullptr;
+        destroyStreamData(data);
+        return nullptr;
+    }
+
+    stb_vorbis_info info = stb_vorbis_get_info(data->ogg->vorbis);
+    data->ogg->isStereo = info.channels == 2 ? 2 : 1;
+    return data;
+}
+
+void Sound::destroyStreamData(void *pStreamData)
+{
+    StreamData *streamData = (StreamData *)pStreamData;
+    if (format == FileFormat::OGG)
+    {
+        if (streamData->ogg->vorbis)
+            stb_vorbis_close(streamData->ogg->vorbis);
+        delete streamData->ogg;
+    }
+    delete streamData;
+}
+
+uint Sound::fillStreamData(void *pStreamData, float *data, uint sampleCount, bool isStereo)
+{
+    StreamData *streamData = (StreamData *)pStreamData;
+    if (format == FileFormat::OGG)
+    {
+        int floatsRead = stb_vorbis_get_samples_float_interleaved(
+            streamData->ogg->vorbis,
+            isStereo ? 2 : 1,
+            data,
+            sampleCount * (isStereo ? 2 : 1));
+
+        return floatsRead;
+    }
+    return 0;
 }
 
 bool Sound::load()
@@ -81,6 +143,7 @@ void Sound::detectFormat()
             path[length - 4] == '.')
         {
             format = FileFormat::OGG;
+            flagIsStereo = true;
         }
     }
 }
