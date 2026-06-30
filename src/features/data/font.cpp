@@ -35,6 +35,17 @@ Font::Font(const std::string &path)
     bIsReady = true;
 }
 
+Font::Font(const uint8 *data)
+{
+    stbtt_fontinfo *font = new stbtt_fontinfo();
+    fontInfo = font;
+
+    stbtt_InitFont(font, data, stbtt_GetFontOffsetForIndex(data, 0));
+
+    memset(map, 0, FONT_MAP_SIZE * sizeof(Glyph **));
+    bIsReady = true;
+}
+
 Font::~Font()
 {
     for (auto &glyph : list)
@@ -46,6 +57,11 @@ Font::~Font()
 std::shared_ptr<Font> Font::create(const std::string &path)
 {
     return std::make_shared<Font>(path);
+}
+
+std::shared_ptr<Font> Font::create(const uint8 *data)
+{
+    return std::make_shared<Font>(data);
 }
 
 Glyph *Font::getGlyph(uint code, uint size)

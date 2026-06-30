@@ -1,11 +1,14 @@
 #include "features/ui/uiNodeText.h"
 #include "features/renderer/renderer.h"
 #include "features/logger/logger.h"
+#include "engine.h"
 
 using namespace wne;
 
 UINodeText::UINodeText(std::shared_ptr<Font> font)
 {
+    if (!font)
+        font = Engine::getInstance()->getDefaultFont();
     this->font = font;
     this->text = std::make_shared<Text>(font);
 }

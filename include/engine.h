@@ -27,6 +27,7 @@
 #include "features/logger/logger.h"
 #include "features/renderer/text.h"
 #include "utils/primitives.h"
+#include <memory>
 
 namespace wne
 {
@@ -35,6 +36,7 @@ namespace wne
     protected:
         Engine();
         static Engine *instance;
+        static std::shared_ptr<Font> font;
         std::vector<Window *> windows;
         std::chrono::_V2::system_clock::time_point timePoint;
         float fpsCounter = 0.0f;
@@ -47,6 +49,8 @@ namespace wne
         void unregisterWindow(Window *window);
 
         void enableLogger();
+
+        std::shared_ptr<Font> getDefaultFont();
 
         float update();
 

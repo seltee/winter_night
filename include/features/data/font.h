@@ -25,8 +25,10 @@ namespace wne
     {
     public:
         Font(const std::string &path);
+        Font(const uint8 *data);
         ~Font();
         static std::shared_ptr<Font> create(const std::string &path);
+        static std::shared_ptr<Font> create(const uint8 *data);
 
         Glyph *getGlyph(uint code, uint size);
 

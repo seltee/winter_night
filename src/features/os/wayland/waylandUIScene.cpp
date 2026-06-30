@@ -17,13 +17,11 @@ WaylandUIScene wne::createWaylandUIScene(Renderer *renderer, Window *window)
     auto actorUI = sceneUI->createActor<ActorUI>(window, 512, 512);
     auto root = &actorUI->getRoot();
 
-    auto font = Font::create("Roboto-Medium.ttf");
-
     const wne::UINodeContainer::Decoration decorationTitleBar{
         .useBackgroundColor = true,
         .backgroundColor = 0xff44444a};
 
-    auto caption = wne::UINodeText::create(font, "Application", 44, 0xff999999);
+    auto caption = wne::UINodeText::create(nullptr, "Application", 52, 0xffcccccc);
 
     // clang-format off
     root->setChild(
@@ -31,7 +29,8 @@ WaylandUIScene wne::createWaylandUIScene(Renderer *renderer, Window *window)
             wne::UINodeCenter::create(
                 {
                     caption
-                }
+                },
+                0, 40
             ),
             0, 56,
             decorationTitleBar
