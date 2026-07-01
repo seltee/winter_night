@@ -1,4 +1,4 @@
-#include "features/static/varelaFont.h"
+#include "features/static/fontVarela.h"
 
 using namespace wne;
 

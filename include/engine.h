@@ -26,6 +26,7 @@
 #include "features/loaders/loader3d.h"
 #include "features/logger/logger.h"
 #include "features/renderer/text.h"
+#include "features/static/media.h"
 #include "utils/primitives.h"
 #include <memory>
 
@@ -50,9 +51,9 @@ namespace wne
 
         void enableLogger();
 
-        std::shared_ptr<Font> getDefaultFont();
-
         float update();
+
+        Media media;
 
         inline JobQueue &getJobQueue()
         {

@@ -63,6 +63,8 @@ UINode::ContextTreeNode UINodeRow::update(const ContextUpdate &context)
         shift = shiftAddition;
     }
 
+    uint leftOverChildWidth = leftWidth / children.size();
+
     std::shared_ptr<wne::UINode> *hoveredChild = nullptr;
     std::vector<std::shared_ptr<UINode>> hoveredLine;
     for (auto &child : children)
@@ -76,7 +78,15 @@ UINode::ContextTreeNode UINodeRow::update(const ContextUpdate &context)
         ContextUpdate nextContext = {context.contextGlobal, context.visible};
         nextContext.x = context.x + shift;
         nextContext.y = context.y - yShift;
-        nextContext.width = child->getWidth() ? child->getWidth() : context.width / children.size();
+        if (child->getWidth())
+        {
+            nextContext.width = child->getWidth();
+        }
+        else
+        {
+            nextContext.width = leftOverChildWidth;
+            nextContext.x -= leftOverChildWidth / 2;
+        }
         nextContext.height = child->getHeight() ? child->getHeight() : context.height;
         auto result = child->update(nextContext);
         if (result.hovered && !hoveredChild)
@@ -102,6 +112,9 @@ void UINodeRow::render(const ContextRender &context)
 
 uint UINodeRow::getWidth()
 {
+    if (layout != Layout::Start)
+        return 0;
+
     uint width = 0;
     for (auto &child : children)
     {

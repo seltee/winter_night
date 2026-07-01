@@ -1,6 +1,5 @@
 #include "engine.h"
 #include "features/os/window.h"
-#include "features/static/varelaFont.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -8,7 +7,6 @@
 using namespace wne;
 
 Engine *Engine::instance = nullptr;
-std::shared_ptr<Font> Engine::font;
 
 Engine::Engine()
 {
@@ -39,13 +37,6 @@ void Engine::unregisterWindow(Window *window)
 void Engine::enableLogger()
 {
     Logger::setLoggingState(true);
-}
-
-std::shared_ptr<Font> Engine::getDefaultFont()
-{
-    if (!font)
-        font = Font::create(varelaRegular);
-    return font;
 }
 
 float Engine::update()

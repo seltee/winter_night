@@ -142,7 +142,7 @@ std::shared_ptr<Texture> RendererVulkan::createTexture(std::shared_ptr<Image> im
 std::shared_ptr<Text> RendererVulkan::createText(std::shared_ptr<Font> font)
 {
     if (!font)
-        font = Engine::getInstance()->getDefaultFont();
+        font = Engine::getInstance()->media.getDefaultFont();
     return VulkanText::create(font, instance->getVulkanUtils());
 }
 

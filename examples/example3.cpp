@@ -142,8 +142,7 @@ int main()
                                     actorCamera->moveRight(8.0f);
                                 }
                             ),
-                        },
-                        wne::UINodeRow::Layout::Middle
+                        }
                     ),
                     wne::UINodeContainer::create(padding, padding),
                     createButton("Backwards", font, 

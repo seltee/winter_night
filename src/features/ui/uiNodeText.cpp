@@ -8,7 +8,7 @@ using namespace wne;
 UINodeText::UINodeText(std::shared_ptr<Font> font)
 {
     if (!font)
-        font = Engine::getInstance()->getDefaultFont();
+        font = Engine::getInstance()->media.getDefaultFont();
     this->font = font;
     this->text = std::make_shared<Text>(font);
 }

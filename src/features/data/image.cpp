@@ -32,6 +32,28 @@ std::shared_ptr<Image> Image::create(const std::string &path)
         4);
 }
 
+std::shared_ptr<Image> Image::createFromMemory(const uint8 *imageData, uint length)
+{
+    int width, height, bytesPerPixel;
+    uint8 *data = stbi_load_from_memory(imageData, length, &width, &height, &bytesPerPixel, 4);
+    if (!data)
+    {
+        Logger::log << "Image loading failed: " << stbi_failure_reason() << endl;
+        return nullptr;
+    }
+    if (width <= 0 || height <= 0)
+    {
+        Logger::log << "Image loading failed: wrong image dimensions" << endl;
+        return nullptr;
+    }
+
+    return std::make_shared<Image>(
+        ImageDataPtr(data, stbi_image_free),
+        (uint32)width,
+        (uint32)height,
+        4);
+}
+
 float Image::getAvarage(float x, float y, float pickRadius)
 {
     int pickPixelsHalfX = (int)((float)width * pickRadius) / 2;

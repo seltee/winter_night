@@ -3,6 +3,7 @@
 #include "features/camera/cameraOrtho.h"
 #include "features/scene/actorUI.h"
 #include "features/logger/logger.h"
+#include "engine.h"
 
 using namespace wne;
 
@@ -23,16 +24,39 @@ WaylandUIScene wne::createWaylandUIScene(Renderer *renderer, Window *window)
 
     auto caption = wne::UINodeText::create(nullptr, "Application", 52, 0xffcccccc);
 
+    auto iconCrossImage = Engine::getInstance()->media.getIconCross();
+    auto iconCrossTexture = renderer->createTexture(iconCrossImage);
+
+    auto iconCrossHoverImage = Engine::getInstance()->media.getIconCrossHover();
+    auto iconCrossHoverTexture = renderer->createTexture(iconCrossHoverImage);
+
     // clang-format off
     root->setChild(
         wne::UINodeContainer::create(
-            wne::UINodeCenter::create(
+            wne::UINodeRow::create(
                 {
-                    caption
+                    wne::UINodeCenter::create(nullptr, 76, 64),
+                    wne::UINodeCenter::create(
+                        {
+                            caption
+                        },
+                        0, 48
+                    ),
+                    wne::UINodeCenter::create(
+                        wne::UINodeButton::create(
+                            wne::UINodeImage::create(iconCrossTexture),
+                            wne::UINodeImage::create(iconCrossHoverTexture),
+                            [&](wne::UINodeButton *button)
+                            {
+                                window->close();
+                            }
+                        ),
+                        76, 64
+                    ),
                 },
-                0, 40
+                wne::UINodeRow::Layout::SpaceBetween
             ),
-            0, 56,
+            0, 64,
             decorationTitleBar
         )
     );

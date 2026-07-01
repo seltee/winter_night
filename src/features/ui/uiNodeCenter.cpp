@@ -60,14 +60,10 @@ void UINodeCenter::render(const ContextRender &context)
 
 uint UINodeCenter::getWidth()
 {
-    if (width)
-        return width;
-    return 0;
+    return width;
 }
 
 uint UINodeCenter::getHeight()
 {
-    if (height)
-        return height;
-    return 0;
+    return height;
 }
