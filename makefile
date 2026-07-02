@@ -23,7 +23,7 @@ IMPLIB = lib/libwne.dll.a
 L_FLAGS = -shared -Wall -g -L"../vulkan/Lib" -Wl,--out-implib,$(IMPLIB)
 else
 CXX_FLAGS = -I$(INCDIR) -Wall -c -std=c++20 -fPIC -g -O2
-LIBRARIES = -lvulkan -lwayland-client
+LIBRARIES = -lvulkan -lwayland-client -lwayland-cursor
 EXT = ""
 EXLFLAGS = -Wall -g -v -L$(BINDIR) -Wl,-rpath,'$$ORIGIN'
 EXLIBRARIES = -lwne

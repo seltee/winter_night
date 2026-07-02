@@ -34,6 +34,8 @@ bool WindowWayland::setup(int32 width, int32 height, WindowType type)
         return false;
     }
 
+    cursorSurface_ = wl_compositor_create_surface(compositor_);
+
     static const wl_seat_listener seatListener = {
         .capabilities = handleSeatCapabilities,
         .name = handleSeatName};
@@ -73,6 +75,11 @@ bool WindowWayland::setup(int32 width, int32 height, WindowType type)
 
     xdg_toplevel_set_title(toplevel_, caption.c_str());
     xdg_toplevel_set_app_id(toplevel_, caption.c_str());
+
+    if (type == WindowType::Fullscreen)
+    {
+        xdg_toplevel_set_fullscreen(toplevel_, nullptr);
+    }
 
     wl_surface_commit(surface_);
     wl_display_roundtrip(display_);
@@ -138,11 +145,15 @@ void WindowWayland::updateWindowSize()
 
 void WindowWayland::startDragging()
 {
-    xdg_toplevel_move(toplevel_, seat_, serial_);
+    if (!flagMouseLocked)
+    {
+        xdg_toplevel_move(toplevel_, seat_, serial_);
+    }
 }
 
 void WindowWayland::stopDragging()
 {
+    updateCursor();
 }
 
 void WindowWayland::close()
@@ -263,7 +274,39 @@ void WindowWayland::providePointerDataOnEnter(
 {
     this->pointer_ = wl_pointer;
     this->serial_ = serial;
+    updateCursor();
     checkWindowLock();
+}
+
+void WindowWayland::updateCursor()
+{
+    if (!serial_)
+        return;
+
+    wl_pointer *pointer = wl_seat_get_pointer(seat_);
+    if (flagMouseLocked)
+    {
+        wl_pointer_set_cursor(pointer, serial_, nullptr, 0, 0);
+    }
+    else
+    {
+        wl_cursor_theme *theme =
+            wl_cursor_theme_load(nullptr, 24, shm_);
+        wl_cursor *cursor =
+            wl_cursor_theme_get_cursor(theme, "left_ptr");
+        wl_cursor_image *image = cursor->images[0];
+        wl_buffer *buffer = wl_cursor_image_get_buffer(image);
+
+        wl_pointer_set_cursor(pointer, serial_, cursorSurface_, 0, 0);
+
+        wl_surface_attach(cursorSurface_, buffer, 0, 0);
+        wl_surface_damage_buffer(
+            cursorSurface_,
+            0, 0,
+            image->width,
+            image->height);
+        wl_surface_commit(cursorSurface_);
+    }
 }
 
 void WindowWayland::handleToplevelConfigure(
@@ -540,6 +583,14 @@ void WindowWayland::onRegistry(void *data,
                     name,
                     &zwp_relative_pointer_manager_v1_interface,
                     1));
+    }
+    else if (!strcmp(interface, wl_shm_interface.name))
+    {
+        window->shm_ = static_cast<wl_shm *>(
+            wl_registry_bind(registry,
+                             name,
+                             &wl_shm_interface,
+                             1));
     }
 }
 

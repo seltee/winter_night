@@ -11,6 +11,7 @@
 #include "core/core.h"
 #include <memory>
 #include <wayland-client.h>
+#include <wayland-cursor.h>
 
 namespace wne
 {
@@ -53,13 +54,15 @@ namespace wne
         zwp_pointer_constraints_v1 *constraints_ = nullptr;
         zwp_relative_pointer_manager_v1 *relativePointerManager_ = nullptr;
         zwp_relative_pointer_v1 *relativePointer_ = nullptr;
+        wl_shm *shm_ = nullptr;
+        wl_surface *cursorSurface_ = nullptr;
         zwp_locked_pointer_v1 *locked = nullptr;
 
     private:
         wl_display *display_ = nullptr;
         wl_surface *surface_ = nullptr;
         wl_pointer *pointer_ = nullptr;
-        uint32 serial_;
+        uint32 serial_ = 0;
         int32 scaleFactor = 1;
         int32 mouseX = 0;
         int32 mouseY = 0;
@@ -67,6 +70,8 @@ namespace wne
         bool flagMouseLocked = false;
 
         WaylandUIScene uiSceneData{};
+
+        void updateCursor();
 
         static void handleToplevelConfigure(void *data,
                                             xdg_toplevel *toplevel,
