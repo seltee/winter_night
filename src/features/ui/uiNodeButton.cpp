@@ -33,6 +33,16 @@ std::shared_ptr<UINodeButton> UINodeButton::create(std::shared_ptr<UINode> nodeM
 
 std::shared_ptr<UINodeButton> UINodeButton::create(
     std::shared_ptr<UINode> nodeMain,
+    const std::function<void(UINodeButton *)> &onClick)
+{
+    return std::make_shared<UINodeButton>(
+        nodeMain, nullptr, nullptr,
+        onClick, nullptr, nullptr, nullptr,
+        false);
+}
+
+std::shared_ptr<UINodeButton> UINodeButton::create(
+    std::shared_ptr<UINode> nodeMain,
     std::shared_ptr<UINode> nodeHover,
     const std::function<void(UINodeButton *)> &onClick)
 {

@@ -81,6 +81,14 @@ void Window::checkWindowLock()
 {
 }
 
+void Window::startDragging()
+{
+}
+
+void Window::stopDragging()
+{
+}
+
 void Window::close()
 {
 }

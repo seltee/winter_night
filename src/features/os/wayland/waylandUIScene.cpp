@@ -32,32 +32,38 @@ WaylandUIScene wne::createWaylandUIScene(Renderer *renderer, Window *window)
 
     // clang-format off
     root->setChild(
-        wne::UINodeContainer::create(
-            wne::UINodeRow::create(
-                {
-                    wne::UINodeCenter::create(nullptr, 76, 64),
-                    wne::UINodeCenter::create(
-                        {
-                            caption
-                        },
-                        0, 48
-                    ),
-                    wne::UINodeCenter::create(
-                        wne::UINodeButton::create(
-                            wne::UINodeImage::create(iconCrossTexture),
-                            wne::UINodeImage::create(iconCrossHoverTexture),
-                            [&](wne::UINodeButton *button)
+        wne::UINodeButton::create(
+            wne::UINodeContainer::create(
+                wne::UINodeRow::create(
+                    {
+                        wne::UINodeCenter::create(nullptr, 76, 64),
+                        wne::UINodeCenter::create(
                             {
-                                window->close();
-                            }
+                                caption
+                            },
+                            0, 48
                         ),
-                        76, 64
-                    ),
-                },
-                wne::UINodeRow::Layout::SpaceBetween
+                        wne::UINodeCenter::create(
+                            wne::UINodeButton::create(
+                                wne::UINodeImage::create(iconCrossTexture),
+                                wne::UINodeImage::create(iconCrossHoverTexture),
+                                [window](wne::UINodeButton *button)
+                                {
+                                    window->close();
+                                }
+                            ),
+                            76, 64
+                        ),
+                    },
+                    wne::UINodeRow::Layout::SpaceBetween
+                ),
+                0, 64,
+                decorationTitleBar
             ),
-            0, 64,
-            decorationTitleBar
+            [window](wne::UINodeButton *button)
+            {
+                window->startDragging();
+            }
         )
     );
     // clang-format on

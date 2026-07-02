@@ -58,6 +58,8 @@ namespace wne
         virtual void render();
         virtual void updateWindowSize();
         virtual void checkWindowLock();
+        virtual void startDragging();
+        virtual void stopDragging();
 
         virtual void close();
 

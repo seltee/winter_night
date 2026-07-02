@@ -25,6 +25,8 @@ namespace wne
         void updateWindowSize() override final;
         void close() override final;
         void checkWindowLock() override final;
+        void startDragging() override final;
+        void stopDragging() override final;
 
         void updateWindowSizeExt(int32 width, int32 height);
         void setScaleFactor(int32 scaleFactor);
@@ -34,7 +36,7 @@ namespace wne
 
         void provideMousePosition(float x, float y);
         void provideMouseShift(float shiftX, float shiftY);
-        void provideMouseButton(MouseButton button, bool state);
+        void provideMouseButton(MouseButton button, bool state, uint32 serial);
         void provideKeyboardKey(uint16 key, bool state);
 
         void providePointerDataOnEnter(

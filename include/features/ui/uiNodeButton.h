@@ -23,6 +23,9 @@ namespace wne
         static std::shared_ptr<UINodeButton> create(std::shared_ptr<UINode> nodeMain);
         static std::shared_ptr<UINodeButton> create(
             std::shared_ptr<UINode> nodeMain,
+            const std::function<void(UINodeButton *)> &onClick);
+        static std::shared_ptr<UINodeButton> create(
+            std::shared_ptr<UINode> nodeMain,
             std::shared_ptr<UINode> nodeHover,
             const std::function<void(UINodeButton *)> &onClick);
         static std::shared_ptr<UINodeButton> create(

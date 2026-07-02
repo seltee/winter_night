@@ -136,6 +136,15 @@ void WindowWayland::updateWindowSize()
 {
 }
 
+void WindowWayland::startDragging()
+{
+    xdg_toplevel_move(toplevel_, seat_, serial_);
+}
+
+void WindowWayland::stopDragging()
+{
+}
+
 void WindowWayland::close()
 {
     flagCloseRequested = true;
@@ -236,8 +245,9 @@ void WindowWayland::provideMouseShift(float shiftX, float shiftY)
     emitEventMouseMove(intShiftX, intShiftY, mouseX, mouseY);
 }
 
-void WindowWayland::provideMouseButton(MouseButton button, bool state)
+void WindowWayland::provideMouseButton(MouseButton button, bool state, uint32 serial)
 {
+    this->serial_ = serial;
     emitEventMouseClick(state, button);
 }
 
@@ -387,11 +397,11 @@ void WindowWayland::handlePointerButton(void *data,
 {
     WindowWayland *window = static_cast<WindowWayland *>(data);
     if (button == 272)
-        window->provideMouseButton(MouseButton::LeftMouseButton, state ? true : false);
+        window->provideMouseButton(MouseButton::LeftMouseButton, state ? true : false, serial);
     if (button == 273)
-        window->provideMouseButton(MouseButton::RightMouseButton, state ? true : false);
+        window->provideMouseButton(MouseButton::RightMouseButton, state ? true : false, serial);
     if (button == 274)
-        window->provideMouseButton(MouseButton::MiddleMouseButton, state ? true : false);
+        window->provideMouseButton(MouseButton::MiddleMouseButton, state ? true : false, serial);
 }
 
 void WindowWayland::handlePointerAxis(void *data,
