@@ -43,21 +43,6 @@ std::shared_ptr<Sound> SoundSystem::loadMusic(const char *path)
 
 void SoundSystem::update()
 {
-    /*
-    auto it = sources.begin();
-        while (it != sources.end())
-        {
-            (*it)->process(delta);
-            if ((*it)->isDestroyed())
-            {
-                delete (*it);
-                it = sources.erase(it);
-            }
-            else
-                ++it;
-        }
-        */
-
     updateBuffers();
 }
 
@@ -69,16 +54,8 @@ void SoundSystem::provideBuffer(float *data, uint sampleCount)
 {
 }
 
-void SoundSystem::setupBuffer(uint sampleCount)
+void SoundSystem::fillBuffer(float *data, uint32 sampleCount)
 {
-    this->sampleCount = sampleCount;
-    buffer.resize(sampleCount * 2);
-}
-
-void SoundSystem::fillBuffer()
-{
-    float *data = buffer.data();
-
     memset(data, 0, sampleCount * sizeof(float) * 2);
 
     for (auto &it : sources)

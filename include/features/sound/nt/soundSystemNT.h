@@ -17,6 +17,7 @@ namespace wne
         static std::shared_ptr<SoundSystemNT> create(void *hWnd);
 
     protected:
+        void setupBuffer(uint sampleCount);
         void updateBuffers() override final;
         void provideBuffer(float *data, uint sampleCount) override final;
         // std::vector<AudioDeviceWindows> getWindowsDevicesList();
@@ -27,6 +28,9 @@ namespace wne
 
         bool bFirstPartPlaying = true;
         uint writeOffset = 0;
+
+        std::vector<float> buffer;
+        uint sampleCount = 0;
     };
 }
 

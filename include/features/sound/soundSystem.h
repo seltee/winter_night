@@ -24,11 +24,8 @@ namespace wne
     protected:
         virtual void updateBuffers();
         virtual void provideBuffer(float *data, uint sampleCount);
-        void setupBuffer(uint sampleCount);
-        void fillBuffer();
+        void fillBuffer(float *data, uint32 sampleCount);
 
         std::vector<std::shared_ptr<SoundSource>> sources;
-        std::vector<float> buffer;
-        uint sampleCount = 0;
     };
 }

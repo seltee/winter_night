@@ -73,6 +73,12 @@ std::shared_ptr<SoundSystemNT> SoundSystemNT::create(void *hWnd)
     return soundSystem;
 }
 
+void SoundSystemNT::setupBuffer(uint sampleCount)
+{
+    this->sampleCount = sampleCount;
+    buffer.resize(sampleCount * 2);
+}
+
 void SoundSystemNT::updateBuffers()
 {
     unsigned long playPos;
@@ -82,14 +88,14 @@ void SoundSystemNT::updateBuffers()
     {
         bFirstPartPlaying = false;
         writeOffset = 0;
-        fillBuffer();
+        fillBuffer(buffer.data(), sampleCount);
     }
 
     if (!bFirstPartPlaying && playPos < BUFFER_SIZE)
     {
         bFirstPartPlaying = true;
         writeOffset = BUFFER_SIZE;
-        fillBuffer();
+        fillBuffer(buffer.data(), sampleCount);
     }
 }
 

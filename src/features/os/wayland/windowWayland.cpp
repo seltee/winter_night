@@ -6,6 +6,7 @@
 #include "features/camera/cameraOrtho.h"
 #include "features/scene/actorUI.h"
 #include "features/logger/logger.h"
+#include "features/sound/unix/soundSystemUnix.h"
 #include <algorithm>
 #include <string>
 
@@ -98,7 +99,7 @@ bool WindowWayland::setup(int32 width, int32 height, WindowType type)
         return false;
     }
 
-    soundSystem = SoundSystem::create();
+    soundSystem = SoundSystemUnix::create();
     if (!soundSystem)
     {
         Logger::log << "Unable to create sound system" << endl;
