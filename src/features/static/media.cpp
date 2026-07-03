@@ -14,13 +14,13 @@ std::shared_ptr<Font> Media::getDefaultFont()
 std::shared_ptr<Image> Media::getIconCross()
 {
     if (!imageIconCross)
-        imageIconCross = Image::createFromMemory(iconCross, iconCrossSize);
+        imageIconCross = Image::createFromFileInMemory(iconCross, iconCrossSize);
     return imageIconCross;
 }
 
 std::shared_ptr<Image> Media::getIconCrossHover()
 {
     if (!imageIconCrossHover)
-        imageIconCrossHover = Image::createFromMemory(iconCrossHover, iconCrossHoverSize);
+        imageIconCrossHover = Image::createFromFileInMemory(iconCrossHover, iconCrossHoverSize);
     return imageIconCrossHover;
 }

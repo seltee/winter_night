@@ -10,6 +10,7 @@ bin/*.ilk
 bin/**/*.spv
 bin/example*
 bin/winter_night
+bin/tetris
 bin/**/*.spv
 bin/**/*.dll
 lib/**/*.dll.a

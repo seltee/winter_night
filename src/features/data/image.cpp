@@ -2,6 +2,7 @@
 #include "features/loaders/stb_image.h"
 #include "features/logger/logger.h"
 #include <iostream>
+#include <cstring>
 
 using namespace wne;
 
@@ -32,7 +33,18 @@ std::shared_ptr<Image> Image::create(const std::string &path)
         4);
 }
 
-std::shared_ptr<Image> Image::createFromMemory(const uint8 *imageData, uint length)
+std::shared_ptr<Image> Image::createFromMemory(const uint8 *imageData, uint width, uint height)
+{
+    uint sizeInBytes = width * height * 4;
+    auto dataCopy = std::shared_ptr<uint8>(
+        new uint8[width * height * 4],
+        std::default_delete<uint8[]>());
+    memcpy(dataCopy.get(), imageData, sizeInBytes);
+
+    return std::make_shared<Image>(dataCopy, width, height, 4);
+}
+
+std::shared_ptr<Image> Image::createFromFileInMemory(const uint8 *imageData, uint length)
 {
     int width, height, bytesPerPixel;
     uint8 *data = stbi_load_from_memory(imageData, length, &width, &height, &bytesPerPixel, 4);

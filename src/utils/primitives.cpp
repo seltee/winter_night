@@ -35,9 +35,9 @@ std::shared_ptr<Model> Primitives::createBox(float size)
 
 std::shared_ptr<Model> Primitives::createBox(const Vector3 &size)
 {
-    float x = size.x;
-    float y = size.y;
-    float z = size.z;
+    float x = size.x / 2.0f;
+    float y = size.y / 2.0f;
+    float z = size.z / 2.0f;
 
     const std::vector<wne::VertexTextured> vertices = {
         {{x, y, -z}, {1.0f, 0.0f}, {1.0f, 0, 0}},
@@ -111,7 +111,7 @@ std::shared_ptr<Model> Primitives::createSphere(float radius, unsigned int rings
             indices.emplace_back(first);
             indices.emplace_back(first + 1);
             indices.emplace_back(second);
-                
+
             indices.emplace_back(second);
             indices.emplace_back(first + 1);
             indices.emplace_back(second + 1);
