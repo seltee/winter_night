@@ -1,4 +1,5 @@
 #include "features/renderer/text.h"
+#include "features/logger/logger.h"
 #include <string>
 #include <string.h>
 #include <stdio.h>
@@ -68,18 +69,21 @@ std::unique_ptr<Text::TextRowData> Text::createBitmap()
 
         for (uint y = 0; y < glyphHeight; y++)
         {
-            uint yPos = fontSize + y + glyph->shiftY;
+            int yPos = (int)fontSize + (int)y + glyph->shiftY;
             if (yPos < height && yPos >= 0)
             {
                 for (uint x = 0; x < glyphWidth; x++)
                 {
-                    uint lineShift = x + glyphShift + glyph->shiftX;
-                    if (lineShift >= width)
+                    int lineShift = (int)x + (int)glyphShift + glyph->shiftX;
+                    if (lineShift >= (int)width)
                         break;
 
-                    uint32 pixelShift = (yPos * width + lineShift) * 4;
-                    *((uint32 *)&data[pixelShift]) = color;
-                    data[pixelShift + 3] = glyph->bitmap[y * glyphWidth + x];
+                    if (lineShift >= 0)
+                    {
+                        int32 pixelShift = (yPos * width + lineShift) * 4;
+                        *((uint32 *)&data[pixelShift]) = color;
+                        data[pixelShift + 3] = glyph->bitmap[y * glyphWidth + x];
+                    }
                 }
             }
         }

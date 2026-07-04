@@ -17,9 +17,12 @@ public:
         auto boxModel = wne::Primitives::createBox(1.0f);
         boxMesh = renderer->createMesh(boxModel);
 
-        addMaterialColor(0xffff0000);
-        addMaterialColor(0xff00ff00);
-        addMaterialColor(0xff0000ff);
+        addMaterialColor(0xffc25e84);
+        addMaterialColor(0xffb15dd6);
+        addMaterialColor(0xff916fff);
+        addMaterialColor(0xff7196ff);
+        addMaterialColor(0xff5fc7ff);
+        addMaterialColor(0xff71f8f9);
     }
 
     void setupIntro()
@@ -100,7 +103,7 @@ int main()
 
     // scene
     auto scene = renderer->createScene();
-    scene->setAmbientLight(0.5f, 0.5f, 0.5f);
+    scene->setAmbientLight(0.6f, 0.6f, 0.6f);
 
     // images & textures
     auto imageAtmosphere = wne::ImageAtmo::create("./atmosphere.jpg");
@@ -111,7 +114,7 @@ int main()
     // light
     auto sun = renderer->createLightDirectional();
     sun->setDirection({-0.5, -0.5, -0.5});
-    sun->setColor({4.0f, 4.0f, 4.0f});
+    sun->setColor({0.4f, 0.4f, 0.4f});
     auto actorSun = scene->createActor<wne::ActorLight>(sun);
 
     // camera
