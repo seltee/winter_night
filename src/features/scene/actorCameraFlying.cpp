@@ -1,6 +1,8 @@
 #include "features/scene/actorCameraFlying.h"
 #include "features/os/windowEvents.h"
 #include "features/os/window.h"
+#include "features/logger/logger.h"
+#include "features/os/gamepad.h"
 #include "core/math.h"
 #include <iostream>
 #include <cmath>
@@ -60,22 +62,14 @@ void ActorCameraFlying::update(float delta)
         }
         else if (event.type == WindowEvents::WindowEventType::GAMEPAD_AXIS)
         {
-            if (event.gamepadAxis.code == 48)
-            {
+            if (event.gamepadAxis.code == GAMEPAD_AXIS_LEFT_V)
                 moveCameraRight = event.gamepadAxis.value;
-            }
-            else if (event.gamepadAxis.code == 49)
-            {
+            else if (event.gamepadAxis.code == GAMEPAD_AXIS_LEFT_H)
                 moveCameraForward = -event.gamepadAxis.value;
-            }
-            else if (event.gamepadAxis.code == 51)
-            {
+            else if (event.gamepadAxis.code == GAMEPAD_AXIS_RIGHT_V)
                 rotateYaw = event.gamepadAxis.value * 0.016f;
-            }
-            else if (event.gamepadAxis.code == 52)
-            {
+            else if (event.gamepadAxis.code == GAMEPAD_AXIS_RIGHT_H)
                 rotatePitch = event.gamepadAxis.value * 0.016f;
-            }
         }
         else if (event.type == WindowEvents::WindowEventType::MOUSE_MOVE)
         {

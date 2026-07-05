@@ -7,6 +7,7 @@
 #include "features/os/wayland/pointer-constraints-unstable-v1-client-protocol.h"
 #include "features/os/wayland/relative-pointer-unstable-v1-client-protocol.h"
 #include "features/os/wayland/waylandUIScene.h"
+#include "features/os/unix/gamepadSystemUnix.h"
 #include "core/api.h"
 #include "core/core.h"
 #include <memory>
@@ -70,6 +71,7 @@ namespace wne
         bool flagMouseLocked = false;
 
         WaylandUIScene uiSceneData{};
+        std::unique_ptr<GamepadSystemUnix> gamepadSystemUnix;
 
         void updateCursor();
 

@@ -70,7 +70,7 @@ std::unique_ptr<Text::TextRowData> Text::createBitmap()
         for (uint y = 0; y < glyphHeight; y++)
         {
             int yPos = (int)fontSize + (int)y + glyph->shiftY;
-            if (yPos < height && yPos >= 0)
+            if (yPos < (int)height && yPos >= 0)
             {
                 for (uint x = 0; x < glyphWidth; x++)
                 {

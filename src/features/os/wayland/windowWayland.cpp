@@ -92,6 +92,9 @@ bool WindowWayland::setup(int32 width, int32 height, WindowType type)
         wl_display_roundtrip(display_);
     }
 
+    gamepadSystemUnix = std::make_unique<GamepadSystemUnix>(this);
+    gamepadSystemUnix->setup();
+
     renderer = RendererVulkanWayland::create(display_, surface_, width, height);
     if (!renderer)
     {
@@ -111,6 +114,7 @@ bool WindowWayland::setup(int32 width, int32 height, WindowType type)
 
 void WindowWayland::update(float delta)
 {
+    gamepadSystemUnix->update();
     wl_display_dispatch_pending(display_);
     wl_display_flush(display_);
     renderer->update(delta);

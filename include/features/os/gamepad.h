@@ -1,6 +1,8 @@
 #pragma once
 #include "core/core.h"
 #include <vector>
+#include "features/os/unix/gamepadUnixMap.h"
+#include "features/os/nt/gamepadNTMap.h"
 
 namespace wne
 {
