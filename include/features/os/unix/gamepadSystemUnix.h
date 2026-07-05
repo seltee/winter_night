@@ -8,6 +8,8 @@
 #include <vector>
 #include <memory>
 
+struct udev_monitor;
+
 namespace wne
 {
     class Window;
@@ -24,6 +26,9 @@ namespace wne
     protected:
         std::vector<std::shared_ptr<GamepadUnix>> gamepads;
         Window *window = nullptr;
+
+        udev_monitor *monitor_ = nullptr;
+        int monitorFd = -1;
     };
 };
 #endif

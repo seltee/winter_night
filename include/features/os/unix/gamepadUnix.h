@@ -29,6 +29,11 @@ namespace wne
         GamepadUnix(const char *devnode);
         ~GamepadUnix();
 
+        inline const char *getDevNode()
+        {
+            return devnode_;
+        }
+
         bool setup();
         bool getEvent(GamepadUnix::Event &gamepadEvent);
 

@@ -41,10 +41,7 @@ bool GamepadSystemUnix::setup()
         const char *syspath =
             udev_list_entry_get_name(entry);
 
-        udev_device *dev =
-            udev_device_new_from_syspath(
-                udev,
-                syspath);
+        udev_device *dev = udev_device_new_from_syspath(udev, syspath);
 
         const char *devnode = udev_device_get_devnode(dev);
         if (!devnode)
@@ -59,6 +56,12 @@ bool GamepadSystemUnix::setup()
             gamepads.push_back(gamepad);
         }
     }
+
+    monitor_ = udev_monitor_new_from_netlink(udev, "udev");
+    udev_monitor_filter_add_match_subsystem_devtype(monitor_, "input", nullptr);
+    udev_monitor_enable_receiving(monitor_);
+
+    monitorFd = udev_monitor_get_fd(monitor_);
 
     return true;
 }
@@ -78,6 +81,32 @@ void GamepadSystemUnix::update()
                 window->emitEventGamepadAxes(gamepad, gamepadEvent.code, gamepadEvent.stateAxis);
             else if (gamepadEvent.type == GamepadUnix::EventType::DPad)
                 window->emitEventGamepadDirectionPad(gamepad, gamepadEvent.code);
+        }
+    }
+
+    udev_device *dev = udev_monitor_receive_device(monitor_);
+    if (dev)
+    {
+        const char *devnode = udev_device_get_devnode(dev);
+        if (devnode)
+        {
+            const char *action = udev_device_get_action(dev);
+            if (!strcmp(action, "remove"))
+            {
+                std::erase_if(gamepads, [&](const std::shared_ptr<wne::GamepadUnix> &gamepad)
+                              { return !strcmp(gamepad->getDevNode(), devnode); });
+            }
+            else if (!strcmp(action, "add"))
+            {
+                if (strncmp(devnode, "/dev/input/event", 16) == 0)
+                {
+                    std::shared_ptr<GamepadUnix> gamepad = std::make_shared<GamepadUnix>(devnode);
+                    if (gamepad->setup())
+                    {
+                        gamepads.push_back(gamepad);
+                    }
+                }
+            }
         }
     }
 }
