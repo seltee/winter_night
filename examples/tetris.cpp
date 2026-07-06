@@ -7,6 +7,43 @@
 #define FIELD_WIDTH 10
 #define FIELD_HEIGHT 20
 
+std::shared_ptr<wne::UINodeButton> createButton(
+    const char *label,
+    std::shared_ptr<wne::Font> font,
+    const std::function<void(wne::UINodeButton *)> &action)
+{
+    const wne::UINodeContainer::Decoration decorationNormal{
+        .useBackgroundColor = true,
+        .backgroundColor = 0xff777777};
+    const wne::UINodeContainer::Decoration decorationHover{
+        .useBackgroundColor = true,
+        .backgroundColor = 0xffbbbbbb};
+
+    const uint buttonWidth = 400;
+    const uint buttonHeight = 80;
+
+    // clang-format off
+    return wne::UINodeButton::create(
+        wne::UINodeContainer::create(
+            wne::UINodeCenter::create(
+                wne::UINodeText::create(font, label, 70, 0xffbbbbbb),
+                0, buttonHeight - 16
+            ),
+            buttonWidth, buttonHeight,
+            decorationNormal
+        ),
+        wne::UINodeContainer::create(
+            wne::UINodeCenter::create(
+                wne::UINodeText::create(font, label, 70, 0xffffffff),
+                0, buttonHeight - 16
+            ),
+            buttonWidth, buttonHeight,
+            decorationHover
+        ),
+        action);
+    // clang-format on
+}
+
 class Field
 {
 public:
@@ -23,6 +60,10 @@ public:
         addMaterialColor(0xff7196ff);
         addMaterialColor(0xff5fc7ff);
         addMaterialColor(0xff71f8f9);
+    }
+
+    void update(float delta, bool isGameStatic)
+    {
     }
 
     void setupIntro()
@@ -48,6 +89,15 @@ public:
             }
             blocks.clear();
         }
+    }
+
+    void genNextFigure()
+    {
+    }
+
+    void spawnNextFigure()
+    {
+        genNextFigure();
     }
 
     std::shared_ptr<wne::ActorMesh> addBlock()
@@ -127,9 +177,54 @@ int main()
     std::unique_ptr<Field> field = std::make_unique<Field>(scene);
     field->setupIntro();
 
+    enum class GameState
+    {
+        Menu,
+        Playing,
+        GameOver
+    };
+    GameState gameState = GameState::Menu;
+
+    // ui
+    auto ui = renderer->createScene();
+
+    auto cameraUI = wne::CameraOrtho::create(window);
+    auto actorUICamera = ui->createActor<wne::ActorCamera>(cameraUI);
+    ui->setCamera(actorUICamera);
+
+    auto uiMainMenu = ui->createActor<wne::ActorUI>(window, 2560, 1440);
+    auto uiMainMenuRoot = &uiMainMenu->getRoot();
+
+    const uint padding = 32;
+
+    // clang-format off
+    uiMainMenuRoot->setChild(
+        wne::UINodeCenter::create(
+            wne::UINodeColumn::create(
+                {
+                    createButton("New Game", nullptr, 
+                        [&](wne::UINodeButton *button){
+                            field->clear();
+                            field->genNextFigure();
+                            field->spawnNextFigure();
+                            uiMainMenu->setVisibility(false);
+                        }
+                    ),
+                    wne::UINodeContainer::create(padding, padding),
+                    createButton("Quit", nullptr, 
+                        [&](wne::UINodeButton *button){
+                            window->close();
+                        }
+                    ),
+                }
+            )
+        )
+    );
+
     while (!window->isCloseRequested())
     {
         float delta = wne::Engine::getInstance()->update();
+        field->update(delta, gameState!= GameState::Playing);
     }
 
     return 0;

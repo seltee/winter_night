@@ -71,6 +71,16 @@ namespace wne
             return isRenderedFlag;
         }
 
+        inline void setVisibility(bool state)
+        {
+            this->isVisibleflag = state;
+        }
+
+        inline bool isVisible()
+        {
+            return isVisibleflag;
+        }
+
         inline void moveForward(float distance)
         {
             Vector3 forward = rotation * Vector3::forward();
@@ -94,6 +104,7 @@ namespace wne
         bool isShadowEnabled = true;
         bool isDestroyedFlag = false;
         bool isRenderedFlag = false;
+        bool isVisibleflag = true;
         Matrix3x3 mNormal = Matrix3x3::identity();
 
         Scene *currentScene = nullptr;

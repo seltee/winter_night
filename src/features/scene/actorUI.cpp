@@ -32,7 +32,14 @@ ActorUI::ActorUI(Renderer *renderer, Window *eventWindow, uint rootWidth, uint r
 
 void ActorUI::update(float delta)
 {
-    bool clickRegistered = false, releaseRegistered = false, moveUp = false, moveDown = false, moveLeft = false, moveRight = false;
+    bool clickRegistered = false,
+         releaseRegistered = false,
+         moveUp = false,
+         moveDown = false,
+         moveLeft = false,
+         moveRight = false,
+         accept = false,
+         reject = false;
 
     if (eventsSubscription)
     {
@@ -60,6 +67,7 @@ void ActorUI::update(float delta)
             }
             else if (event.type == WindowEvents::WindowEventType::KEY_PRESS)
             {
+                Logger::log << event.key.scancode << endl;
                 if (event.key.code == Key::ArrowUp)
                     moveUp = true;
                 if (event.key.code == Key::ArrowDown)
@@ -68,6 +76,10 @@ void ActorUI::update(float delta)
                     moveLeft = true;
                 if (event.key.code == Key::ArrowRight)
                     moveRight = true;
+                if (event.key.code == Key::Enter || event.key.code == Key::Spacebar)
+                    accept = true;
+                if (event.key.code == Key::Escape)
+                    reject = true;
             }
             else if (event.type == WindowEvents::WindowEventType::GAMEPAD_DIRECTION_PAD)
             {
@@ -83,6 +95,8 @@ void ActorUI::update(float delta)
             }
         }
     }
+    if (!isVisibleflag)
+        return;
 
     UINode::ContextGlobal contextGlobal;
     UINode::ContextUpdate contextUpdate;
@@ -91,12 +105,12 @@ void ActorUI::update(float delta)
     contextGlobal.mouseX = mouseX - (int)rootWidth / 2;
     contextGlobal.mouseY = (int)rootHeight - mouseY - (int)rootHeight / 2;
 
-    #if defined(OS_WINDOWS)
-        const uint shiftTop = -48;
-    #else
-        const uint shiftTop = 0;
-    #endif
-    
+#if defined(OS_WINDOWS)
+    const uint shiftTop = -48;
+#else
+    const uint shiftTop = 0;
+#endif
+
     contextUpdate.contextGlobal = &contextGlobal;
     contextUpdate.visible = true;
     contextUpdate.x = -(int)rootWidth / 2;
@@ -135,7 +149,12 @@ void ActorUI::update(float delta)
     if (moveLeft)
         selectedNode = moveFocusHorizontal(false, contextGlobal.selectableNodes, selectedNode);
 
-    if (clickRegistered)
+    if (accept && selectedNode)
+    {
+        Logger::log << "BANG " << endl;
+        selectedNode->pressLeftMouseButton();
+    }
+    else if (clickRegistered)
     {
         for (auto &node : result.hoveredLine)
         {

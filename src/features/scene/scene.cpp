@@ -70,7 +70,7 @@ void Scene::renderDepthShadow()
     // shadow depth pass
     for (const auto &object : actors)
     {
-        if (object->hasShadow())
+        if (object->hasShadow() && object->isVisible())
             object->renderDepthShadow();
     }
 }
@@ -80,14 +80,14 @@ void Scene::renderDepth()
     // depth pass
     for (const auto &object : actors)
     {
-        if (object->isRendered())
+        if (object->isRendered() && object->isVisible())
             object->renderDepth();
     }
 }
 
 void Scene::render()
 {
-    renderer->prepareRenderingState();    
+    renderer->prepareRenderingState();
 
     // render atmosphere if set
     if (this->atmosphereMap)
@@ -103,7 +103,7 @@ void Scene::render()
     // color pass
     for (const auto &object : actors)
     {
-        if (object->isRendered())
+        if (object->isRendered() && object->isVisible())
         {
             if (object->getRenderPass() == Actor::RenderPass::Main)
                 object->renderColor();
