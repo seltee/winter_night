@@ -19,7 +19,7 @@ namespace wne
         void selectDescriptorColor(ModelDataType dataType) override final;
         void selectDescriptorDepth(ModelDataType dataType) override final;
         void selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData) override final;
-        void setPCData(uint64 objectId, const AffectingLights &lights) override final;
+        void setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData) override final;
         void rebuild() override final;
 
         inline void setAlbedo(std::shared_ptr<Texture> texture)

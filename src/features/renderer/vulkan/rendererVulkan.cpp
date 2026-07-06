@@ -84,11 +84,12 @@ void RendererVulkan::renderFinish()
 
 void RendererVulkan::renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial)
 {
+    static const Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
     auto state = getState();
     Matrix4x4 mModel = Matrix4x4::translation(state->getCameraPosition());
     Matrix3x3 mNormal = Matrix3x3::identity();
     AffectingLights lights{};
-    atmoMaterial->bindColor(atmoSphereMeshId, lights, state->getViewProjectionMatrix() * mModel, mModel, mNormal, atmoSphere->getDataType());
+    atmoMaterial->bindColor(atmoSphereMeshId, lights, state->getViewProjectionMatrix() * mModel, mModel, mNormal, uvModifier, atmoSphere->getDataType());
     atmoSphere->render(getFrameData());
 }
 

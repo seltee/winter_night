@@ -10,6 +10,9 @@ layout(push_constant) uniform PushConstants {
     uint objectId;
     uint lightsAmount;
     uint lightIds[12];
+    float normalShadowingFactor;
+    float uvShiftX, uvShiftY;
+    float uvScaleX, uvScaleY;
 } objectData;
 
 layout(set = 0, binding = 0, std430) readonly buffer BufferMVPs {
@@ -19,5 +22,6 @@ layout(set = 0, binding = 0, std430) readonly buffer BufferMVPs {
 
 void main() {
     gl_Position = mMVPs.matrix[objectData.objectId] * vec4(inPosition, 1.0);
-    UV = inUV;
+    UV.x = inUV.x * objectData.uvScaleX + objectData.uvShiftX;
+    UV.y = inUV.y * objectData.uvScaleY + objectData.uvShiftY;
 }

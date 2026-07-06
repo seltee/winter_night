@@ -30,8 +30,8 @@ namespace wne
         void renderColor() override final;
 
         void setShadowRenderingMode(ShadowRenderingMode shadowRenderingMode);
-        void setFrameSize(float frameWidth, float frameHeight);
         void setFrame(uint frame);
+        void updateUV();
 
         RenderPass getRenderPass() override final;
 
@@ -42,14 +42,30 @@ namespace wne
             return objectId;
         }
 
-        inline float getFrameWidth()
+        inline void setFramesDimensions(uint32 framesHorizontal, uint32 framesVertical)
         {
-            return frameWidth;
+            this->framesHorizontal = framesHorizontal;
+            this->framesVertical = framesVertical;
         }
 
-        inline float getFrameHeight()
+        inline void setFramesHorizontal(uint32 framesHorizontal)
         {
-            return frameHeight;
+            this->framesHorizontal = framesHorizontal;
+        }
+
+        inline uint32 getFramesHorizontal()
+        {
+            return framesHorizontal;
+        }
+
+        inline void setFramesVertical(uint32 framesVertical)
+        {
+            this->framesVertical = framesVertical;
+        }
+
+        inline uint32 getFramesVertical()
+        {
+            return framesVertical;
         }
 
         inline uint getFrame()
@@ -63,10 +79,12 @@ namespace wne
         uint64 objectId = 0xffffffff;
 
         float r = 0.0f;
-        
+
         ShadowRenderingMode shadowRenderingMode = ShadowRenderingMode::FromCamera;
-        float frameWidth = 1.0f;
-        float frameHeight = 1.0f;
+        uint32 framesHorizontal = 1;
+        uint32 framesVertical = 1;
         uint frame = 0;
+
+        Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
     };
 };

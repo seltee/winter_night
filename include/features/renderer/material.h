@@ -17,16 +17,41 @@ namespace wne
     class WNE_API Material
     {
     public:
+        struct UVData
+        {
+            float shiftX, shiftY;
+            float scaleX, scaleY;
+        };
+
         virtual void rebuild();
 
         // bind for light's shadow depth
-        virtual void bindDepthShadow(uint64 objectId, Renderer *renderer, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType);
+        virtual void bindDepthShadow(
+            uint64 objectId,
+            Renderer *renderer,
+            const Matrix4x4 &mMVP,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            ModelDataType dataType);
 
         // bind for depth render
-        virtual void bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix4x4 &mModel, const Matrix3x3 &mNormal, ModelDataType dataType);
+        virtual void bindDepth(
+            uint64 objectId,
+            const Matrix4x4 &mMVP,
+            const Matrix4x4 &mModel,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            ModelDataType dataType);
 
         // bind for color render
-        virtual void bindColor(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix4x4 &mModel, const Matrix3x3 &mNormal, ModelDataType dataType);
+        virtual void bindColor(
+            uint64 objectId,
+            const AffectingLights &lights,
+            const Matrix4x4 &mMVP,
+            const Matrix4x4 &mModel,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            ModelDataType dataType);
 
         void setMasked(bool masked)
         {

@@ -13,6 +13,9 @@ namespace wne
         Arrowleft = 75,
         ArrowRight = 77,
         ArrowUp = 72,
-        ArrowDown = 80
+        ArrowDown = 80,
+        Enter = 28,
+        Spacebar = 57,
+        Escape = 1
     };
 }

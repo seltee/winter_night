@@ -28,11 +28,20 @@ namespace wne
             return objectId;
         }
 
+        inline void setUVModifier(float shiftX, float shiftY, float scaleX, float scaleY)
+        {
+            uvModifier.shiftX = shiftX;
+            uvModifier.shiftY = shiftY;
+            uvModifier.scaleX = scaleX;
+            uvModifier.scaleY = scaleY;
+        }
+
     protected:
         std::shared_ptr<Mesh> mesh;
         std::shared_ptr<Material> material;
         uint64 objectId = 0xffffffff;
 
         float r = 0.0f;
+        Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
     };
 };

@@ -51,5 +51,7 @@ namespace wne
         int resolution = 10;
         float size = 10.0f;
         float boundingRadius = 1.0f;
+
+        Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
     };
 }

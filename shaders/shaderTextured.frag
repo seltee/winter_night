@@ -15,6 +15,8 @@ layout(push_constant) uniform PushConstants {
     uint lightsAmount;
     uint lightIds[12];
     float normalShadowingFactor;
+    float uvShiftX, uvShiftY;
+    float uvScaleX, uvScaleY;
 } objectData;
 
 layout(set = 0, binding = 3) uniform BufferGlobalData {

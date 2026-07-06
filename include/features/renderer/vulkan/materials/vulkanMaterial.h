@@ -13,6 +13,8 @@ namespace wne
         uint32 objectId;
         AffectingLights lights;
         float normalShadowingFactor;
+        float uvShiftX, uvShiftY;
+        float uvScaleX, uvScaleY;
     };
 
     struct VulkanMaterialDescription;
@@ -24,9 +26,28 @@ namespace wne
         static std::shared_ptr<Material> createFlat(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture);
         static std::shared_ptr<Material> createAtmosphere(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture);
 
-        void bindDepthShadow(uint64 objectId, Renderer *renderer, const Matrix4x4 &mMVP, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
-        void bindDepth(uint64 objectId, const Matrix4x4 &mMVP, const Matrix4x4 &mModel, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
-        void bindColor(uint64 objectId, const AffectingLights &lights, const Matrix4x4 &mMVP, const Matrix4x4 &mModel, const Matrix3x3 &mNormal, ModelDataType dataType) override final;
+        void bindDepthShadow(
+            uint64 objectId,
+            Renderer *renderer,
+            const Matrix4x4 &mMVP,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            ModelDataType dataType) override final;
+        void bindDepth(
+            uint64 objectId,
+            const Matrix4x4 &mMVP,
+            const Matrix4x4 &mModel,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            ModelDataType dataType) override final;
+        void bindColor(
+            uint64 objectId,
+            const AffectingLights &lights,
+            const Matrix4x4 &mMVP,
+            const Matrix4x4 &mModel,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            ModelDataType dataType) override final;
 
         virtual void selectPipelineDepth(ModelDataType dataType);
         virtual void selectPipelineColor(ModelDataType dataType);
@@ -35,7 +56,7 @@ namespace wne
         virtual void selectDescriptorColor(ModelDataType dataType);
         virtual void selectDescriptorDepth(ModelDataType dataType);
         virtual void selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData);
-        virtual void setPCData(uint64 objectId, const AffectingLights &lights);
+        virtual void setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData);
 
         inline static void clearLastDescriptorColorBond()
         {

@@ -15,7 +15,7 @@ namespace wne
 
         void selectPipelineColor(ModelDataType dataType) override final;
         void selectDescriptorColor(ModelDataType dataType) override final;
-        void setPCData(uint64 objectId, const AffectingLights &lights) override final;
+        void setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData) override final;
 
         inline void setAtmosphereTexture(std::shared_ptr<Texture> texture)
         {

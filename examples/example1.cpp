@@ -84,6 +84,7 @@ int main()
     actorSpriteGoblin->setMaterial(materialGoblin);
     actorSpriteGoblin->setScale(12.0f);
     actorSpriteGoblin->setPosition(12.0f, 16.0f, 12.0f);
+    actorSpriteGoblin->setFramesDimensions(5, 4);
 
     auto boxModel = wne::Primitives::createBox(4.0f);
     auto boxMesh = renderer->createMesh(boxModel);
@@ -146,9 +147,13 @@ int main()
     scene->setCamera(actorCamera);
 
     float translate = 0.0f;
+    float goblinAnim = 0.0f;
     while (!window->isCloseRequested())
     {
         float delta = wne::Engine::getInstance()->update();
+        goblinAnim += delta * 6.0f;
+        actorSpriteGoblin->setFrame(static_cast<uint32>(goblinAnim) % 10);
+
         translate += delta * 2.0f;
         actorMesh->setPosition(-8.0f, 8.0f, 1.0f);
         actorMesh->setRotation(0.0f, 0.0f, translate * 0.1f);
