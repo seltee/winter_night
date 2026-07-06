@@ -1,4 +1,6 @@
 #include "features/os/unix/gamepadSystemUnix.h"
+
+#if defined(OS_LINUX)
 #include "features/logger/logger.h"
 #include "features/os/window.h"
 #include <libudev.h>
@@ -110,3 +112,5 @@ void GamepadSystemUnix::update()
         }
     }
 }
+
+#endif

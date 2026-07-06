@@ -49,6 +49,11 @@ int main()
     // materialExplosion->setLighted(false);
     materialExplosion->setColorBlending(wne::ColorBlending::Addition);
 
+    auto imageGoblin = wne::Image::create("./goblin.png");
+    auto textureGoblin = renderer->createTexture(imageGoblin);
+    auto materialGoblin = renderer->createFlatMaterial(textureGoblin);
+    materialGoblin->setMasked(true);
+
     // actor with mesh
     auto model = wne::Model::createFromData(vertices, indices);
     auto mesh = renderer->createMesh(model);
@@ -73,6 +78,12 @@ int main()
     actorSprite->setMaterial(materialExplosion);
     actorSprite->setScale(6.0f);
     actorSprite->setPosition(0.0f, 16.0f, 12.0f);
+    actorSprite->setShadowRenderingMode(wne::ActorSprite::ShadowRenderingMode::FromLight);
+
+    auto actorSpriteGoblin = scene->createActor<wne::ActorSprite>();
+    actorSpriteGoblin->setMaterial(materialGoblin);
+    actorSpriteGoblin->setScale(12.0f);
+    actorSpriteGoblin->setPosition(12.0f, 16.0f, 12.0f);
 
     auto boxModel = wne::Primitives::createBox(4.0f);
     auto boxMesh = renderer->createMesh(boxModel);

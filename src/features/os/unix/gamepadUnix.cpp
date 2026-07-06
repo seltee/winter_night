@@ -1,4 +1,6 @@
 #include "features/os/unix/gamepadUnix.h"
+
+#if defined(OS_LINUX)
 #include "features/logger/logger.h"
 #include <cmath>
 #include <cstring>
@@ -38,8 +40,6 @@ bool GamepadUnix::setup()
     // set none blocking
     int flags = fcntl(fd, F_GETFL, 0);
     fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-
-    Logger::log << "Gamepad added" << endl;
     return true;
 }
 
@@ -129,3 +129,4 @@ std::string GamepadUnix::getInternalDisplayName()
 {
     return displayName;
 }
+#endif

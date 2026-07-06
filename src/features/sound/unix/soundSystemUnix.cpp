@@ -2,6 +2,7 @@
 #include "features/logger/logger.h"
 #include <cmath>
 
+#if defined(OS_LINUX)
 using namespace wne;
 
 #define FREQ (44100)
@@ -152,3 +153,4 @@ void SoundSystemUnix::onProcess(void *userdata)
 
     pw_stream_queue_buffer(stream, b);
 }
+#endif

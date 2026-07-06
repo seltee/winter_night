@@ -11,6 +11,12 @@ namespace wne
     class WNE_API ActorSprite : public Actor
     {
     public:
+        enum class ShadowRenderingMode
+        {
+            FromCamera, // sprite rotated to camera when shadow is rendered
+            FromLight   // sprite rotated to light when shadow is rendered
+        };
+
         ActorSprite(Renderer *renderer);
         ~ActorSprite();
 
@@ -23,6 +29,10 @@ namespace wne
         void renderDepth() override final;
         void renderColor() override final;
 
+        void setShadowRenderingMode(ShadowRenderingMode shadowRenderingMode);
+        void setFrameSize(float frameWidth, float frameHeight);
+        void setFrame(uint frame);
+
         RenderPass getRenderPass() override final;
 
         float getBoundingRadius() override final;
@@ -32,11 +42,31 @@ namespace wne
             return objectId;
         }
 
+        inline float getFrameWidth()
+        {
+            return frameWidth;
+        }
+
+        inline float getFrameHeight()
+        {
+            return frameHeight;
+        }
+
+        inline uint getFrame()
+        {
+            return frame;
+        }
+
     protected:
         std::shared_ptr<Mesh> mesh;
         std::shared_ptr<Material> material;
         uint64 objectId = 0xffffffff;
 
         float r = 0.0f;
+        
+        ShadowRenderingMode shadowRenderingMode = ShadowRenderingMode::FromCamera;
+        float frameWidth = 1.0f;
+        float frameHeight = 1.0f;
+        uint frame = 0;
     };
 };

@@ -87,6 +87,22 @@ void ActorSprite::renderColor()
     mesh->render(renderer->getFrameData());
 }
 
+void ActorSprite::setShadowRenderingMode(ShadowRenderingMode shadowRenderingMode)
+{
+    this->shadowRenderingMode = shadowRenderingMode;
+}
+
+void ActorSprite::setFrameSize(float frameWidth, float frameHeight)
+{
+    this->frameWidth = frameWidth;
+    this->frameHeight = frameHeight;
+}
+
+void ActorSprite::setFrame(uint frame)
+{
+    this->frame = frame;
+}
+
 Actor::RenderPass ActorSprite::getRenderPass()
 {
     return (!material || material->getColorBlending() == ColorBlending::Solid) ? RenderPass::Main : RenderPass::Blended;
