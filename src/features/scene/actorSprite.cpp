@@ -46,6 +46,7 @@ void ActorSprite::update(float delta)
 {
     isDirtyFlag = true;
     eventUpdate(delta);
+    updateUV();
 }
 
 void ActorSprite::setMaterial(std::shared_ptr<Material> material)
@@ -60,7 +61,7 @@ void ActorSprite::renderDepthShadow()
         return;
 
     auto state = renderer->getState();
-    materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 
@@ -71,7 +72,7 @@ void ActorSprite::renderDepth()
         return;
 
     auto state = renderer->getState();
-    materialToUse->bindDepth(objectId, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    materialToUse->bindDepth(objectId, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 
@@ -83,7 +84,7 @@ void ActorSprite::renderColor()
 
     auto state = renderer->getState();
     AffectingLights lights = materialToUse->isLighted() ? currentScene->collectAffectingLights(getPosition(), 0.0f) : AffectingLights{};
-    materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 
@@ -92,15 +93,21 @@ void ActorSprite::setShadowRenderingMode(ShadowRenderingMode shadowRenderingMode
     this->shadowRenderingMode = shadowRenderingMode;
 }
 
-void ActorSprite::setFrameSize(float frameWidth, float frameHeight)
-{
-    this->frameWidth = frameWidth;
-    this->frameHeight = frameHeight;
-}
-
 void ActorSprite::setFrame(uint frame)
 {
     this->frame = frame;
+}
+
+void ActorSprite::updateUV()
+{
+    uint32 frameX = frame % framesHorizontal;
+    uint32 frameY = frame / framesHorizontal;
+
+    uvModifier = {
+        static_cast<float>(frameX) / static_cast<float>(framesHorizontal),
+        static_cast<float>(frameY) / static_cast<float>(framesVertical),
+        1.0f / static_cast<float>(framesHorizontal),
+        1.0f / static_cast<float>(framesVertical)};
 }
 
 Actor::RenderPass ActorSprite::getRenderPass()

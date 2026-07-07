@@ -60,7 +60,6 @@ UINode::ContextTreeNode UINodeImage::update(const ContextUpdate &context)
     newModel = newModel * Matrix4x4::rotationY(PI);
     mModel = newModel * Matrix4x4::scale(Vector3(texWidth, texHeight, 1.0f));
 
-
     bool hovered = context.contextGlobal->mouseX >= context.x &&
                    context.contextGlobal->mouseY <= context.y &&
                    context.contextGlobal->mouseX < context.x + (int)image->getWidth() &&
@@ -74,9 +73,10 @@ void UINodeImage::render(const ContextRender &context)
     if (!renderer || !material || objectId == 0xffffffff)
         return;
 
+    static const Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
     auto state = renderer->getState();
     AffectingLights lights{};
-    material->bindColor(objectId, lights, state->getViewProjectionMatrix() * mModel, mModel, Matrix3x3::identity(), mesh->getDataType());
+    material->bindColor(objectId, lights, state->getViewProjectionMatrix() * mModel, mModel, Matrix3x3::identity(), uvModifier, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 

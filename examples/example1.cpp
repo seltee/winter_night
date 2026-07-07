@@ -83,7 +83,7 @@ int main()
     auto actorSpriteGoblin = scene->createActor<wne::ActorSprite>();
     actorSpriteGoblin->setMaterial(materialGoblin);
     actorSpriteGoblin->setScale(12.0f);
-    actorSpriteGoblin->setPosition(12.0f, 16.0f, 12.0f);
+    actorSpriteGoblin->setPosition(12.0f, 10.0f, 12.0f);
     actorSpriteGoblin->setFramesDimensions(5, 4);
 
     auto boxModel = wne::Primitives::createBox(4.0f);

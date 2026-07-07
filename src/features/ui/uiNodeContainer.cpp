@@ -147,6 +147,7 @@ UINode::ContextTreeNode UINodeContainer::update(const ContextUpdate &context)
 
 void UINodeContainer::render(const ContextRender &context)
 {
+    static const Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
     if (backgroundMaterial)
     {
         auto state = renderer->getState();
@@ -157,6 +158,7 @@ void UINodeContainer::render(const ContextRender &context)
             state->getViewProjectionMatrix() * mBackgroung,
             mBackgroung,
             Matrix3x3::identity(),
+            uvModifier,
             mesh->getDataType());
         mesh->render(renderer->getFrameData());
     }

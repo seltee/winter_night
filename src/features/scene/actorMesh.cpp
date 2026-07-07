@@ -27,7 +27,7 @@ void ActorMesh::renderDepthShadow()
         return;
 
     auto state = renderer->getState();
-    materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 
@@ -38,7 +38,7 @@ void ActorMesh::renderDepth()
         return;
 
     auto state = renderer->getState();
-    materialToUse->bindDepth(objectId, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    materialToUse->bindDepth(objectId, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 
@@ -50,7 +50,7 @@ void ActorMesh::renderColor()
 
     auto state = renderer->getState();
     AffectingLights lights = currentScene->collectAffectingLights(getPosition(), 0.0f);
-    materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), mesh->getDataType());
+    materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 

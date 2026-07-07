@@ -109,7 +109,7 @@ void VulkanMaterialFlat::selectDescriptorDepthShadow(ModelDataType dataType, Vul
     }
 }
 
-void VulkanMaterialFlat::setPCData(uint64 objectId, const AffectingLights &lights)
+void VulkanMaterialFlat::setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData)
 {
     auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
     auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
@@ -118,6 +118,10 @@ void VulkanMaterialFlat::setPCData(uint64 objectId, const AffectingLights &light
     pco.objectId = objectId;
     pco.lights = lights;
     pco.normalShadowingFactor = normalShadowingFactor;
+    pco.uvShiftX = uvData.shiftX;
+    pco.uvShiftY = uvData.shiftY;
+    pco.uvScaleX = uvData.scaleX;
+    pco.uvScaleY = uvData.scaleY;
 
     vkCmdPushConstants(
         commandBuffer,

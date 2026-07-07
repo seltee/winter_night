@@ -43,7 +43,7 @@ void VulkanMaterialAtmosphere::selectDescriptorColor(ModelDataType dataType)
     }
 }
 
-void VulkanMaterialAtmosphere::setPCData(uint64 objectId, const AffectingLights &lights)
+void VulkanMaterialAtmosphere::setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData)
 {
     auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
     auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
@@ -51,6 +51,10 @@ void VulkanMaterialAtmosphere::setPCData(uint64 objectId, const AffectingLights 
     PushConstantObject pco{};
     pco.objectId = objectId;
     pco.lights = lights;
+    pco.uvShiftX = 0.0f;
+    pco.uvShiftY = 0.0f;
+    pco.uvScaleX = 1.0f;
+    pco.uvScaleY = 1.0f;
 
     vkCmdPushConstants(
         commandBuffer,

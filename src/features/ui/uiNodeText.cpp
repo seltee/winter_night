@@ -99,9 +99,10 @@ void UINodeText::render(const ContextRender &context)
     if (!materialToUse || objectId == 0xffffffff)
         return;
 
+    static const Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
     auto state = renderer->getState();
     AffectingLights lights{};
-    materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * mModel, mModel, Matrix3x3::identity(), mesh->getDataType());
+    materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * mModel, mModel, Matrix3x3::identity(), uvModifier, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 
