@@ -23,7 +23,7 @@ namespace wne
 
         void update(float delta);
         void renderShadows();
-        void renderDepthShadow();
+        void renderDepthShadow(Vector3 &lightPosition);
         void renderDepth();
         void render();
         void calcSceneMVP();

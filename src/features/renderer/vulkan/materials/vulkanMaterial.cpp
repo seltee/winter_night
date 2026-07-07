@@ -40,6 +40,7 @@ void VulkanMaterial::bindDepthShadow(
     const Matrix4x4 &mMVP,
     const Matrix3x3 &mNormal,
     const UVData &uvData,
+    bool isDoubleSided,
     ModelDataType dataType)
 {
     auto state = (VulkanRendererState *)renderer->getState();
@@ -48,7 +49,7 @@ void VulkanMaterial::bindDepthShadow(
         return;
 
     AffectingLights lights{};
-    selectPipelineShadowDepth(dataType);
+    selectPipelineShadowDepth(dataType, isDoubleSided);
     selectDescriptorDepthShadow(dataType, cascadeData);
     cascadeData->updateObjectData(objectId, mMVP);
     setPCData(objectId, lights, uvData);
@@ -98,7 +99,7 @@ void VulkanMaterial::selectPipelineColor(ModelDataType dataType)
 {
 }
 
-void VulkanMaterial::selectPipelineShadowDepth(ModelDataType dataType)
+void VulkanMaterial::selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided)
 {
 }
 

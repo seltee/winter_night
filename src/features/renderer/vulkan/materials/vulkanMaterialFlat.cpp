@@ -27,9 +27,9 @@ void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType)
     vulkanUtils->enablePipelineColorByType(dataType, colorBlending, flagIsLighted);
 }
 
-void VulkanMaterialFlat::selectPipelineShadowDepth(ModelDataType dataType)
+void VulkanMaterialFlat::selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided)
 {
-    vulkanUtils->enablePipelineShadowByType(dataType, flagIsMasked);
+    vulkanUtils->enablePipelineShadowByType(dataType, flagIsMasked, isDoubleSided);
 }
 
 void VulkanMaterialFlat::selectDescriptorColor(ModelDataType dataType)

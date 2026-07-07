@@ -64,7 +64,7 @@ bool VulkanPipelineTextured::setupParametred(VulkanRenderPass *renderPass, bool 
     }
 
     // if solid then it's solid stage and depth is prepared so op is equal
-    if (!buildPipeline(2, true, false, true, true, false, blending == ColorBlending::Solid, MSAASmapleCountBit, blending, renderPass))
+    if (!buildPipeline(2, true, false, true, true, true, false, blending == ColorBlending::Solid, MSAASmapleCountBit, blending, renderPass))
     {
         Logger::log << "Unable to build pipeline" << endl;
         return false;
@@ -89,7 +89,7 @@ bool VulkanPipelineTextured::setupDepth(VulkanRenderPass *depthPass, uint64 MSAA
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(1, false, true, true, false, false, false, MSAASmapleCountBit, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(1, false, true, true, false, true, false, false, MSAASmapleCountBit, ColorBlending::Solid, depthPass))
     {
         Logger::log << "Unable to build pipeline" << endl;
         return false;
@@ -121,7 +121,7 @@ bool VulkanPipelineTextured::setupMaskedDepth(VulkanRenderPass *depthPass, uint6
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(2, false, true, true, true, false, false, MSAASmapleCountBit, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(2, false, true, true, true, true, false, false, MSAASmapleCountBit, ColorBlending::Solid, depthPass))
     {
         Logger::log << "Unable to build pipeline" << endl;
         return false;
@@ -130,7 +130,7 @@ bool VulkanPipelineTextured::setupMaskedDepth(VulkanRenderPass *depthPass, uint6
     return true;
 }
 
-bool VulkanPipelineTextured::setupDepthShadow(VulkanRenderPass *depthPass)
+bool VulkanPipelineTextured::setupDepthShadow(VulkanRenderPass *depthPass, bool isDoubleSided)
 {
     if (!buildShaderDepth())
     {
@@ -146,7 +146,7 @@ bool VulkanPipelineTextured::setupDepthShadow(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(1, false, true, true, false, false, false, 1, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(1, false, true, true, false, !isDoubleSided, false, false, 1, ColorBlending::Solid, depthPass))
     {
         Logger::log << "Unable to build pipeline" << endl;
         return false;
@@ -155,7 +155,7 @@ bool VulkanPipelineTextured::setupDepthShadow(VulkanRenderPass *depthPass)
     return true;
 }
 
-bool VulkanPipelineTextured::setupMaskedDepthShadow(VulkanRenderPass *depthPass)
+bool VulkanPipelineTextured::setupMaskedDepthShadow(VulkanRenderPass *depthPass, bool isDoubleSided)
 {
     if (!buildShaderMaskedDepth())
     {
@@ -178,7 +178,7 @@ bool VulkanPipelineTextured::setupMaskedDepthShadow(VulkanRenderPass *depthPass)
     }
 
     // mask needs fragment shader otherwise only vertex depth needed
-    if (!buildPipeline(2, false, true, true, true, false, false, 1, ColorBlending::Solid, depthPass))
+    if (!buildPipeline(2, false, true, true, true, !isDoubleSided, false, false, 1, ColorBlending::Solid, depthPass))
     {
         Logger::log << "Unable to build pipeline" << endl;
         return false;
@@ -209,7 +209,7 @@ bool VulkanPipelineTextured::setupAtmosphere(VulkanRenderPass *renderPass, uint6
         return false;
     }
 
-    if (!buildPipeline(2, true, false, false, true, true, false, MSAASmapleCountBit, ColorBlending::Solid, renderPass))
+    if (!buildPipeline(2, true, false, false, true, true, true, false, MSAASmapleCountBit, ColorBlending::Solid, renderPass))
     {
         Logger::log << "Unable to build pipeline" << endl;
         return false;
@@ -294,6 +294,7 @@ bool VulkanPipelineTextured::buildPipeline(
     bool enableDepthWrite,
     bool enableDepthTest,
     bool enableSampler,
+    bool faceCooling,
     bool reverseFaceCooling,
     bool opEqual,
     uint64 MSAASmapleCountBit,
@@ -370,7 +371,7 @@ bool VulkanPipelineTextured::buildPipeline(
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = reverseFaceCooling ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_BACK_BIT;
+    rasterizer.cullMode = faceCooling ? (reverseFaceCooling ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_BACK_BIT) : VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.depthBiasConstantFactor = 0.0f; // Optional

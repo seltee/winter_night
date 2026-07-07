@@ -31,7 +31,7 @@ void Actor::updateRenderFlag(ActorCamera *camera)
     }
 }
 
-void Actor::renderDepthShadow()
+void Actor::renderDepthShadow(Vector3 &lightPosition)
 {
 }
 

@@ -14,7 +14,7 @@ namespace wne
     class WNE_API VulkanLightDirectional : public LightDirectional
     {
     public:
-            VulkanLightDirectional(VulkanUtils *vulkanUtils);
+        VulkanLightDirectional(VulkanUtils *vulkanUtils);
         ~VulkanLightDirectional();
 
         void renderShadows(Renderer *renderer, Scene *scene, ActorCamera *camera) override final;
@@ -36,5 +36,7 @@ namespace wne
 
         std::vector<std::unique_ptr<VulkanLightCascadeData>> cascades;
         Matrix4x4 mVP = Matrix4x4::identity();
+
+        Vector3 projectionPosition = {};
     };
 };

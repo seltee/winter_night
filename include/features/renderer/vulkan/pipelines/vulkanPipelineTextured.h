@@ -27,8 +27,8 @@ namespace wne
         bool setupParametred(VulkanRenderPass *renderPass, bool enableLights, ColorBlending blending, uint64 MSAASmapleCountBit);
         bool setupDepth(VulkanRenderPass *depthPass, uint64 MSAASmapleCountBit);
         bool setupMaskedDepth(VulkanRenderPass *depthPass, uint64 MSAASmapleCountBit);
-        bool setupDepthShadow(VulkanRenderPass *depthPass);
-        bool setupMaskedDepthShadow(VulkanRenderPass *depthPass);
+        bool setupDepthShadow(VulkanRenderPass *depthPass, bool isDoubleSided);
+        bool setupMaskedDepthShadow(VulkanRenderPass *depthPass, bool isDoubleSided);
         bool setupAtmosphere(VulkanRenderPass *renderPass, uint64 MSAASmapleCountBit);
 
         VulkanDescriptorSetLayout *getDescriptorSetLayoutPipeline() override final;
@@ -46,6 +46,7 @@ namespace wne
             bool enableDepthWrite,
             bool enableDepthTest,
             bool enableSampler,
+            bool faceCooling,
             bool reverseFaceCooling,
             bool opEqual,
             uint64 MSAASmapleCountBit,

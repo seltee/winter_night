@@ -26,7 +26,7 @@ namespace wne
         virtual void updateRenderFlag(ActorCamera *camera);
 
         // build depth buffer for light's shadow
-        virtual void renderDepthShadow();
+        virtual void renderDepthShadow(Vector3 &lightPosition);
 
         // build depth buffer
         virtual void renderDepth();
@@ -51,9 +51,9 @@ namespace wne
             return isShadowEnabled;
         }
 
-        inline void setShadow(bool isEnabled)
+        inline void setShadowEnabled(bool state)
         {
-            isShadowEnabled = isEnabled;
+            isShadowEnabled = state;
         }
 
         inline void destroy()

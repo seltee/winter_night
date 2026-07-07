@@ -32,6 +32,7 @@ namespace wne
             const Matrix4x4 &mMVP,
             const Matrix3x3 &mNormal,
             const UVData &uvData,
+            bool isDoubleSided,
             ModelDataType dataType) override final;
         void bindDepth(
             uint64 objectId,
@@ -51,7 +52,7 @@ namespace wne
 
         virtual void selectPipelineDepth(ModelDataType dataType);
         virtual void selectPipelineColor(ModelDataType dataType);
-        virtual void selectPipelineShadowDepth(ModelDataType dataType);
+        virtual void selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided);
 
         virtual void selectDescriptorColor(ModelDataType dataType);
         virtual void selectDescriptorDepth(ModelDataType dataType);

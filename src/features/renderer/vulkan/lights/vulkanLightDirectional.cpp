@@ -46,7 +46,7 @@ void VulkanLightDirectional::renderShadows(Renderer *renderer, Scene *scene, Act
             VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
             VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
         vulkanUtils->getCurrentCommandBuffer()->beginDepthPass(depthPass, frameBuffer->getFrameBuffer(), resolition, resolition);
-        scene->renderDepthShadow();
+        scene->renderDepthShadow(projectionPosition);
         vulkanUtils->getCurrentCommandBuffer()->endPass();
     }
 }
@@ -86,7 +86,7 @@ void VulkanLightDirectional::prepareForRender(const Vector3 &cameraPosition)
         shadowId = vulkanUtils->getShadowMaps()->registerShadowMap(cascades[0]->getDepthBuffer());
 
         Matrix4x4 mProjection = makeOrthographicProjectionMatrix(-80.0f, 80.0f, 80.0f, -80.0f, 0.0f, 160.0f);
-        Vector3 projectionPosition = cameraPosition + realDirection.xyz() * 80.0f;
+        projectionPosition = cameraPosition + realDirection.xyz() * 80.0f;
         Matrix4x4 model = Matrix4x4::translation(projectionPosition);
         model = model * Matrix4x4(lookAt(projectionPosition, cameraPosition));
         Matrix4x4 invModelMatrix = inverse(model);

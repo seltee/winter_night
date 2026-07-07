@@ -155,9 +155,9 @@ namespace wne
                 vulkanPipelines->enablePipelineTextured(currentCommandBuffer, isLightEnabled, blending);
         }
 
-        inline void enablePipelineShadowByType(ModelDataType dataType, bool isMasked)
+        inline void enablePipelineShadowByType(ModelDataType dataType, bool isMasked, bool isDoubleSided)
         {
-            vulkanPipelines->enablePipelineTexturedShadowDepth(currentCommandBuffer, isMasked);
+            vulkanPipelines->enablePipelineTexturedShadowDepth(currentCommandBuffer, isMasked, isDoubleSided);
         }
 
         inline void enablePipelineAtmosphere()

@@ -78,6 +78,7 @@ int main()
     actorSprite->setMaterial(materialExplosion);
     actorSprite->setScale(6.0f);
     actorSprite->setPosition(0.0f, 16.0f, 12.0f);
+    actorSprite->setShadowEnabled(true);
     actorSprite->setShadowRenderingMode(wne::ActorSprite::ShadowRenderingMode::FromLight);
 
     auto actorSpriteGoblin = scene->createActor<wne::ActorSprite>();

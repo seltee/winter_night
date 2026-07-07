@@ -35,7 +35,7 @@ namespace wne
 
         float getBoundingRadius() override final;
 
-        void renderDepthShadow() override final;
+        void renderDepthShadow(Vector3 &lightPosition) override final;
         void renderDepth() override final;
         void renderColor() override final;
 

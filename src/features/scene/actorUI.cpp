@@ -151,7 +151,6 @@ void ActorUI::update(float delta)
 
     if (accept && selectedNode)
     {
-        Logger::log << "BANG " << endl;
         selectedNode->pressLeftMouseButton();
     }
     else if (clickRegistered)

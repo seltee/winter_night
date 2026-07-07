@@ -16,7 +16,7 @@ namespace wne
 
         void setMaterial(std::shared_ptr<Material> material);
 
-        void renderDepthShadow() override final;
+        void renderDepthShadow(Vector3 &lightPosition) override final;
         void renderDepth() override final;
         void renderColor() override final;
 

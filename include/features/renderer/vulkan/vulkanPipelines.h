@@ -37,7 +37,7 @@ namespace wne
 
         void enablePipelineColored(VulkanCommandBuffer *commandBuffer, bool isDepthRendering);
         void enablePipelineTexturedDepth(VulkanCommandBuffer *commandBuffer, bool isMasked);
-        void enablePipelineTexturedShadowDepth(VulkanCommandBuffer *commandBuffer, bool isMasked);
+        void enablePipelineTexturedShadowDepth(VulkanCommandBuffer *commandBuffer, bool isMasked, bool isDoubleSided);
         void enablePipelineTextured(VulkanCommandBuffer *commandBuffer, bool isLightEnabled, ColorBlending blending);
         void enablePipelineAtmosphere(VulkanCommandBuffer *commandBuffer);
 
@@ -62,8 +62,10 @@ namespace wne
         std::unique_ptr<VulkanPipelineColored> vulkanPipelineColoredColor;
         std::unique_ptr<VulkanPipelineColored> vulkanPipelineColoredDepth;
 
-        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedShadowDepth;
-        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedMaskedShadowDepth;
+        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedSingleSideShadowDepth;
+        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedSingleSideMaskedShadowDepth;
+        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedDoubleSideShadowDepth;
+        std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedDoubleSideMaskedShadowDepth;
         std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedDepth;
         std::unique_ptr<VulkanPipelineTextured> vulkanPipelineTexturedMaskedDepth;
 

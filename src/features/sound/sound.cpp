@@ -73,7 +73,7 @@ void *Sound::createStreamData()
     }
 
     stb_vorbis_info info = stb_vorbis_get_info(data->ogg->vorbis);
-    data->ogg->isStereo = info.channels == 2 ? 2 : 1;
+    data->ogg->isStereo = info.channels == 2;
     return data;
 }
 

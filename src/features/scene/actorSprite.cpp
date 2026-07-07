@@ -54,14 +54,40 @@ void ActorSprite::setMaterial(std::shared_ptr<Material> material)
     this->material = std::move(material);
 }
 
-void ActorSprite::renderDepthShadow()
+void ActorSprite::renderDepthShadow(Vector3 &lightPosition)
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || !currentScene || objectId == 0xffffffff)
         return;
 
     auto state = renderer->getState();
-    materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
+    if (shadowRenderingMode == ShadowRenderingMode::FromCamera)
+    {
+        materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), uvModifier, true, mesh->getDataType());
+    }
+    else if (shadowRenderingMode == ShadowRenderingMode::FromLight)
+    {
+        Matrix4x4 mShadowModel;
+        if (parent)
+        {
+            Matrix4x4 translation = Matrix4x4::translation(position);
+            Matrix4x4 mPosition = parent->getModelMatrix() * translation;
+            Vector4 absolutePosition = mPosition * Vector4(0, 0, 0, 1.0f);
+            absolutePosition = absolutePosition / absolutePosition.w;
+
+            Matrix4x4 newShadowModel = Matrix4x4::translation(absolutePosition);
+            newShadowModel = newShadowModel * Matrix4x4(lookAt(absolutePosition.xyz(), state->getCameraPosition()));
+            mShadowModel = newShadowModel * Matrix4x4::scale(scale);
+        }
+        else
+        {
+            Matrix4x4 newShadowModel = Matrix4x4::translation(position);
+            newShadowModel = newShadowModel * Matrix4x4(lookAt(position, lightPosition));
+            mShadowModel = newShadowModel * Matrix4x4::scale(scale);
+        }
+
+        materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * mShadowModel, getNormalMatrix(), uvModifier, false, mesh->getDataType());
+    }
     mesh->render(renderer->getFrameData());
 }
 
@@ -86,11 +112,6 @@ void ActorSprite::renderColor()
     AffectingLights lights = materialToUse->isLighted() ? currentScene->collectAffectingLights(getPosition(), 0.0f) : AffectingLights{};
     materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
     mesh->render(renderer->getFrameData());
-}
-
-void ActorSprite::setShadowRenderingMode(ShadowRenderingMode shadowRenderingMode)
-{
-    this->shadowRenderingMode = shadowRenderingMode;
 }
 
 void ActorSprite::setFrame(uint frame)

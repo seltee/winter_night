@@ -32,6 +32,7 @@ namespace wne
             const Matrix4x4 &mMVP,
             const Matrix3x3 &mNormal,
             const UVData &uvData,
+            bool isDoubleSided,
             ModelDataType dataType);
 
         // bind for depth render

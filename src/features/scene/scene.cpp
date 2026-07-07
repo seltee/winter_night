@@ -65,13 +65,13 @@ void Scene::renderShadows()
     }
 }
 
-void Scene::renderDepthShadow()
+void Scene::renderDepthShadow(Vector3 &lightPosition)
 {
     // shadow depth pass
     for (const auto &object : actors)
     {
         if (object->hasShadow() && object->isVisible())
-            object->renderDepthShadow();
+            object->renderDepthShadow(lightPosition);
     }
 }
 

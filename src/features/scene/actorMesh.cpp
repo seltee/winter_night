@@ -20,14 +20,14 @@ void ActorMesh::setMaterial(std::shared_ptr<Material> material)
     this->material = std::move(material);
 }
 
-void ActorMesh::renderDepthShadow()
+void ActorMesh::renderDepthShadow(Vector3 &lightPosition)
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || !currentScene || objectId == 0xffffffff)
         return;
 
     auto state = renderer->getState();
-    materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
+    materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), uvModifier, false, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 

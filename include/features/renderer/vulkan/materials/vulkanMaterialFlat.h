@@ -15,7 +15,7 @@ namespace wne
 
         void selectPipelineDepth(ModelDataType dataType) override final;
         void selectPipelineColor(ModelDataType dataType) override final;
-        void selectPipelineShadowDepth(ModelDataType dataType) override final;
+        void selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided) override final;
         void selectDescriptorColor(ModelDataType dataType) override final;
         void selectDescriptorDepth(ModelDataType dataType) override final;
         void selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData) override final;

@@ -147,14 +147,14 @@ float ActorTerrain::getBoundingRadius()
     return boundingRadius;
 }
 
-void ActorTerrain::renderDepthShadow()
+void ActorTerrain::renderDepthShadow(Vector3 &lightPosition)
 {
     Material *materialToUse = material ? material.get() : renderer->getDefaultMaterial().get();
     if (!materialToUse || !mesh || !currentScene || objectId == 0xffffffff)
         return;
 
     auto state = renderer->getState();
-    materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
+    materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), uvModifier, false, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 

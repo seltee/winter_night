@@ -25,11 +25,10 @@ namespace wne
         const Matrix4x4 &getModelMatrix();
 
         void update(float delta) override final;
-        void renderDepthShadow() override final;
+        void renderDepthShadow(Vector3 &lightPosition) override final;
         void renderDepth() override final;
         void renderColor() override final;
 
-        void setShadowRenderingMode(ShadowRenderingMode shadowRenderingMode);
         void setFrame(uint frame);
         void updateUV();
 
@@ -71,6 +70,16 @@ namespace wne
         inline uint getFrame()
         {
             return frame;
+        }
+
+        inline void setShadowRenderingMode(ShadowRenderingMode shadowRenderingMode)
+        {
+            this->shadowRenderingMode = shadowRenderingMode;
+        }
+
+        inline ShadowRenderingMode getShadowRenderingMode()
+        {
+            return shadowRenderingMode;
         }
 
     protected:
