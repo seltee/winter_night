@@ -3,6 +3,8 @@
 #include "features/renderer/vulkan/vulkanDescriptorPool.h"
 #include "features/renderer/vulkan/lights/vulkanLightCascadeData.h"
 #include "features/renderer/vulkan/vulkanDefines.h"
+#include "features/renderer/vulkan/vulkanRendererState.h"
+#include "features/renderer/vulkan/rendererVulkan.h"
 #include "features/logger/logger.h"
 #include "vulkan/vulkan.h"
 #include <array>
@@ -15,6 +17,62 @@ VulkanMaterialFlat::VulkanMaterialFlat(VulkanUtils *vulkanUtils) : VulkanMateria
 
 VulkanMaterialFlat::~VulkanMaterialFlat()
 {
+}
+
+void VulkanMaterialFlat::bindDepthShadow(
+    uint64 objectId, Renderer *renderer,
+    const Matrix4x4 &mMVP,
+    const Matrix3x3 &mNormal,
+    const UVData &uvData,
+    bool isDoubleSided,
+    ModelDataType dataType)
+{
+    auto state = (VulkanRendererState *)renderer->getState();
+    VulkanLightCascadeData *cascadeData = state->getVulkanLightCascadeData();
+    if (dataType == ModelDataType::Unknown || !cascadeData)
+        return;
+
+    AffectingLights lights{};
+    selectPipelineShadowDepth(dataType, isDoubleSided);
+    selectDescriptorDepthShadow(dataType, cascadeData);
+    cascadeData->updateObjectData(objectId, mMVP);
+    setPCData(objectId, lights, uvData);
+}
+
+void VulkanMaterialFlat::bindDepth(
+    uint64 objectId,
+    const Matrix4x4 &mMVP,
+    const Matrix4x4 &mModel,
+    const Matrix3x3 &mNormal,
+    const UVData &uvData,
+    ModelDataType dataType)
+{
+    if (dataType == ModelDataType::Unknown)
+        return;
+
+    AffectingLights lights{};
+    selectPipelineDepth(dataType);
+    selectDescriptorDepth(dataType);
+    vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
+    setPCData(objectId, lights, uvData);
+}
+
+void VulkanMaterialFlat::bindColor(
+    uint64 objectId,
+    const AffectingLights &lights,
+    const Matrix4x4 &mMVP,
+    const Matrix4x4 &mModel,
+    const Matrix3x3 &mNormal,
+    const UVData &uvData,
+    ModelDataType dataType)
+{
+    if (dataType == ModelDataType::Unknown)
+        return;
+
+    selectPipelineColor(dataType);
+    selectDescriptorColor(dataType);
+    vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
+    setPCData(objectId, lights, uvData);
 }
 
 void VulkanMaterialFlat::selectPipelineDepth(ModelDataType dataType)
@@ -182,4 +240,9 @@ VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
     vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
 
     return descriptorSet;
+}
+
+void VulkanMaterialFlat::setAlbedoTexture(std::shared_ptr<Texture> albedoTexture)
+{
+    this->albedoTexture = albedoTexture;
 }

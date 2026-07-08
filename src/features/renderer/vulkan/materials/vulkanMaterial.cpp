@@ -19,10 +19,17 @@ VulkanMaterial::VulkanMaterial(VulkanUtils *vulkanUtils)
     this->vulkanUtils = vulkanUtils;
 }
 
-std::shared_ptr<Material> VulkanMaterial::createFlat(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture)
+std::shared_ptr<MaterialFlat> VulkanMaterial::createFlat(VulkanUtils *vulkanUtils)
 {
     std::shared_ptr<VulkanMaterialFlat> material = std::make_shared<VulkanMaterialFlat>(vulkanUtils);
-    material->setAlbedo(texture);
+    material->rebuild();
+    return material;
+}
+
+std::shared_ptr<MaterialFlat> VulkanMaterial::createFlat(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture)
+{
+    std::shared_ptr<VulkanMaterialFlat> material = std::make_shared<VulkanMaterialFlat>(vulkanUtils);
+    material->setAlbedoTexture(texture);
     material->rebuild();
     return material;
 }
@@ -33,62 +40,6 @@ std::shared_ptr<Material> VulkanMaterial::createAtmosphere(VulkanUtils *vulkanUt
     material->setAtmosphereTexture(texture);
     material->rebuild();
     return material;
-}
-
-void VulkanMaterial::bindDepthShadow(
-    uint64 objectId, Renderer *renderer,
-    const Matrix4x4 &mMVP,
-    const Matrix3x3 &mNormal,
-    const UVData &uvData,
-    bool isDoubleSided,
-    ModelDataType dataType)
-{
-    auto state = (VulkanRendererState *)renderer->getState();
-    VulkanLightCascadeData *cascadeData = state->getVulkanLightCascadeData();
-    if (dataType == ModelDataType::Unknown || !cascadeData)
-        return;
-
-    AffectingLights lights{};
-    selectPipelineShadowDepth(dataType, isDoubleSided);
-    selectDescriptorDepthShadow(dataType, cascadeData);
-    cascadeData->updateObjectData(objectId, mMVP);
-    setPCData(objectId, lights, uvData);
-}
-
-void VulkanMaterial::bindDepth(
-    uint64 objectId,
-    const Matrix4x4 &mMVP,
-    const Matrix4x4 &mModel,
-    const Matrix3x3 &mNormal,
-    const UVData &uvData,
-    ModelDataType dataType)
-{
-    if (dataType == ModelDataType::Unknown)
-        return;
-
-    AffectingLights lights{};
-    selectPipelineDepth(dataType);
-    selectDescriptorDepth(dataType);
-    vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
-    setPCData(objectId, lights, uvData);
-}
-
-void VulkanMaterial::bindColor(
-    uint64 objectId,
-    const AffectingLights &lights,
-    const Matrix4x4 &mMVP,
-    const Matrix4x4 &mModel,
-    const Matrix3x3 &mNormal,
-    const UVData &uvData,
-    ModelDataType dataType)
-{
-    if (dataType == ModelDataType::Unknown)
-        return;
-
-    selectPipelineColor(dataType);
-    selectDescriptorColor(dataType);
-    vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
-    setPCData(objectId, lights, uvData);
 }
 
 void VulkanMaterial::selectPipelineDepth(ModelDataType dataType)
@@ -115,6 +66,6 @@ void VulkanMaterial::selectDescriptorDepthShadow(ModelDataType dataType, VulkanL
 {
 }
 
-void VulkanMaterial::setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData)
+void VulkanMaterial::setPCData(uint64 objectId, const AffectingLights &lights, const Material::UVData &uvData)
 {
 }

@@ -38,7 +38,8 @@ namespace wne
         std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model) override final;
         std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image) override final;
         std::shared_ptr<Text> createText(std::shared_ptr<Font> font) override final;
-        std::shared_ptr<Material> createFlatMaterial(std::shared_ptr<Texture> texture) override final;
+        std::shared_ptr<MaterialFlat> createFlatMaterial() override final;
+        std::shared_ptr<MaterialFlat> createFlatMaterial(std::shared_ptr<Texture> texture) override final;
         std::shared_ptr<Material> createAtmosphereMaterial(std::shared_ptr<Texture> texture) override final;
 
         std::shared_ptr<LightDirectional> createLightDirectional() override final;

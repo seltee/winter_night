@@ -4,6 +4,7 @@
 #include "features/renderer/mesh.h"
 #include "features/renderer/texture.h"
 #include "features/renderer/material.h"
+#include "features/renderer/materialFlat.h"
 #include "features/renderer/rendererState.h"
 #include "features/renderer/text.h"
 #include "features/scene/scene.h"
@@ -30,7 +31,8 @@ namespace wne
         virtual std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model);
         virtual std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image);
         virtual std::shared_ptr<Text> createText(std::shared_ptr<Font> font);
-        virtual std::shared_ptr<Material> createFlatMaterial(std::shared_ptr<Texture> texture);
+        virtual std::shared_ptr<MaterialFlat> createFlatMaterial();
+        virtual std::shared_ptr<MaterialFlat> createFlatMaterial(std::shared_ptr<Texture> texture);
         virtual std::shared_ptr<Material> createAtmosphereMaterial(std::shared_ptr<Texture> texture);
 
         virtual void *getFrameData();

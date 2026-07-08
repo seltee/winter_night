@@ -147,7 +147,12 @@ std::shared_ptr<Text> RendererVulkan::createText(std::shared_ptr<Font> font)
     return VulkanText::create(font, instance->getVulkanUtils());
 }
 
-std::shared_ptr<Material> RendererVulkan::createFlatMaterial(std::shared_ptr<Texture> texture)
+std::shared_ptr<MaterialFlat> RendererVulkan::createFlatMaterial()
+{
+    return VulkanMaterial::createFlat(instance->getVulkanUtils());
+}
+
+std::shared_ptr<MaterialFlat> RendererVulkan::createFlatMaterial(std::shared_ptr<Texture> texture)
 {
     return VulkanMaterial::createFlat(instance->getVulkanUtils(), texture);
 }

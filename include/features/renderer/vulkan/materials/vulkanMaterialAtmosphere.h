@@ -7,11 +7,35 @@ namespace wne
 {
     class VulkanLightCascadeData;
 
-    class WNE_API VulkanMaterialAtmosphere : public VulkanMaterial
+    class WNE_API VulkanMaterialAtmosphere : public Material, VulkanMaterial
     {
     public:
         VulkanMaterialAtmosphere(VulkanUtils *vulkanUtils);
         ~VulkanMaterialAtmosphere();
+
+        void bindDepthShadow(
+            uint64 objectId,
+            Renderer *renderer,
+            const Matrix4x4 &mMVP,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            bool isDoubleSided,
+            ModelDataType dataType) override final;
+        void bindDepth(
+            uint64 objectId,
+            const Matrix4x4 &mMVP,
+            const Matrix4x4 &mModel,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            ModelDataType dataType) override final;
+        void bindColor(
+            uint64 objectId,
+            const AffectingLights &lights,
+            const Matrix4x4 &mMVP,
+            const Matrix4x4 &mModel,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            ModelDataType dataType) override final;
 
         void selectPipelineColor(ModelDataType dataType) override final;
         void selectDescriptorColor(ModelDataType dataType) override final;

@@ -62,12 +62,17 @@ public:
         auto boxModel = wne::Primitives::createBox(1.0f);
         boxMesh = renderer->createMesh(boxModel);
 
+        scoreSprite = scene->createActor<wne::ActorSprite>();
+        scoreText = renderer->createText(nullptr);
+
         addMaterialColor(0xffc25e84);
         addMaterialColor(0xffb15dd6);
         addMaterialColor(0xff916fff);
         addMaterialColor(0xff7196ff);
         addMaterialColor(0xff5fc7ff);
         addMaterialColor(0xff71f8f9);
+
+        scoreMaterial = renderer->createFlatMaterial();
     }
 
     void update(float delta, bool isGameStatic)
@@ -162,6 +167,8 @@ public:
             }
             blocks.clear();
         }
+        score = 0;
+        updateScore();
     }
 
     void genNextFigure()
@@ -523,6 +530,20 @@ public:
         score += destroed * 100 + (destroed - 1) * 200;
     }
 
+    void updateScore()
+    {
+        char scoreBuffer[32];
+        sprintf(scoreBuffer, "%i", score);
+        scoreText->setText(scoreBuffer);
+        scoreText->setFontSize(48);
+        scoreText->update();
+
+        scoreSprite->setPosition(9.6f, 17.0f, 0.0f);
+        scoreSprite->setScale(1.6f, 1.6f, 1.6f);
+        scoreMaterial->setAlbedoTexture(scoreText->getTexture());
+        scoreSprite->setMaterial(scoreMaterial);
+    }
+
 protected:
     std::shared_ptr<wne::WindowEvents> eventsSubscription;
     float timerMoveDown = 0.0f;
@@ -544,6 +565,10 @@ protected:
     std::shared_ptr<wne::Material> nextFigureMaterial;
 
     std::vector<FigureBlock> activeFigure;
+
+    std::shared_ptr<wne::ActorSprite> scoreSprite;
+    std::shared_ptr<wne::Text> scoreText;
+    std::shared_ptr<wne::MaterialFlat> scoreMaterial;
 };
 
 int main()

@@ -1,17 +1,42 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
+#include "features/renderer/materialFlat.h"
 #include "core/api.h"
 
 namespace wne
 {
     class VulkanLightCascadeData;
 
-    class WNE_API VulkanMaterialFlat : public VulkanMaterial
+    class WNE_API VulkanMaterialFlat : public MaterialFlat, VulkanMaterial
     {
     public:
         VulkanMaterialFlat(VulkanUtils *vulkanUtils);
         ~VulkanMaterialFlat();
+
+        void bindDepthShadow(
+            uint64 objectId,
+            Renderer *renderer,
+            const Matrix4x4 &mMVP,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            bool isDoubleSided,
+            ModelDataType dataType) override final;
+        void bindDepth(
+            uint64 objectId,
+            const Matrix4x4 &mMVP,
+            const Matrix4x4 &mModel,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            ModelDataType dataType) override final;
+        void bindColor(
+            uint64 objectId,
+            const AffectingLights &lights,
+            const Matrix4x4 &mMVP,
+            const Matrix4x4 &mModel,
+            const Matrix3x3 &mNormal,
+            const UVData &uvData,
+            ModelDataType dataType) override final;
 
         void selectPipelineDepth(ModelDataType dataType) override final;
         void selectPipelineColor(ModelDataType dataType) override final;
@@ -19,13 +44,10 @@ namespace wne
         void selectDescriptorColor(ModelDataType dataType) override final;
         void selectDescriptorDepth(ModelDataType dataType) override final;
         void selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData) override final;
-        void setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData) override final;
+        void setPCData(uint64 objectId, const AffectingLights &lights, const Material::UVData &uvData) override final;
         void rebuild() override final;
 
-        inline void setAlbedo(std::shared_ptr<Texture> texture)
-        {
-            albedoTexture = texture;
-        }
+        void setAlbedoTexture(std::shared_ptr<Texture> albedoTexture) override final;
 
     protected:
         std::shared_ptr<Texture> albedoTexture;

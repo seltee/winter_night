@@ -43,7 +43,12 @@ std::shared_ptr<Text> Renderer::createText(std::shared_ptr<Font> font)
     return nullptr;
 }
 
-std::shared_ptr<Material> Renderer::createFlatMaterial(std::shared_ptr<Texture> texture)
+std::shared_ptr<MaterialFlat> Renderer::createFlatMaterial()
+{
+    return nullptr;
+}
+
+std::shared_ptr<MaterialFlat> Renderer::createFlatMaterial(std::shared_ptr<Texture> texture)
 {
     return nullptr;
 }
