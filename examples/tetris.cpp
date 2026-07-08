@@ -571,6 +571,8 @@ int main()
                             field->clear();
                             field->genNextFigure();
                             field->spawnNextFigure();
+                            field->genNextFigure();
+                        
                             uiMainMenu->setVisibility(false);
                             gameState = GameState::Playing;
                         }
