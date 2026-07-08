@@ -393,6 +393,7 @@ public:
         activeFigure.clear();
         spawnNextFigure();
         genNextFigure();
+        doExplosions();
     }
 
     void rotateActiveFigure()
@@ -482,6 +483,46 @@ public:
         return dis(gen);
     }
 
+    void doExplosions()
+    {
+        int destroed = 0;
+        for (int y = 0; y < FIELD_HEIGHT; y++)
+        {
+            int lineCounter = 0;
+            for (auto &figureElement : blocks)
+            {
+                if (y == figureElement.y)
+                    lineCounter++;
+            }
+
+            if (lineCounter == FIELD_WIDTH)
+            {
+                for (auto &figureElement : blocks)
+                {
+                    if (figureElement.y == y)
+                        figureElement.block->destroy();
+                }
+
+                std::erase_if(blocks, [&](FigureBlock block)
+                              { return block.y == y; });
+
+                for (auto &figureElement : blocks)
+                {
+                    if (figureElement.y > y)
+                    {
+                        figureElement.y--;
+                        setToGrid(figureElement.block, figureElement.x, figureElement.y);
+                    }
+                }
+
+                destroed++;
+                y--;
+            }
+        }
+
+        score += destroed * 100 + (destroed - 1) * 200;
+    }
+
 protected:
     std::shared_ptr<wne::WindowEvents> eventsSubscription;
     float timerMoveDown = 0.0f;
@@ -491,6 +532,8 @@ protected:
     bool buttonMoveDownPressed = false;
     bool buttonMoveLeftPressed = false;
     bool buttonMoveRightPressed = false;
+
+    unsigned int score = 0;
 
     std::shared_ptr<wne::Scene> scene;
     std::shared_ptr<wne::Mesh> boxMesh;
