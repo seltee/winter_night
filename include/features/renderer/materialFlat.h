@@ -7,5 +7,6 @@ namespace wne
     {
     public:
         virtual void setAlbedoTexture(std::shared_ptr<Texture> albedoTexture);
+        virtual std::shared_ptr<Texture> getAlbedoTexture();
     };
 };

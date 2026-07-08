@@ -197,8 +197,15 @@ void VulkanMaterialFlat::rebuild()
 
 VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
 {
+    auto albedoImageLayout = static_cast<VulkanTexture *>(albedoTexture.get())->getImageLayout();
+    auto albedoImageView = static_cast<VulkanTexture *>(albedoTexture.get())->getImageView()->getImageView();
     if (descriptorSet)
-        return descriptorSet;
+    {
+        // if texture has the same image layout and view return descriptor
+        if (currentImageLayout == albedoImageLayout && currentImageView == albedoImageView)
+            return descriptorSet;
+    }
+
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
     auto pipeline = vulkanUtils->getCurrentPipeline();
 
@@ -224,8 +231,8 @@ VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
 
     // albedo sampler
     VkDescriptorImageInfo imageInfo{};
-    imageInfo.imageLayout = (VkImageLayout)((VulkanTexture *)albedoTexture.get())->getImageLayout();
-    imageInfo.imageView = ((VulkanTexture *)albedoTexture.get())->getImageView()->getImageView();
+    imageInfo.imageLayout = static_cast<VkImageLayout>(albedoImageLayout);
+    imageInfo.imageView = albedoImageView;
     imageInfo.sampler = vulkanUtils->getSampler()->getTextureSampler();
 
     VkWriteDescriptorSet descriptorWrite{};
@@ -239,10 +246,18 @@ VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
 
     vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
 
+    currentImageLayout = imageInfo.imageLayout;
+    currentImageView = imageInfo.imageView;
+
     return descriptorSet;
 }
 
 void VulkanMaterialFlat::setAlbedoTexture(std::shared_ptr<Texture> albedoTexture)
 {
     this->albedoTexture = albedoTexture;
+}
+
+std::shared_ptr<Texture> VulkanMaterialFlat::getAlbedoTexture()
+{
+    return this->albedoTexture;
 }

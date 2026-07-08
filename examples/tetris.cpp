@@ -527,7 +527,8 @@ public:
             }
         }
 
-        score += destroed * 100 + (destroed - 1) * 200;
+        score += std::max(destroed * 100 + (destroed - 1) * 200, 0);
+        updateScore();
     }
 
     void updateScore()
@@ -535,12 +536,17 @@ public:
         char scoreBuffer[32];
         sprintf(scoreBuffer, "%i", score);
         scoreText->setText(scoreBuffer);
-        scoreText->setFontSize(48);
+        scoreText->setFontSize(64);
         scoreText->update();
 
+        float textTextureWidth = static_cast<float>(scoreText->getTexture()->getWidth());
+        float textTextureHeight = static_cast<float>(scoreText->getTexture()->getHeight());
+        float textScaleX = textTextureWidth / textTextureHeight;
+
         scoreSprite->setPosition(9.6f, 17.0f, 0.0f);
-        scoreSprite->setScale(1.6f, 1.6f, 1.6f);
+        scoreSprite->setScale(2.0f * textScaleX, 2.0f, 2.0f);
         scoreMaterial->setAlbedoTexture(scoreText->getTexture());
+        scoreMaterial->setColorBlending(wne::ColorBlending::Alpha);
         scoreSprite->setMaterial(scoreMaterial);
     }
 

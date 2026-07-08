@@ -67,7 +67,7 @@ void ActorUI::update(float delta)
             }
             else if (event.type == WindowEvents::WindowEventType::KEY_PRESS)
             {
-                Logger::log << event.key.scancode << endl;
+                // Logger::log << event.key.scancode << endl;
                 if (event.key.code == Key::ArrowUp)
                     moveUp = true;
                 if (event.key.code == Key::ArrowDown)

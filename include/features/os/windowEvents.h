@@ -10,7 +10,7 @@
 
 namespace wne
 {
-    class WindowEvents
+    class WNE_API WindowEvents
     {
     public:
         enum WindowEventType

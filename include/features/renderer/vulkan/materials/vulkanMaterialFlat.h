@@ -48,11 +48,15 @@ namespace wne
         void rebuild() override final;
 
         void setAlbedoTexture(std::shared_ptr<Texture> albedoTexture) override final;
+        std::shared_ptr<Texture> getAlbedoTexture() override final;
 
     protected:
         std::shared_ptr<Texture> albedoTexture;
         VkDescriptorSet descriptorSet = nullptr;
 
         VkDescriptorSet getDescriptorSetFlatTextured();
+
+        uint64 currentImageLayout = 0;
+        VkImageView currentImageView = nullptr;
     };
 };
