@@ -9,7 +9,6 @@
 
 std::shared_ptr<wne::UINodeButton> createButton(
     const char *label,
-    std::shared_ptr<wne::Font> font,
     const std::function<void(wne::UINodeButton *)> &action)
 {
     const wne::UINodeContainer::Decoration decorationNormal{
@@ -26,7 +25,7 @@ std::shared_ptr<wne::UINodeButton> createButton(
     return wne::UINodeButton::create(
         wne::UINodeContainer::create(
             wne::UINodeCenter::create(
-                wne::UINodeText::create(font, label, 70, 0xffbbbbbb),
+                wne::UINodeText::create(nullptr, label, 70, 0xffbbbbbb),
                 0, buttonHeight - 16
             ),
             buttonWidth, buttonHeight,
@@ -34,7 +33,7 @@ std::shared_ptr<wne::UINodeButton> createButton(
         ),
         wne::UINodeContainer::create(
             wne::UINodeCenter::create(
-                wne::UINodeText::create(font, label, 70, 0xffffffff),
+                wne::UINodeText::create(nullptr, label, 70, 0xffffffff),
                 0, buttonHeight - 16
             ),
             buttonWidth, buttonHeight,
@@ -109,6 +108,9 @@ public:
             }
         }
 
+        if (gameOver)
+            isGameStatic = true;
+
         if (isGameStatic)
             return;
 
@@ -169,6 +171,10 @@ public:
         }
         score = 0;
         updateScore();
+        gameOver = false;
+        timerMoveDown = 0.0f;
+        timerMoveLeft = 0.0f;
+        timerMoveRight = 0.0f;
     }
 
     void genNextFigure()
@@ -256,10 +262,18 @@ public:
             int x = 4 + nextFigureElement.x;
             int y = 21 - nextFigureElement.y;
 
-            auto actorBox = scene->createActor<wne::ActorMesh>(boxMesh);
-            actorBox->setMaterial(nextFigureMaterial);
-            activeFigure.push_back({x, y, actorBox});
-            setToGrid(actorBox, x, y);
+            if (!findAtPosition(x, y))
+            {
+                auto actorBox = scene->createActor<wne::ActorMesh>(boxMesh);
+                actorBox->setMaterial(nextFigureMaterial);
+                activeFigure.push_back({x, y, actorBox});
+                setToGrid(actorBox, x, y);
+            }
+            else
+            {
+                gameOver = true;
+                return;
+            }
         }
     }
 
@@ -401,6 +415,16 @@ public:
         spawnNextFigure();
         genNextFigure();
         doExplosions();
+    }
+
+    bool findAtPosition(int x, int y)
+    {
+        for (auto &figureElement : blocks)
+        {
+            if (figureElement.x == x && figureElement.y == y)
+                return true;
+        }
+        return false;
     }
 
     void rotateActiveFigure()
@@ -550,6 +574,11 @@ public:
         scoreSprite->setMaterial(scoreMaterial);
     }
 
+    bool isGameOver()
+    {
+        return gameOver;
+    }
+
 protected:
     std::shared_ptr<wne::WindowEvents> eventsSubscription;
     float timerMoveDown = 0.0f;
@@ -559,6 +588,8 @@ protected:
     bool buttonMoveDownPressed = false;
     bool buttonMoveLeftPressed = false;
     bool buttonMoveRightPressed = false;
+
+    bool gameOver = false;
 
     unsigned int score = 0;
 
@@ -594,7 +625,7 @@ int main()
     scene->setAmbientLight(0.6f, 0.6f, 0.6f);
 
     // images & textures
-    auto imageAtmosphere = wne::ImageAtmo::create("./atmosphere.jpg");
+    auto imageAtmosphere = wne::ImageAtmo::create("./atmosphereNight3.jpg");
     scene->setAtmosphere(
         renderer->createTexture(imageAtmosphere),
         renderer->createTexture(imageAtmosphere->getAtmosphereAsImage()));
@@ -640,7 +671,7 @@ int main()
         wne::UINodeCenter::create(
             wne::UINodeColumn::create(
                 {
-                    createButton("New Game", nullptr, 
+                    createButton("New Game", 
                         [&](wne::UINodeButton *button){
                             field->clear();
                             field->genNextFigure();
@@ -652,7 +683,7 @@ int main()
                         }
                     ),
                     wne::UINodeContainer::create(padding, padding),
-                    createButton("Quit", nullptr, 
+                    createButton("Quit", 
                         [&](wne::UINodeButton *button){
                             window->close();
                         }
@@ -662,10 +693,47 @@ int main()
         )
     );
 
+
+    auto uiGameOver = ui->createActor<wne::ActorUI>(window, 2560, 1440);
+    auto uiGameOverRoot = &uiGameOver->getRoot();
+    uiGameOver->setVisibility(false);
+
+    // clang-format off
+    uiGameOverRoot->setChild(
+        wne::UINodeCenter::create(
+            wne::UINodeColumn::create(
+                {
+                    wne::UINodeText::create(nullptr, "Game Over", 144, 0xfffffffff),
+                    wne::UINodeContainer::create(padding * 2, padding * 2),
+                    createButton("Restart", 
+                        [&](wne::UINodeButton *button){
+                            field->clear();
+                            field->genNextFigure();
+                            field->spawnNextFigure();
+                            field->genNextFigure();
+                        
+                            uiMainMenu->setVisibility(false);
+                            uiGameOver->setVisibility(false);
+                            gameState = GameState::Playing;
+                        }
+                    ),
+                },
+                wne::UINodeColumn::Layout::Middle,
+                wne::UINodeColumn::Position::Middle
+            )
+        )
+    );
+
     while (!window->isCloseRequested())
     {
         float delta = wne::Engine::getInstance()->update();
         field->update(delta, gameState!= GameState::Playing);
+
+
+        if (gameState == GameState::Playing && field->isGameOver()){
+            gameState = GameState::GameOver;
+            uiGameOver->setVisibility(true);
+        }
     }
 
     return 0;
