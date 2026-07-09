@@ -28,14 +28,12 @@ bool VulkanTexture::setup(void *pixels, uint32 width, uint32 height)
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
     if (textureImage)
     {
-        Logger::log << "Failed to destroy image" << endl;
-        // vkDestroyImage(device, textureImage, nullptr);
+        vulkanUtils->destroyImagePostponned(textureImage);
         textureImage = nullptr;
     }
     if (textureImageMemory)
     {
-        Logger::log << "Failed to destroy memory" << endl;
-        // vkFreeMemory(device, textureImageMemory, nullptr);
+        vulkanUtils->destroyDeviceMemoryPostponned(textureImageMemory);
         textureImageMemory = nullptr;
     }
 

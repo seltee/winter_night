@@ -374,6 +374,9 @@ void VulkanInstance::finishRendering()
 {
     uint currentFrame = vulkanUtils->getCurrentFrame();
     frames[currentFrame]->finishFrame(graphicsQueue, presentQueue);
+
+    vulkanUtils->incrementCurrentFrameNumber();
+    vulkanUtils->processPostponnedRemoval();
 }
 
 void VulkanInstance::waitIdle()

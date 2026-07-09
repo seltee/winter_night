@@ -26,6 +26,18 @@ namespace wne
     class VulkanUtils
     {
     public:
+        struct PostponnedImage
+        {
+            VkImage image;
+            uint64 frame;
+        };
+
+        struct PostponnedDeviceMemory
+        {
+            VkDeviceMemory deviceMemory;
+            uint64 frame;
+        };
+
         VulkanUtils(
             VulkanDevice *vulkanDevice,
             VulkanCommandPool *vulkanCommandPool,
@@ -74,11 +86,16 @@ namespace wne
 
         uint64 getVkSampleCountFlagBits(uint64 sampleCount);
 
+        void destroyImagePostponned(VkImage image);
+        void destroyDeviceMemoryPostponned(VkDeviceMemory deviceMemory);
+        void processPostponnedRemoval();
+
         inline void swapSets()
         {
             vulkanObjectBuffers->swap();
         }
 
+        // current in flight frame number, depends on max frames in flight
         inline uint getCurrentFrame()
         {
             return vulkanObjectBuffers->getFrameInFlight();
@@ -205,6 +222,17 @@ namespace wne
             vulkanPipelines->getDescriptorSets()->updateRadianceMap(radianceMap ? radianceMap : dummyTexture.get(), vulkanSampler.get());
         }
 
+        // global current frame number
+        inline uint64 getCurrentFrameNumber()
+        {
+            return currentFrameNumber;
+        }
+
+        inline void incrementCurrentFrameNumber()
+        {
+            currentFrameNumber++;
+        }
+
     protected:
         std::unique_ptr<VulkanDescriptorPool> vulkanDescriptorPool;
         std::unique_ptr<VulkanObjectBuffers> vulkanObjectBuffers;
@@ -231,5 +259,15 @@ namespace wne
         VulkanRenderPass *vulkanShadowDepthPass = nullptr;
 
         std::unique_ptr<VulkanTexture> dummyTexture;
+
+        uint64 currentFrameNumber = 0;
+
+        // destroyes image when it's not longer used in the frame rendering process
+        std::vector<PostponnedImage> postponnedRemovalImage;
+        std::mutex postponnedRemovalImageMutex;
+
+        // destroyes device memory when it's not longer used in the frame rendering process
+        std::vector<PostponnedDeviceMemory> postponnedRemovalDeviceMemory;
+        std::mutex postponnedRemovalDeviceMemoryMutex;
     };
 };

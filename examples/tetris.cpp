@@ -703,7 +703,7 @@ int main()
         wne::UINodeCenter::create(
             wne::UINodeColumn::create(
                 {
-                    wne::UINodeText::create(nullptr, "Game Over", 144, 0xfffffffff),
+                    wne::UINodeText::create(nullptr, "Game Over", 144, 0xffffffff),
                     wne::UINodeContainer::create(padding * 2, padding * 2),
                     createButton("Restart", 
                         [&](wne::UINodeButton *button){

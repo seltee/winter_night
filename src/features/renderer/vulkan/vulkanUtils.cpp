@@ -490,3 +490,40 @@ uint64 VulkanUtils::getVkSampleCountFlagBits(uint64 sampleCount)
         return VK_SAMPLE_COUNT_2_BIT;
     return VK_SAMPLE_COUNT_1_BIT;
 }
+
+void VulkanUtils::destroyImagePostponned(VkImage image)
+{
+    std::lock_guard<std::mutex> lock(postponnedRemovalImageMutex);
+
+    postponnedRemovalImage.push_back({image, currentFrameNumber + 2});
+}
+
+void VulkanUtils::destroyDeviceMemoryPostponned(VkDeviceMemory deviceMemory)
+{
+    std::lock_guard<std::mutex> lock(postponnedRemovalDeviceMemoryMutex);
+
+    postponnedRemovalDeviceMemory.push_back({deviceMemory, currentFrameNumber + 2});
+}
+
+void VulkanUtils::processPostponnedRemoval()
+{
+    std::lock_guard<std::mutex> lockImageRemoval(postponnedRemovalImageMutex);
+    std::erase_if(postponnedRemovalImage, [&](PostponnedImage image)
+                  { 
+                    if ( image.frame == currentFrameNumber)
+                    {
+                        //vkDestroyImage(device, image.image, nullptr);
+                        return true;
+                    }
+                return false; });
+
+    std::lock_guard<std::mutex> lockDeviceMemoryRemoval(postponnedRemovalDeviceMemoryMutex);
+    std::erase_if(postponnedRemovalDeviceMemory, [&](PostponnedDeviceMemory deviceMemory)
+                  { 
+                    if ( deviceMemory.frame == currentFrameNumber)
+                    {
+                        //vkFreeMemory(device, deviceMemory.deviceMemory, nullptr);
+                        return true;
+                    }
+                return false; });
+}
