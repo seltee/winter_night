@@ -3,6 +3,8 @@
 #include "features/loaders/fbx/fbxGeometry.h"
 #include "features/loaders/fbx/fbxModel.h"
 #include "features/loaders/fbx/fbxAnimationStack.h"
+#include "features/loaders/fbx/fbxAnimationLayer.h"
+#include "features/loaders/fbx/fbxAnimationCurveNode.h"
 #include "features/data/base3d.h"
 #include "features/data/file.h"
 #include <memory>

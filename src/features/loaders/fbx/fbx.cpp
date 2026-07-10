@@ -35,6 +35,8 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
     std::vector<FBXGeometry> geometries;
     std::vector<FBXModel> models;
     std::vector<FBXAnimationStack> animationStacks;
+    std::vector<FBXAnimationLayer> animationLayers;
+    std::vector<FBXAnimationCurveNode> animationCurveNodes;
 
     for (auto &geometryNode : objects->getChildrenByName("Geometry"))
         geometries.emplace_back(FBXGeometry(*geometryNode));
@@ -42,9 +44,11 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
         models.emplace_back(FBXModel(*modelNode));
     for (auto &animationStackNode : objects->getChildrenByName("AnimationStack"))
         animationStacks.emplace_back(FBXAnimationStack(*animationStackNode));
-    
-    // auto animationLayerNodes = objects->getChildrenByName("AnimationLayer");
-    // auto animationCurveNodeNodes = objects->getChildrenByName("AnimationCurveNode");
+    for (auto &animationLayer : objects->getChildrenByName("AnimationLayer"))
+        animationLayers.emplace_back(FBXAnimationLayer(*animationLayer));
+    for (auto &animationCurveNode : objects->getChildrenByName("AnimationCurveNode"))
+        animationCurveNodes.emplace_back(FBXAnimationCurveNode(*animationCurveNode));
+
     // auto animationCurveNodes = objects->getChildrenByName("AnimationCurve");
     // auto nodeAttributeNodes = objects->getChildrenByName("NodeAttribute");
     // auto poseNodes = objects->getChildrenByName("Pose");
