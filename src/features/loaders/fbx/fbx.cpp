@@ -34,13 +34,15 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
 
     std::vector<FBXGeometry> geometries;
     std::vector<FBXModel> models;
+    std::vector<FBXAnimationStack> animationStacks;
 
     for (auto &geometryNode : objects->getChildrenByName("Geometry"))
         geometries.emplace_back(FBXGeometry(*geometryNode));
-    for (auto &geometryNode : objects->getChildrenByName("Model"))
-        models.emplace_back(FBXModel(*geometryNode));
-
-    // auto animationStackNodes = objects->getChildrenByName("AnimationStack");
+    for (auto &modelNode : objects->getChildrenByName("Model"))
+        models.emplace_back(FBXModel(*modelNode));
+    for (auto &animationStackNode : objects->getChildrenByName("AnimationStack"))
+        animationStacks.emplace_back(FBXAnimationStack(*animationStackNode));
+    
     // auto animationLayerNodes = objects->getChildrenByName("AnimationLayer");
     // auto animationCurveNodeNodes = objects->getChildrenByName("AnimationCurveNode");
     // auto animationCurveNodes = objects->getChildrenByName("AnimationCurve");

@@ -24,6 +24,11 @@ namespace wne
             return type == 'D';
         }
 
+        inline bool isLong() const
+        {
+            return type == 'L';
+        }
+
         inline const char *asString() const
         {
 
@@ -40,6 +45,13 @@ namespace wne
                 return *((int *)(data.data()));
 
             return 0.0f;
+        }
+
+        inline uint64 asLong() const
+        {
+            if (type == 'L')
+                return *((uint64 *)(data.data()));
+            return 0;
         }
 
         uint8 type;

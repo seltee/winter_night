@@ -2,6 +2,7 @@
 #include "features/loaders/fbx/fbxNode.h"
 #include "features/loaders/fbx/fbxGeometry.h"
 #include "features/loaders/fbx/fbxModel.h"
+#include "features/loaders/fbx/fbxAnimationStack.h"
 #include "features/data/base3d.h"
 #include "features/data/file.h"
 #include <memory>
