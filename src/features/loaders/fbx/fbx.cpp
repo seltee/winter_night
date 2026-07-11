@@ -37,6 +37,8 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
     std::vector<FBXAnimationStack> animationStacks;
     std::vector<FBXAnimationLayer> animationLayers;
     std::vector<FBXAnimationCurveNode> animationCurveNodes;
+    std::vector<FBXAnimationCurve> animationCurves;
+    std::vector<FBXNodeAttribute> nodeAttributes;
 
     for (auto &geometryNode : objects->getChildrenByName("Geometry"))
         geometries.emplace_back(FBXGeometry(*geometryNode));
@@ -46,11 +48,13 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
         animationStacks.emplace_back(FBXAnimationStack(*animationStackNode));
     for (auto &animationLayer : objects->getChildrenByName("AnimationLayer"))
         animationLayers.emplace_back(FBXAnimationLayer(*animationLayer));
-    for (auto &animationCurveNode : objects->getChildrenByName("AnimationCurveNode"))
-        animationCurveNodes.emplace_back(FBXAnimationCurveNode(*animationCurveNode));
+    for (auto &animationCurveNodeNode : objects->getChildrenByName("AnimationCurveNode"))
+        animationCurveNodes.emplace_back(FBXAnimationCurveNode(*animationCurveNodeNode));
+    for (auto &animationCurveNode : objects->getChildrenByName("AnimationCurve"))
+        animationCurves.emplace_back(FBXAnimationCurve(*animationCurveNode));
+    for (auto &nodeAttributeNode : objects->getChildrenByName("NodeAttribute"))
+        nodeAttributes.emplace_back(FBXNodeAttribute(*nodeAttributeNode));
 
-    // auto animationCurveNodes = objects->getChildrenByName("AnimationCurve");
-    // auto nodeAttributeNodes = objects->getChildrenByName("NodeAttribute");
     // auto poseNodes = objects->getChildrenByName("Pose");
     // auto deformerNodes = objects->getChildrenByName("Deformer");
 

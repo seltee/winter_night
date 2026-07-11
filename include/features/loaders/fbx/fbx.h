@@ -5,6 +5,8 @@
 #include "features/loaders/fbx/fbxAnimationStack.h"
 #include "features/loaders/fbx/fbxAnimationLayer.h"
 #include "features/loaders/fbx/fbxAnimationCurveNode.h"
+#include "features/loaders/fbx/fbxAnimationCurve.h"
+#include "features/loaders/fbx/fbxNodeAttribute.h"
 #include "features/data/base3d.h"
 #include "features/data/file.h"
 #include <memory>

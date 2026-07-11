@@ -2,6 +2,7 @@
 #include "features/data/base3d.h"
 #include "features/data/file.h"
 #include "features/loaders/fbx/fbxProperty.h"
+#include "features/logger/logger.h"
 #include <memory>
 #include <iostream>
 
@@ -69,7 +70,7 @@ namespace wne
         {
             if (index < properties.size() && properties[index].type == 'S')
                 return (const char *)properties[index].data.data();
-            std::cout << "Unable to get index " << index << " on " << name << " as string" << std::endl;
+            Logger::log << "Unable to get index " << index << " on " << name << " as string" << endl;
             return 0;
         }
 
@@ -77,7 +78,7 @@ namespace wne
         {
             if (index < properties.size() && properties[index].type == 'L')
                 return *((uint64 *)properties[index].data.data());
-            std::cout << "Unable to get index " << index << " on " << name << " as long" << std::endl;
+            Logger::log << "Unable to get index " << index << " on " << name << " as long" << endl;
             return 0;
         }
 
@@ -85,7 +86,7 @@ namespace wne
         {
             if (index < properties.size() && properties[index].type == 'd')
                 return ((double *)properties[index].data.data());
-            std::cout << "Unable to get index " << index << " on " << name << " as double array (" << properties[index].type << ")" << std::endl;
+            Logger::log << "Unable to get index " << index << " on " << name << " as double array (" << properties[index].type << ")" << endl;
             return nullptr;
         }
 
@@ -93,7 +94,23 @@ namespace wne
         {
             if (index < properties.size() && properties[index].type == 'i')
                 return ((int32 *)properties[index].data.data());
-            std::cout << "Unable to get index " << index << " on " << name << " as int array" << std::endl;
+            Logger::log << "Unable to get index " << index << " on " << name << " as int array" << endl;
+            return nullptr;
+        }
+
+        inline float *getArrayFloats(uint32 index)
+        {
+            if (index < properties.size() && properties[index].type == 'f')
+                return ((float *)properties[index].data.data());
+            Logger::log << "Unable to get index " << index << " on " << name << " as int array" << endl;
+            return nullptr;
+        }
+
+        inline uint64 *getArrayLongs(uint32 index)
+        {
+            if (index < properties.size() && properties[index].type == 'l')
+                return ((uint64 *)properties[index].data.data());
+            Logger::log << "Unable to get index " << index << " on " << name << " as long array, type is " << properties[index].type << endl;
             return nullptr;
         }
 
@@ -101,7 +118,7 @@ namespace wne
         {
             if (index < properties.size())
                 return properties[index].data.size() / getTypeSize(properties[index].type);
-            std::cout << "Index out of bounds " << index << " on " << name << std::endl;
+            Logger::log << "Index out of bounds " << index << " on " << name << endl;
             return 0;
         }
 
