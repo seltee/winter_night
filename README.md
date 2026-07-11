@@ -15,11 +15,19 @@ My personal Vulkan 3d/2d engine I'm constructing using C++ 2020
 - Rotation using quaternions
 - Directional, Spot and omni lights
 - Directional light shadows
+- Sprites
 
 # Compilation
 
+## Windows
+
 - Install Msys2. In Msys2 install gcc and make
 - Clone the repo and use make under Msys2 terminal
+
+## Linux
+
+- Make sure gcc, git and make tools are installed
+- Clone the repo and run make from the terminal
 
 ---
 
