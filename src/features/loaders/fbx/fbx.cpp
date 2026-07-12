@@ -167,9 +167,10 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
         transformation = transformation * rotationY;
         transformation = transformation * rotationZ;
         transformation = transformation * scale;
-        model.getAsModel()->setDefaultTransformation(transformation);
 
-        base->addModel(model.getName(), model.getAsModel());
+        auto newModel = model.getAsModel();
+        newModel->setDefaultTransformation(transformation);
+        base->addModel(model.getName(), newModel);
     }
 
     return base;

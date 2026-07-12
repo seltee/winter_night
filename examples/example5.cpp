@@ -44,6 +44,14 @@ int main()
 
     // actor with mesh
     auto animBoxData = wne::Loader3d::loadAsModelAnimation("./anim_box.fbx");
+    auto animBoxCollection = renderer->createMeshCollection(animBoxData.models);
+    auto actorLoadedBox = scene->createActor<wne::ActorAnimatedMesh>(animBoxCollection);
+    auto animationTrack = actorLoadedBox->createAnimationTrack(animBoxData.animations[0]);
+    animationTrack->play();
+    // actorLoadedBox->setPosition(0.0f, 6.0f, 4.0f);
+
+    auto actorLoadedBoxStatic = scene->createActor<wne::ActorMesh>((*animBoxCollection)[0]);
+    actorLoadedBoxStatic->setPosition(8.0f, 0, 10.0f);
 
     wne::Logger::log << "Loaded objects" << wne::endl;
     for (auto &model : animBoxData.models)
@@ -60,18 +68,6 @@ int main()
             wne::Logger::log << "Targets Cube" << wne::endl;
         }
     }
-
-    /*
-    auto actorLoadedMesh = renderer->createMesh(actorLoadedModel);
-    auto actorLoadedBox = scene->createActor<wne::ActorMesh>(actorLoadedMesh);
-    actorLoadedBox->setMaterial(materialMetalBox);
-    actorLoadedBox->setPosition(0.0f, 6.0f, 4.0f);
-    */
-
-    auto boxModel = wne::Primitives::createBox(4.0f);
-    auto boxMesh = renderer->createMesh(boxModel);
-    auto actorBox = scene->createActor<wne::ActorMesh>(boxMesh);
-    actorBox->setPosition(12.0f, 9.0f, -6.0f);
 
     // light
     auto sun = renderer->createLightDirectional();

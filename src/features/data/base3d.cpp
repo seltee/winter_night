@@ -8,6 +8,7 @@ std::shared_ptr<Model> Base3d::getAsModel()
     if (models.size() > 0)
     {
         std::shared_ptr<Model> baseModel = Model::create(ModelDataType::VertexTexturedInd32);
+        baseModel->setName("CombinedMesh");
         for (auto &model : models)
         {
             if (model.model->getAsVertexTextured().size() == 0)

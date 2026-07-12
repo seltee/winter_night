@@ -36,6 +36,7 @@ namespace wne
 
         void changeWindowSize(int32 width, int32 height) override final;
         std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model) override final;
+        std::shared_ptr<MeshCollection> createMeshCollection(std::vector<std::shared_ptr<Model>> models) override final;
         std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image) override final;
         std::shared_ptr<Text> createText(std::shared_ptr<Font> font) override final;
         std::shared_ptr<MaterialFlat> createFlatMaterial() override final;

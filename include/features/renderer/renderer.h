@@ -2,6 +2,7 @@
 #include "features/data/model.h"
 #include "features/data/font.h"
 #include "features/renderer/mesh.h"
+#include "features/renderer/meshCollection.h"
 #include "features/renderer/texture.h"
 #include "features/renderer/material.h"
 #include "features/renderer/materialFlat.h"
@@ -29,6 +30,7 @@ namespace wne
 
         virtual void changeWindowSize(int32 width, int32 height);
         virtual std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model);
+        virtual std::shared_ptr<MeshCollection> createMeshCollection(std::vector<std::shared_ptr<Model>> models);
         virtual std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image);
         virtual std::shared_ptr<Text> createText(std::shared_ptr<Font> font);
         virtual std::shared_ptr<MaterialFlat> createFlatMaterial();

@@ -135,6 +135,16 @@ std::shared_ptr<Mesh> RendererVulkan::createMesh(std::shared_ptr<Model> model)
     return VulkanMesh::create(model, instance->getVulkanUtils());
 }
 
+std::shared_ptr<MeshCollection> RendererVulkan::createMeshCollection(std::vector<std::shared_ptr<Model>> models)
+{
+    auto meshCollection = std::make_shared<MeshCollection>();
+    for (auto &model : models)
+    {
+        meshCollection->addMesh(createMesh(model));
+    }
+    return meshCollection;
+}
+
 std::shared_ptr<Texture> RendererVulkan::createTexture(std::shared_ptr<Image> image)
 {
     return VulkanTexture::create(image, instance->getVulkanUtils());

@@ -33,6 +33,11 @@ std::shared_ptr<Mesh> Renderer::createMesh(std::shared_ptr<Model> model)
     return nullptr;
 }
 
+std::shared_ptr<MeshCollection> Renderer::createMeshCollection(std::vector<std::shared_ptr<Model>> models)
+{
+    return nullptr;
+}
+
 std::shared_ptr<Texture> Renderer::createTexture(std::shared_ptr<Image> image)
 {
     return nullptr;

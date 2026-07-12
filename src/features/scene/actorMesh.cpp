@@ -1,6 +1,5 @@
 #include "features/scene/actorMesh.h"
 #include "features/renderer/renderer.h"
-#include <iostream>
 
 using namespace wne;
 

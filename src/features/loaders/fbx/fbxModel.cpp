@@ -69,11 +69,13 @@ std::shared_ptr<Model> FBXModel::getAsModel()
 
         geometry->getData(vertexTextured, indices);
 
-        return Model::createFromData(vertexTextured, indices);
+        auto out = Model::createFromData(vertexTextured, indices);
+        out->setName(name);
+        return out;
     }
     else
     {
-        return std::shared_ptr<Model>(nullptr);
+        return nullptr;
     }
 }
 

@@ -19,6 +19,7 @@ namespace wne
         };
 
         static std::shared_ptr<Model> loadAsModel(const char *path);
+        static std::vector<std::shared_ptr<Model>> loadAsModels(const char *path);
         static ModelAnimations loadAsModelAnimation(const char *path);
 
     protected:
