@@ -44,10 +44,12 @@ Model::~Model()
     }
 }
 
-bool Model::append(Model *model, Matrix4x4 &transformation)
+bool Model::append(Model *model)
 {
     if (model->getDataType() != dataType)
         return false;
+
+    Matrix4x4 transformation = model->getDefaultTransformation();
 
     Matrix3x3 normalMatrix = transpose(inverse(Matrix3x3(transformation)));
 

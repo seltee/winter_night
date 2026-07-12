@@ -6,11 +6,14 @@
 
 namespace wne
 {
+    class FBXAnimationCurveNode;
     class FBXModel
     {
     public:
         FBXModel(FBXNode &node);
         std::shared_ptr<Model> getAsModel();
+
+        void addAnimationCurveNode(FBXAnimationCurveNode *curveNode);
 
         inline uint64 getId()
         {
@@ -62,5 +65,7 @@ namespace wne
         Vector3 scale = Vector3(1.0f, 1.0f, 1.0f);
         FBXGeometry *geometry = nullptr;
         FBXModel *parent = nullptr;
+
+        std::vector<FBXAnimationCurveNode *> curveNodes;
     };
 };

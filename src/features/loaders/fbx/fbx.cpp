@@ -5,6 +5,8 @@
 
 using namespace wne;
 
+const uint64 FBXTimeToMs = 46186158;
+
 FBX::FBX()
 {
 }
@@ -85,7 +87,71 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
             continue;
         }
 
+        FBXAnimationLayer *layerFrom = getAnimationLayerById(animationLayers, indexFrom);
+        if (layerFrom)
+        {
+            FBXAnimationStack *stackTo = getAnimationStackById(animationStacks, indexTo);
+            if (stackTo)
+            {
+                stackTo->linkLayer(layerFrom);
+            }
+            continue;
+        }
+
+        FBXAnimationCurveNode *curveNodeFrom = getAnimationCurveNodeById(animationCurveNodes, indexFrom);
+        if (curveNodeFrom)
+        {
+            FBXModel *modelTo = getModelById(models, indexTo);
+            FBXAnimationLayer *layerTo = getAnimationLayerById(animationLayers, indexTo);
+            if (modelTo)
+            {
+                modelTo->addAnimationCurveNode(curveNodeFrom);
+                curveNodeFrom->addAffectedModel(modelTo);
+            }
+            if (layerTo)
+            {
+                layerTo->linkAnimationCurveNode(curveNodeFrom);
+            }
+            continue;
+        }
+
+        FBXAnimationCurve *curveFrom = getAnimationCurveById(animationCurves, indexFrom);
+        if (curveFrom)
+        {
+            FBXAnimationCurveNode *curveNodeTo = getAnimationCurveNodeById(animationCurveNodes, indexTo);
+            if (curveNodeTo)
+            {
+                curveNodeTo->linkCurve(curveFrom, connection.get());
+            }
+            continue;
+        }
+
         std::cout << "Unknown link " << indexFrom << " to " << indexTo << std::endl;
+    }
+
+    if (!animationStacks.empty())
+    {
+        auto animationNames = getAnimationNames(animationLayers);
+        for (auto &animationName : animationNames)
+        {
+            auto newAnimation = std::make_shared<Animation3d>(animationName);
+
+            for (auto &animationLayer : animationLayers)
+            {
+                if (animationLayer.getName() != animationName)
+                    continue;
+
+                std::vector<uint64> timestamps = animationLayer.getTimestampsList();
+
+                for (auto &timestamp : timestamps)
+                {
+                    float floatTimeStamp = static_cast<float>(timestamp / FBXTimeToMs) / 1000.0f;
+                    animationLayer.collectAnimationTargets(newAnimation, floatTimeStamp);
+                }
+            }
+
+            base->addAnimation(animationName.c_str(), newAnimation);
+        }
     }
 
     for (auto &model : models)
@@ -101,8 +167,9 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
         transformation = transformation * rotationY;
         transformation = transformation * rotationZ;
         transformation = transformation * scale;
+        model.getAsModel()->setDefaultTransformation(transformation);
 
-        base->addModel(model.getName(), model.getAsModel(), transformation);
+        base->addModel(model.getName(), model.getAsModel());
     }
 
     return base;
@@ -136,4 +203,63 @@ FBXModel *FBX::getModelById(std::vector<FBXModel> &list, uint64 id)
             return &it;
     }
     return nullptr;
+}
+
+FBXAnimationLayer *FBX::getAnimationLayerById(std::vector<FBXAnimationLayer> &list, uint64 id)
+{
+    for (auto &it : list)
+    {
+        if (it.getId() == id)
+            return &it;
+    }
+    return nullptr;
+}
+
+FBXAnimationStack *FBX::getAnimationStackById(std::vector<FBXAnimationStack> &list, uint64 id)
+{
+    for (auto &it : list)
+    {
+        if (it.getId() == id)
+            return &it;
+    }
+    return nullptr;
+}
+
+FBXAnimationCurveNode *FBX::getAnimationCurveNodeById(std::vector<FBXAnimationCurveNode> &list, uint64 id)
+{
+    for (auto &it : list)
+    {
+        if (it.getId() == id)
+            return &it;
+    }
+    return nullptr;
+}
+
+FBXAnimationCurve *FBX::getAnimationCurveById(std::vector<FBXAnimationCurve> &list, uint64 id)
+{
+    for (auto &it : list)
+    {
+        if (it.getId() == id)
+            return &it;
+    }
+    return nullptr;
+}
+
+std::vector<std::string> FBX::getAnimationNames(std::vector<FBXAnimationLayer> &animationLayers)
+{
+    std::vector<std::string> animNames;
+    for (auto &it : animationLayers)
+    {
+        bool found = false;
+        for (auto &animName : animNames)
+        {
+            if (animName == it.getName())
+                found = true;
+        }
+        if (!found)
+        {
+            animNames.push_back(it.getName());
+        }
+    }
+    return animNames;
 }

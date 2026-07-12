@@ -1,4 +1,5 @@
 #include "features/loaders/fbx/fbxAnimationStack.h"
+#include "features/loaders/fbx/fbxAnimationLayer.h"
 #include "features/logger/logger.h"
 
 using namespace wne;
@@ -19,7 +20,7 @@ FBXAnimationStack::FBXAnimationStack(FBXNode &node)
         {
             if (property.isString())
             {
-                Logger::log << property.asString() << endl;
+                // Logger::log << property.asString() << endl;
                 if (!strcmp(property.asString(), "LocalStop"))
                     type = "lstop";
                 if (!strcmp(property.asString(), "ReferenceStop"))
@@ -38,5 +39,10 @@ FBXAnimationStack::FBXAnimationStack(FBXNode &node)
             referenceTime = longValue;
     }
 
-    Logger::log << "Animation stack " << id << ", " << localTime << " " << referenceTime << endl;
+    // Logger::log << "Animation stack " << id << ", " << localTime << " " << referenceTime << endl;
+}
+
+void FBXAnimationStack::linkLayer(FBXAnimationLayer *layer)
+{
+    layers.push_back(layer);
 }

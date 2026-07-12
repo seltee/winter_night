@@ -38,11 +38,13 @@ namespace wne
         ModelIndexData indexData;
         ModelDataType dataType;
         float boundingRadius = 0.0f;
+        Matrix4x4 defaultTransformation = Matrix4x4::identity();
+        std::string name = "NoNameModel";
 
     public:
         Model(ModelVertexData vertexData, ModelIndexData indexData, ModelDataType type);
         ~Model();
-        bool append(Model *model, Matrix4x4 &transformation);
+        bool append(Model *model);
 
         static std::shared_ptr<Model> create(ModelDataType type);
         static std::shared_ptr<Model> createFromData(const std::vector<VertexColored> &vertexColored, const std::vector<uint16> &indices);
@@ -83,6 +85,26 @@ namespace wne
         inline float getBoundingRadius()
         {
             return boundingRadius;
+        }
+
+        inline Matrix4x4 &getDefaultTransformation()
+        {
+            return defaultTransformation;
+        }
+
+        inline void setDefaultTransformation(const Matrix4x4 &defaultTransformation)
+        {
+            this->defaultTransformation = defaultTransformation;
+        }
+
+        inline const char *getName() const
+        {
+            return name.c_str();
+        }
+
+        inline void setName(const char *name)
+        {
+            this->name = std::string(name);
         }
     };
 

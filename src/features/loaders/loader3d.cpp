@@ -15,3 +15,14 @@ std::shared_ptr<Model> Loader3d::loadAsModel(const char *path)
         return nullptr;
     return modelBase->getAsModel();
 }
+
+Loader3d::ModelAnimations Loader3d::loadAsModelAnimation(const char *path)
+{
+    auto modelBase = FBX::loadFile(path);
+    if (!modelBase)
+        return {};
+    return {
+        modelBase->getModels(),
+        modelBase->getAnimations(),
+    };
+}

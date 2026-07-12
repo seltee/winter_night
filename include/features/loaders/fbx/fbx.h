@@ -23,5 +23,10 @@ namespace wne
         static FBXNode *findByName(std::vector<std::unique_ptr<wne::FBXNode>> &list, const char *name);
         static FBXGeometry *getGeometryById(std::vector<FBXGeometry> &list, uint64 id);
         static FBXModel *getModelById(std::vector<FBXModel> &list, uint64 id);
+        static FBXAnimationLayer *getAnimationLayerById(std::vector<FBXAnimationLayer> &list, uint64 id);
+        static FBXAnimationStack *getAnimationStackById(std::vector<FBXAnimationStack> &list, uint64 id);
+        static FBXAnimationCurveNode *getAnimationCurveNodeById(std::vector<FBXAnimationCurveNode> &list, uint64 id);
+        static FBXAnimationCurve *getAnimationCurveById(std::vector<FBXAnimationCurve> &list, uint64 id);
+        static std::vector<std::string> getAnimationNames(std::vector<FBXAnimationLayer> &animLayers);
     };
 };

@@ -1,4 +1,5 @@
 #include "features/loaders/fbx/fbxModel.h"
+#include "features/loaders/fbx/fbxAnimationCurveNode.h"
 #include <iostream>
 
 using namespace wne;
@@ -42,15 +43,18 @@ FBXModel::FBXModel(FBXNode &node)
 
     // Stupid FBX format compensation
     // You can't obtain the correct value somewhere else
-    if (scale.x > 99.9f){
+    if (scale.x > 99.9f)
+    {
         scale.x /= 100.0f;
         position.x /= 100.0f;
     }
-    if (scale.y > 99.9f){
+    if (scale.y > 99.9f)
+    {
         scale.y /= 100.0f;
         position.y /= 100.0f;
     }
-    if (scale.z > 99.9f){
+    if (scale.z > 99.9f)
+    {
         scale.z /= 100.0f;
         position.z /= 100.0f;
     }
@@ -71,4 +75,9 @@ std::shared_ptr<Model> FBXModel::getAsModel()
     {
         return std::shared_ptr<Model>(nullptr);
     }
+}
+
+void FBXModel::addAnimationCurveNode(FBXAnimationCurveNode *curveNode)
+{
+    curveNodes.push_back(curveNode);
 }
