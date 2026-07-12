@@ -12,6 +12,8 @@ namespace wne
 
         std::shared_ptr<AnimationTarget> getAnimationTarget(const std::string &targetName, bool createEmptyIfNotFound = false);
 
+        float getAnimationLength();
+
         inline const char *getName()
         {
             return name.c_str();

@@ -1,4 +1,5 @@
 #include "features/data/animation3d.h"
+#include <cmath>
 
 using namespace wne;
 
@@ -23,4 +24,16 @@ std::shared_ptr<AnimationTarget> Animation3d::getAnimationTarget(const std::stri
     }
 
     return nullptr;
+}
+
+float Animation3d::getAnimationLength()
+{
+    float maxLength = 0.0f;
+
+    for (auto &target : targets)
+    {
+        maxLength = std::max(maxLength, target->getAnimationTimeLength());
+    }
+
+    return maxLength;
 }
