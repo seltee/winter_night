@@ -26,12 +26,22 @@ Matrix4x4 AnimationTarget::getTransformByTime(float timeStamp)
         if (timeStamp < keys[i].timeStamp)
         {
             float time = (timeStamp - keys[i - 1].timeStamp) / (keys[i].timeStamp - keys[i - 1].timeStamp);
-            Vector3 position = keys[i - 1].position * (1.0f - time) + keys[i].position * time;
+            float lTime = 1.0f - time;
+            Vector3 position = keys[i - 1].position * lTime + keys[i].position * time;
+            Vector3 pRotation = keys[i - 1].rotation;
+            Vector3 nRotation = keys[i].rotation;
+            Vector3 scale = keys[i - 1].scale * lTime + keys[i].scale * time;
+
+            auto q0 = Quat(pRotation.x, pRotation.y, pRotation.z);
+            auto q1 = Quat(nRotation.x, nRotation.y, nRotation.z);
+
+            auto q = slerp(q0, q1, time);
+
             Matrix4x4 transformation = Matrix4x4::translation(position);
+            transformation = transformation * asMatrix(q);
+            transformation = transformation * Matrix4x4::scale(scale);
 
             return transformation;
-            // entity->setRotation(keys[i - 1].rotation * (1.0f - time) + keys[i].rotation * time);
-            // entity->setScale(keys[i - 1].scale * (1.0f - time) + keys[i].scale * time);
         }
     }
     return Matrix4x4::identity();

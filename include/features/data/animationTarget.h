@@ -40,6 +40,11 @@ namespace wne
             return keys.size();
         }
 
+        inline const KeyTranform &getKey(uint index)
+        {
+            return keys[index];
+        }
+
     protected:
         std::string targetName;
         std::vector<KeyTranform> keys;

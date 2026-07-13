@@ -16,6 +16,8 @@ namespace wne
 
         void eraseTargetsWithKeysLessThan(uint amount);
 
+        void eraseEmptyTargets();
+
         inline const char *getName()
         {
             return name.c_str();

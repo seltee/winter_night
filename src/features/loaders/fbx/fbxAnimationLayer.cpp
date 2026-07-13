@@ -115,6 +115,8 @@ void FBXAnimationLayer::collectAnimationTargets(std::shared_ptr<Animation3d> ani
         auto animTarget = animation->getAnimationTarget(animBinding.modelName, true);
         animTarget->addKey(animBinding.keyTransform);
     }
+
+    animation->eraseEmptyTargets();
 }
 
 float FBXAnimationLayer::getCurveLerped(FBXAnimationCurve *curve, float time)

@@ -3,7 +3,7 @@
 #include "vector3.h"
 #include "vector4.h"
 #include "quat.h"
-
+#include <cmath>
 namespace wne
 {
     inline float dot(const Vector2 &v1, const Vector2 &v2) noexcept
@@ -125,6 +125,56 @@ namespace wne
     inline float getHighestAxisValue(const Vector2 &vec)
     {
         return fmaxf(vec.x, vec.y);
+    }
+
+    inline Quat slerp(const Quat &source, const Quat &dest, float factor)
+    {
+        factor = std::max(0.0f, std::min(1.0f, factor));
+
+        float dot = source.x * dest.x + source.y * dest.y + source.z * dest.z + source.w * dest.w;
+
+        Quat target = dest;
+        if (dot < 0.0f)
+        {
+            dot = -dot;
+            target.x = -dest.x;
+            target.y = -dest.y;
+            target.z = -dest.z;
+            target.w = -dest.w;
+        }
+
+        if (dot > 0.9995f)
+        {
+            Quat result;
+            result.x = source.x + factor * (target.x - source.x);
+            result.y = source.y + factor * (target.y - source.y);
+            result.z = source.z + factor * (target.z - source.z);
+            result.w = source.w + factor * (target.w - source.w);
+
+            float len = std::sqrt(result.x * result.x + result.y * result.y + result.z * result.z + result.w * result.w);
+            result.x /= len;
+            result.y /= len;
+            result.z /= len;
+            result.w /= len;
+            return result;
+        }
+
+        float theta_0 = std::acos(dot);
+        float theta = theta_0 * factor;
+
+        float sinTheta0 = std::sin(theta_0);
+        float sinTheta = std::sin(theta);
+
+        float s1 = std::cos(theta) - dot * sinTheta / sinTheta0;
+        float s2 = sinTheta / sinTheta0;
+
+        Quat result;
+        result.x = (s1 * source.x) + (s2 * target.x);
+        result.y = (s1 * source.y) + (s2 * target.y);
+        result.z = (s1 * source.z) + (s2 * target.z);
+        result.w = (s1 * source.w) + (s2 * target.w);
+
+        return result;
     }
 
 };
