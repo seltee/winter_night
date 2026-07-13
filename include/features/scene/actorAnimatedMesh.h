@@ -15,6 +15,7 @@ namespace wne
     public:
         std::shared_ptr<Material> material;
         uint64 objectId;
+        Matrix4x4 transfotmation;
     };
 
     class WNE_API ActorAnimatedMesh : public Actor
@@ -22,6 +23,8 @@ namespace wne
     public:
         ActorAnimatedMesh(Renderer *renderer, std::shared_ptr<MeshCollection> mesh);
         ~ActorAnimatedMesh();
+
+        void update(float delta) override final;
 
         void renderDepthShadow(Vector3 &lightPosition) override final;
         void renderDepth() override final;

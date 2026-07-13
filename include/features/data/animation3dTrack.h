@@ -22,6 +22,8 @@ namespace wne
         void setAnimation(std::shared_ptr<Animation3d> animation);
         void play(bool repeat = false);
 
+        Matrix4x4 getTransformationMatrix(const char *objectName, float maxMixFactor);
+
         inline std::shared_ptr<Animation3d> getAnimation()
         {
             return animation;

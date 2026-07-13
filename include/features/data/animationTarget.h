@@ -25,7 +25,7 @@ namespace wne
         float getAnimationTimeLength();
 
         // interpolates between 2 frames
-        // void getTransformByTime(float timeStamp, Entity *entity);
+        Matrix4x4 getTransformByTime(float timeStamp);
         // picks static
         // void getTransformByTimeFixedFrame(float timeStamp, Entity *entity);
 

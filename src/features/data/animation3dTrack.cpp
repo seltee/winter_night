@@ -42,3 +42,17 @@ void Animation3dTrack::play(bool repeat)
 {
     this->state = repeat ? State::Looping : State::Playing;
 }
+
+Matrix4x4 Animation3dTrack::getTransformationMatrix(const char *objectName, float maxMixFactor)
+{
+    if (!animation)
+        return Matrix4x4::identity();
+
+    float localFactor = mixFactor / maxMixFactor;
+
+    auto animationTarget = animation->getAnimationTarget(objectName);
+    if (!animationTarget)
+        return Matrix4x4::identity();
+
+    return animationTarget->getTransformByTime(playPosition);
+}

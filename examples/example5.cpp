@@ -47,7 +47,7 @@ int main()
     auto animBoxCollection = renderer->createMeshCollection(animBoxData.models);
     auto actorLoadedBox = scene->createActor<wne::ActorAnimatedMesh>(animBoxCollection);
     auto animationTrack = actorLoadedBox->createAnimationTrack(animBoxData.animations[0]);
-    animationTrack->play();
+    animationTrack->play(true);
     // actorLoadedBox->setPosition(0.0f, 6.0f, 4.0f);
 
     auto actorLoadedBoxStatic = scene->createActor<wne::ActorMesh>((*animBoxCollection)[0]);

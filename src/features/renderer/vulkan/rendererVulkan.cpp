@@ -140,7 +140,9 @@ std::shared_ptr<MeshCollection> RendererVulkan::createMeshCollection(std::vector
     auto meshCollection = std::make_shared<MeshCollection>();
     for (auto &model : models)
     {
-        meshCollection->addMesh(createMesh(model));
+        auto mesh = createMesh(model);
+        mesh->setName(model->getName());
+        meshCollection->addMesh(mesh);
     }
     return meshCollection;
 }

@@ -23,6 +23,29 @@ ActorAnimatedMesh::~ActorAnimatedMesh()
         mesh->freeMeshId(node.objectId);
 }
 
+void ActorAnimatedMesh::update(float delta)
+{
+    for (uint i = 0; i < count; i++)
+    {
+        Matrix4x4 out = Matrix4x4::identity();
+
+        float mixFactorAcc = 0.0f;
+        for (auto &track : tracks)
+        {
+            track->update(delta);
+            mixFactorAcc += track->getMixFactor();
+        }
+
+        if (mixFactorAcc > 0)
+        {
+            for (auto &track : tracks)
+                out = out * track->getTransformationMatrix((*mesh)[i]->getName(), mixFactorAcc);
+        }
+
+        nodes[i].transfotmation = getModelMatrix() * out;
+    }
+}
+
 void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
 {
     auto state = renderer->getState();
@@ -34,7 +57,7 @@ void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
         materialToUse->bindDepthShadow(
             nodes[i].objectId,
             renderer,
-            state->getViewProjectionMatrix() * getModelMatrix() * nodes[i].getModelMatrix(),
+            state->getViewProjectionMatrix() * nodes[i].transfotmation,
             getNormalMatrix(),
             uvModifier,
             false,
@@ -53,7 +76,7 @@ void ActorAnimatedMesh::renderDepth()
         Material *materialToUse = renderer->getDefaultMaterial().get();
         materialToUse->bindDepth(
             nodes[i].objectId,
-            state->getViewProjectionMatrix() * getModelMatrix() * nodes[i].getModelMatrix(),
+            state->getViewProjectionMatrix() * nodes[i].transfotmation,
             getModelMatrix(),
             getNormalMatrix(),
             uvModifier,
@@ -74,7 +97,7 @@ void ActorAnimatedMesh::renderColor()
         materialToUse->bindColor(
             nodes[i].objectId,
             lights,
-            state->getViewProjectionMatrix() * getModelMatrix() * nodes[i].getModelMatrix(),
+            state->getViewProjectionMatrix() * nodes[i].transfotmation,
             getModelMatrix(),
             getNormalMatrix(),
             uvModifier,
