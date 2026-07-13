@@ -46,8 +46,13 @@ int main()
     auto animBoxData = wne::Loader3d::loadAsModelAnimation("./anim_box.fbx");
     auto animBoxCollection = renderer->createMeshCollection(animBoxData.models);
     auto actorLoadedBox = scene->createActor<wne::ActorAnimatedMesh>(animBoxCollection);
-    auto animationTrack = actorLoadedBox->createAnimationTrack(animBoxData.animations);
-    animationTrack->play(true);
+
+    for (auto &anim : animBoxData.animations)
+    {
+        auto animationTrack = actorLoadedBox->createAnimationTrack(anim);
+        animationTrack->play(true);
+    }
+
     actorLoadedBox->setPosition(0.0f, 6.0f, 4.0f);
 
     auto actorLoadedBoxStatic = scene->createActor<wne::ActorMesh>((*animBoxCollection)[0]);

@@ -32,7 +32,7 @@ void ActorAnimatedMesh::update(float delta)
         float mixFactorAcc = 0.0f;
         for (auto &track : tracks)
         {
-            track->update(delta);
+            track->update(delta * 0.5f);
             mixFactorAcc += track->getMixFactor();
         }
 
@@ -77,7 +77,7 @@ void ActorAnimatedMesh::renderDepth()
         materialToUse->bindDepth(
             nodes[i].objectId,
             state->getViewProjectionMatrix() * nodes[i].transfotmation,
-            getModelMatrix(),
+            nodes[i].transfotmation,
             getNormalMatrix(),
             uvModifier,
             (*mesh)[i]->getDataType());
@@ -98,7 +98,7 @@ void ActorAnimatedMesh::renderColor()
             nodes[i].objectId,
             lights,
             state->getViewProjectionMatrix() * nodes[i].transfotmation,
-            getModelMatrix(),
+            nodes[i].transfotmation,
             getNormalMatrix(),
             uvModifier,
             (*mesh)[i]->getDataType());
@@ -119,16 +119,7 @@ float ActorAnimatedMesh::getBoundingRadius()
 std::shared_ptr<Animation3dTrack> ActorAnimatedMesh::createAnimationTrack(std::shared_ptr<Animation3d> animation)
 {
 
-    auto newTrack = std::make_shared<Animation3dTrack>(
-        std::vector<std::shared_ptr<Animation3d>>({animation}));
-    tracks.push_back(newTrack);
-    return newTrack;
-}
-
-std::shared_ptr<Animation3dTrack> ActorAnimatedMesh::createAnimationTrack(
-    std::vector<std::shared_ptr<Animation3d>> animations)
-{
-    auto newTrack = std::make_shared<Animation3dTrack>(animations);
+    auto newTrack = std::make_shared<Animation3dTrack>(animation);
     tracks.push_back(newTrack);
     return newTrack;
 }

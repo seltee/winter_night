@@ -7,9 +7,9 @@ Animation3dTrack::Animation3dTrack()
 {
 }
 
-Animation3dTrack::Animation3dTrack(std::vector<std::shared_ptr<Animation3d>> animations)
+Animation3dTrack::Animation3dTrack(std::shared_ptr<Animation3d> animation)
 {
-    this->animations = animations;
+    this->animation = animation;
     recalcMaxPosition();
 }
 
@@ -33,9 +33,9 @@ void Animation3dTrack::update(float delta)
     }
 }
 
-void Animation3dTrack::setAnimations(std::vector<std::shared_ptr<Animation3d>> animations)
+void Animation3dTrack::setAnimation(std::shared_ptr<Animation3d> animation)
 {
-    this->animations = animations;
+    this->animation = animation;
     recalcMaxPosition();
 }
 
@@ -46,22 +46,10 @@ void Animation3dTrack::play(bool repeat)
 
 Matrix4x4 Animation3dTrack::getTransformationMatrix(const char *objectName, float maxMixFactor)
 {
-    if (!animations.size())
-        return Matrix4x4::identity();
-
-    Logger::log << "Get for " << objectName << " count " << animations.size() << endl;
-
-    float localFactor = mixFactor / maxMixFactor;
-
-    for (auto &animation : animations)
+    auto animationTarget = animation->getAnimationTarget(objectName);
+    if (animationTarget)
     {
-        auto animationTarget = animation->getAnimationTarget(objectName);
-        if (animationTarget)
-        {
-            Logger::log << "Found for " << animation->getName() << " " << animationTarget->getKeysCount() << endl;
-            return animationTarget->getTransformByTime(playPosition);
-        }
-        Logger::log << "Animation target is for " << animationTarget->getTargetName().c_str() << endl;
+        return animationTarget->getTransformByTime(playPosition);
     }
 
     return Matrix4x4::identity();
@@ -69,7 +57,5 @@ Matrix4x4 Animation3dTrack::getTransformationMatrix(const char *objectName, floa
 
 void Animation3dTrack::recalcMaxPosition()
 {
-    maxPosition = 0.0f;
-    for (auto &animation : animations)
-        maxPosition = std::max(animation->getAnimationLength(), maxPosition);
+    maxPosition = animation->getAnimationLength();
 }

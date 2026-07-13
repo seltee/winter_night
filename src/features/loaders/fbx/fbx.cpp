@@ -141,8 +141,6 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
                 if (animationLayer.getName() != animationName)
                     continue;
 
-                Logger::log << "ASDF " << animationLayer.getTimestampsList().size() << endl;
-
                 std::vector<uint64> timestamps = animationLayer.getTimestampsList();
 
                 for (auto &timestamp : timestamps)
@@ -155,7 +153,6 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
             base->addAnimation(animationName.c_str(), newAnimation);
         }
     }
-    return base;
 
     for (auto &model : models)
     {

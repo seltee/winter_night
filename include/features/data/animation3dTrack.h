@@ -16,18 +16,18 @@ namespace wne
         };
 
         Animation3dTrack();
-        Animation3dTrack(std::vector<std::shared_ptr<Animation3d>> animations);
+        Animation3dTrack(std::shared_ptr<Animation3d> animation);
 
         void update(float delta);
 
-        void setAnimations(std::vector<std::shared_ptr<Animation3d>> animations);
+        void setAnimation(std::shared_ptr<Animation3d> animation);
         void play(bool repeat = false);
 
         Matrix4x4 getTransformationMatrix(const char *objectName, float maxMixFactor);
 
-        inline std::vector<std::shared_ptr<Animation3d>> getAnimations()
+        inline std::shared_ptr<Animation3d> getAnimation()
         {
-            return animations;
+            return animation;
         }
 
         inline void setMixFactor(float mixFactor)
@@ -43,7 +43,7 @@ namespace wne
     protected:
         void recalcMaxPosition();
 
-        std::vector<std::shared_ptr<Animation3d>> animations;
+        std::shared_ptr<Animation3d> animation;
         float mixFactor = 1.0f;
         float playPosition = 0.0f;
         float maxPosition = 1.0f;

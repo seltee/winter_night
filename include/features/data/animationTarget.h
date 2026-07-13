@@ -1,4 +1,5 @@
 #pragma once
+#include "core/core.h"
 #include "core/api.h"
 #include "core/math.h"
 #include <string>

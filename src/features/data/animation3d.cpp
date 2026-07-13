@@ -11,16 +11,10 @@ Animation3d::Animation3d(const std::string &name)
 
 std::shared_ptr<AnimationTarget> Animation3d::getAnimationTarget(const std::string &targetName, bool createEmptyIfNotFound)
 {
-    // Logger::log << "TARGET FOR " << name.c_str() << " NAMES " << targetName << endl;
-    for (auto &target : targets)
-    {
-        // Logger::log << target->getTargetName() << " " << target->getKeysCount() << endl;
-    }
     for (auto &target : targets)
     {
         if (target->isName(targetName))
         {
-            // Logger::log << "Target found " << targetName << " " << target->getKeysCount() << endl;
             return target;
         }
     }
