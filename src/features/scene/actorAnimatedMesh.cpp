@@ -118,7 +118,17 @@ float ActorAnimatedMesh::getBoundingRadius()
 
 std::shared_ptr<Animation3dTrack> ActorAnimatedMesh::createAnimationTrack(std::shared_ptr<Animation3d> animation)
 {
-    auto newTrack = std::make_shared<Animation3dTrack>(animation);
+
+    auto newTrack = std::make_shared<Animation3dTrack>(
+        std::vector<std::shared_ptr<Animation3d>>({animation}));
+    tracks.push_back(newTrack);
+    return newTrack;
+}
+
+std::shared_ptr<Animation3dTrack> ActorAnimatedMesh::createAnimationTrack(
+    std::vector<std::shared_ptr<Animation3d>> animations)
+{
+    auto newTrack = std::make_shared<Animation3dTrack>(animations);
     tracks.push_back(newTrack);
     return newTrack;
 }

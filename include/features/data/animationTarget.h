@@ -34,6 +34,11 @@ namespace wne
 
         void addKey(KeyTranform keyTransform);
 
+        inline uint getKeysCount()
+        {
+            return keys.size();
+        }
+
     protected:
         std::string targetName;
         std::vector<KeyTranform> keys;

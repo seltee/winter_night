@@ -1,6 +1,7 @@
 #pragma once
 #include "animation3d.h"
 #include <memory>
+#include <vector>
 
 namespace wne
 {
@@ -15,18 +16,18 @@ namespace wne
         };
 
         Animation3dTrack();
-        Animation3dTrack(std::shared_ptr<Animation3d> animation);
+        Animation3dTrack(std::vector<std::shared_ptr<Animation3d>> animations);
 
         void update(float delta);
 
-        void setAnimation(std::shared_ptr<Animation3d> animation);
+        void setAnimations(std::vector<std::shared_ptr<Animation3d>> animations);
         void play(bool repeat = false);
 
         Matrix4x4 getTransformationMatrix(const char *objectName, float maxMixFactor);
 
-        inline std::shared_ptr<Animation3d> getAnimation()
+        inline std::vector<std::shared_ptr<Animation3d>> getAnimations()
         {
-            return animation;
+            return animations;
         }
 
         inline void setMixFactor(float mixFactor)
@@ -40,7 +41,9 @@ namespace wne
         }
 
     protected:
-        std::shared_ptr<Animation3d> animation;
+        void recalcMaxPosition();
+
+        std::vector<std::shared_ptr<Animation3d>> animations;
         float mixFactor = 1.0f;
         float playPosition = 0.0f;
         float maxPosition = 1.0f;

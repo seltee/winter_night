@@ -35,6 +35,8 @@ namespace wne
         float getBoundingRadius() override final;
 
         std::shared_ptr<Animation3dTrack> createAnimationTrack(std::shared_ptr<Animation3d> animation = nullptr);
+        std::shared_ptr<Animation3dTrack> createAnimationTrack(
+            std::vector<std::shared_ptr<Animation3d>> animations);
         void removeAnimationTrack(std::shared_ptr<Animation3dTrack> track);
 
     protected:

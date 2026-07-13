@@ -14,6 +14,8 @@ namespace wne
 
         float getAnimationLength();
 
+        void eraseTargetsWithKeysLessThan(uint amount);
+
         inline const char *getName()
         {
             return name.c_str();
