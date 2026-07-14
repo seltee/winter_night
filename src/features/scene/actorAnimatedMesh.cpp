@@ -10,26 +10,39 @@ ActorAnimatedMesh::ActorAnimatedMesh(Renderer *renderer, std::shared_ptr<MeshCol
 {
     this->mesh = mesh;
     count = mesh->getMeshCount();
-    nodes.resize(count);
+
+    // adding nodes
+    nodes.reserve(count);
     for (uint i = 0; i < count; i++)
     {
-        nodes[i].objectId = mesh->getNewObjectId();
-        nodes[i].name = (*mesh)[i].name.c_str();
-        nodes[i].material = nullptr;
+        nodes.emplace_back(AnimatedMeshNode(
+            mesh->getNewObjectId(),
+            (*mesh)[i].name.c_str(),
+            (*mesh)[i].parentName.c_str()));
+    }
+
+    // linking parents
+    for (uint i = 0; i < count; i++)
+    {
+        if (!nodes[i].getParentName() || strlen(nodes[i].getParentName()) == 0)
+            continue;
+        nodes[i].parentNode = getMeshNodeByName(nodes[i].getParentName());
     }
 }
 
 ActorAnimatedMesh::~ActorAnimatedMesh()
 {
     for (auto &node : nodes)
-        mesh->freeMeshId(node.objectId);
+    {
+        mesh->freeMeshId(node.getObjectId());
+    }
 }
 
 void ActorAnimatedMesh::setMaterialByName(const char *name, std::shared_ptr<Material> material)
 {
     for (auto &node : nodes)
     {
-        if (!strcmp(node.name, name))
+        if (!strcmp(node.getName(), name))
             node.material = material;
     }
 }
@@ -42,25 +55,34 @@ void ActorAnimatedMesh::setMaterialToAll(std::shared_ptr<Material> material)
 
 void ActorAnimatedMesh::update(float delta)
 {
+    for (auto &node : nodes)
+        node.isTransformationDirty = true;
+
+    for (auto &track : tracks)
+        track->update(delta);
+
     for (uint i = 0; i < count; i++)
     {
-        Matrix4x4 out = Matrix4x4::identity();
-
-        float mixFactorAcc = 0.0f;
-        for (auto &track : tracks)
-        {
-            track->update(delta * 0.5f);
-            mixFactorAcc += track->getMixFactor();
-        }
-
-        if (mixFactorAcc > 0)
-        {
-            for (auto &track : tracks)
-                out = out * track->getTransformationMatrix(nodes[i].name, mixFactorAcc);
-        }
-
-        nodes[i].transfotmation = getModelMatrix() * out;
+        if (nodes[i].isTransformationDirty)
+            nodes[i].transfotmation = getNodeTransformation(&nodes[i]);
     }
+}
+
+Matrix4x4 ActorAnimatedMesh::getNodeTransformation(AnimatedMeshNode *node)
+{
+    if (!node->isTransformationDirty)
+        return node->transfotmation;
+
+    node->isTransformationDirty = false;
+
+    Matrix4x4 base = node->parentNode ? getNodeTransformation(node->parentNode) : getModelMatrix();
+    Matrix4x4 out = Matrix4x4::identity();
+
+    for (auto &track : tracks)
+        out = out * track->getTransformationMatrix(node->getName(), 1.0f);
+
+    node->transfotmation = base * out;
+    return node->transfotmation;
 }
 
 void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
@@ -72,7 +94,7 @@ void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
     {
         Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
         materialToUse->bindDepthShadow(
-            nodes[i].objectId,
+            nodes[i].getObjectId(),
             renderer,
             state->getViewProjectionMatrix() * nodes[i].transfotmation,
             getNormalMatrix(),
@@ -92,7 +114,7 @@ void ActorAnimatedMesh::renderDepth()
     {
         Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
         materialToUse->bindDepth(
-            nodes[i].objectId,
+            nodes[i].getObjectId(),
             state->getViewProjectionMatrix() * nodes[i].transfotmation,
             nodes[i].transfotmation,
             getNormalMatrix(),
@@ -112,7 +134,7 @@ void ActorAnimatedMesh::renderColor()
     {
         Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
         materialToUse->bindColor(
-            nodes[i].objectId,
+            nodes[i].getObjectId(),
             lights,
             state->getViewProjectionMatrix() * nodes[i].transfotmation,
             nodes[i].transfotmation,
