@@ -2,6 +2,7 @@
 #include "features/renderer/renderer.h"
 #include "features/logger/logger.h"
 #include <iterator>
+#include <string>
 
 using namespace wne;
 
@@ -13,6 +14,7 @@ ActorAnimatedMesh::ActorAnimatedMesh(Renderer *renderer, std::shared_ptr<MeshCol
     for (uint i = 0; i < count; i++)
     {
         nodes[i].objectId = mesh->getNewObjectId();
+        nodes[i].name = (*mesh)[i]->getName();
         nodes[i].material = nullptr;
     }
 }
@@ -21,6 +23,21 @@ ActorAnimatedMesh::~ActorAnimatedMesh()
 {
     for (auto &node : nodes)
         mesh->freeMeshId(node.objectId);
+}
+
+void ActorAnimatedMesh::setMaterialByName(const char *name, std::shared_ptr<Material> material)
+{
+    for (auto &node : nodes)
+    {
+        if (!strcmp(node.name, name))
+            node.material = material;
+    }
+}
+
+void ActorAnimatedMesh::setMaterialToAll(std::shared_ptr<Material> material)
+{
+    for (auto &node : nodes)
+        node.material = material;
 }
 
 void ActorAnimatedMesh::update(float delta)
@@ -53,7 +70,7 @@ void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
 
     for (uint i = 0; i < count; i++)
     {
-        Material *materialToUse = renderer->getDefaultMaterial().get();
+        Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
         materialToUse->bindDepthShadow(
             nodes[i].objectId,
             renderer,
@@ -73,7 +90,7 @@ void ActorAnimatedMesh::renderDepth()
 
     for (uint i = 0; i < count; i++)
     {
-        Material *materialToUse = renderer->getDefaultMaterial().get();
+        Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
         materialToUse->bindDepth(
             nodes[i].objectId,
             state->getViewProjectionMatrix() * nodes[i].transfotmation,
@@ -93,7 +110,7 @@ void ActorAnimatedMesh::renderColor()
 
     for (uint i = 0; i < count; i++)
     {
-        Material *materialToUse = renderer->getDefaultMaterial().get();
+        Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
         materialToUse->bindColor(
             nodes[i].objectId,
             lights,

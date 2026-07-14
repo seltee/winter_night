@@ -46,6 +46,8 @@ int main()
     auto animBoxData = wne::Loader3d::loadAsModelAnimation("./anim_box.fbx");
     auto animBoxCollection = renderer->createMeshCollection(animBoxData.models);
     auto actorLoadedBox = scene->createActor<wne::ActorAnimatedMesh>(animBoxCollection);
+    actorLoadedBox->setMaterialToAll(materialBox);
+    actorLoadedBox->setMaterialByName("Cube", materialMetalBox);
 
     for (auto &anim : animBoxData.animations)
     {
