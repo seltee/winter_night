@@ -24,7 +24,7 @@ L_FLAGS = -shared -Wall -g -L"../vulkan/Lib" -Wl,--out-implib,$(IMPLIB)
 else
 INC_PIPEWIRE = "/usr/include/pipewire-0.3"
 INC_SPA = "/usr/include/spa-0.2"
-CXX_FLAGS = -I$(INCDIR) -I$(INC_PIPEWIRE) -I$(INC_SPA) -Wall -c -std=c++20 -fPIC -g -O2
+CXX_FLAGS = -I$(INCDIR) -I$(INC_PIPEWIRE) -I$(INC_SPA) -Wall -c -MMD -MP -std=c++20 -fPIC -g -O2
 LIBRARIES = -lvulkan -lwayland-client -lwayland-cursor -lpipewire-0.3 -ludev
 EXT = ""
 EXLFLAGS = -Wall -g -v -L$(BINDIR) -Wl,-rpath,'$$ORIGIN'
