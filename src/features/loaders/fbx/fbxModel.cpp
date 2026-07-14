@@ -61,6 +61,8 @@ std::shared_ptr<Model> FBXModel::getAsModel()
 
         auto out = Model::createFromData(vertexTextured, indices);
         out->setName(name);
+        if (parent)
+            out->setParentName(parent->getName());
         return out;
     }
     else

@@ -100,11 +100,16 @@ void FBXAnimationLayer::collectAnimationTargets(std::shared_ptr<Animation3d> ani
             if (curveNode->hasModelName(anim.modelName))
             {
                 if (curveNode->getType() == std::string("pos"))
-                    anim.keyTransform.position = out / 100.0f;
+                    anim.keyTransform.position = out;
                 if (curveNode->getType() == std::string("scl"))
-                    anim.keyTransform.scale = out / 100.0f;
+                    anim.keyTransform.scale = out;
                 if (curveNode->getType() == std::string("rot"))
                     anim.keyTransform.rotation = (out / 180.0f) * PI;
+                if (anim.keyTransform.scale.x > 50.0f)
+                {
+                    anim.keyTransform.position /= 100.0f;
+                    anim.keyTransform.scale /= 100.0f;
+                }
             }
         }
     }

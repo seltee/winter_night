@@ -10,32 +10,41 @@ namespace wne
     class WNE_API MeshCollection
     {
     public:
-        void addMesh(std::shared_ptr<Mesh> mesh);
+        struct Entity
+        {
+            std::shared_ptr<Mesh> mesh;
+            std::string name;
+            std::string parentName;
+        };
+
+        Entity *addMesh(std::shared_ptr<Mesh> mesh);
+        Entity *addMesh(std::shared_ptr<Mesh> mesh, const char *name);
+        Entity *addMesh(std::shared_ptr<Mesh> mesh, const char *name, const char *parentName);
 
         inline const uint getMeshCount()
         {
-            return meshes.size();
+            return entities.size();
         }
 
         inline const uint64 getNewObjectId() const
         {
-            if (meshes.size() > 0)
-                return meshes[0]->genNewObjectId();
+            if (entities.size() > 0)
+                return entities[0].mesh->genNewObjectId();
             return 0xffffffff;
         }
 
         inline void freeMeshId(uint64 meshId) const
         {
-            if (meshes.size() > 0)
-                meshes[0]->freeObjectId(meshId);
+            if (entities.size() > 0)
+                entities[0].mesh->freeObjectId(meshId);
         }
 
-        std::shared_ptr<Mesh> &operator[](int meshNumber)
+        Entity &operator[](int meshNumber)
         {
-            return meshes[meshNumber];
+            return entities[meshNumber];
         }
 
     protected:
-        std::vector<std::shared_ptr<Mesh>> meshes;
+        std::vector<Entity> entities;
     };
 }

@@ -40,6 +40,7 @@ namespace wne
         float boundingRadius = 0.0f;
         Matrix4x4 defaultTransformation = Matrix4x4::identity();
         std::string name = "NoNameModel";
+        std::string parentName = "";
 
     public:
         Model(ModelVertexData vertexData, ModelIndexData indexData, ModelDataType type);
@@ -105,6 +106,16 @@ namespace wne
         inline void setName(const char *name)
         {
             this->name = std::string(name);
+        }
+
+        inline const char *getParentName() const
+        {
+            return parentName.c_str();
+        }
+
+        inline void setParentName(const char *parentName)
+        {
+            this->parentName = std::string(parentName);
         }
     };
 

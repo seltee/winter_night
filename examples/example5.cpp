@@ -57,7 +57,7 @@ int main()
 
     actorLoadedBox->setPosition(0.0f, 6.0f, 4.0f);
 
-    auto actorLoadedBoxStatic = scene->createActor<wne::ActorMesh>((*animBoxCollection)[0]);
+    auto actorLoadedBoxStatic = scene->createActor<wne::ActorMesh>((*animBoxCollection)[0].mesh);
     actorLoadedBoxStatic->setPosition(8.0f, 0, 10.0f);
 
     wne::Logger::log << "Loaded objects" << wne::endl;

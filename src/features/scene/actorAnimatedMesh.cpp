@@ -14,7 +14,7 @@ ActorAnimatedMesh::ActorAnimatedMesh(Renderer *renderer, std::shared_ptr<MeshCol
     for (uint i = 0; i < count; i++)
     {
         nodes[i].objectId = mesh->getNewObjectId();
-        nodes[i].name = (*mesh)[i]->getName();
+        nodes[i].name = (*mesh)[i].name.c_str();
         nodes[i].material = nullptr;
     }
 }
@@ -56,7 +56,7 @@ void ActorAnimatedMesh::update(float delta)
         if (mixFactorAcc > 0)
         {
             for (auto &track : tracks)
-                out = out * track->getTransformationMatrix((*mesh)[i]->getName(), mixFactorAcc);
+                out = out * track->getTransformationMatrix(nodes[i].name, mixFactorAcc);
         }
 
         nodes[i].transfotmation = getModelMatrix() * out;
@@ -78,8 +78,8 @@ void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
             getNormalMatrix(),
             uvModifier,
             false,
-            (*mesh)[i]->getDataType());
-        (*mesh)[i]->render(renderer->getFrameData());
+            (*mesh)[i].mesh->getDataType());
+        (*mesh)[i].mesh->render(renderer->getFrameData());
     }
 }
 
@@ -97,8 +97,8 @@ void ActorAnimatedMesh::renderDepth()
             nodes[i].transfotmation,
             getNormalMatrix(),
             uvModifier,
-            (*mesh)[i]->getDataType());
-        (*mesh)[i]->render(renderer->getFrameData());
+            (*mesh)[i].mesh->getDataType());
+        (*mesh)[i].mesh->render(renderer->getFrameData());
     }
 }
 
@@ -118,8 +118,8 @@ void ActorAnimatedMesh::renderColor()
             nodes[i].transfotmation,
             getNormalMatrix(),
             uvModifier,
-            (*mesh)[i]->getDataType());
-        (*mesh)[i]->render(renderer->getFrameData());
+            (*mesh)[i].mesh->getDataType());
+        (*mesh)[i].mesh->render(renderer->getFrameData());
     }
 }
 
