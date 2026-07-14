@@ -98,7 +98,8 @@ int main()
         float sz = cos(r) * 2.0f;
         wne::Vector3 rPosFrom(sx, 1.0f, sz);
         wne::Vector3 rPosTo(-sx, 1.0f, -sz);
-        renderer->addDebugLine(rPosFrom, rPosTo, wne::Renderer::DebugColor::Green, 0.2f, true);
+        renderer->addDebugLine(rPosFrom, rPosTo, wne::Renderer::DebugColor::Green);
+        renderer->addDebugLine(rPosFrom, wne::Vector3(8.0f, 0, 10.0f), wne::Renderer::DebugColor::White);
 
         sun->setDirection({sinf(translate * 0.5f), 1.6, cosf(translate * 0.5f)});
     }

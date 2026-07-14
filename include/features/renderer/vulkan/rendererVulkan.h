@@ -5,6 +5,8 @@
 #include "core/core.h"
 #include <memory>
 
+#define MAX_DEBUG_IDS 128
+
 namespace wne
 {
     class WNE_API RendererVulkan : public Renderer
@@ -33,6 +35,7 @@ namespace wne
 
         std::shared_ptr<wne::Material> getDefaultMaterial() override final;
         std::shared_ptr<Mesh> getDefaultPlane() override final;
+        std::shared_ptr<Mesh> getDefaultCube() override final;
         void prepareRenderingState() override final;
 
         void changeWindowSize(int32 width, int32 height) override final;
@@ -52,13 +55,24 @@ namespace wne
         RendererVulkan() = default;
         void setupDefaults();
 
+        std::shared_ptr<MaterialFlat> createDebugMaterial(uint32 color);
+        Material *getDebugMaterial(DebugColor color);
+
         std::unique_ptr<VulkanInstance> instance;
         std::shared_ptr<Mesh> atmoSphere;
         uint64 atmoSphereMeshId = 0xffffffff;
 
         std::shared_ptr<Material> defaultMaterial;
         std::shared_ptr<Mesh> defaultPlane;
+        std::shared_ptr<Mesh> defaultCube;
+
+        std::shared_ptr<MaterialFlat> debugMaterialGreen;
+        std::shared_ptr<MaterialFlat> debugMaterialRed;
+        std::shared_ptr<MaterialFlat> debugMaterialYellow;
+        std::shared_ptr<MaterialFlat> debugMaterialWhite;
 
         uint MSAASampleCount = 1;
+
+        uint64 debugIds[MAX_DEBUG_IDS];
     };
 }

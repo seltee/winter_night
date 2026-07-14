@@ -111,12 +111,17 @@ std::shared_ptr<Light> Renderer::createLightSpot()
     return nullptr;
 }
 
-std::shared_ptr<wne::Material> Renderer::getDefaultMaterial()
+std::shared_ptr<Material> Renderer::getDefaultMaterial()
 {
     return nullptr;
 }
 
-std::shared_ptr<wne::Mesh> Renderer::getDefaultPlane()
+std::shared_ptr<Mesh> Renderer::getDefaultPlane()
+{
+    return nullptr;
+}
+
+std::shared_ptr<Mesh> Renderer::getDefaultCube()
 {
     return nullptr;
 }
@@ -149,26 +154,26 @@ std::shared_ptr<Scene> Renderer::createScene()
 void Renderer::addDebugLine(const Vector3 &from, const Vector3 &to, Renderer::DebugColor color, float timer, bool onTop)
 {
     std::lock_guard<std::mutex> lock(mutexDebugData);
-    debugLineData.emplace_back(DebugLineData({from, to, timer, color, onTop}));
+    debugLineData.emplace_back(DebugLineData({from, to, timer, color, onTop, false}));
 }
 
 void Renderer::addDebugCube(const Vector3 &position, Renderer::DebugColor color, float timer, bool onTop)
 {
     std::lock_guard<std::mutex> lock(mutexDebugData);
-    debugCubeData.emplace_back(DebugCubeData({position, timer, color, onTop}));
+    debugCubeData.emplace_back(DebugCubeData({position, timer, color, onTop, false}));
 }
 
 void Renderer::updateDebugVisuals(float delta)
 {
     std::lock_guard<std::mutex> lock(mutexDebugData);
 
-    std::erase_if(debugLineData, [&](DebugLineData &block)
+    std::erase_if(debugLineData, [&](DebugLineData &node)
                   { 
-                    block.removeTimer -= delta;
-                    return block.removeTimer<0.0f; });
+                    node.removeTimer -= delta;
+                    return node.removeTimer<0.0f && node.oneFrameShown; });
 
-    std::erase_if(debugCubeData, [&](DebugCubeData &block)
+    std::erase_if(debugCubeData, [&](DebugCubeData &node)
                   { 
-                    block.removeTimer -= delta;
-                    return block.removeTimer<0.0f; });
+                    node.removeTimer -= delta;
+                    return node.removeTimer<0.0f && node.oneFrameShown; });
 }

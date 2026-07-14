@@ -38,6 +38,7 @@ namespace wne
             float removeTimer;
             DebugColor color;
             bool onTop;
+            bool oneFrameShown;
         };
 
         struct DebugCubeData
@@ -46,6 +47,7 @@ namespace wne
             float removeTimer;
             DebugColor color;
             bool onTop;
+            bool oneFrameShown;
         };
 
         virtual ~Renderer();
@@ -82,6 +84,7 @@ namespace wne
 
         virtual std::shared_ptr<Material> getDefaultMaterial();
         virtual std::shared_ptr<Mesh> getDefaultPlane();
+        virtual std::shared_ptr<Mesh> getDefaultCube();
 
         virtual void prepareRenderingState();
 
@@ -91,8 +94,8 @@ namespace wne
 
         std::shared_ptr<Scene> createScene();
 
-        void addDebugLine(const Vector3 &from, const Vector3 &to, DebugColor color, float timer = 0.0f, bool onTop = false);
-        void addDebugCube(const Vector3 &position, DebugColor color, float timer = 0.0f, bool onTop = false);
+        void addDebugLine(const Vector3 &from, const Vector3 &to, DebugColor color, float timer = 0.0f, bool onTop = true);
+        void addDebugCube(const Vector3 &position, DebugColor color, float timer = 0.0f, bool onTop = true);
         void updateDebugVisuals(float delta);
 
         inline RendererState *getState()

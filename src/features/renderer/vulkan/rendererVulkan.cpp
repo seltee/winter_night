@@ -80,6 +80,53 @@ void RendererVulkan::renderScenes()
 
 void RendererVulkan::renderDebug()
 {
+    uint idCounter = 0;
+    static AffectingLights lights{};
+    static const Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
+    static Matrix3x3 mNormal = Matrix3x3::identity();
+    auto state = getState();
+
+    for (auto &debugLine : debugLineData)
+    {
+        Vector3 center = (debugLine.from + debugLine.to) * 0.5f;
+        Matrix4x4 mModel = Matrix4x4::translation(center);
+        mModel = mModel * Matrix4x4(lookAt(debugLine.from, debugLine.to));
+        mModel = mModel * Matrix4x4::scale(0.08f, 0.08f, distance(debugLine.from, debugLine.to));
+        if (debugIds[idCounter] == 0xffffffff)
+            debugIds[idCounter] = defaultCube->genNewObjectId();
+
+        Material *material = getDebugMaterial(debugLine.color);
+        material->bindColor(
+            debugIds[idCounter], lights,
+            state->getViewProjectionMatrix() * mModel, mModel, mNormal,
+            uvModifier, defaultCube->getDataType());
+        defaultCube->render(getFrameData());
+        debugLine.oneFrameShown = true;
+
+        idCounter++;
+        if (idCounter == MAX_DEBUG_IDS)
+            return;
+    }
+
+    for (auto &debugCube : debugCubeData)
+    {
+        Matrix4x4 mModel = Matrix4x4::translation(debugCube.position);
+        mModel = mModel * Matrix4x4::scale(0.16f, 0.16f, 0.16f);
+        if (debugIds[idCounter] == 0xffffffff)
+            debugIds[idCounter] = defaultCube->genNewObjectId();
+
+        Material *material = getDebugMaterial(debugCube.color);
+        material->bindColor(
+            debugIds[idCounter], lights,
+            state->getViewProjectionMatrix() * mModel, mModel, mNormal,
+            uvModifier, defaultCube->getDataType());
+        defaultCube->render(getFrameData());
+        debugCube.oneFrameShown = true;
+
+        idCounter++;
+        if (idCounter == MAX_DEBUG_IDS)
+            return;
+    }
 }
 
 void RendererVulkan::renderFinish()
@@ -92,8 +139,8 @@ void RendererVulkan::renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial)
     static const Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
     auto state = getState();
     Matrix4x4 mModel = Matrix4x4::translation(state->getCameraPosition());
-    Matrix3x3 mNormal = Matrix3x3::identity();
-    AffectingLights lights{};
+    static Matrix3x3 mNormal = Matrix3x3::identity();
+    static AffectingLights lights{};
     atmoMaterial->bindColor(atmoSphereMeshId, lights, state->getViewProjectionMatrix() * mModel, mModel, mNormal, uvModifier, atmoSphere->getDataType());
     atmoSphere->render(getFrameData());
 }
@@ -123,6 +170,11 @@ std::shared_ptr<wne::Material> RendererVulkan::getDefaultMaterial()
 std::shared_ptr<Mesh> RendererVulkan::getDefaultPlane()
 {
     return defaultPlane;
+}
+
+std::shared_ptr<Mesh> RendererVulkan::getDefaultCube()
+{
+    return defaultCube;
 }
 
 void RendererVulkan::prepareRenderingState()
@@ -195,7 +247,6 @@ std::shared_ptr<Light> RendererVulkan::createLightSpot()
 
 void RendererVulkan::setupDefaults()
 {
-
     auto sphereModel = Primitives::createSphere(1.0f, 14, 10);
     atmoSphere = createMesh(sphereModel);
     atmoSphereMeshId = atmoSphere->genNewObjectId();
@@ -235,6 +286,44 @@ void RendererVulkan::setupDefaults()
     auto defaultTexture = createTexture(std::make_shared<Image>(textureData, defaultWidth, defaultHeight, 4));
     defaultMaterial = createFlatMaterial(defaultTexture);
 
+    // debug materials
+    debugMaterialGreen = createDebugMaterial(0xff85e5a3);
+    debugMaterialRed = createDebugMaterial(0xff3f00fa);
+    debugMaterialYellow = createDebugMaterial(0xff8ceeff);
+    debugMaterialWhite = createDebugMaterial(0xfff0f0f0);
+
+    // default meshes
     auto planeModel = Primitives::createPlane(0.5f, Vector3::forward());
     defaultPlane = createMesh(planeModel);
+
+    auto cubeModel = Primitives::createBox(1.0f);
+    defaultCube = createMesh(cubeModel);
+
+    // setup debug ids
+    for (uint i = 0; i < MAX_DEBUG_IDS; i++)
+        debugIds[i] = 0xffffffff;
+}
+
+std::shared_ptr<MaterialFlat> RendererVulkan::createDebugMaterial(uint32 color)
+{
+    auto textureDebugData = std::shared_ptr<uint8>(new uint8[2 * 2 * 4], std::default_delete<uint8[]>());
+    for (uint p = 0; p < 4; p++)
+        ((uint32 *)textureDebugData.get())[p] = color;
+
+    auto textureDebug = createTexture(std::make_shared<Image>(textureDebugData, 2, 2, 4));
+    std::shared_ptr<MaterialFlat> debugMaterial = createFlatMaterial(textureDebug);
+    debugMaterial->setColorBlending(ColorBlending::Alpha);
+    debugMaterial->setLighted(false);
+    return debugMaterial;
+}
+
+Material *RendererVulkan::getDebugMaterial(DebugColor color)
+{
+    if (color == DebugColor::Green)
+        return debugMaterialGreen.get();
+    else if (color == DebugColor::Red)
+        return debugMaterialRed.get();
+    else if (color == DebugColor::Yellow)
+        return debugMaterialYellow.get();
+    return debugMaterialWhite.get();
 }
