@@ -135,6 +135,7 @@ void WindowWayland::render()
 {
     renderer->renderStart();
     renderer->renderScenes();
+    renderer->renderDebug();
     if (flagShowTitlebar && uiSceneData.scene)
     {
         uiSceneData.scene->calcSceneMVP();

@@ -13,6 +13,7 @@
 #include "core/core.h"
 #include "core/math.h"
 #include <vector>
+#include <mutex>
 
 namespace wne
 {
@@ -22,10 +23,36 @@ namespace wne
     class WNE_API Renderer
     {
     public:
+        enum class DebugColor
+        {
+            Red,
+            Green,
+            Yellow,
+            White
+        };
+
+        struct DebugLineData
+        {
+            Vector3 from;
+            Vector3 to;
+            float removeTimer;
+            DebugColor color;
+            bool onTop;
+        };
+
+        struct DebugCubeData
+        {
+            Vector3 position;
+            float removeTimer;
+            DebugColor color;
+            bool onTop;
+        };
+
         virtual ~Renderer();
         virtual void update(float delta);
         virtual void renderStart();
         virtual void renderScenes();
+        virtual void renderDebug();
         virtual void renderFinish();
 
         virtual void changeWindowSize(int32 width, int32 height);
@@ -64,6 +91,10 @@ namespace wne
 
         std::shared_ptr<Scene> createScene();
 
+        void addDebugLine(const Vector3 &from, const Vector3 &to, DebugColor color, float timer = 0.0f, bool onTop = false);
+        void addDebugCube(const Vector3 &position, DebugColor color, float timer = 0.0f, bool onTop = false);
+        void updateDebugVisuals(float delta);
+
         inline RendererState *getState()
         {
             return state;
@@ -74,5 +105,8 @@ namespace wne
     protected:
         std::vector<std::shared_ptr<Scene>> scenes;
         RendererState *state = nullptr;
+        std::mutex mutexDebugData;
+        std::vector<DebugLineData> debugLineData;
+        std::vector<DebugCubeData> debugCubeData;
     };
 }

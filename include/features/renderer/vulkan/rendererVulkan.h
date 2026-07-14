@@ -18,6 +18,7 @@ namespace wne
         void update(float delta) override final;
         void renderStart() override final;
         void renderScenes() override final;
+        void renderDebug() override final;
         void renderFinish() override final;
 
         void renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial) override final;

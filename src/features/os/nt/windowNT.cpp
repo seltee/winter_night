@@ -161,6 +161,7 @@ void WindowNT::render()
 {
     renderer->renderStart();
     renderer->renderScenes();
+    renderer->renderDebug();
     renderer->renderFinish();
 }
 

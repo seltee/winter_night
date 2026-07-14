@@ -36,8 +36,9 @@ bool RendererVulkan::getSyncState()
 void RendererVulkan::update(float delta)
 {
     instance->getVulkanUtils()->swapSets();
-
     instance->getVulkanUtils()->getShadowMaps()->clear();
+    updateDebugVisuals(delta);
+
     for (const auto &scene : scenes)
     {
         scene->update(delta);
@@ -75,6 +76,10 @@ void RendererVulkan::renderScenes()
         scene->provideSceneMVP();
         scene->render();
     }
+}
+
+void RendererVulkan::renderDebug()
+{
 }
 
 void RendererVulkan::renderFinish()

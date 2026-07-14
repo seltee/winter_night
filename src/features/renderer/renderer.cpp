@@ -1,6 +1,7 @@
 #include "features/renderer/renderer.h"
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 #include <iostream>
+#include <iterator>
 
 using namespace wne;
 
@@ -10,6 +11,7 @@ Renderer::~Renderer()
 
 void Renderer::update(float delta)
 {
+    updateDebugVisuals(delta);
 }
 
 void Renderer::renderStart()
@@ -17,6 +19,10 @@ void Renderer::renderStart()
 }
 
 void Renderer::renderScenes()
+{
+}
+
+void Renderer::renderDebug()
 {
 }
 
@@ -138,4 +144,31 @@ std::shared_ptr<Scene> Renderer::createScene()
     auto scene = wne::Scene::create(this);
     addScene(scene);
     return scene;
+}
+
+void Renderer::addDebugLine(const Vector3 &from, const Vector3 &to, Renderer::DebugColor color, float timer, bool onTop)
+{
+    std::lock_guard<std::mutex> lock(mutexDebugData);
+    debugLineData.emplace_back(DebugLineData({from, to, timer, color, onTop}));
+}
+
+void Renderer::addDebugCube(const Vector3 &position, Renderer::DebugColor color, float timer, bool onTop)
+{
+    std::lock_guard<std::mutex> lock(mutexDebugData);
+    debugCubeData.emplace_back(DebugCubeData({position, timer, color, onTop}));
+}
+
+void Renderer::updateDebugVisuals(float delta)
+{
+    std::lock_guard<std::mutex> lock(mutexDebugData);
+
+    std::erase_if(debugLineData, [&](DebugLineData &block)
+                  { 
+                    block.removeTimer -= delta;
+                    return block.removeTimer<0.0f; });
+
+    std::erase_if(debugCubeData, [&](DebugCubeData &block)
+                  { 
+                    block.removeTimer -= delta;
+                    return block.removeTimer<0.0f; });
 }

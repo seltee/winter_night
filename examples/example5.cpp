@@ -86,12 +86,19 @@ int main()
 
     float translate = 0.0f;
     float goblinAnim = 0.0f;
+    float r = 0;
     while (!window->isCloseRequested())
     {
         float delta = wne::Engine::getInstance()->update();
         goblinAnim += delta * 6.0f;
-
         translate += delta * 2.0f;
+
+        r += delta;
+        float sx = sin(r) * 2.0f;
+        float sz = cos(r) * 2.0f;
+        wne::Vector3 rPosFrom(sx, 1.0f, sz);
+        wne::Vector3 rPosTo(-sx, 1.0f, -sz);
+        renderer->addDebugLine(rPosFrom, rPosTo, wne::Renderer::DebugColor::Green, 0.2f, true);
 
         sun->setDirection({sinf(translate * 0.5f), 1.6, cosf(translate * 0.5f)});
     }
