@@ -70,6 +70,16 @@ namespace wne
 
         void removeAnimationTrack(std::shared_ptr<Animation3dTrack> track);
 
+        inline void setDebugViewChierarchy(bool state)
+        {
+            debugViewChierarchyState = state;
+        }
+
+        inline bool getDebugViewChierarchy()
+        {
+            return debugViewChierarchyState;
+        }
+
         inline AnimatedMeshNode *getMeshNodeByName(const char *name)
         {
             for (auto &meshNode : nodes)
@@ -89,5 +99,8 @@ namespace wne
 
         // animations
         std::vector<std::shared_ptr<Animation3dTrack>> tracks;
+
+        // debug
+        bool debugViewChierarchyState = false;
     };
 };

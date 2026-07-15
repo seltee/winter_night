@@ -48,6 +48,7 @@ int main()
     auto actorLoadedBox = scene->createActor<wne::ActorAnimatedMesh>(animBoxCollection);
     actorLoadedBox->setMaterialToAll(materialBox);
     actorLoadedBox->setMaterialByName("Cube", materialMetalBox);
+    actorLoadedBox->setDebugViewChierarchy(true);
 
     for (auto &anim : animBoxData.animations)
     {

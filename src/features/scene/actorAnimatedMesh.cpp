@@ -143,6 +143,21 @@ void ActorAnimatedMesh::renderColor()
             (*mesh)[i].mesh->getDataType());
         (*mesh)[i].mesh->render(renderer->getFrameData());
     }
+
+    if (debugViewChierarchyState)
+    {
+        for (uint i = 0; i < count; i++)
+        {
+            if (nodes[i].parentNode)
+            {
+                Vector4 pFrom4(0, 0, 0, 1.0f);
+                Vector4 pTo4(0, 0, 0, 1.0f);
+                Vector3 from = (nodes[i].transfotmation * pFrom4).xyz();
+                Vector3 to = (nodes[i].parentNode->transfotmation * pFrom4).xyz();
+                renderer->addDebugLine(from, to, Renderer::DebugColor::White);
+            }
+        }
+    }
 }
 
 Actor::RenderPass ActorAnimatedMesh::getRenderPass()
