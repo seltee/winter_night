@@ -63,5 +63,5 @@ void ActorCamera::updateClippingPlanes()
 
 void ActorCamera::updateRenderFlag(ActorCamera *camera)
 {
-    isRenderedFlag = false;
+    isInRenderFlag = false;
 }

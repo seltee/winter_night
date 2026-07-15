@@ -38,9 +38,10 @@ namespace wne
         std::shared_ptr<Material> material;
         Matrix4x4 transfotmation;
         AnimatedMeshNode *parentNode = nullptr;
-        float radius = 1.0f;
+        float boundingRadius = 1.0f;
         Vector3 position{0, 0, 0};
         bool isTransformationDirty = true;
+        bool isInRender = false;
 
     protected:
         uint64 objectId;
@@ -59,6 +60,8 @@ namespace wne
 
         void update(float delta) override final;
         Matrix4x4 getNodeTransformation(AnimatedMeshNode *node);
+
+        void updateRenderFlag(ActorCamera *camera) override final;
 
         void renderDepthShadow(Vector3 &lightPosition) override final;
         void renderDepth() override final;

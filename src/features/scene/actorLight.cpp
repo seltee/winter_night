@@ -28,5 +28,5 @@ void ActorLight::update(float delta)
 
 void ActorLight::updateRenderFlag(ActorCamera *camera)
 {
-    isRenderedFlag = false;
+    isInRenderFlag = false;
 }

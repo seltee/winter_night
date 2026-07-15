@@ -80,7 +80,7 @@ void Scene::renderDepth()
     // depth pass
     for (const auto &object : actors)
     {
-        if (object->isRendered() && object->isVisible())
+        if (object->isInRender() && object->isVisible())
             object->renderDepth();
     }
 }
@@ -103,7 +103,7 @@ void Scene::render()
     // color pass
     for (const auto &object : actors)
     {
-        if (object->isRendered() && object->isVisible())
+        if (object->isInRender() && object->isVisible())
         {
             if (object->getRenderPass() == Actor::RenderPass::Main)
                 object->renderColor();

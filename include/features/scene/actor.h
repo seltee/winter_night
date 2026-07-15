@@ -66,9 +66,9 @@ namespace wne
             return isDestroyedFlag;
         }
 
-        inline bool isRendered()
+        inline bool isInRender()
         {
-            return isRenderedFlag;
+            return isInRenderFlag;
         }
 
         inline void setVisibility(bool state)
@@ -103,7 +103,9 @@ namespace wne
         bool isDirtyNormalsFlag = true;
         bool isShadowEnabled = true;
         bool isDestroyedFlag = false;
-        bool isRenderedFlag = false;
+
+        // is in frustrum
+        bool isInRenderFlag = false;
         bool isVisibleflag = true;
         Matrix3x3 mNormal = Matrix3x3::identity();
 

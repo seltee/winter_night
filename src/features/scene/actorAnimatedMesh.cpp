@@ -75,7 +75,8 @@ void ActorAnimatedMesh::update(float delta)
 
             // boundings
             Vector3 scale = extractScale(transformation);
-            nodes[i].radius = getHighestAxisValue(scale) * (*mesh)[i].mesh->getBoundingRadius();
+            float nodeRadius = getHighestAxisValue(scale) * (*mesh)[i].mesh->getBoundingRadius();
+            nodes[i].boundingRadius = nodeRadius;
             Vector4 position4 = transformation * Vector4(0, 0, 0, 1.0f);
             position4 = position4 / position4.w;
             Vector3 position = position4.xyz();
@@ -83,7 +84,7 @@ void ActorAnimatedMesh::update(float delta)
 
             boundingRadius = std::max(
                 boundingRadius,
-                length(position - actorPosition) + nodes[i].radius);
+                length(position - actorPosition) + nodeRadius);
         }
     }
     this->boundingRadius = boundingRadius;
@@ -104,6 +105,23 @@ Matrix4x4 ActorAnimatedMesh::getNodeTransformation(AnimatedMeshNode *node)
 
     node->transfotmation = base * out;
     return node->transfotmation;
+}
+
+void ActorAnimatedMesh::updateRenderFlag(ActorCamera *camera)
+{
+    if (camera)
+    {
+        Vector4 position = getModelMatrix() * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+        position = position / position.w;
+        isInRenderFlag = camera->checkFrustrum(position.xyz(), getBoundingRadius());
+
+        for (uint i = 0; i < count; i++)
+            nodes[i].isInRender = camera->checkFrustrum(nodes[i].position, nodes[i].boundingRadius);
+    }
+    else
+    {
+        isInRenderFlag = false;
+    }
 }
 
 void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
@@ -133,15 +151,18 @@ void ActorAnimatedMesh::renderDepth()
 
     for (uint i = 0; i < count; i++)
     {
-        Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
-        materialToUse->bindDepth(
-            nodes[i].getObjectId(),
-            state->getViewProjectionMatrix() * nodes[i].transfotmation,
-            nodes[i].transfotmation,
-            getNormalMatrix(),
-            uvModifier,
-            (*mesh)[i].mesh->getDataType());
-        (*mesh)[i].mesh->render(renderer->getFrameData());
+        if (nodes[i].isInRender)
+        {
+            Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
+            materialToUse->bindDepth(
+                nodes[i].getObjectId(),
+                state->getViewProjectionMatrix() * nodes[i].transfotmation,
+                nodes[i].transfotmation,
+                getNormalMatrix(),
+                uvModifier,
+                (*mesh)[i].mesh->getDataType());
+            (*mesh)[i].mesh->render(renderer->getFrameData());
+        }
     }
 }
 
@@ -153,16 +174,19 @@ void ActorAnimatedMesh::renderColor()
 
     for (uint i = 0; i < count; i++)
     {
-        Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
-        materialToUse->bindColor(
-            nodes[i].getObjectId(),
-            lights,
-            state->getViewProjectionMatrix() * nodes[i].transfotmation,
-            nodes[i].transfotmation,
-            getNormalMatrix(),
-            uvModifier,
-            (*mesh)[i].mesh->getDataType());
-        (*mesh)[i].mesh->render(renderer->getFrameData());
+        if (nodes[i].isInRender)
+        {
+            Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
+            materialToUse->bindColor(
+                nodes[i].getObjectId(),
+                lights,
+                state->getViewProjectionMatrix() * nodes[i].transfotmation,
+                nodes[i].transfotmation,
+                getNormalMatrix(),
+                uvModifier,
+                (*mesh)[i].mesh->getDataType());
+            (*mesh)[i].mesh->render(renderer->getFrameData());
+        }
     }
 
     if (debugViewChierarchyState)

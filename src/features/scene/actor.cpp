@@ -23,11 +23,11 @@ void Actor::updateRenderFlag(ActorCamera *camera)
     {
         Vector4 position = getModelMatrix() * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
         position = position / position.w;
-        isRenderedFlag = camera->checkFrustrum(position.xyz(), getBoundingRadius());
+        isInRenderFlag = camera->checkFrustrum(position.xyz(), getBoundingRadius());
     }
     else
     {
-        isRenderedFlag = false;
+        isInRenderFlag = false;
     }
 }
 
