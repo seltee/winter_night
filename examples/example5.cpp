@@ -49,6 +49,20 @@ int main()
     actorLoadedBox->setMaterialToAll(materialBox);
     actorLoadedBox->setMaterialByName("Cube", materialMetalBox);
     actorLoadedBox->setDebugViewChierarchy(true);
+    actorLoadedBox->setPosition(0.0f, 6.0f, 4.0f);
+
+    for (auto &anim : animBoxData.animations)
+    {
+        auto animationTrack = actorLoadedBox->createAnimationTrack(anim);
+        animationTrack->play(true);
+    }
+
+    // auto animTubeData = wne::Loader3d::loadAsModelAnimation("./bones_tube.fbx");
+    // auto animTubeCollection = renderer->createMeshCollection(animTubeData.models);
+    // auto actorLoadedTube = scene->createActor<wne::ActorAnimatedMesh>(animTubeCollection);
+    // actorLoadedTube->setMaterialToAll(materialBox);
+    // actorLoadedTube->setDebugViewChierarchy(true);
+    // actorLoadedTube->setPosition(-5.0f, 2.0f, 6.0f);
 
     for (auto &anim : animBoxData.animations)
     {
@@ -57,9 +71,6 @@ int main()
     }
 
     actorLoadedBox->setPosition(0.0f, 6.0f, 4.0f);
-
-    auto actorLoadedBoxStatic = scene->createActor<wne::ActorMesh>((*animBoxCollection)[0].mesh);
-    actorLoadedBoxStatic->setPosition(8.0f, 0, 10.0f);
 
     wne::Logger::log << "Loaded objects" << wne::endl;
     for (auto &model : animBoxData.models)
