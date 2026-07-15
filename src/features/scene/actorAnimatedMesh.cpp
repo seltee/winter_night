@@ -61,11 +61,32 @@ void ActorAnimatedMesh::update(float delta)
     for (auto &track : tracks)
         track->update(delta);
 
+    Vector4 actorPosition4 = getModelMatrix() * Vector4(0, 0, 0, 1.0f);
+    actorPosition4 = actorPosition4 / actorPosition4.w;
+    Vector3 actorPosition = actorPosition4.xyz();
+    float boundingRadius = 0.0f;
     for (uint i = 0; i < count; i++)
     {
         if (nodes[i].isTransformationDirty)
-            nodes[i].transfotmation = getNodeTransformation(&nodes[i]);
+        {
+            // main transformation
+            Matrix4x4 transformation = getNodeTransformation(&nodes[i]);
+            nodes[i].transfotmation = transformation;
+
+            // boundings
+            Vector3 scale = extractScale(transformation);
+            nodes[i].radius = getHighestAxisValue(scale) * (*mesh)[i].mesh->getBoundingRadius();
+            Vector4 position4 = transformation * Vector4(0, 0, 0, 1.0f);
+            position4 = position4 / position4.w;
+            Vector3 position = position4.xyz();
+            nodes[i].position = position;
+
+            boundingRadius = std::max(
+                boundingRadius,
+                length(position - actorPosition) + nodes[i].radius);
+        }
     }
+    this->boundingRadius = boundingRadius;
 }
 
 Matrix4x4 ActorAnimatedMesh::getNodeTransformation(AnimatedMeshNode *node)
@@ -150,11 +171,11 @@ void ActorAnimatedMesh::renderColor()
         {
             if (nodes[i].parentNode)
             {
-                Vector4 pFrom4(0, 0, 0, 1.0f);
-                Vector4 pTo4(0, 0, 0, 1.0f);
-                Vector3 from = (nodes[i].transfotmation * pFrom4).xyz();
-                Vector3 to = (nodes[i].parentNode->transfotmation * pFrom4).xyz();
-                renderer->addDebugLine(from, to, Renderer::DebugColor::White);
+                Vector4 pFrom4 = nodes[i].transfotmation * Vector4(0, 0, 0, 1.0f);
+                pFrom4 = pFrom4 / pFrom4.w;
+                Vector4 pTo4 = nodes[i].parentNode->transfotmation * Vector4(0, 0, 0, 1.0f);
+                pTo4 = pTo4 / pTo4.w;
+                renderer->addDebugLine(pFrom4.xyz(), pTo4.xyz(), Renderer::DebugColor::White);
             }
         }
     }
@@ -167,7 +188,7 @@ Actor::RenderPass ActorAnimatedMesh::getRenderPass()
 
 float ActorAnimatedMesh::getBoundingRadius()
 {
-    return 4.0f;
+    return boundingRadius;
 }
 
 std::shared_ptr<Animation3dTrack> ActorAnimatedMesh::createAnimationTrack(std::shared_ptr<Animation3d> animation)

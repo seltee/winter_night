@@ -31,7 +31,7 @@ namespace wne
         Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
 
         // operators
-        inline Vector3 xyz()
+        inline Vector3 xyz() const
         {
             return Vector3(x, y, z);
         }

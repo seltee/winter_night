@@ -38,6 +38,8 @@ namespace wne
         std::shared_ptr<Material> material;
         Matrix4x4 transfotmation;
         AnimatedMeshNode *parentNode = nullptr;
+        float radius = 1.0f;
+        Vector3 position{0, 0, 0};
         bool isTransformationDirty = true;
 
     protected:
@@ -91,9 +93,10 @@ namespace wne
         }
 
     protected:
-        std::shared_ptr<MeshCollection> mesh;
+        float boundingRadius = 1.0f;
 
         // position and data about meshes
+        std::shared_ptr<MeshCollection> mesh;
         std::vector<AnimatedMeshNode> nodes;
         uint count = 0;
 

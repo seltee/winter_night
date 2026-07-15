@@ -112,6 +112,11 @@ namespace wne
         return plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;
     }
 
+    inline float length(const Vector3 &vec)
+    {
+        return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+    }
+
     inline float getHighestAxisValue(const Vector4 &vec)
     {
         return fmaxf(fmaxf(fmaxf(vec.x, vec.y), vec.z), vec.w);
@@ -177,4 +182,11 @@ namespace wne
         return result;
     }
 
+    inline Vector3 extractScale(const Matrix4x4 &m)
+    {
+        return Vector3(
+            length(m[0].xyz()),
+            length(m[1].xyz()),
+            length(m[2].xyz()));
+    }
 };
