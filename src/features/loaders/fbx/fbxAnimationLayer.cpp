@@ -12,7 +12,6 @@ const uint64 FBXTimeToMs = 46186158;
 
 FBXAnimationLayer::FBXAnimationLayer(FBXNode &node)
 {
-    // node->print();
     id = node.getLong(0);
     const char *charName = node.getString(1);
     name = std::string(charName);

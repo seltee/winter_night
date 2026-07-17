@@ -7,6 +7,8 @@
 namespace wne
 {
     class FBXAnimationCurveNode;
+    class FBXNodeAttribute;
+
     class FBXModel
     {
     public:
@@ -55,6 +57,11 @@ namespace wne
             return scale;
         }
 
+        inline void addAttribute(FBXNodeAttribute *nodeAttribute)
+        {
+            nodeAttributes.push_back(nodeAttribute);
+        }
+
     protected:
         uint64 id;
         const char *name = nullptr;
@@ -67,5 +74,7 @@ namespace wne
         FBXModel *parent = nullptr;
 
         std::vector<FBXAnimationCurveNode *> curveNodes;
+
+        std::vector<FBXNodeAttribute *> nodeAttributes;
     };
 };

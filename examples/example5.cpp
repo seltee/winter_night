@@ -57,11 +57,11 @@ int main()
         animationTrack->play(true);
     }
 
-    // auto animTubeData = wne::Loader3d::loadAsModelAnimation("./bones_tube.fbx");
-    // auto animTubeCollection = renderer->createMeshCollection(animTubeData.models);
-    // auto actorLoadedTube = scene->createActor<wne::ActorAnimatedMesh>(animTubeCollection);
+    auto animTubeData = wne::Loader3d::loadAsModelAnimation("./bones_tube.fbx");
+    auto animTubeCollection = renderer->createMeshCollection(animTubeData.models);
+    auto actorLoadedTube = scene->createActor<wne::ActorAnimatedMesh>(animTubeCollection);
     // actorLoadedTube->setMaterialToAll(materialBox);
-    // actorLoadedTube->setDebugViewChierarchy(true);
+    actorLoadedTube->setDebugViewChierarchy(true);
     // actorLoadedTube->setPosition(-5.0f, 2.0f, 6.0f);
 
     for (auto &anim : animBoxData.animations)

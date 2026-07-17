@@ -52,23 +52,24 @@ FBXModel::FBXModel(FBXNode &node)
 
 std::shared_ptr<Model> FBXModel::getAsModel()
 {
-    if (geometry)
+    std::shared_ptr<wne::Model> out;
+    if (geometry && !geometry->isEmpty())
     {
         std::vector<VertexTextured> vertexTextured;
         std::vector<uint32> indices;
 
         geometry->getData(vertexTextured, indices);
 
-        auto out = Model::createFromData(vertexTextured, indices);
-        out->setName(name);
-        if (parent)
-            out->setParentName(parent->getName());
-        return out;
+        out = Model::createFromData(vertexTextured, indices);
     }
     else
     {
-        return nullptr;
+        out = Model::create(ModelDataType::VertexTexturedInd32);
     }
+    out->setName(name);
+    if (parent)
+        out->setParentName(parent->getName());
+    return out;
 }
 
 void FBXModel::addAnimationCurveNode(FBXAnimationCurveNode *curveNode)

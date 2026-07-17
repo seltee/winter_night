@@ -5,6 +5,8 @@
 
 namespace wne
 {
+    class FBXDeformer;
+
     class FBXGeometry
     {
     public:
@@ -14,6 +16,21 @@ namespace wne
         inline uint64 getId()
         {
             return id;
+        }
+
+        inline void addDeformer(FBXDeformer *deformer)
+        {
+            deformers.push_back(deformer);
+        }
+
+        inline const std::vector<FBXDeformer *> &getDeformers()
+        {
+            return deformers;
+        }
+
+        inline bool isEmpty()
+        {
+            return vertices.size() == 0;
         }
 
     protected:
@@ -44,5 +61,7 @@ namespace wne
         std::vector<uint32> normalIndices;
         std::vector<Vector2> UVs;
         std::vector<uint32> UVIndices;
+
+        std::vector<FBXDeformer *> deformers;
     };
 };

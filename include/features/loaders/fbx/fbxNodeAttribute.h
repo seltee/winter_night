@@ -10,7 +10,10 @@ namespace wne
     public:
         FBXNodeAttribute(FBXNode &node);
 
-        uint64 id = 0;
+        inline uint64 getId()
+        {
+            return id;
+        }
 
         inline const std::string &getName() const
         {
@@ -18,6 +21,7 @@ namespace wne
         }
 
     private:
+        uint64 id = 0;
         std::string name;
     };
 };

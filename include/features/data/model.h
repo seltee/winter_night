@@ -53,6 +53,14 @@ namespace wne
         static std::shared_ptr<Model> createFromData(const std::vector<VertexTextured> &vertexTextured, const std::vector<uint16> &indices);
         static std::shared_ptr<Model> createFromData(const std::vector<VertexTextured> &vertexTextured, const std::vector<uint32> &indices);
 
+        inline bool isEmpty()
+        {
+            if (is32bitIndicides())
+                return indexData.ind32->size() == 0;
+            else
+                return indexData.ind16->size() == 0;
+        }
+
         inline bool is32bitIndicides()
         {
             return dataType == ModelDataType::VertexColoredInd32 || dataType == ModelDataType::VertexTexturedInd32;

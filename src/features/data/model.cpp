@@ -46,7 +46,7 @@ Model::~Model()
 
 bool Model::append(Model *model)
 {
-    if (model->getDataType() != dataType)
+    if (model->getDataType() != dataType || model->isEmpty())
         return false;
 
     Matrix4x4 transformation = model->getDefaultTransformation();

@@ -41,6 +41,8 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
     std::vector<FBXAnimationCurveNode> animationCurveNodes;
     std::vector<FBXAnimationCurve> animationCurves;
     std::vector<FBXNodeAttribute> nodeAttributes;
+    std::vector<FBXPose> poses;
+    std::vector<FBXDeformer> deformers;
 
     for (auto &geometryNode : objects->getChildrenByName("Geometry"))
         geometries.emplace_back(FBXGeometry(*geometryNode));
@@ -56,9 +58,10 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
         animationCurves.emplace_back(FBXAnimationCurve(*animationCurveNode));
     for (auto &nodeAttributeNode : objects->getChildrenByName("NodeAttribute"))
         nodeAttributes.emplace_back(FBXNodeAttribute(*nodeAttributeNode));
-
-    // auto poseNodes = objects->getChildrenByName("Pose");
-    // auto deformerNodes = objects->getChildrenByName("Deformer");
+    for (auto &poseNode : objects->getChildrenByName("Pose"))
+        poses.emplace_back(FBXPose(*poseNode));
+    for (auto &deformerNode : objects->getChildrenByName("Deformer"))
+        deformers.emplace_back(FBXDeformer(*deformerNode));
 
     // Connecting models, geometry and animations
     for (auto &connection : connections->getChildren())
@@ -69,13 +72,16 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
         FBXModel *modelFrom = getModelById(models, indexFrom);
         if (modelFrom)
         {
-            if (indexTo)
+            if (indexTo > 0)
             {
                 FBXModel *modelTo = getModelById(models, indexTo);
                 if (modelTo)
+                {
                     modelFrom->setParent(modelTo);
+                    continue;
+                }
             }
-            continue;
+            Logger::log << "Unknown model link" << endl;
         }
 
         FBXGeometry *geometryFrom = getGeometryById(geometries, indexFrom);
@@ -83,8 +89,11 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
         {
             FBXModel *modelTo = getModelById(models, indexTo);
             if (modelTo)
+            {
                 modelTo->setGeometry(geometryFrom);
-            continue;
+                continue;
+            }
+            Logger::log << "Unknown geometry link" << endl;
         }
 
         FBXAnimationLayer *layerFrom = getAnimationLayerById(animationLayers, indexFrom);
@@ -94,8 +103,10 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
             if (stackTo)
             {
                 stackTo->linkLayer(layerFrom);
+                continue;
             }
-            continue;
+
+            Logger::log << "Unknown anim layer link" << endl;
         }
 
         FBXAnimationCurveNode *curveNodeFrom = getAnimationCurveNodeById(animationCurveNodes, indexFrom);
@@ -107,12 +118,15 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
             {
                 modelTo->addAnimationCurveNode(curveNodeFrom);
                 curveNodeFrom->addAffectedModel(modelTo);
+                continue;
             }
             if (layerTo)
             {
                 layerTo->linkAnimationCurveNode(curveNodeFrom);
+                continue;
             }
-            continue;
+
+            Logger::log << "Unknown curve node link" << endl;
         }
 
         FBXAnimationCurve *curveFrom = getAnimationCurveById(animationCurves, indexFrom);
@@ -122,11 +136,47 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
             if (curveNodeTo)
             {
                 curveNodeTo->linkCurve(curveFrom, connection.get());
+                continue;
             }
-            continue;
+
+            Logger::log << "Unknown curve link" << endl;
         }
 
-        std::cout << "Unknown link " << indexFrom << " to " << indexTo << std::endl;
+        FBXDeformer *deformerFrom = getDeformerById(deformers, indexFrom);
+        if (deformerFrom)
+        {
+            FBXDeformer *deformerParentTo = getDeformerById(deformers, indexTo);
+            if (deformerParentTo)
+            {
+                deformerParentTo->addChildDeformer(deformerFrom);
+                deformerFrom->setParent(deformerParentTo);
+                continue;
+            }
+
+            FBXGeometry *geometryTo = getGeometryById(geometries, indexTo);
+            if (geometryTo)
+            {
+                geometryTo->addDeformer(deformerFrom);
+                continue;
+            }
+
+            Logger::log << "Unknown deformer link" << endl;
+        }
+
+        FBXNodeAttribute *nodeAttributeFrom = getNodeAttributeById(nodeAttributes, indexFrom);
+        if (nodeAttributeFrom)
+        {
+            FBXModel *modelTo = getModelById(models, indexTo);
+            if (modelTo)
+            {
+                modelTo->addAttribute(nodeAttributeFrom);
+                continue;
+            }
+
+            Logger::log << "Unknown attribute link" << endl;
+        }
+
+        Logger::log << "Unknown link " << indexFrom << " to " << indexTo << endl;
     }
 
     if (!animationStacks.empty())
@@ -156,6 +206,7 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
 
     for (auto &model : models)
     {
+        Logger::log << "Adding model " << model.getName() << endl;
         Matrix4x4 translation = Matrix4x4::translation(model.getPosition());
         Matrix4x4 rotationX = Matrix4x4::rotationX(model.getRotation().x);
         Matrix4x4 rotationY = Matrix4x4::rotationY(model.getRotation().y);
@@ -172,6 +223,8 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
         newModel->setDefaultTransformation(transformation);
         base->addModel(model.getName(), newModel);
     }
+
+    Logger::log << "FBX Loaded" << endl;
 
     return base;
 }
@@ -237,6 +290,26 @@ FBXAnimationCurveNode *FBX::getAnimationCurveNodeById(std::vector<FBXAnimationCu
 }
 
 FBXAnimationCurve *FBX::getAnimationCurveById(std::vector<FBXAnimationCurve> &list, uint64 id)
+{
+    for (auto &it : list)
+    {
+        if (it.getId() == id)
+            return &it;
+    }
+    return nullptr;
+}
+
+FBXDeformer *FBX::getDeformerById(std::vector<FBXDeformer> &list, uint64 id)
+{
+    for (auto &it : list)
+    {
+        if (it.getId() == id)
+            return &it;
+    }
+    return nullptr;
+}
+
+FBXNodeAttribute *FBX::getNodeAttributeById(std::vector<FBXNodeAttribute> &list, uint64 id)
 {
     for (auto &it : list)
     {

@@ -7,6 +7,8 @@
 #include "features/loaders/fbx/fbxAnimationCurveNode.h"
 #include "features/loaders/fbx/fbxAnimationCurve.h"
 #include "features/loaders/fbx/fbxNodeAttribute.h"
+#include "features/loaders/fbx/fbxPose.h"
+#include "features/loaders/fbx/fbxDeformer.h"
 #include "features/data/base3d.h"
 #include "features/data/file.h"
 #include <memory>
@@ -27,6 +29,8 @@ namespace wne
         static FBXAnimationStack *getAnimationStackById(std::vector<FBXAnimationStack> &list, uint64 id);
         static FBXAnimationCurveNode *getAnimationCurveNodeById(std::vector<FBXAnimationCurveNode> &list, uint64 id);
         static FBXAnimationCurve *getAnimationCurveById(std::vector<FBXAnimationCurve> &list, uint64 id);
+        static FBXDeformer *getDeformerById(std::vector<FBXDeformer> &list, uint64 id);
+        static FBXNodeAttribute *getNodeAttributeById(std::vector<FBXNodeAttribute> &list, uint64 id);
         static std::vector<std::string> getAnimationNames(std::vector<FBXAnimationLayer> &animLayers);
     };
 };
