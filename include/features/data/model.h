@@ -8,6 +8,7 @@
 #include "core/api.h"
 #include "core/data.h"
 #include "core/core.h"
+#include "features/data/armature.h"
 
 namespace wne
 {
@@ -42,6 +43,8 @@ namespace wne
         std::string name = "NoNameModel";
         std::string parentName = "";
 
+        std::vector<std::shared_ptr<Armature>> armatures;
+
     public:
         Model(ModelVertexData vertexData, ModelIndexData indexData, ModelDataType type);
         ~Model();
@@ -52,6 +55,11 @@ namespace wne
         static std::shared_ptr<Model> createFromData(const std::vector<VertexColored> &vertexColored, const std::vector<uint32> &indices);
         static std::shared_ptr<Model> createFromData(const std::vector<VertexTextured> &vertexTextured, const std::vector<uint16> &indices);
         static std::shared_ptr<Model> createFromData(const std::vector<VertexTextured> &vertexTextured, const std::vector<uint32> &indices);
+
+        inline void addArmature(std::shared_ptr<Armature> armature)
+        {
+            armatures.push_back(armature);
+        }
 
         inline bool isEmpty()
         {

@@ -206,7 +206,28 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
 
     for (auto &model : models)
     {
-        Logger::log << "Adding model " << model.getName() << endl;
+        Logger::log << "Adding model " << model.getName()
+                    << " -> " << (model.getParent() ? model.getParent()->getName() : "none")
+                    << ((!model.getGeometry() || model.getGeometry()->isEmpty()) ? " | Empty" : " | Has geometry")
+                    << ((model.getGeometry() && model.getGeometry()->getDeformers().size() > 0) ? " Has deformers" : " No deformers")
+                    << endl;
+
+        auto newModel = model.getAsModel();
+
+        if (model.getGeometry() && model.getGeometry()->getDeformers().size() > 0)
+        {
+            Logger::log << "Deformers info " << model.getGeometry()->getDeformers().size() << endl;
+            for (auto &def : model.getGeometry()->getDeformers())
+            {
+                Logger::log << def->getName() << " " << def->getTypeName() << endl;
+                if (def->isSkin())
+                {
+                    auto armature = def->getAsSkeleton();
+                    newModel->addArmature(armature);
+                }
+            }
+        }
+
         Matrix4x4 translation = Matrix4x4::translation(model.getPosition());
         Matrix4x4 rotationX = Matrix4x4::rotationX(model.getRotation().x);
         Matrix4x4 rotationY = Matrix4x4::rotationY(model.getRotation().y);
@@ -219,7 +240,6 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
         transformation = transformation * rotationZ;
         transformation = transformation * scale;
 
-        auto newModel = model.getAsModel();
         newModel->setDefaultTransformation(transformation);
         base->addModel(model.getName(), newModel);
     }

@@ -1,5 +1,6 @@
 #pragma once
 #include "core/core.h"
+#include "features/data/armature.h"
 #include "fbxNode.h"
 #include <memory>
 #include <vector>
@@ -10,6 +11,7 @@ namespace wne
     {
     public:
         FBXDeformer(FBXNode &node);
+        std::shared_ptr<Armature> getAsSkeleton();
 
         inline const uint64 getId()
         {
@@ -54,6 +56,16 @@ namespace wne
         inline const std::vector<FBXDeformer *> &getChildrenDeformers()
         {
             return children;
+        }
+
+        inline const std::vector<int> &getIndexes()
+        {
+            return indexes;
+        }
+
+        inline const std::vector<float> &getWeights()
+        {
+            return weights;
         }
 
     private:

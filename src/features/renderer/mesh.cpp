@@ -14,3 +14,8 @@ uint64 Mesh::genNewObjectId()
 void Mesh::freeObjectId(uint64 objectId)
 {
 }
+
+bool Mesh::isEmpty() const
+{
+    return true;
+}

@@ -30,6 +30,16 @@ VulkanMesh::~VulkanMesh()
 std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, VulkanUtils *vulkanUtils)
 {
     auto mesh = std::make_shared<VulkanMesh>(vulkanUtils);
+
+    // empty setup
+    if (model->isEmpty())
+    {
+        Logger::log << "EMPTY" << endl;
+        mesh->setup();
+        return mesh;
+    }
+
+    // data setup
     if (model->getDataType() == ModelDataType::VertexColoredInd16 || model->getDataType() == ModelDataType::VertexColoredInd32)
     {
         if (model->is32bitIndicides())
@@ -60,6 +70,12 @@ std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, Vul
     }
 
     return nullptr;
+}
+
+bool VulkanMesh::setup()
+{
+    this->boundingRadius = 0.0f;
+    return true;
 }
 
 bool VulkanMesh::setup(std::vector<VertexColored> &vertexData, std::vector<uint16> &indexData, float boundingRadius)
@@ -140,6 +156,9 @@ bool VulkanMesh::setup(std::vector<VertexTextured> &vertexData, std::vector<uint
 
 void VulkanMesh::render(void *frameRenderData)
 {
+    if (isEmpty())
+        return;
+
     VulkanFrame *vFrame = reinterpret_cast<VulkanFrame *>(frameRenderData);
     VkBuffer vertexBuffers[] = {vertexBuffer};
     VkDeviceSize offsets[] = {0};
@@ -158,6 +177,11 @@ uint64 VulkanMesh::genNewObjectId()
 void VulkanMesh::freeObjectId(uint64 objectId)
 {
     vulkanUtils->getObjectBuffers()->freeObjectId(objectId);
+}
+
+bool VulkanMesh::isEmpty() const
+{
+    return amountOfVerticies == 0;
 }
 
 bool VulkanMesh::allocateVertexBuffer(uint64 bufferSize, void *data)

@@ -27,6 +27,11 @@ namespace wne
             this->parent = parent;
         }
 
+        inline FBXModel *getParent()
+        {
+            return parent;
+        }
+
         inline void setGeometry(FBXGeometry *geometry)
         {
             this->geometry = geometry;

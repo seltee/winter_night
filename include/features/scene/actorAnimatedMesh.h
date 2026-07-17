@@ -13,11 +13,12 @@ namespace wne
     class WNE_API AnimatedMeshNode : public Positionable
     {
     public:
-        AnimatedMeshNode(uint64 objectId, const char *name, const char *parentName)
+        AnimatedMeshNode(uint64 objectId, const char *name, const char *parentName, bool isEmptyFlag)
         {
             this->objectId = objectId;
             this->name = std::string(name);
             this->parentName = std::string(parentName);
+            this->isEmptyFlag = isEmptyFlag;
         }
 
         inline const char *getName()
@@ -35,6 +36,11 @@ namespace wne
             return objectId;
         }
 
+        inline bool isEmpty()
+        {
+            return isEmptyFlag;
+        }
+
         std::shared_ptr<Material> material;
         Matrix4x4 transfotmation;
         AnimatedMeshNode *parentNode = nullptr;
@@ -42,6 +48,7 @@ namespace wne
         Vector3 position{0, 0, 0};
         bool isTransformationDirty = true;
         bool isInRender = false;
+        bool isEmptyFlag = false;
 
     protected:
         uint64 objectId;

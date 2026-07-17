@@ -12,6 +12,7 @@ namespace wne
 
         virtual uint64 genNewObjectId();
         virtual void freeObjectId(uint64 objectId);
+        virtual bool isEmpty() const;
 
         inline float getBoundingRadius()
         {

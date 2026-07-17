@@ -18,7 +18,8 @@ ActorAnimatedMesh::ActorAnimatedMesh(Renderer *renderer, std::shared_ptr<MeshCol
         nodes.emplace_back(AnimatedMeshNode(
             mesh->getNewObjectId(),
             (*mesh)[i].name.c_str(),
-            (*mesh)[i].parentName.c_str()));
+            (*mesh)[i].parentName.c_str(),
+            (*mesh)[i].mesh->isEmpty()));
     }
 
     // linking parents
@@ -116,7 +117,7 @@ void ActorAnimatedMesh::updateRenderFlag(ActorCamera *camera)
         isInRenderFlag = camera->checkFrustrum(position.xyz(), getBoundingRadius());
 
         for (uint i = 0; i < count; i++)
-            nodes[i].isInRender = camera->checkFrustrum(nodes[i].position, nodes[i].boundingRadius);
+            nodes[i].isInRender = !nodes[i].isEmpty() && camera->checkFrustrum(nodes[i].position, nodes[i].boundingRadius);
     }
     else
     {

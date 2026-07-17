@@ -20,6 +20,7 @@ namespace wne
 
         static std::shared_ptr<VulkanMesh> create(std::shared_ptr<Model> model, VulkanUtils *vulkanUtils);
 
+        bool setup();
         bool setup(std::vector<VertexColored> &vertexData, std::vector<uint16> &indexData, float boundingRadius);
         bool setup(std::vector<VertexColored> &vertexData, std::vector<uint32> &indexData, float boundingRadius);
         bool setup(std::vector<VertexTextured> &vertexData, std::vector<uint16> &indexData, float boundingRadius);
@@ -29,6 +30,8 @@ namespace wne
 
         uint64 genNewObjectId() override final;
         void freeObjectId(uint64 objectId) override final;
+
+        bool isEmpty() const override final;
 
         inline uint32 getAmountOfVerticies()
         {
