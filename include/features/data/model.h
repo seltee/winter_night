@@ -61,7 +61,17 @@ namespace wne
             armatures.push_back(armature);
         }
 
-        inline bool isEmpty()
+        inline bool hasArmatures() const
+        {
+            return armatures.size() > 0;
+        }
+
+        inline std::vector<std::shared_ptr<Armature>> &getArmatures()
+        {
+            return armatures;
+        }
+
+        inline bool isEmpty() const
         {
             if (is32bitIndicides())
                 return indexData.ind32->size() == 0;
@@ -69,12 +79,12 @@ namespace wne
                 return indexData.ind16->size() == 0;
         }
 
-        inline bool is32bitIndicides()
+        inline bool is32bitIndicides() const
         {
             return dataType == ModelDataType::VertexColoredInd32 || dataType == ModelDataType::VertexTexturedInd32;
         }
 
-        inline ModelDataType getDataType()
+        inline ModelDataType getDataType() const
         {
             return dataType;
         }

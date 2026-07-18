@@ -1,5 +1,6 @@
 #pragma once
 #include "features/data/model.h"
+#include "features/data/armature.h"
 #include "features/renderer/mesh.h"
 #include "core/api.h"
 #include <vector>
@@ -21,6 +22,8 @@ namespace wne
         Entity *addMesh(std::shared_ptr<Mesh> mesh, const char *name);
         Entity *addMesh(std::shared_ptr<Mesh> mesh, const char *name, const char *parentName);
 
+        void addArmature(std::shared_ptr<Armature> armature);
+
         inline const uint getMeshCount()
         {
             return entities.size();
@@ -39,12 +42,23 @@ namespace wne
                 entities[0].mesh->freeObjectId(meshId);
         }
 
-        Entity &operator[](int meshNumber)
+        inline bool hasArmatures()
+        {
+            return armatures.size() > 0;
+        }
+
+        inline const std::vector<std::shared_ptr<Armature>> &getArmatures()
+        {
+            return armatures;
+        }
+
+        inline Entity &operator[](int meshNumber)
         {
             return entities[meshNumber];
         }
 
     protected:
         std::vector<Entity> entities;
+        std::vector<std::shared_ptr<Armature>> armatures;
     };
 }

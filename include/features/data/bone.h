@@ -15,6 +15,16 @@ namespace wne
             return name.c_str();
         }
 
+        const std::vector<int> &getIndexes()
+        {
+            return indexes;
+        }
+
+        const std::vector<float> &getWeights()
+        {
+            return weights;
+        }
+
     protected:
         std::string name;
         std::vector<int> indexes;

@@ -54,14 +54,10 @@ std::shared_ptr<Armature> FBXDeformer::getAsSkeleton()
     if (!isSkin())
         return nullptr;
 
-    Logger::log << "Creating armature" << endl;
     std::shared_ptr<Armature> armature = std::make_shared<Armature>(name.c_str());
 
     for (auto &def : children)
-    {
-        Logger::log << "Child " << def->getName() << endl;
         armature->addBone(def->getName(), def->getIndexes(), def->getWeights());
-    }
 
     return armature;
 }

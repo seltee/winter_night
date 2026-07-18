@@ -70,18 +70,6 @@ int main()
         animationTrack->play(true);
     }
 
-    wne::Logger::log << "Loaded objects" << wne::endl;
-    for (auto &model : animBoxData.models)
-    {
-        wne::Logger::log << model->getName() << wne::endl;
-    }
-
-    wne::Logger::log << "Loaded animations" << wne::endl;
-    for (auto &anim : animBoxData.animations)
-    {
-        wne::Logger::log << anim->getName() << wne::endl;
-    }
-
     // light
     auto sun = renderer->createLightDirectional();
     sun->setDirection({-0.5, -0.5, -0.5});

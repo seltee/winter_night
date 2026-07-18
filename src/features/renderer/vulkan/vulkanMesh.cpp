@@ -34,7 +34,6 @@ std::shared_ptr<VulkanMesh> VulkanMesh::create(std::shared_ptr<Model> model, Vul
     // empty setup
     if (model->isEmpty())
     {
-        Logger::log << "EMPTY" << endl;
         mesh->setup();
         return mesh;
     }

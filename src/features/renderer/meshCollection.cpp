@@ -25,3 +25,8 @@ MeshCollection::Entity *MeshCollection::addMesh(std::shared_ptr<Mesh> mesh, cons
                                   std::string(parentName)}));
     return &entities[entities.size() - 1];
 }
+
+void MeshCollection::addArmature(std::shared_ptr<Armature> armature)
+{
+    armatures.push_back(armature);
+}

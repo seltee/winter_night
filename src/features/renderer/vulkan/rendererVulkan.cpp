@@ -199,6 +199,11 @@ std::shared_ptr<MeshCollection> RendererVulkan::createMeshCollection(std::vector
     {
         auto mesh = createMesh(model);
         meshCollection->addMesh(mesh, model->getName(), model->getParentName());
+        if (model->hasArmatures())
+        {
+            for (auto armature : model->getArmatures())
+                meshCollection->addArmature(armature);
+        }
     }
     return meshCollection;
 }

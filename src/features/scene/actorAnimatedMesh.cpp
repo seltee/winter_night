@@ -22,6 +22,12 @@ ActorAnimatedMesh::ActorAnimatedMesh(Renderer *renderer, std::shared_ptr<MeshCol
             (*mesh)[i].mesh->isEmpty()));
     }
 
+    // adding armatures
+    for (auto &armature : mesh->getArmatures())
+    {
+        Logger::log << "Armature found" << endl;
+    }
+
     // linking parents
     for (uint i = 0; i < count; i++)
     {
