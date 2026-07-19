@@ -63,7 +63,7 @@ void ActorSprite::renderDepthShadow(Vector3 &lightPosition)
     auto state = renderer->getState();
     if (shadowRenderingMode == ShadowRenderingMode::FromCamera)
     {
-        materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), uvModifier, true, mesh->getDataType());
+        materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * getModelMatrix(), getNormalMatrix(), uvModifier, nullptr, true, mesh->getDataType());
     }
     else if (shadowRenderingMode == ShadowRenderingMode::FromLight)
     {
@@ -86,7 +86,7 @@ void ActorSprite::renderDepthShadow(Vector3 &lightPosition)
             mShadowModel = newShadowModel * Matrix4x4::scale(scale);
         }
 
-        materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * mShadowModel, getNormalMatrix(), uvModifier, false, mesh->getDataType());
+        materialToUse->bindDepthShadow(objectId, renderer, state->getViewProjectionMatrix() * mShadowModel, getNormalMatrix(), uvModifier, nullptr, false, mesh->getDataType());
     }
     mesh->render(renderer->getFrameData());
 }
@@ -98,7 +98,7 @@ void ActorSprite::renderDepth()
         return;
 
     auto state = renderer->getState();
-    materialToUse->bindDepth(objectId, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
+    materialToUse->bindDepth(objectId, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), uvModifier, nullptr, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 
@@ -110,7 +110,7 @@ void ActorSprite::renderColor()
 
     auto state = renderer->getState();
     AffectingLights lights = materialToUse->isLighted() ? currentScene->collectAffectingLights(getPosition(), 0.0f) : AffectingLights{};
-    materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), uvModifier, mesh->getDataType());
+    materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), uvModifier, nullptr, mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 

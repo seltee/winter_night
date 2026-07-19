@@ -216,7 +216,17 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedColor(
     bufferLightMVPs.offset = 0;
     bufferLightMVPs.range = vulkanObjectBuffers->getLightMVPsBufferSize();
 
-    std::array<VkWriteDescriptorSet, 6> writes{};
+    VkDescriptorBufferInfo bufferBonesInfo{};
+    bufferBonesInfo.buffer = vulkanObjectBuffers->getBonesBuffer(frame);
+    bufferBonesInfo.offset = 0;
+    bufferBonesInfo.range = vulkanObjectBuffers->getBonesBufferSize();
+
+    VkDescriptorBufferInfo bufferBoneWeightsInfo{};
+    bufferBoneWeightsInfo.buffer = vulkanObjectBuffers->getBoneWeightsBuffer();
+    bufferBoneWeightsInfo.offset = 0;
+    bufferBoneWeightsInfo.range = vulkanObjectBuffers->getBoneWeightsBufferSize();
+
+    std::array<VkWriteDescriptorSet, 8> writes{};
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = *descriptorSet;
     writes[0].dstBinding = 0;
@@ -258,6 +268,20 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedColor(
     writes[5].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     writes[5].descriptorCount = 1;
     writes[5].pBufferInfo = &bufferLightMVPs;
+
+    writes[6].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[6].dstSet = *descriptorSet;
+    writes[6].dstBinding = 8;
+    writes[6].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    writes[6].descriptorCount = 1;
+    writes[6].pBufferInfo = &bufferBonesInfo;
+
+    writes[7].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[7].dstSet = *descriptorSet;
+    writes[7].dstBinding = 9;
+    writes[7].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    writes[7].descriptorCount = 1;
+    writes[7].pBufferInfo = &bufferBoneWeightsInfo;
 
     vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
     return true;

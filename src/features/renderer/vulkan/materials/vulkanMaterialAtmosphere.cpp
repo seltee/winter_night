@@ -24,6 +24,7 @@ void VulkanMaterialAtmosphere::bindDepthShadow(
     const Matrix4x4 &mMVP,
     const Matrix3x3 &mNormal,
     const UVData &uvData,
+    const MeshArmature *meshArmature,
     bool isDoubleSided,
     ModelDataType dataType)
 {
@@ -36,7 +37,9 @@ void VulkanMaterialAtmosphere::bindDepthShadow(
     selectPipelineShadowDepth(dataType, isDoubleSided);
     selectDescriptorDepthShadow(dataType, cascadeData);
     cascadeData->updateObjectData(objectId, mMVP);
-    setPCData(objectId, lights, uvData);
+
+    MaterialBoneData materialBoneData{};
+    setPCData(objectId, lights, uvData, materialBoneData);
 }
 
 void VulkanMaterialAtmosphere::bindDepth(
@@ -45,6 +48,7 @@ void VulkanMaterialAtmosphere::bindDepth(
     const Matrix4x4 &mModel,
     const Matrix3x3 &mNormal,
     const UVData &uvData,
+    const MeshArmature *meshArmature,
     ModelDataType dataType)
 {
     if (dataType == ModelDataType::Unknown)
@@ -54,7 +58,9 @@ void VulkanMaterialAtmosphere::bindDepth(
     selectPipelineDepth(dataType);
     selectDescriptorDepth(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
-    setPCData(objectId, lights, uvData);
+
+    MaterialBoneData materialBoneData{};
+    setPCData(objectId, lights, uvData, materialBoneData);
 }
 
 void VulkanMaterialAtmosphere::bindColor(
@@ -64,6 +70,7 @@ void VulkanMaterialAtmosphere::bindColor(
     const Matrix4x4 &mModel,
     const Matrix3x3 &mNormal,
     const UVData &uvData,
+    const MeshArmature *meshArmature,
     ModelDataType dataType)
 {
     if (dataType == ModelDataType::Unknown)
@@ -72,7 +79,9 @@ void VulkanMaterialAtmosphere::bindColor(
     selectPipelineColor(dataType);
     selectDescriptorColor(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
-    setPCData(objectId, lights, uvData);
+
+    MaterialBoneData materialBoneData{};
+    setPCData(objectId, lights, uvData, materialBoneData);
 }
 
 void VulkanMaterialAtmosphere::selectPipelineColor(ModelDataType dataType)
@@ -101,7 +110,7 @@ void VulkanMaterialAtmosphere::selectDescriptorColor(ModelDataType dataType)
     }
 }
 
-void VulkanMaterialAtmosphere::setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData)
+void VulkanMaterialAtmosphere::setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData, const MaterialBoneData &materialBoneData)
 {
     auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
     auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
@@ -113,6 +122,7 @@ void VulkanMaterialAtmosphere::setPCData(uint64 objectId, const AffectingLights 
     pco.uvShiftY = 0.0f;
     pco.uvScaleX = 1.0f;
     pco.uvScaleY = 1.0f;
+    pco.enableBones = 0;
 
     vkCmdPushConstants(
         commandBuffer,

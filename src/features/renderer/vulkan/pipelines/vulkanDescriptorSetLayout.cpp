@@ -47,7 +47,7 @@ bool VulkanDescriptorSetLayout::setupTexturedColor()
 {
 
     // pipeline layout
-    VkDescriptorSetLayoutBinding pipelineBinding[8]{};
+    VkDescriptorSetLayoutBinding pipelineBinding[10]{};
 
     // mvp matrices
     pipelineBinding[0].binding = 0;
@@ -105,9 +105,23 @@ bool VulkanDescriptorSetLayout::setupTexturedColor()
     pipelineBinding[7].pImmutableSamplers = nullptr;
     pipelineBinding[7].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
+    // bones buffer
+    pipelineBinding[8].binding = 8;
+    pipelineBinding[8].descriptorCount = 1;
+    pipelineBinding[8].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    pipelineBinding[8].pImmutableSamplers = nullptr;
+    pipelineBinding[8].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    // bones weight buffer
+    pipelineBinding[9].binding = 9;
+    pipelineBinding[9].descriptorCount = 1;
+    pipelineBinding[9].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    pipelineBinding[9].pImmutableSamplers = nullptr;
+    pipelineBinding[9].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
     VkDescriptorSetLayoutCreateInfo layoutInfoPipeline{};
     layoutInfoPipeline.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfoPipeline.bindingCount = 8;
+    layoutInfoPipeline.bindingCount = 10;
     layoutInfoPipeline.pBindings = pipelineBinding;
 
     if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayout) != VK_SUCCESS)

@@ -8,6 +8,7 @@
 #include "features/renderer/materialFlat.h"
 #include "features/renderer/rendererState.h"
 #include "features/renderer/text.h"
+#include "features/renderer/meshArmature.h"
 #include "features/scene/scene.h"
 #include "features/data/image.h"
 #include "core/core.h"
@@ -60,6 +61,8 @@ namespace wne
         virtual void changeWindowSize(int32 width, int32 height);
         virtual std::shared_ptr<Mesh> createMesh(std::shared_ptr<Model> model);
         virtual std::shared_ptr<MeshCollection> createMeshCollection(std::vector<std::shared_ptr<Model>> models);
+        virtual std::shared_ptr<MeshArmature> createMeshArmature(std::shared_ptr<Armature> armature);
+
         virtual std::shared_ptr<Texture> createTexture(std::shared_ptr<Image> image);
         virtual std::shared_ptr<Text> createText(std::shared_ptr<Font> font);
         virtual std::shared_ptr<MaterialFlat> createFlatMaterial();

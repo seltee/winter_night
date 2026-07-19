@@ -1,4 +1,5 @@
 #include "features/renderer/vulkan/vulkanMeshArmature.h"
+#include "features/logger/logger.h"
 #include "vulkan/vulkan.h"
 #include <memory>
 
@@ -9,54 +10,50 @@ VulkanMeshArmature::VulkanMeshArmature(VulkanUtils *vulkanUtils)
     this->vulkanUtils = vulkanUtils;
 }
 
-bool VulkanMeshArmature::setupMatrixBuffer(int boneAmount)
+bool VulkanMeshArmature::setupMatrixBuffer(int bonesAmount)
 {
-    auto device = vulkanUtils->getVulkanDevice()->getDevice();
-
-    uint bufferSize = (uint)boneAmount * sizeof(Matrix4x4);
-    vulkanUtils->createBuffer(
-        bufferSize,
-        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        boneMatricies,
-        boneMatriciesMemory);
-
-    vkMapMemory(device, boneMatriciesMemory, 0, bufferSize, 0, (void **)&boneMatriciesMapped);
-    for (int i = 0; i < boneAmount; i++)
-    {
-        boneMatriciesMapped[i] = Matrix4x4::identity();
-    }
+    auto objectBuffers = vulkanUtils->getObjectBuffers();
+    bonesBufferIndex = objectBuffers->allocateBonesForObject(bonesAmount);
+    return true;
 }
 
 bool VulkanMeshArmature::setupBoneWeights(const std::vector<std::shared_ptr<wne::Bone>> &bones)
 {
-    auto device = vulkanUtils->getVulkanDevice()->getDevice();
+    auto objectBuffers = vulkanUtils->getObjectBuffers();
+    boneWeightsBufferIndex = objectBuffers->allocateBoneWeightsForObject(armature->getMaxIndex());
+    auto boneWeightsBuffer = objectBuffers->getBoneWeightsForObject(boneWeightsBufferIndex);
 
-    uint bufferSize = maxIndex * sizeof(BoneVertexData);
-    vulkanUtils->createBuffer(
-        bufferSize,
-        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        vertexIndexes,
-        vertexIndexesMemory);
-
-    vkMapMemory(device, vertexIndexesMemory, 0, bufferSize, 0, (void **)&vertexIndexesMapped);
-    memset(vertexIndexesMapped, 0, bufferSize);
-
+    uint boneIndex = 0;
     for (auto &bone : bones)
     {
         auto indexes = bone->getIndexes();
+        auto weights = bone->getWeights();
         uint indexAmount = indexes.size();
         for (uint i = 0; i < indexAmount; i++)
         {
+            uint vIndex = indexes[i];
+            float weight = weights[i];
+            for (int i = 0; i < MAX_WEIGHTS_PER_VERTEX; i++)
+            {
+                if (boneWeightsBuffer[vIndex].boneWeight[i] == 0.0f)
+                {
+                    boneWeightsBuffer[vIndex].boneIndex[i] = boneIndex;
+                    boneWeightsBuffer[vIndex].boneWeight[i] = weight;
+                    break;
+                }
+            }
         }
+        boneIndex++;
     }
+
+    return true;
 }
 
 void VulkanMeshArmature::setBoneTransformationMatrix(int index, const Matrix4x4 &data)
 {
+    auto objectBuffers = vulkanUtils->getObjectBuffers();
     if (index >= 0 && index < maxIndex)
     {
-        boneMatriciesMapped[index] = data;
+        objectBuffers->setBoneMatrix(bonesBufferIndex + index, data);
     }
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "features/renderer/texture.h"
+#include "features/renderer/meshArmature.h"
 #include "features/data/model.h"
 #include "core/math.h"
 #include "core/api.h"
@@ -32,6 +33,7 @@ namespace wne
             const Matrix4x4 &mMVP,
             const Matrix3x3 &mNormal,
             const UVData &uvData,
+            const MeshArmature *meshArmature,
             bool isDoubleSided,
             ModelDataType dataType);
 
@@ -42,6 +44,7 @@ namespace wne
             const Matrix4x4 &mModel,
             const Matrix3x3 &mNormal,
             const UVData &uvData,
+            const MeshArmature *meshArmature,
             ModelDataType dataType);
 
         // bind for color render
@@ -52,6 +55,7 @@ namespace wne
             const Matrix4x4 &mModel,
             const Matrix3x3 &mNormal,
             const UVData &uvData,
+            const MeshArmature *meshArmature,
             ModelDataType dataType);
 
         void setMasked(bool masked)

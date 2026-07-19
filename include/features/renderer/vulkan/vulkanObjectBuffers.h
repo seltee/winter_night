@@ -17,6 +17,9 @@ namespace wne
         static const uint32 AMOUNT_OF_OBJECTS = 8192;
         static const uint32 AMOUNT_OF_LIGHTS = 128;
         static const uint32 MAX_LIGHT_SHADOWS = 16;
+        static const int32 MAX_BONES_IN_SCENE = 4096;
+        static const int32 MAX_BONE_WEIGHTS = 5;
+        static const int32 MAX_BONE_BINDINGS = (1024 * 256);
 
         struct GlobalData
         {
@@ -36,6 +39,12 @@ namespace wne
             uint32 shadowId, amountOfCascades;
             float texelSize, pad3;
             uint32 enableDirectional, enableOmni, enableSpot, pad1;
+        };
+
+        struct BoneWeightBinding
+        {
+            int boneIndex[MAX_BONE_WEIGHTS];
+            float boneWeight[MAX_BONE_WEIGHTS];
         };
 
         VulkanObjectBuffers(VulkanUtils *vulkanUtils);
@@ -77,6 +86,15 @@ namespace wne
             uint useRadianceMap,
             float radienceMapFactor);
 
+        // returns starting bone index
+        int32 allocateBonesForObject(uint32 bonesAmount);
+        void deallocateBonesOfOjbect(int32 index);
+        void setBoneMatrix(int32 index, const Matrix4x4 &mTransformation);
+
+        int32 allocateBoneWeightsForObject(uint32 vertexAmount);
+        void deallocateBoneWeightsOfOjbect(int32 index);
+        BoneWeightBinding *getBoneWeightsForObject(int32 index);
+
         inline uint getFrameInFlight()
         {
             return currentInFlight;
@@ -117,6 +135,16 @@ namespace wne
             return bufferLightsData[frame];
         }
 
+        VkBuffer getBonesBuffer(uint frame)
+        {
+            return bufferBonesData[frame];
+        }
+
+        VkBuffer getBoneWeightsBuffer()
+        {
+            return bufferBoneWeightsData;
+        }
+
         inline VulkanDepthBuffer *getDummyDepthBuffer()
         {
             return dummyBuffer.get();
@@ -135,6 +163,16 @@ namespace wne
         constexpr uint64 getLightsBufferSize()
         {
             return sizeof(LightData) * AMOUNT_OF_LIGHTS;
+        }
+
+        constexpr uint64 getBonesBufferSize()
+        {
+            return sizeof(Matrix4x4) * MAX_BONES_IN_SCENE;
+        }
+
+        constexpr uint64 getBoneWeightsBufferSize()
+        {
+            return sizeof(BoneWeightBinding) * MAX_BONE_BINDINGS;
         }
 
         constexpr uint64 getLightMVPsBufferSize()
@@ -177,6 +215,16 @@ namespace wne
         std::vector<VkBuffer> bufferLightsData;
         std::vector<VkDeviceMemory> bufferLightsDataMemory;
         std::vector<LightData *> bufferLightsDataMapped;
+
+        std::vector<VkBuffer> bufferBonesData;
+        std::vector<VkDeviceMemory> bufferBonesMemory;
+        std::vector<Matrix4x4 *> bufferBonesMapped;
+        uint32 bufferBonesOccupation[MAX_BONES_IN_SCENE]{};
+
+        VkBuffer bufferBoneWeightsData;
+        VkDeviceMemory bufferBoneWeightsMemory;
+        BoneWeightBinding *bufferBoneWeightsMapped;
+        uint32 bufferBoneWeightsOccupation[MAX_BONE_BINDINGS]{};
 
         std::unique_ptr<VulkanDepthBuffer> dummyBuffer;
     };

@@ -5,6 +5,7 @@
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/renderer/vulkan/vulkanRendererState.h"
 #include "features/renderer/vulkan/rendererVulkan.h"
+#include "features/renderer/vulkan/vulkanMeshArmature.h"
 #include "features/logger/logger.h"
 #include "vulkan/vulkan.h"
 #include <array>
@@ -24,6 +25,7 @@ void VulkanMaterialFlat::bindDepthShadow(
     const Matrix4x4 &mMVP,
     const Matrix3x3 &mNormal,
     const UVData &uvData,
+    const MeshArmature *meshArmature,
     bool isDoubleSided,
     ModelDataType dataType)
 {
@@ -36,7 +38,15 @@ void VulkanMaterialFlat::bindDepthShadow(
     selectPipelineShadowDepth(dataType, isDoubleSided);
     selectDescriptorDepthShadow(dataType, cascadeData);
     cascadeData->updateObjectData(objectId, mMVP);
-    setPCData(objectId, lights, uvData);
+
+    MaterialBoneData materialBoneData{};
+    if (meshArmature)
+    {
+        materialBoneData.enableBones = 1;
+        materialBoneData.boneWeightsShift = static_cast<const VulkanMeshArmature *>(meshArmature)->getWeightIndexShift();
+        materialBoneData.boneMatrixesShift = static_cast<const VulkanMeshArmature *>(meshArmature)->getMatrixIndexShift();
+    }
+    setPCData(objectId, lights, uvData, materialBoneData);
 }
 
 void VulkanMaterialFlat::bindDepth(
@@ -45,6 +55,7 @@ void VulkanMaterialFlat::bindDepth(
     const Matrix4x4 &mModel,
     const Matrix3x3 &mNormal,
     const UVData &uvData,
+    const MeshArmature *meshArmature,
     ModelDataType dataType)
 {
     if (dataType == ModelDataType::Unknown)
@@ -54,7 +65,15 @@ void VulkanMaterialFlat::bindDepth(
     selectPipelineDepth(dataType);
     selectDescriptorDepth(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
-    setPCData(objectId, lights, uvData);
+
+    MaterialBoneData materialBoneData{};
+    if (meshArmature)
+    {
+        materialBoneData.enableBones = 1;
+        materialBoneData.boneWeightsShift = static_cast<const VulkanMeshArmature *>(meshArmature)->getWeightIndexShift();
+        materialBoneData.boneMatrixesShift = static_cast<const VulkanMeshArmature *>(meshArmature)->getMatrixIndexShift();
+    }
+    setPCData(objectId, lights, uvData, materialBoneData);
 }
 
 void VulkanMaterialFlat::bindColor(
@@ -64,6 +83,7 @@ void VulkanMaterialFlat::bindColor(
     const Matrix4x4 &mModel,
     const Matrix3x3 &mNormal,
     const UVData &uvData,
+    const MeshArmature *meshArmature,
     ModelDataType dataType)
 {
     if (dataType == ModelDataType::Unknown)
@@ -72,7 +92,15 @@ void VulkanMaterialFlat::bindColor(
     selectPipelineColor(dataType);
     selectDescriptorColor(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
-    setPCData(objectId, lights, uvData);
+
+    MaterialBoneData materialBoneData{};
+    if (meshArmature)
+    {
+        materialBoneData.enableBones = 1;
+        materialBoneData.boneWeightsShift = static_cast<const VulkanMeshArmature *>(meshArmature)->getWeightIndexShift();
+        materialBoneData.boneMatrixesShift = static_cast<const VulkanMeshArmature *>(meshArmature)->getMatrixIndexShift();
+    }
+    setPCData(objectId, lights, uvData, materialBoneData);
 }
 
 void VulkanMaterialFlat::selectPipelineDepth(ModelDataType dataType)
@@ -167,7 +195,7 @@ void VulkanMaterialFlat::selectDescriptorDepthShadow(ModelDataType dataType, Vul
     }
 }
 
-void VulkanMaterialFlat::setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData)
+void VulkanMaterialFlat::setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData, const MaterialBoneData &materialBoneData)
 {
     auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
     auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
@@ -180,6 +208,9 @@ void VulkanMaterialFlat::setPCData(uint64 objectId, const AffectingLights &light
     pco.uvShiftY = uvData.shiftY;
     pco.uvScaleX = uvData.scaleX;
     pco.uvScaleY = uvData.scaleY;
+    pco.enableBones = materialBoneData.enableBones;
+    pco.boneWeightsShift = materialBoneData.boneWeightsShift;
+    pco.boneMatrixesShift = materialBoneData.boneMatrixesShift;
 
     vkCmdPushConstants(
         commandBuffer,

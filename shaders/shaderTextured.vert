@@ -16,6 +16,7 @@ layout(push_constant) uniform PushConstants {
     float normalShadowingFactor;
     float uvShiftX, uvShiftY;
     float uvScaleX, uvScaleY;
+    uint enableBones, boneIndexesShift, boneMatrixesShift;
 } objectData;
 
 layout(set = 0, binding = 0, std430) readonly buffer BufferMVPs {
@@ -29,6 +30,21 @@ layout(set = 0, binding = 1, std430) readonly buffer BufferObjects {
 layout(set = 0, binding = 2, std430) readonly buffer BufferNormals {
      mat4 matrix[8192];
 } mNormals;
+
+layout(set = 0, binding = 8, std430) readonly buffer BufferBoneMatrixes {
+     mat4 matrix[4096];
+} mBufferBoneMatrixes;
+
+struct BoneData
+{
+    int boneIndex[5];
+    float boneWeight[5];
+};
+
+layout(set = 0, binding = 9) buffer Bones
+{
+    BoneData boneData[128];
+};
 
 struct LightData
 {
@@ -59,7 +75,9 @@ layout(set = 0, binding = 5) uniform BufferLightMVPs {
 } mLightMvps;
 
 void main() {
-    gl_Position = mMVPs.matrix[objectData.objectId] * vec4(inPosition, 1.0);
+    vec4 position = mMVPs.matrix[objectData.objectId] * vec4(inPosition, 1.0);
+    uint vertexID = gl_VertexIndex;
+
     UV.x = inUV.x * objectData.uvScaleX + objectData.uvShiftX;
     UV.y = inUV.y * objectData.uvScaleY + objectData.uvShiftY;
 
@@ -69,6 +87,28 @@ void main() {
     normal = normalize(
         (mNormals.matrix[objectData.objectId] * vec4(inNormal, 0.0)).xyz
     );
+
+    if (objectData.enableBones != 0)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            uint boneDataIndex = vertexID + objectData.boneIndexesShift;
+            uint boneIndex = boneData[boneDataIndex].boneIndex[i];
+            float boneWeight = boneData[boneDataIndex].boneIndex[i];
+
+            mat4 mWorld =  mBufferBoneMatrixes.matrix[objectData.boneMatrixesShift + boneIndex];
+
+            position += boneWeight * mWorld * vec4(inPosition, 1.0);
+            /*
+            position += weight * mul(float4(vin.pos, 1.0f), world);
+            normal += weight * mul(vin.normal, (float3x3)world);
+            tangent += weight * mul(vin.tangent, (float3x3)world);
+            bitangent += weight * mul(vin.bitangent, (float3x3)world);
+            */
+        }
+    }
+    
+    gl_Position = position;
 
     for (uint i = 0; i < objectData.lightsAmount; i++)
     {

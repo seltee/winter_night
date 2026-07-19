@@ -5,6 +5,7 @@
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
 #include "features/renderer/vulkan/lights/vulkanLight.h"
 #include "features/renderer/vulkan/lights/vulkanLightDirectional.h"
+#include "features/renderer/vulkan/vulkanMeshArmature.h"
 #include "features/logger/logger.h"
 #include "features/data/image.h"
 #include "utils/primitives.h"
@@ -99,7 +100,7 @@ void RendererVulkan::renderDebug()
         material->bindColor(
             debugIds[idCounter], lights,
             state->getViewProjectionMatrix() * mModel, mModel, mNormal,
-            uvModifier, defaultCube->getDataType());
+            uvModifier, nullptr, defaultCube->getDataType());
         defaultCube->render(getFrameData());
         debugLine.oneFrameShown = true;
 
@@ -119,7 +120,7 @@ void RendererVulkan::renderDebug()
         material->bindColor(
             debugIds[idCounter], lights,
             state->getViewProjectionMatrix() * mModel, mModel, mNormal,
-            uvModifier, defaultCube->getDataType());
+            uvModifier, nullptr, defaultCube->getDataType());
         defaultCube->render(getFrameData());
         debugCube.oneFrameShown = true;
 
@@ -141,7 +142,7 @@ void RendererVulkan::renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial)
     Matrix4x4 mModel = Matrix4x4::translation(state->getCameraPosition());
     static Matrix3x3 mNormal = Matrix3x3::identity();
     static AffectingLights lights{};
-    atmoMaterial->bindColor(atmoSphereMeshId, lights, state->getViewProjectionMatrix() * mModel, mModel, mNormal, uvModifier, atmoSphere->getDataType());
+    atmoMaterial->bindColor(atmoSphereMeshId, lights, state->getViewProjectionMatrix() * mModel, mModel, mNormal, uvModifier, nullptr, atmoSphere->getDataType());
     atmoSphere->render(getFrameData());
 }
 
@@ -202,10 +203,22 @@ std::shared_ptr<MeshCollection> RendererVulkan::createMeshCollection(std::vector
         if (model->hasArmatures())
         {
             for (auto armature : model->getArmatures())
-                meshCollection->addArmature(armature);
+            {
+                meshCollection->setArmature(model->getName(), armature);
+            }
         }
     }
     return meshCollection;
+}
+
+std::shared_ptr<MeshArmature> RendererVulkan::createMeshArmature(std::shared_ptr<Armature> armature)
+{
+    auto meshArmature = std::make_shared<VulkanMeshArmature>(instance->getVulkanUtils());
+    if (meshArmature->setup(armature))
+    {
+        return meshArmature;
+    }
+    return nullptr;
 }
 
 std::shared_ptr<Texture> RendererVulkan::createTexture(std::shared_ptr<Image> image)

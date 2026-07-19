@@ -1,3 +1,4 @@
+#pragma once
 #include "features/data/armature.h"
 #include "core/core.h"
 #include "core/math.h"

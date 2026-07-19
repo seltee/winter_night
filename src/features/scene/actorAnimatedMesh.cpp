@@ -8,6 +8,7 @@ using namespace wne;
 
 ActorAnimatedMesh::ActorAnimatedMesh(Renderer *renderer, std::shared_ptr<MeshCollection> mesh) : Actor(renderer)
 {
+    Logger::log << "Animated mesh setup" << endl;
     this->mesh = mesh;
     count = mesh->getMeshCount();
 
@@ -22,10 +23,16 @@ ActorAnimatedMesh::ActorAnimatedMesh(Renderer *renderer, std::shared_ptr<MeshCol
             (*mesh)[i].mesh->isEmpty()));
     }
 
-    // adding armatures
-    for (auto &armature : mesh->getArmatures())
+    // adding armature
+    auto armature = mesh->getArmature();
+    if (armature)
     {
-        Logger::log << "Armature found" << endl;
+        auto animatedMeshArmatureNode = std::make_shared<AnimatedMeshArmatureNode>(renderer, armature, nodes);
+        auto targetMesh = getMeshNodeByName(mesh->getArmatureTargetName());
+        if (targetMesh)
+            targetMesh->armature = animatedMeshArmatureNode;
+        else
+            Logger::log << "Unable to find armature mesh" << endl;
     }
 
     // linking parents
@@ -93,6 +100,9 @@ void ActorAnimatedMesh::update(float delta)
                 boundingRadius,
                 length(position - actorPosition) + nodeRadius);
         }
+
+        if (nodes[i].armature)
+            nodes[i].armature->updateMatricies();
     }
     this->boundingRadius = boundingRadius;
 }
@@ -138,6 +148,7 @@ void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
 
     for (uint i = 0; i < count; i++)
     {
+        MeshArmature *meshArmature = nodes[i].armature ? nodes[i].armature->meshArmature.get() : nullptr;
         Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
         materialToUse->bindDepthShadow(
             nodes[i].getObjectId(),
@@ -145,6 +156,7 @@ void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
             state->getViewProjectionMatrix() * nodes[i].transfotmation,
             getNormalMatrix(),
             uvModifier,
+            meshArmature,
             false,
             (*mesh)[i].mesh->getDataType());
         (*mesh)[i].mesh->render(renderer->getFrameData());
@@ -160,6 +172,7 @@ void ActorAnimatedMesh::renderDepth()
     {
         if (nodes[i].isInRender)
         {
+            MeshArmature *meshArmature = nodes[i].armature ? nodes[i].armature->meshArmature.get() : nullptr;
             Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
             materialToUse->bindDepth(
                 nodes[i].getObjectId(),
@@ -167,6 +180,7 @@ void ActorAnimatedMesh::renderDepth()
                 nodes[i].transfotmation,
                 getNormalMatrix(),
                 uvModifier,
+                meshArmature,
                 (*mesh)[i].mesh->getDataType());
             (*mesh)[i].mesh->render(renderer->getFrameData());
         }
@@ -183,6 +197,7 @@ void ActorAnimatedMesh::renderColor()
     {
         if (nodes[i].isInRender)
         {
+            MeshArmature *meshArmature = nodes[i].armature ? nodes[i].armature->meshArmature.get() : nullptr;
             Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
             materialToUse->bindColor(
                 nodes[i].getObjectId(),
@@ -191,6 +206,7 @@ void ActorAnimatedMesh::renderColor()
                 nodes[i].transfotmation,
                 getNormalMatrix(),
                 uvModifier,
+                meshArmature,
                 (*mesh)[i].mesh->getDataType());
             (*mesh)[i].mesh->render(renderer->getFrameData());
         }

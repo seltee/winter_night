@@ -159,6 +159,7 @@ void UINodeContainer::render(const ContextRender &context)
             mBackgroung,
             Matrix3x3::identity(),
             uvModifier,
+            nullptr,
             mesh->getDataType());
         mesh->render(renderer->getFrameData());
     }

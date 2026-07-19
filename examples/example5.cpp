@@ -57,6 +57,7 @@ int main()
         animationTrack->play(true);
     }
 
+    /*
     auto animTubeData = wne::Loader3d::loadAsModelAnimation("./bones_tube.fbx");
     auto animTubeCollection = renderer->createMeshCollection(animTubeData.models);
     auto actorLoadedTube = scene->createActor<wne::ActorAnimatedMesh>(animTubeCollection);
@@ -69,6 +70,7 @@ int main()
         auto animationTrack = actorLoadedTube->createAnimationTrack(anim);
         animationTrack->play(true);
     }
+        */
 
     // light
     auto sun = renderer->createLightDirectional();

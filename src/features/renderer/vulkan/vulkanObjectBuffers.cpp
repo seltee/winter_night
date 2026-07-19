@@ -45,6 +45,11 @@ VulkanObjectBuffers::~VulkanObjectBuffers()
         vkDestroyBuffer(device, buffer, nullptr);
     for (const auto &buffer : bufferLightsDataMemory)
         vkFreeMemory(device, buffer, nullptr);
+
+    for (const auto &buffer : bufferBonesData)
+        vkDestroyBuffer(device, buffer, nullptr);
+    for (const auto &buffer : bufferBonesMemory)
+        vkFreeMemory(device, buffer, nullptr);
 }
 
 void VulkanObjectBuffers::updateObjectData(uint32 objectId, const Matrix4x4 &mModel, const Matrix4x4 &mNormal, const Matrix4x4 &mMVP) noexcept
@@ -107,6 +112,8 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
     uint64 matrixBufferSize = getMatrixBufferSize();
     uint64 lightsBufferSize = getLightsBufferSize();
     uint64 lightMVPsSize = getLightMVPsBufferSize();
+    uint64 bonesBufferSize = getBonesBufferSize();
+    uint64 boneWeightsBufferSize = getBoneWeightsBufferSize();
 
     bufferModelMatrices.resize(maxFramesInFlight);
     bufferModelMatricesMemory.resize(maxFramesInFlight);
@@ -132,6 +139,11 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
     bufferLightsDataMemory.resize(maxFramesInFlight);
     bufferLightsDataMapped.resize(maxFramesInFlight);
 
+    bufferBonesData.resize(maxFramesInFlight);
+    bufferBonesMemory.resize(maxFramesInFlight);
+    bufferBonesMapped.resize(maxFramesInFlight);
+
+    // setting up per frames buffers
     for (uint i = 0; i < maxFramesInFlight; i++)
     {
         if (!vulkanUtils->createBuffer(
@@ -199,8 +211,42 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
             return false;
         }
         vkMapMemory(device, bufferLightsDataMemory[i], 0, lightsBufferSize, 0, (void **)&bufferLightsDataMapped[i]);
+
+        if (!vulkanUtils->createBuffer(
+                bonesBufferSize,
+                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                bufferBonesData[i],
+                bufferBonesMemory[i]))
+        {
+            return false;
+        }
+        vkMapMemory(device, bufferBonesMemory[i], 0, lightsBufferSize, 0, (void **)&bufferBonesMapped[i]);
     }
 
+    // shared between frames
+    if (!vulkanUtils->createBuffer(
+            boneWeightsBufferSize,
+            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            bufferBoneWeightsData,
+            bufferBoneWeightsMemory))
+    {
+        return false;
+    }
+    vkMapMemory(device, bufferBoneWeightsMemory, 0, boneWeightsBufferSize, 0, (void **)&bufferBoneWeightsMapped);
+
+    // setting up buffers
+    for (int i = 0; i < MAX_BONES_IN_SCENE; i++)
+        bufferBonesOccupation[i] = 0xffffffff;
+    for (int i = 0; i < MAX_BONE_BINDINGS; i++)
+    {
+        bufferBoneWeightsOccupation[i] = 0xffffffff;
+        for (int r = 0; r < MAX_BONE_WEIGHTS; r++)
+            bufferBoneWeightsMapped[i].boneWeight[r] = 0.0f;
+    }
+
+    // dummies
     dummyBuffer = std::make_unique<VulkanDepthBuffer>(vulkanUtils);
     if (!dummyBuffer->setup(8, 8, 1, true))
     {
@@ -266,4 +312,129 @@ void VulkanObjectBuffers::freeLightId(uint32 lightId)
 {
     if (lightId < AMOUNT_OF_LIGHTS)
         bufferLightsOccupied[lightId] = 0;
+}
+
+// returns starting bone index
+int32 VulkanObjectBuffers::allocateBonesForObject(uint32 bonesAmount)
+{
+    static uint32 cId = 0;
+    static uint32 lastSearchPoint = 0;
+    uint32 searchPoint = lastSearchPoint;
+
+    while (true)
+    {
+        if (searchPoint + bonesAmount >= MAX_BONES_IN_SCENE)
+            searchPoint = 0;
+        if (bufferBonesOccupation[searchPoint] == 0xffffffff)
+        {
+            // free block;
+            bool found = true;
+            for (uint32 b = 0; b < bonesAmount; b++)
+            {
+                if (bufferBonesOccupation[searchPoint + b] != 0)
+                {
+                    found = false;
+                    searchPoint += b;
+                    if (searchPoint == lastSearchPoint)
+                        return 0xffffffff;
+                }
+            }
+            if (found)
+            {
+                for (uint32 b = 0; b < bonesAmount; b++)
+                    bufferBonesOccupation[searchPoint + b] = cId;
+                cId++;
+                lastSearchPoint = searchPoint + bonesAmount;
+                return searchPoint;
+            }
+        }
+        else
+        {
+            // occupied block
+            searchPoint++;
+            if (searchPoint >= MAX_BONES_IN_SCENE)
+                searchPoint = 0;
+            if (searchPoint == lastSearchPoint)
+                return 0xffffffff;
+        }
+    }
+}
+
+void VulkanObjectBuffers::deallocateBonesOfOjbect(int32 index)
+{
+    int objectId = bufferBonesOccupation[index];
+    if (objectId == 0xffffffff)
+        return;
+    while (index < MAX_BONES_IN_SCENE && bufferBonesOccupation[index] == objectId)
+    {
+        bufferBonesOccupation[index] = 0xffffffff;
+        index++;
+    }
+}
+
+void VulkanObjectBuffers::setBoneMatrix(int32 index, const Matrix4x4 &mTransformation)
+{
+    bufferBonesMapped[currentInFlight][index] = mTransformation;
+}
+
+int32 VulkanObjectBuffers::allocateBoneWeightsForObject(uint32 vertexAmount)
+{
+    static uint32 cId = 0;
+    static uint32 lastSearchPoint = 0;
+    uint32 searchPoint = lastSearchPoint;
+
+    while (true)
+    {
+        if (searchPoint + vertexAmount >= MAX_BONES_IN_SCENE)
+            searchPoint = 0;
+        if (bufferBoneWeightsOccupation[searchPoint] == 0xffffffff)
+        {
+            // free block;
+            bool found = true;
+            for (uint32 b = 0; b < vertexAmount; b++)
+            {
+                if (bufferBoneWeightsOccupation[searchPoint + b] != 0)
+                {
+                    found = false;
+                    searchPoint += b;
+                    if (searchPoint == lastSearchPoint)
+                        return 0xffffffff;
+                }
+            }
+            if (found)
+            {
+                for (uint32 b = 0; b < vertexAmount; b++)
+                    bufferBoneWeightsOccupation[searchPoint + b] = cId;
+                cId++;
+                lastSearchPoint = searchPoint + vertexAmount;
+                return searchPoint;
+            }
+        }
+        else
+        {
+            // occupied block
+            searchPoint++;
+            if (searchPoint >= MAX_BONES_IN_SCENE)
+                searchPoint = 0;
+            if (searchPoint == lastSearchPoint)
+                return 0xffffffff;
+        }
+    }
+}
+
+void VulkanObjectBuffers::deallocateBoneWeightsOfOjbect(int32 index)
+{
+    uint сId = bufferBoneWeightsOccupation[index];
+    if (сId == 0xffffffff)
+        return;
+    while (index < MAX_BONES_IN_SCENE && bufferBoneWeightsOccupation[index] == сId)
+    {
+        bufferBoneWeightsOccupation[index] = 0xffffffff;
+        index++;
+    }
+}
+
+VulkanObjectBuffers::BoneWeightBinding *VulkanObjectBuffers::getBoneWeightsForObject(int32 index)
+{
+    return &bufferBoneWeightsMapped[index];
 }

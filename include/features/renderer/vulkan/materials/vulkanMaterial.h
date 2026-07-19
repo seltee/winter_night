@@ -16,6 +16,14 @@ namespace wne
         float normalShadowingFactor;
         float uvShiftX, uvShiftY;
         float uvScaleX, uvScaleY;
+        uint enableBones, boneWeightsShift, boneMatrixesShift;
+    };
+
+    struct MaterialBoneData
+    {
+        uint enableBones;
+        uint boneWeightsShift;
+        uint boneMatrixesShift;
     };
 
     struct VulkanMaterialDescription;
@@ -35,7 +43,7 @@ namespace wne
         virtual void selectDescriptorColor(ModelDataType dataType);
         virtual void selectDescriptorDepth(ModelDataType dataType);
         virtual void selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData);
-        virtual void setPCData(uint64 objectId, const AffectingLights &lights, const Material::UVData &uvData);
+        virtual void setPCData(uint64 objectId, const AffectingLights &lights, const Material::UVData &uvData, const MaterialBoneData &materialBoneData);
 
         inline static void clearLastDescriptorColorBond()
         {

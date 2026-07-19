@@ -12,6 +12,7 @@ void Material::bindDepthShadow(
     const Matrix4x4 &mMVP,
     const Matrix3x3 &mNormal,
     const UVData &uvData,
+    const MeshArmature *meshArmature,
     bool isDoubleSided,
     ModelDataType dataType)
 {
@@ -23,6 +24,7 @@ void Material::bindDepth(
     const Matrix4x4 &mModel,
     const Matrix3x3 &mNormal,
     const UVData &uvData,
+    const MeshArmature *meshArmature,
     ModelDataType dataType)
 {
 }
@@ -34,6 +36,7 @@ void Material::bindColor(
     const Matrix4x4 &mModel,
     const Matrix3x3 &mNormal,
     const UVData &uvData,
+    const MeshArmature *meshArmature,
     ModelDataType dataType)
 {
 }

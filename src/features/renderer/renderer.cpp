@@ -44,6 +44,11 @@ std::shared_ptr<MeshCollection> Renderer::createMeshCollection(std::vector<std::
     return nullptr;
 }
 
+std::shared_ptr<MeshArmature> Renderer::createMeshArmature(std::shared_ptr<Armature> armature)
+{
+    return nullptr;
+}
+
 std::shared_ptr<Texture> Renderer::createTexture(std::shared_ptr<Image> image)
 {
     return nullptr;

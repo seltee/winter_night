@@ -22,7 +22,7 @@ namespace wne
         Entity *addMesh(std::shared_ptr<Mesh> mesh, const char *name);
         Entity *addMesh(std::shared_ptr<Mesh> mesh, const char *name, const char *parentName);
 
-        void addArmature(std::shared_ptr<Armature> armature);
+        void setArmature(const char *targetName, std::shared_ptr<Armature> armature);
 
         inline const uint getMeshCount()
         {
@@ -44,12 +44,17 @@ namespace wne
 
         inline bool hasArmatures()
         {
-            return armatures.size() > 0;
+            return armature.get() != nullptr;
         }
 
-        inline const std::vector<std::shared_ptr<Armature>> &getArmatures()
+        inline const std::shared_ptr<Armature> &getArmature()
         {
-            return armatures;
+            return armature;
+        }
+
+        inline const char *getArmatureTargetName()
+        {
+            return armatureTargetName.c_str();
         }
 
         inline Entity &operator[](int meshNumber)
@@ -59,6 +64,8 @@ namespace wne
 
     protected:
         std::vector<Entity> entities;
-        std::vector<std::shared_ptr<Armature>> armatures;
+
+        std::string armatureTargetName;
+        std::shared_ptr<Armature> armature;
     };
 }

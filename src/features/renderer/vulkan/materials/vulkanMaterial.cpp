@@ -66,6 +66,6 @@ void VulkanMaterial::selectDescriptorDepthShadow(ModelDataType dataType, VulkanL
 {
 }
 
-void VulkanMaterial::setPCData(uint64 objectId, const AffectingLights &lights, const Material::UVData &uvData)
+void VulkanMaterial::setPCData(uint64 objectId, const AffectingLights &lights, const Material::UVData &uvData, const MaterialBoneData &materialBoneData)
 {
 }

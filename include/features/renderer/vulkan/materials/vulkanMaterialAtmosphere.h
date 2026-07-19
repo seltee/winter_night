@@ -19,6 +19,7 @@ namespace wne
             const Matrix4x4 &mMVP,
             const Matrix3x3 &mNormal,
             const UVData &uvData,
+            const MeshArmature *meshArmature,
             bool isDoubleSided,
             ModelDataType dataType) override final;
         void bindDepth(
@@ -27,6 +28,7 @@ namespace wne
             const Matrix4x4 &mModel,
             const Matrix3x3 &mNormal,
             const UVData &uvData,
+            const MeshArmature *meshArmature,
             ModelDataType dataType) override final;
         void bindColor(
             uint64 objectId,
@@ -35,11 +37,12 @@ namespace wne
             const Matrix4x4 &mModel,
             const Matrix3x3 &mNormal,
             const UVData &uvData,
+            const MeshArmature *meshArmature,
             ModelDataType dataType) override final;
 
         void selectPipelineColor(ModelDataType dataType) override final;
         void selectDescriptorColor(ModelDataType dataType) override final;
-        void setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData) override final;
+        void setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData, const MaterialBoneData &materialBoneData) override final;
 
         inline void setAtmosphereTexture(std::shared_ptr<Texture> texture)
         {
