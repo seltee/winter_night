@@ -230,7 +230,7 @@ void ActorAnimatedMesh::renderColor()
 
 Actor::RenderPass ActorAnimatedMesh::getRenderPass()
 {
-    return RenderPass::Main;
+    return RenderPass::Blended;
 }
 
 float ActorAnimatedMesh::getBoundingRadius()

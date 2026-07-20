@@ -3,6 +3,7 @@
 #include "features/renderer/vulkan/vulkanDepthBuffer.h"
 #include "features/renderer/vulkan/vulkanTexture.h"
 #include "features/renderer/vulkan/vulkanDefines.h"
+#include "features/logger/logger.h"
 #include "vulkan/vulkan.h"
 #include <memory>
 
@@ -221,7 +222,7 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
         {
             return false;
         }
-        vkMapMemory(device, bufferBonesMemory[i], 0, lightsBufferSize, 0, (void **)&bufferBonesMapped[i]);
+        vkMapMemory(device, bufferBonesMemory[i], 0, bonesBufferSize, 0, (void **)&bufferBonesMapped[i]);
     }
 
     // shared between frames
@@ -238,12 +239,18 @@ bool VulkanObjectBuffers::setup(uint maxFramesInFlight)
 
     // setting up buffers
     for (int i = 0; i < MAX_BONES_IN_SCENE; i++)
+    {
         bufferBonesOccupation[i] = 0xffffffff;
+        for (uint f = 0; f < maxFramesInFlight; f++)
+            bufferBonesMapped[f][i] = Matrix4x4::identity();
+    }
     for (int i = 0; i < MAX_BONE_BINDINGS; i++)
     {
         bufferBoneWeightsOccupation[i] = 0xffffffff;
-        for (int r = 0; r < MAX_BONE_WEIGHTS; r++)
+        for (int r = 0; r < MAX_BONE_WEIGHTS; r++){
+            bufferBoneWeightsMapped[i].boneIndex[r] = 0;
             bufferBoneWeightsMapped[i].boneWeight[r] = 0.0f;
+        }
     }
 
     // dummies
@@ -331,7 +338,7 @@ int32 VulkanObjectBuffers::allocateBonesForObject(uint32 bonesAmount)
             bool found = true;
             for (uint32 b = 0; b < bonesAmount; b++)
             {
-                if (bufferBonesOccupation[searchPoint + b] != 0)
+                if (bufferBonesOccupation[searchPoint + b] != 0xffffffff)
                 {
                     found = false;
                     searchPoint += b;
@@ -393,7 +400,7 @@ int32 VulkanObjectBuffers::allocateBoneWeightsForObject(uint32 vertexAmount)
             bool found = true;
             for (uint32 b = 0; b < vertexAmount; b++)
             {
-                if (bufferBoneWeightsOccupation[searchPoint + b] != 0)
+                if (bufferBoneWeightsOccupation[searchPoint + b] != 0xffffffff)
                 {
                     found = false;
                     searchPoint += b;

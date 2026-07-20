@@ -19,6 +19,5 @@ namespace wne
         int maxIndex = 0;
         int boneAmount = 0;
         std::shared_ptr<Armature> armature;
-        std::vector<Matrix4x4> boneMatricies;
     };
 }

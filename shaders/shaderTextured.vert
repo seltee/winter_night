@@ -31,21 +31,6 @@ layout(set = 0, binding = 2, std430) readonly buffer BufferNormals {
      mat4 matrix[8192];
 } mNormals;
 
-layout(set = 0, binding = 8, std430) readonly buffer BufferBoneMatrixes {
-     mat4 matrix[4096];
-} mBufferBoneMatrixes;
-
-struct BoneData
-{
-    int boneIndex[5];
-    float boneWeight[5];
-};
-
-layout(set = 0, binding = 9) buffer Bones
-{
-    BoneData boneData[128];
-};
-
 struct LightData
 {
     vec4 position;
@@ -74,15 +59,27 @@ layout(set = 0, binding = 5) uniform BufferLightMVPs {
      mat4 matrix[16];
 } mLightMvps;
 
+layout(set = 0, binding = 8, std430) readonly buffer BufferBoneMatrixes {
+     mat4 matrix[4096];
+} mBufferBoneMatrixes;
+
+struct BoneData
+{
+    int boneIndex[5];
+    float boneWeight[5];
+};
+
+layout(set = 0, binding = 9) buffer Bones
+{
+    BoneData boneData[128];
+};
+
 void main() {
-    vec4 position = mMVPs.matrix[objectData.objectId] * vec4(inPosition, 1.0);
+    vec4 position = vec4(0.0, 0.0, 0.0, 0.0);
     uint vertexID = gl_VertexIndex;
 
     UV.x = inUV.x * objectData.uvScaleX + objectData.uvShiftX;
     UV.y = inUV.y * objectData.uvScaleY + objectData.uvShiftY;
-
-    worldPosition = mModels.matrix[objectData.objectId] * vec4(inPosition, 1.0);
-    worldPosition /= worldPosition.w;
 
     normal = normalize(
         (mNormals.matrix[objectData.objectId] * vec4(inNormal, 0.0)).xyz
@@ -94,21 +91,26 @@ void main() {
         {
             uint boneDataIndex = vertexID + objectData.boneIndexesShift;
             uint boneIndex = boneData[boneDataIndex].boneIndex[i];
-            float boneWeight = boneData[boneDataIndex].boneIndex[i];
+            float boneWeight = boneData[boneDataIndex].boneWeight[i];
 
-            mat4 mWorld =  mBufferBoneMatrixes.matrix[objectData.boneMatrixesShift + boneIndex];
+            mat4 mWorld = mBufferBoneMatrixes.matrix[boneIndex];
 
-            position += boneWeight * mWorld * vec4(inPosition, 1.0);
+            position += boneWeight * (mWorld * vec4(inPosition, 1.0));
+
             /*
-            position += weight * mul(float4(vin.pos, 1.0f), world);
             normal += weight * mul(vin.normal, (float3x3)world);
             tangent += weight * mul(vin.tangent, (float3x3)world);
             bitangent += weight * mul(vin.bitangent, (float3x3)world);
             */
         }
+    } else {
+        position = vec4(inPosition, 1.0);
     }
     
-    gl_Position = position;
+    gl_Position = mMVPs.matrix[objectData.objectId] * position;
+
+    worldPosition = mModels.matrix[objectData.objectId] * position;
+    worldPosition /= worldPosition.w;
 
     for (uint i = 0; i < objectData.lightsAmount; i++)
     {

@@ -68,6 +68,11 @@ namespace wne
             return weights;
         }
 
+        inline const Matrix4x4 &getInvTransform()
+        {
+            return mInvTransform;
+        }
+
     private:
         uint64 id = 0;
         std::string name;

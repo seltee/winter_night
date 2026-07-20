@@ -37,5 +37,7 @@ namespace wne
 
         int32 bonesBufferIndex = 0xffffffff;
         int32 boneWeightsBufferIndex = 0xffffffff;
+
+        std::vector<Matrix4x4> boneMatricies;
     };
 };

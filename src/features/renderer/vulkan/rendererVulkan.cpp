@@ -215,9 +215,7 @@ std::shared_ptr<MeshArmature> RendererVulkan::createMeshArmature(std::shared_ptr
 {
     auto meshArmature = std::make_shared<VulkanMeshArmature>(instance->getVulkanUtils());
     if (meshArmature->setup(armature))
-    {
         return meshArmature;
-    }
     return nullptr;
 }
 

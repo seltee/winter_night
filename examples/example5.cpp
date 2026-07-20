@@ -37,6 +37,7 @@ int main()
     auto imageBox = wne::Image::create("./box.png");
     auto textureBox = renderer->createTexture(imageBox);
     auto materialBox = renderer->createFlatMaterial(textureBox);
+    materialBox->setColorBlending(wne::ColorBlending::Alpha);
 
     auto imageMetalBox = wne::Image::create("./mbox.png");
     auto textureMetalBox = renderer->createTexture(imageMetalBox);
@@ -57,7 +58,6 @@ int main()
         animationTrack->play(true);
     }
 
-    /*
     auto animTubeData = wne::Loader3d::loadAsModelAnimation("./bones_tube.fbx");
     auto animTubeCollection = renderer->createMeshCollection(animTubeData.models);
     auto actorLoadedTube = scene->createActor<wne::ActorAnimatedMesh>(animTubeCollection);
@@ -70,7 +70,6 @@ int main()
         auto animationTrack = actorLoadedTube->createAnimationTrack(anim);
         animationTrack->play(true);
     }
-        */
 
     // light
     auto sun = renderer->createLightDirectional();

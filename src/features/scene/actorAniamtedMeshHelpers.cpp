@@ -25,7 +25,7 @@ AnimatedMeshArmatureNode::AnimatedMeshArmatureNode(Renderer *renderer, std::shar
     {
         for (auto &node : nodes)
         {
-            if (node.getName() == bones[i]->getName())
+            if (!strcmp(node.getName(), bones[i]->getName()))
             {
                 bindings[i] = BoneBinding({i,
                                            &node});

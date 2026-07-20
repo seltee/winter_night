@@ -11,7 +11,10 @@ namespace wne
      public:
           Armature(const char *name);
 
-          void addBone(const char *name, const std::vector<int> &indexes, const std::vector<float> &weights);
+          void addBone(const char *name,
+                       const std::vector<int> &indexes,
+                       const std::vector<float> &weights,
+                       const Matrix4x4 &transform);
 
           uint getMaxIndex()
           {
