@@ -91,7 +91,8 @@ void ActorTerrain::updateMesh()
             shiftX = (float)ix * partSize;
             shiftZ = (float)iz * partSize;
             vertices.push_back(
-                {{startX + shiftX * size, heights[iz * resolution + ix], startZ + shiftZ * size},
+                {static_cast<uint32>(vertices.size()),
+                 {startX + shiftX * size, heights[iz * resolution + ix], startZ + shiftZ * size},
                  {shiftX, shiftZ},
                  normal});
         }

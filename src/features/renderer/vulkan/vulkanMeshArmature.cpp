@@ -20,11 +20,14 @@ bool VulkanMeshArmature::setupMatrixBuffer(int bonesAmount)
 bool VulkanMeshArmature::setupBoneWeights(const std::vector<std::shared_ptr<wne::Bone>> &bones)
 {
     auto objectBuffers = vulkanUtils->getObjectBuffers();
-    uint32 maxIndex = armature->getMaxIndex();
     boneWeightsBufferIndex = objectBuffers->allocateBoneWeightsForObject(maxIndex);
     auto boneWeightsBuffer = objectBuffers->getBoneWeightsForObject(boneWeightsBufferIndex);
 
     boneMatricies.resize(bones.size());
+
+    for (int i = 0; i < maxIndex; i++)
+        for (int v = 0; v < MAX_WEIGHTS_PER_VERTEX; v++)
+            boneWeightsBuffer[i].boneWeight[v] = 0;
 
     uint boneIndex = 0;
     for (auto &bone : bones)
@@ -55,15 +58,9 @@ bool VulkanMeshArmature::setupBoneWeights(const std::vector<std::shared_ptr<wne:
 
 void VulkanMeshArmature::setBoneTransformationMatrix(int index, const Matrix4x4 &data)
 {
-    // Logger::log << "BONE MATRIIES " << endl;
     auto objectBuffers = vulkanUtils->getObjectBuffers();
     if (index >= 0 && index < maxIndex)
     {
-        // Logger::log << "SET BONE MATRIX " << index << " (" << bonesBufferIndex << ")" << endl;
-        // Logger::log << data[0][0] << " " << data[1][0] << " " << data[2][0] << " " << data[3][0] << endl;
-        // Logger::log << data[0][1] << " " << data[1][1] << " " << data[2][1] << " " << data[3][1] << endl;
-        // Logger::log << data[0][2] << " " << data[1][2] << " " << data[2][2] << " " << data[3][2] << endl;
-        // Logger::log << data[0][3] << " " << data[1][3] << " " << data[2][3] << " " << data[3][3] << endl;
         objectBuffers->setBoneMatrix(bonesBufferIndex + index, data * boneMatricies[index]);
     }
 }

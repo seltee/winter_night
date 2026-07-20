@@ -1,4 +1,5 @@
 #include "features/data/model.h"
+#include "features/logger/logger.h"
 #include <iostream>
 
 using namespace wne;
@@ -57,6 +58,7 @@ bool Model::append(Model *model)
     if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
     {
         indexShift = vertexData.vertexColored->size();
+        uint32 vNum = indexShift;
         for (auto &vertex : model->getAsVertexColored())
         {
             Vector4 vec = transformation * Vector4(vertex.pos, 1.0f);
@@ -64,16 +66,16 @@ bool Model::append(Model *model)
             Vector3 normal = normalize(normalMatrix * vertex.normal);
 
             vertexData.vertexColored->emplace_back(
-                VertexColored({{vec.x, vec.y, vec.z},
-                               {vertex.color.r, vertex.color.g, vertex.color.b},
-                               normal}));
+                VertexColored({vNum, {vec.x, vec.y, vec.z}, {vertex.color.r, vertex.color.g, vertex.color.b}, normal}));
 
             boundingRadius = fmaxf(boundingRadius, sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
+            vNum++;
         }
     }
     else if (dataType == ModelDataType::VertexTexturedInd32 || dataType == ModelDataType::VertexTexturedInd16)
     {
         indexShift = vertexData.vertexTextured->size();
+        uint32 vNum = indexShift;
         for (auto &vertex : model->getAsVertexTextured())
         {
             Vector4 vec = transformation * Vector4(vertex.pos, 1.0f);
@@ -81,9 +83,7 @@ bool Model::append(Model *model)
             Vector3 normal = normalize(normalMatrix * vertex.normal);
 
             vertexData.vertexTextured->emplace_back(
-                VertexTextured({{vec.x, vec.y, vec.z},
-                                {vertex.uv.x, vertex.uv.y},
-                                normal}));
+                VertexTextured({vNum, {vec.x, vec.y, vec.z}, {vertex.uv.x, vertex.uv.y}, normal}));
 
             boundingRadius = fmaxf(boundingRadius, sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
         }

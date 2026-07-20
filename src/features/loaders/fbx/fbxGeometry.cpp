@@ -78,7 +78,8 @@ void FBXGeometry::getData(std::vector<VertexTextured> &vertexTexturedData, std::
         Vector2 uv = (uvIndex >= 0) ? UVs[uvIndex] : Vector2(0, 0);
         Vector3 normal = (normalIndex >= 0) ? normals[normalIndex] : Vector3(0, 0, 1.0f);
 
-        uint32 newIndex = getIndexByTrait(vertexTexturedData, vertex, uv, normal);
+        uint32 newIndex = getIndexByTrait(vertexTexturedData, vertex, uv, normal, index);
+
         indicesData.push_back(newIndex);
     }
 }
@@ -102,7 +103,7 @@ std::vector<FBXGeometry::Point> FBXGeometry::breakPoints(std::vector<Point> poin
     return out;
 }
 
-uint32 FBXGeometry::getIndexByTrait(std::vector<VertexTextured> &vertexTexturedData, Vector3 &vertex, Vector2 &uv, Vector3 &normal)
+uint32 FBXGeometry::getIndexByTrait(std::vector<VertexTextured> &vertexTexturedData, Vector3 &vertex, Vector2 &uv, Vector3 &normal, int oldIndex)
 {
     for (uint32 i = 0; i < vertexTexturedData.size(); i++)
     {
@@ -118,7 +119,10 @@ uint32 FBXGeometry::getIndexByTrait(std::vector<VertexTextured> &vertexTexturedD
             return i;
         }
     }
-    vertexTexturedData.push_back({vertex, uv, normal});
+
+    retargetVertexList.emplace_back(RetargetVertexIndex({oldIndex, static_cast<int32>(vertexTexturedData.size())}));
+
+    vertexTexturedData.push_back({static_cast<uint32>(vertexTexturedData.size()), vertex, uv, normal});
     return vertexTexturedData.size() - 1;
 }
 

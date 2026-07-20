@@ -1,8 +1,10 @@
 #version 450
 
-layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec2 inUV;
-layout(location = 2) in vec3 inNormal;
+layout(location = 0) in uint inVertexID;
+layout(location = 1) in vec3 inPosition;
+layout(location = 2) in vec2 inUV;
+layout(location = 3) in vec3 inNormal;
+
 
 layout(location = 0) out vec2 UV;
 layout(location = 1) out vec3 normal;
@@ -96,7 +98,7 @@ void main() {
 
             mat4 mWorld = mBufferBoneMatrixes.matrix[objectData.boneMatrixesShift + boneIndex];
 
-            position += boneWeight * mWorld * vec4(inPosition, 1.0);
+            position += boneWeight * (mWorld * vec4(inPosition, 1.0));
             /*
             position += weight * mul(float4(vin.pos, 1.0f), world);
             normal += weight * mul(vin.normal, (float3x3)world);

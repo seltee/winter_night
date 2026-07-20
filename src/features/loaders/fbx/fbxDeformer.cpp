@@ -20,7 +20,6 @@ FBXDeformer::FBXDeformer(FBXNode &node)
     // node.findNode("TransformLink");
     // node.findNode("TransformAssociateModel");
 
-    Logger::log << "DEFORMER " << id << " " << name.c_str() << " " << typeName.c_str() << endl;
     if (indexNode)
     {
         auto indexData = indexNode->getArrayIntegers(0);
@@ -44,24 +43,48 @@ FBXDeformer::FBXDeformer(FBXNode &node)
         auto mInvData = transformNode->getArrayDouble(0);
         for (int i = 0; i < 16; i++)
         {
-            mInvTransform[i % 4][i / 4] = static_cast<float>(mInvData[i]);
+            mInvTransform[i / 4][i % 4] = static_cast<float>(mInvData[i]);
         }
     }
 }
 
-std::shared_ptr<Armature> FBXDeformer::getAsSkeleton()
+std::shared_ptr<Armature> FBXDeformer::getAsSkeleton(FBXGeometry *targetGeometry)
 {
     if (!isSkin())
         return nullptr;
 
+    auto retargetVertexList = targetGeometry->getRetargetVertexList();
+
     std::shared_ptr<Armature> armature = std::make_shared<Armature>(name.c_str());
 
     for (auto &def : children)
+    {
+        auto origIndexes = def->getIndexes();
+        auto origWeights = def->getWeights();
+        uint origAmount = origIndexes.size();
+
+        std::vector<int> newIndexes;
+        std::vector<float> newWeights;
+
+        for (uint i = 0; i < origAmount; i++)
+        {
+            int origIndex = origIndexes[i];
+            for (auto &retarget : retargetVertexList)
+            {
+                if (retarget.from == origIndex)
+                {
+                    newIndexes.push_back(retarget.to);
+                    newWeights.push_back(origWeights[i]);
+                }
+            }
+        }
+
         armature->addBone(
             def->getName(),
-            def->getIndexes(),
-            def->getWeights(),
+            newIndexes,
+            newWeights,
             def->getInvTransform());
+    }
 
     return armature;
 }

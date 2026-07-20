@@ -1,17 +1,19 @@
 #pragma once
 #include "core/core.h"
 #include "features/data/armature.h"
+#include "features/loaders/fbx/fbxGeometry.h"
 #include "fbxNode.h"
 #include <memory>
 #include <vector>
 
 namespace wne
 {
+    class FBXGeometry;
     class FBXDeformer
     {
     public:
         FBXDeformer(FBXNode &node);
-        std::shared_ptr<Armature> getAsSkeleton();
+        std::shared_ptr<Armature> getAsSkeleton(FBXGeometry *targetGeometry);
 
         inline const uint64 getId()
         {

@@ -5,5 +5,4 @@ using namespace wne;
 
 FBXPose::FBXPose(FBXNode &node)
 {
-    Logger::log << "pose" << endl;
 }

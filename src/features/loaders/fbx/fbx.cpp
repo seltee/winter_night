@@ -206,23 +206,15 @@ std::shared_ptr<Base3d> FBX::loadFile(const char *path)
 
     for (auto &model : models)
     {
-        Logger::log << "Adding model " << model.getName()
-                    << " -> " << (model.getParent() ? model.getParent()->getName() : "none")
-                    << ((!model.getGeometry() || model.getGeometry()->isEmpty()) ? " | Empty" : " | Has geometry")
-                    << ((model.getGeometry() && model.getGeometry()->getDeformers().size() > 0) ? " Has deformers" : " No deformers")
-                    << endl;
-
         auto newModel = model.getAsModel();
 
         if (model.getGeometry() && model.getGeometry()->getDeformers().size() > 0)
         {
-            Logger::log << "Deformers info " << model.getGeometry()->getDeformers().size() << endl;
             for (auto &def : model.getGeometry()->getDeformers())
             {
-                Logger::log << def->getName() << " " << def->getTypeName() << endl;
                 if (def->isSkin())
                 {
-                    auto armature = def->getAsSkeleton();
+                    auto armature = def->getAsSkeleton(model.getGeometry());
                     newModel->addArmature(armature);
                 }
             }

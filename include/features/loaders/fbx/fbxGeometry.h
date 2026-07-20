@@ -10,6 +10,12 @@ namespace wne
     class FBXGeometry
     {
     public:
+        struct RetargetVertexIndex
+        {
+            int32 from;
+            int32 to;
+        };
+
         FBXGeometry(FBXNode &node);
         void getData(std::vector<VertexTextured> &vertexTexturedData, std::vector<uint32> &indicesData);
 
@@ -33,6 +39,11 @@ namespace wne
             return vertices.size() == 0;
         }
 
+        inline const std::vector<RetargetVertexIndex> &getRetargetVertexList()
+        {
+            return retargetVertexList;
+        }
+
     protected:
         struct Point
         {
@@ -44,7 +55,7 @@ namespace wne
 
         std::vector<Point> breakPoints(std::vector<Point> points);
         // adds vertex if doesn't exist
-        uint32 getIndexByTrait(std::vector<VertexTextured> &vertexTexturedData, Vector3 &vertex, Vector2 &uv, Vector3 &normal);
+        uint32 getIndexByTrait(std::vector<VertexTextured> &vertexTexturedData, Vector3 &vertex, Vector2 &uv, Vector3 &normal, int oldIndex);
 
         void provideVertices(double *list, uint64 countOfDoubles);
         void providePolygonIndices(int32 *list, uint64 countOfIndicies);
@@ -61,6 +72,7 @@ namespace wne
         std::vector<uint32> normalIndices;
         std::vector<Vector2> UVs;
         std::vector<uint32> UVIndices;
+        std::vector<RetargetVertexIndex> retargetVertexList;
 
         std::vector<FBXDeformer *> deformers;
     };

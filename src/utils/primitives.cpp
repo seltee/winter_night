@@ -18,10 +18,10 @@ std::shared_ptr<Model> Primitives::createPlane(float halfSize, const Vector3 &no
     Vector3 zAxis = normalize(cross(normal, xAxis));
 
     const std::vector<wne::VertexTextured> vertices = {
-        {xAxis * -halfSize + zAxis * -halfSize, {1.0f, 1.0f}, normal},
-        {xAxis * halfSize + zAxis * -halfSize, {0.0f, 1.0f}, normal},
-        {xAxis * halfSize + zAxis * halfSize, {0.0f, 0.0f}, normal},
-        {xAxis * -halfSize + zAxis * halfSize, {1.0f, 0.0f}, normal}};
+        {0, xAxis * -halfSize + zAxis * -halfSize, {1.0f, 1.0f}, normal},
+        {1, xAxis * halfSize + zAxis * -halfSize, {0.0f, 1.0f}, normal},
+        {2, xAxis * halfSize + zAxis * halfSize, {0.0f, 0.0f}, normal},
+        {3, xAxis * -halfSize + zAxis * halfSize, {1.0f, 0.0f}, normal}};
 
     const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 
@@ -40,35 +40,35 @@ std::shared_ptr<Model> Primitives::createBox(const Vector3 &size)
     float z = size.z / 2.0f;
 
     const std::vector<wne::VertexTextured> vertices = {
-        {{x, y, -z}, {1.0f, 0.0f}, {1.0f, 0, 0}},
-        {{x, y, z}, {1.0f, 1.0f}, {1.0f, 0, 0}},
-        {{x, -y, z}, {0.0f, 1.0f}, {1.0f, 0, 0}},
-        {{x, -y, -z}, {0.0f, 0.0f}, {1.0f, 0, 0}},
+        {0, {x, y, -z}, {1.0f, 0.0f}, {1.0f, 0, 0}},
+        {1, {x, y, z}, {1.0f, 1.0f}, {1.0f, 0, 0}},
+        {2, {x, -y, z}, {0.0f, 1.0f}, {1.0f, 0, 0}},
+        {3, {x, -y, -z}, {0.0f, 0.0f}, {1.0f, 0, 0}},
 
-        {{-x, y, -z}, {0.0f, 0.0f}, {-1.0f, 0, 0}},
-        {{-x, y, z}, {0.0f, 1.0f}, {-1.0f, 0, 0}},
-        {{-x, -y, z}, {1.0f, 1.0f}, {-1.0f, 0, 0}},
-        {{-x, -y, -z}, {1.0f, 0.0f}, {-1.0f, 0, 0}},
+        {4, {-x, y, -z}, {0.0f, 0.0f}, {-1.0f, 0, 0}},
+        {5, {-x, y, z}, {0.0f, 1.0f}, {-1.0f, 0, 0}},
+        {6, {-x, -y, z}, {1.0f, 1.0f}, {-1.0f, 0, 0}},
+        {7, {-x, -y, -z}, {1.0f, 0.0f}, {-1.0f, 0, 0}},
 
-        {{-x, -y, -z}, {0.0f, 0.0f}, {0, 0, -1.0f}},
-        {{-x, y, -z}, {0.0f, 1.0f}, {0, 0, -1.0f}},
-        {{x, y, -z}, {1.0f, 1.0f}, {0, 0, -1.0f}},
-        {{x, -y, -z}, {1.0f, 0.0f}, {0, 0, -1.0f}},
+        {8, {-x, -y, -z}, {0.0f, 0.0f}, {0, 0, -1.0f}},
+        {9, {-x, y, -z}, {0.0f, 1.0f}, {0, 0, -1.0f}},
+        {10, {x, y, -z}, {1.0f, 1.0f}, {0, 0, -1.0f}},
+        {11, {x, -y, -z}, {1.0f, 0.0f}, {0, 0, -1.0f}},
 
-        {{-x, -y, z}, {1.0f, 0.0f}, {0, 0, 1.0f}},
-        {{-x, y, z}, {1.0f, 1.0f}, {0, 0, 1.0f}},
-        {{x, y, z}, {0.0f, 1.0f}, {0, 0, 1.0f}},
-        {{x, -y, z}, {0.0f, 0.0f}, {0, 0, 1.0f}},
+        {12, {-x, -y, z}, {1.0f, 0.0f}, {0, 0, 1.0f}},
+        {13, {-x, y, z}, {1.0f, 1.0f}, {0, 0, 1.0f}},
+        {14, {x, y, z}, {0.0f, 1.0f}, {0, 0, 1.0f}},
+        {15, {x, -y, z}, {0.0f, 0.0f}, {0, 0, 1.0f}},
 
-        {{-x, y, -z}, {1.0f, 0.0f}, {0, 1.0f, 0}},
-        {{-x, y, z}, {1.0f, 1.0f}, {0, 1.0f, 0}},
-        {{x, y, z}, {0.0f, 1.0f}, {0, 1.0f, 0}},
-        {{x, y, -z}, {0.0f, 0.0f}, {0, 1.0f, 0}},
+        {16, {-x, y, -z}, {1.0f, 0.0f}, {0, 1.0f, 0}},
+        {17, {-x, y, z}, {1.0f, 1.0f}, {0, 1.0f, 0}},
+        {18, {x, y, z}, {0.0f, 1.0f}, {0, 1.0f, 0}},
+        {19, {x, y, -z}, {0.0f, 0.0f}, {0, 1.0f, 0}},
 
-        {{-x, -y, -z}, {1.0f, 0.0f}, {0, -1.0f, 0}},
-        {{-x, -y, z}, {1.0f, 1.0f}, {0, -1.0f, 0}},
-        {{x, -y, z}, {0.0f, 1.0f}, {0, -1.0f, 0}},
-        {{x, -y, -z}, {0.0f, 0.0f}, {0, -1.0f, 0}}};
+        {20, {-x, -y, -z}, {1.0f, 0.0f}, {0, -1.0f, 0}},
+        {21, {-x, -y, z}, {1.0f, 1.0f}, {0, -1.0f, 0}},
+        {22, {x, -y, z}, {0.0f, 1.0f}, {0, -1.0f, 0}},
+        {23, {x, -y, -z}, {0.0f, 0.0f}, {0, -1.0f, 0}}};
 
     const std::vector<uint16_t> indices = {
         0, 1, 2, 2, 3, 0,
@@ -97,7 +97,7 @@ std::shared_ptr<Model> Primitives::createSphere(float radius, unsigned int rings
             float zPos = radius * sin(xSegment * PI2) * sin(ySegment * PI);
 
             Vector3 normal = normalize(Vector3(xPos, yPos, zPos));
-            vertices.push_back({{xPos, yPos, zPos}, {xSegment, ySegment}, {normal.x, normal.y, normal.z}});
+            vertices.push_back({static_cast<uint32>(vertices.size()), {xPos, yPos, zPos}, {xSegment, ySegment}, {normal.x, normal.y, normal.z}});
         }
     }
 

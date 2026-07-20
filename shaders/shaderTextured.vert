@@ -1,8 +1,9 @@
 #version 450
 
-layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec2 inUV;
-layout(location = 2) in vec3 inNormal;
+layout(location = 0) in uint inVertexID;
+layout(location = 1) in vec3 inPosition;
+layout(location = 2) in vec2 inUV;
+layout(location = 3) in vec3 inNormal;
 
 layout(location = 0) out vec2 UV;
 layout(location = 1) out vec3 normal;
@@ -76,7 +77,6 @@ layout(set = 0, binding = 9) buffer Bones
 
 void main() {
     vec4 position = vec4(0.0, 0.0, 0.0, 0.0);
-    uint vertexID = gl_VertexIndex;
 
     UV.x = inUV.x * objectData.uvScaleX + objectData.uvShiftX;
     UV.y = inUV.y * objectData.uvScaleY + objectData.uvShiftY;
@@ -89,7 +89,7 @@ void main() {
     {
         for (int i = 0; i < 5; i++)
         {
-            uint boneDataIndex = vertexID + objectData.boneIndexesShift;
+            uint boneDataIndex = inVertexID + objectData.boneIndexesShift;
             uint boneIndex = boneData[boneDataIndex].boneIndex[i];
             float boneWeight = boneData[boneDataIndex].boneWeight[i];
 

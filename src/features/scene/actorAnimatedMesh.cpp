@@ -8,7 +8,6 @@ using namespace wne;
 
 ActorAnimatedMesh::ActorAnimatedMesh(Renderer *renderer, std::shared_ptr<MeshCollection> mesh) : Actor(renderer)
 {
-    Logger::log << "Animated mesh setup" << endl;
     this->mesh = mesh;
     count = mesh->getMeshCount();
 
@@ -165,6 +164,7 @@ void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
 
 void ActorAnimatedMesh::renderDepth()
 {
+    return;
     auto state = renderer->getState();
     static const Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
 
@@ -199,11 +199,12 @@ void ActorAnimatedMesh::renderColor()
         {
             MeshArmature *meshArmature = nodes[i].armature ? nodes[i].armature->meshArmature.get() : nullptr;
             Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
+            Matrix4x4 transformation = meshArmature ? Matrix4x4::identity() : nodes[i].transfotmation;
             materialToUse->bindColor(
                 nodes[i].getObjectId(),
                 lights,
-                state->getViewProjectionMatrix() * nodes[i].transfotmation,
-                nodes[i].transfotmation,
+                state->getViewProjectionMatrix() * transformation,
+                transformation,
                 getNormalMatrix(),
                 uvModifier,
                 meshArmature,

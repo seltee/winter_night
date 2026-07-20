@@ -82,14 +82,6 @@ int main()
     auto soundSystem = window->getSoundSystem();
     auto shootFloat = soundSystem->loadSound("./data/snow_float.wav");
 
-    const std::vector<wne::VertexTextured> vertices = {
-        {{-5.0f, -5.0f, 0.0f}, {0.0f, 1.0f}, {0, 0, -1.0f}},
-        {{5.0f, -5.0f, 0.0f}, {1.0f, 1.0f}, {0, 0, -1.0f}},
-        {{5.0f, 5.0f, 0.0f}, {1.0f, 0.0f}, {0, 0, -1.0f}},
-        {{-5.0f, 5.0f, 0.0f}, {0.0f, 0.0f}, {0, 0, -1.0f}}};
-
-    const std::vector<uint16_t> indices = {0, 2, 1, 3, 2, 0};
-
     // scene
     auto scene = renderer->createScene();
     scene->setAmbientLight(0.0f, 0.0f, 0.0f);
