@@ -164,7 +164,6 @@ void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
 
 void ActorAnimatedMesh::renderDepth()
 {
-    return;
     auto state = renderer->getState();
     static const Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
 
@@ -231,7 +230,7 @@ void ActorAnimatedMesh::renderColor()
 
 Actor::RenderPass ActorAnimatedMesh::getRenderPass()
 {
-    return RenderPass::Blended;
+    return RenderPass::Main;
 }
 
 float ActorAnimatedMesh::getBoundingRadius()

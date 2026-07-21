@@ -20,7 +20,7 @@ VulkanDescriptorSetLayout::~VulkanDescriptorSetLayout()
 bool VulkanDescriptorSetLayout::setupTexturedDepth()
 {
     // pipeline layout
-    VkDescriptorSetLayoutBinding pipelineBinding[1]{};
+    VkDescriptorSetLayoutBinding pipelineBinding[3]{};
 
     // mvp matrices
     pipelineBinding[0].binding = 0;
@@ -29,9 +29,23 @@ bool VulkanDescriptorSetLayout::setupTexturedDepth()
     pipelineBinding[0].pImmutableSamplers = nullptr;
     pipelineBinding[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
+    // bones buffer
+    pipelineBinding[1].binding = 1;
+    pipelineBinding[1].descriptorCount = 1;
+    pipelineBinding[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    pipelineBinding[1].pImmutableSamplers = nullptr;
+    pipelineBinding[1].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    // bones weight buffer
+    pipelineBinding[2].binding = 2;
+    pipelineBinding[2].descriptorCount = 1;
+    pipelineBinding[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    pipelineBinding[2].pImmutableSamplers = nullptr;
+    pipelineBinding[2].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
     VkDescriptorSetLayoutCreateInfo layoutInfoPipeline{};
     layoutInfoPipeline.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfoPipeline.bindingCount = 1;
+    layoutInfoPipeline.bindingCount = 3;
     layoutInfoPipeline.pBindings = pipelineBinding;
 
     if (vkCreateDescriptorSetLayout(vulkanDevice->getDevice(), &layoutInfoPipeline, nullptr, &descriptorSetLayout) != VK_SUCCESS)

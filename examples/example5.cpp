@@ -29,7 +29,6 @@ int main()
     auto imageBox = wne::Image::create("./box.png");
     auto textureBox = renderer->createTexture(imageBox);
     auto materialBox = renderer->createFlatMaterial(textureBox);
-    materialBox->setColorBlending(wne::ColorBlending::Alpha);
 
     auto imageMetalBox = wne::Image::create("./mbox.png");
     auto textureMetalBox = renderer->createTexture(imageMetalBox);

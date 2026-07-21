@@ -150,13 +150,37 @@ bool VulkanDescriptorSets::initDescriptorSetTexturedDepth(
     bufferMVPInfo.offset = 0;
     bufferMVPInfo.range = vulkanObjectBuffers->getMatrixBufferSize();
 
-    std::array<VkWriteDescriptorSet, 1> writes{};
+    VkDescriptorBufferInfo bufferBonesInfo{};
+    bufferBonesInfo.buffer = vulkanObjectBuffers->getBonesBuffer(frame);
+    bufferBonesInfo.offset = 0;
+    bufferBonesInfo.range = vulkanObjectBuffers->getBonesBufferSize();
+
+    VkDescriptorBufferInfo bufferBoneWeightsInfo{};
+    bufferBoneWeightsInfo.buffer = vulkanObjectBuffers->getBoneWeightsBuffer();
+    bufferBoneWeightsInfo.offset = 0;
+    bufferBoneWeightsInfo.range = vulkanObjectBuffers->getBoneWeightsBufferSize();
+
+    std::array<VkWriteDescriptorSet, 3> writes{};
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = *descriptorSet;
     writes[0].dstBinding = 0;
     writes[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     writes[0].descriptorCount = 1;
     writes[0].pBufferInfo = &bufferMVPInfo;
+
+    writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[1].dstSet = *descriptorSet;
+    writes[1].dstBinding = 1;
+    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    writes[1].descriptorCount = 1;
+    writes[1].pBufferInfo = &bufferBonesInfo;
+
+    writes[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[2].dstSet = *descriptorSet;
+    writes[2].dstBinding = 2;
+    writes[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    writes[2].descriptorCount = 1;
+    writes[2].pBufferInfo = &bufferBoneWeightsInfo;
 
     vkUpdateDescriptorSets(device, (uint32)writes.size(), writes.data(), 0, nullptr);
     return true;
