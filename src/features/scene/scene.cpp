@@ -105,9 +105,8 @@ void Scene::render()
     {
         if (object->isInRender() && object->isVisible())
         {
-            if (object->getRenderPass() == Actor::RenderPass::Main)
-                object->renderColor();
-            else
+            object->renderColor(false);
+            if (object->isBlendingPassRequired())
                 blendingPass.push_back(object.get());
         }
     }
@@ -115,7 +114,7 @@ void Scene::render()
     // blending pass
     for (const auto &object : blendingPass)
     {
-        object->renderColor();
+        object->renderColor(true);
     }
 }
 

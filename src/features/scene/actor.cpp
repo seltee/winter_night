@@ -39,8 +39,13 @@ void Actor::renderDepth()
 {
 }
 
-void Actor::renderColor()
+void Actor::renderColor(bool isBlendingPhase)
 {
+}
+
+bool Actor::isBlendingPassRequired()
+{
+    return false;
 }
 
 void Actor::modelMatrixChanged()
@@ -57,11 +62,6 @@ const Matrix3x3 &Actor::getNormalMatrix()
         isDirtyNormalsFlag = false;
     }
     return mNormal;
-}
-
-Actor::RenderPass Actor::getRenderPass()
-{
-    return RenderPass::Main;
 }
 
 void Actor::setScene(Scene *scene)

@@ -192,16 +192,19 @@ void ActorUI::update(float delta)
     }
 }
 
-void ActorUI::renderColor()
+void ActorUI::renderColor(bool isBlendingPhase)
 {
-    UINode::ContextRender context;
-    context.renderer = renderer;
-    root.render(context);
+    if (isBlendingPhase)
+    {
+        UINode::ContextRender context;
+        context.renderer = renderer;
+        root.render(context);
+    }
 }
 
-Actor::RenderPass ActorUI::getRenderPass()
+bool ActorUI::isBlendingPassRequired()
 {
-    return RenderPass::Blended;
+    return true;
 }
 
 float ActorUI::getBoundingRadius()

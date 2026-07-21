@@ -13,12 +13,6 @@ namespace wne
     class WNE_API Actor : public Object, public Positionable
     {
     public:
-        enum RenderPass
-        {
-            Main,
-            Blended
-        };
-
         Actor(Renderer *renderer);
 
         virtual void update(float delta);
@@ -32,11 +26,12 @@ namespace wne
         virtual void renderDepth();
 
         // render equal to depth buffer
-        virtual void renderColor();
+        virtual void renderColor(bool isBlendingPhase);
+
+        virtual bool isBlendingPassRequired();
 
         void modelMatrixChanged() override;
         virtual const Matrix3x3 &getNormalMatrix();
-        virtual RenderPass getRenderPass();
 
         void setScene(Scene *scene);
 

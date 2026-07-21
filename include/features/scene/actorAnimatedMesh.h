@@ -31,9 +31,9 @@ namespace wne
 
         void renderDepthShadow(Vector3 &lightPosition) override final;
         void renderDepth() override final;
-        void renderColor() override final;
+        void renderColor(bool isBlendingPhase) override final;
 
-        RenderPass getRenderPass() override final;
+        bool isBlendingPassRequired() override final;
 
         float getBoundingRadius() override final;
 

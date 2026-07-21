@@ -27,12 +27,12 @@ namespace wne
         void update(float delta) override final;
         void renderDepthShadow(Vector3 &lightPosition) override final;
         void renderDepth() override final;
-        void renderColor() override final;
+        void renderColor(bool isBlendingPhase) override final;
+
+        bool isBlendingPassRequired() override final;
 
         void setFrame(uint frame);
         void updateUV();
-
-        RenderPass getRenderPass() override final;
 
         float getBoundingRadius() override final;
 

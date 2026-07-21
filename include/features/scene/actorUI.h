@@ -22,8 +22,9 @@ namespace wne
         ActorUI(Renderer *renderer, Window *eventWindow, uint rootWidth, uint rootHeight);
 
         void update(float delta) override final;
-        void renderColor() override final;
-        RenderPass getRenderPass() override final;
+        void renderColor(bool isBlendingPhase) override final;
+
+        bool isBlendingPassRequired() override final;
 
         float getBoundingRadius() override final;
 

@@ -149,10 +149,12 @@ void ActorAnimatedMesh::renderDepthShadow(Vector3 &lightPosition)
     {
         MeshArmature *meshArmature = nodes[i].armature ? nodes[i].armature->meshArmature.get() : nullptr;
         Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
+        Matrix4x4 transformation = meshArmature ? Matrix4x4::identity() : nodes[i].transfotmation;
+
         materialToUse->bindDepthShadow(
             nodes[i].getObjectId(),
             renderer,
-            state->getViewProjectionMatrix() * nodes[i].transfotmation,
+            state->getViewProjectionMatrix() * transformation,
             getNormalMatrix(),
             uvModifier,
             meshArmature,
@@ -171,22 +173,27 @@ void ActorAnimatedMesh::renderDepth()
     {
         if (nodes[i].isInRender)
         {
-            MeshArmature *meshArmature = nodes[i].armature ? nodes[i].armature->meshArmature.get() : nullptr;
             Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
-            materialToUse->bindDepth(
-                nodes[i].getObjectId(),
-                state->getViewProjectionMatrix() * nodes[i].transfotmation,
-                nodes[i].transfotmation,
-                getNormalMatrix(),
-                uvModifier,
-                meshArmature,
-                (*mesh)[i].mesh->getDataType());
-            (*mesh)[i].mesh->render(renderer->getFrameData());
+            if (materialToUse->getColorBlending() == ColorBlending::Solid)
+            {
+                MeshArmature *meshArmature = nodes[i].armature ? nodes[i].armature->meshArmature.get() : nullptr;
+                Matrix4x4 transformation = meshArmature ? Matrix4x4::identity() : nodes[i].transfotmation;
+
+                materialToUse->bindDepth(
+                    nodes[i].getObjectId(),
+                    state->getViewProjectionMatrix() * transformation,
+                    transformation,
+                    getNormalMatrix(),
+                    uvModifier,
+                    meshArmature,
+                    (*mesh)[i].mesh->getDataType());
+                (*mesh)[i].mesh->render(renderer->getFrameData());
+            }
         }
     }
 }
 
-void ActorAnimatedMesh::renderColor()
+void ActorAnimatedMesh::renderColor(bool isBlendingPhase)
 {
     auto state = renderer->getState();
     static const Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
@@ -196,41 +203,57 @@ void ActorAnimatedMesh::renderColor()
     {
         if (nodes[i].isInRender)
         {
-            MeshArmature *meshArmature = nodes[i].armature ? nodes[i].armature->meshArmature.get() : nullptr;
             Material *materialToUse = nodes[i].material ? nodes[i].material.get() : renderer->getDefaultMaterial().get();
-            Matrix4x4 transformation = meshArmature ? Matrix4x4::identity() : nodes[i].transfotmation;
-            materialToUse->bindColor(
-                nodes[i].getObjectId(),
-                lights,
-                state->getViewProjectionMatrix() * transformation,
-                transformation,
-                getNormalMatrix(),
-                uvModifier,
-                meshArmature,
-                (*mesh)[i].mesh->getDataType());
-            (*mesh)[i].mesh->render(renderer->getFrameData());
+            bool isMainPhase = materialToUse->getColorBlending() == ColorBlending::Solid;
+            if ((isBlendingPhase && !isMainPhase) || (!isBlendingPhase && isMainPhase))
+            {
+                MeshArmature *meshArmature = nodes[i].armature ? nodes[i].armature->meshArmature.get() : nullptr;
+                Matrix4x4 transformation = meshArmature ? Matrix4x4::identity() : nodes[i].transfotmation;
+                materialToUse->bindColor(
+                    nodes[i].getObjectId(),
+                    lights,
+                    state->getViewProjectionMatrix() * transformation,
+                    transformation,
+                    getNormalMatrix(),
+                    uvModifier,
+                    meshArmature,
+                    (*mesh)[i].mesh->getDataType());
+                (*mesh)[i].mesh->render(renderer->getFrameData());
+            }
         }
     }
 
-    if (debugViewChierarchyState)
+    if (!isBlendingPhase)
     {
-        for (uint i = 0; i < count; i++)
+        if (debugViewChierarchyState)
         {
-            if (nodes[i].parentNode)
+            for (uint i = 0; i < count; i++)
             {
-                Vector4 pFrom4 = nodes[i].transfotmation * Vector4(0, 0, 0, 1.0f);
-                pFrom4 = pFrom4 / pFrom4.w;
-                Vector4 pTo4 = nodes[i].parentNode->transfotmation * Vector4(0, 0, 0, 1.0f);
-                pTo4 = pTo4 / pTo4.w;
-                renderer->addDebugLine(pFrom4.xyz(), pTo4.xyz(), Renderer::DebugColor::White);
+                if (nodes[i].parentNode)
+                {
+                    Vector4 pFrom4 = nodes[i].transfotmation * Vector4(0, 0, 0, 1.0f);
+                    pFrom4 = pFrom4 / pFrom4.w;
+                    Vector4 pTo4 = nodes[i].parentNode->transfotmation * Vector4(0, 0, 0, 1.0f);
+                    pTo4 = pTo4 / pTo4.w;
+                    renderer->addDebugLine(pFrom4.xyz(), pTo4.xyz(), Renderer::DebugColor::White);
+                }
             }
         }
     }
 }
 
-Actor::RenderPass ActorAnimatedMesh::getRenderPass()
+bool ActorAnimatedMesh::isBlendingPassRequired()
 {
-    return RenderPass::Main;
+    for (uint i = 0; i < count; i++)
+    {
+        if (nodes[i].isInRender &&
+            nodes[i].material &&
+            nodes[i].material->getColorBlending() != ColorBlending::Solid)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 float ActorAnimatedMesh::getBoundingRadius()
