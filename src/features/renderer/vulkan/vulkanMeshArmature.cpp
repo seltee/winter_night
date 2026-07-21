@@ -5,9 +5,21 @@
 
 using namespace wne;
 
+std::mutex VulkanMeshArmature::cacheWeightsMutex;
+std::vector<VulkanMeshArmature::CachedArmatureWeights> VulkanMeshArmature::cacheWeightsList;
+
 VulkanMeshArmature::VulkanMeshArmature(VulkanUtils *vulkanUtils)
 {
     this->vulkanUtils = vulkanUtils;
+}
+
+VulkanMeshArmature::~VulkanMeshArmature()
+{
+    if (bonesBufferIndex != 0xffffffff)
+    {
+        auto objectBuffers = vulkanUtils->getObjectBuffers();
+        objectBuffers->deallocateBonesOfOjbect(bonesBufferIndex);
+    }
 }
 
 bool VulkanMeshArmature::setupMatrixBuffer(int bonesAmount)
@@ -17,10 +29,11 @@ bool VulkanMeshArmature::setupMatrixBuffer(int bonesAmount)
     return true;
 }
 
-bool VulkanMeshArmature::setupBoneWeights(const std::vector<std::shared_ptr<wne::Bone>> &bones)
+bool VulkanMeshArmature::setupBoneWeights(const std::shared_ptr<Armature> &armature)
 {
+    auto bones = armature->getBones();
     auto objectBuffers = vulkanUtils->getObjectBuffers();
-    boneWeightsBufferIndex = objectBuffers->allocateBoneWeightsForObject(maxIndex);
+    boneWeightsBufferIndex = getCachedWeightsBufferIndex(armature, maxIndex);
     auto boneWeightsBuffer = objectBuffers->getBoneWeightsForObject(boneWeightsBufferIndex);
 
     boneMatricies.resize(bones.size());
@@ -63,4 +76,20 @@ void VulkanMeshArmature::setBoneTransformationMatrix(int index, const Matrix4x4 
     {
         objectBuffers->setBoneMatrix(bonesBufferIndex + index, data * boneMatricies[index]);
     }
+}
+
+int32 VulkanMeshArmature::getCachedWeightsBufferIndex(const std::shared_ptr<Armature> &armature, int maxIndex)
+{
+    std::lock_guard<std::mutex> lock(cacheWeightsMutex);
+
+    for (auto &cachedIndexData : cacheWeightsList)
+    {
+        if (cachedIndexData.armature.get() == armature.get())
+            return cachedIndexData.weightsBufferIndex;
+    }
+
+    auto objectBuffers = vulkanUtils->getObjectBuffers();
+    int newBoneWeightsBufferIndex = objectBuffers->allocateBoneWeightsForObject(maxIndex);
+    cacheWeightsList.emplace_back(CachedArmatureWeights({armature, newBoneWeightsBufferIndex}));
+    return newBoneWeightsBufferIndex;
 }

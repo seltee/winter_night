@@ -9,7 +9,7 @@ bool MeshArmature::setup(std::shared_ptr<Armature> armature)
     this->armature = armature;
 
     setupMatrixBuffer(boneAmount);
-    setupBoneWeights(armature->getBones());
+    setupBoneWeights(armature);
     return true;
 }
 
@@ -18,7 +18,7 @@ bool MeshArmature::setupMatrixBuffer(int boneAmount)
     return false;
 }
 
-bool MeshArmature::setupBoneWeights(const std::vector<std::shared_ptr<wne::Bone>> &bones)
+bool MeshArmature::setupBoneWeights(const std::shared_ptr<Armature> &armature)
 {
     return false;
 }

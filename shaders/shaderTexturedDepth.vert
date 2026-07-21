@@ -48,7 +48,7 @@ void main() {
         for (int i = 0; i < 5; i++)
         {
             uint boneDataIndex = inVertexID + objectData.boneIndexesShift;
-            uint boneIndex = boneData[boneDataIndex].boneIndex[i];
+            uint boneIndex = boneData[boneDataIndex].boneIndex[i] + objectData.boneMatrixesShift;
             float boneWeight = boneData[boneDataIndex].boneWeight[i];
 
             mat4 mWorld = mBufferBoneMatrixes.matrix[boneIndex];

@@ -12,7 +12,7 @@ namespace wne
         bool setup(std::shared_ptr<Armature> armature);
 
         virtual bool setupMatrixBuffer(int boneAmount);
-        virtual bool setupBoneWeights(const std::vector<std::shared_ptr<wne::Bone>> &bones);
+        virtual bool setupBoneWeights(const std::shared_ptr<Armature> &armature);
         virtual void setBoneTransformationMatrix(int index, const Matrix4x4 &data);
 
     protected:

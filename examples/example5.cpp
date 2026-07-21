@@ -62,6 +62,17 @@ int main()
         animationTrack->play(true);
     }
 
+    auto actorLoadedTube2 = scene->createActor<wne::ActorAnimatedMesh>(animTubeCollection);
+    actorLoadedTube2->setMaterialToAll(materialBox);
+    actorLoadedTube2->setDebugViewChierarchy(true);
+    actorLoadedTube2->setPosition(6.0f, 1.0f, 2.0f);
+
+    for (auto &anim : animTubeData.animations)
+    {
+        auto animationTrack = actorLoadedTube2->createAnimationTrack(anim);
+        animationTrack->play(true);
+    }
+
     // light
     auto sun = renderer->createLightDirectional();
     sun->setDirection({-0.5, -0.5, -0.5});
