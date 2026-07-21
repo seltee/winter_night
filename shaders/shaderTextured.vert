@@ -6,7 +6,7 @@ layout(location = 2) in vec2 inUV;
 layout(location = 3) in vec3 inNormal;
 
 layout(location = 0) out vec2 UV;
-layout(location = 1) out vec3 normal;
+layout(location = 1) out vec3 outNormal;
 layout(location = 2) out vec4 worldPosition;
 layout(location = 3) out vec4 lightClipPos[16];
 
@@ -77,13 +77,12 @@ layout(set = 0, binding = 9) buffer Bones
 
 void main() {
     vec4 position = vec4(0.0, 0.0, 0.0, 0.0);
+    vec3 normal = vec3(0.0, 0.0, 0.0);
 
     UV.x = inUV.x * objectData.uvScaleX + objectData.uvShiftX;
     UV.y = inUV.y * objectData.uvScaleY + objectData.uvShiftY;
 
-    normal = normalize(
-        (mNormals.matrix[objectData.objectId] * vec4(inNormal, 0.0)).xyz
-    );
+
 
     if (objectData.enableBones != 0)
     {
@@ -96,6 +95,7 @@ void main() {
             mat4 mWorld = mBufferBoneMatrixes.matrix[boneIndex];
 
             position += boneWeight * (mWorld * vec4(inPosition, 1.0));
+            normal += boneWeight * (mat3(mWorld) * inNormal);
 
             /*
             normal += weight * mul(vin.normal, (float3x3)world);
@@ -105,9 +105,11 @@ void main() {
         }
     } else {
         position = vec4(inPosition, 1.0);
+        normal = (mNormals.matrix[objectData.objectId] * vec4(inNormal, 0.0)).xyz;
     }
     
     gl_Position = mMVPs.matrix[objectData.objectId] * position;
+    outNormal = normalize(normal);
 
     worldPosition = mModels.matrix[objectData.objectId] * position;
     worldPosition /= worldPosition.w;
