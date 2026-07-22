@@ -6,6 +6,7 @@
 #include "features/renderer/vulkan/vulkanRendererState.h"
 #include "features/renderer/vulkan/rendererVulkan.h"
 #include "features/renderer/vulkan/vulkanMeshArmature.h"
+#include "features/renderer/vulkan/vulkanShaderMaker.h"
 #include "features/logger/logger.h"
 #include "vulkan/vulkan.h"
 #include <array>
@@ -14,6 +15,8 @@ using namespace wne;
 
 VulkanMaterialFlat::VulkanMaterialFlat(VulkanUtils *vulkanUtils) : VulkanMaterial(vulkanUtils)
 {
+    VulkanShaderMaker shaderMaker;
+    shaderMaker.updateShaderCode();
 }
 
 VulkanMaterialFlat::~VulkanMaterialFlat()

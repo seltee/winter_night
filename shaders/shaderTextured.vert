@@ -82,8 +82,6 @@ void main() {
     UV.x = inUV.x * objectData.uvScaleX + objectData.uvShiftX;
     UV.y = inUV.y * objectData.uvScaleY + objectData.uvShiftY;
 
-
-
     if (objectData.enableBones != 0)
     {
         for (int i = 0; i < 5; i++)
