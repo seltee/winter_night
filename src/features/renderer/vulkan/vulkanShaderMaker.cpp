@@ -32,6 +32,7 @@ extern const char *txtBufferMVPs;
 extern const char *txtBufferMModels;
 extern const char *txtBufferMNormals;
 extern const char *txtBufferBones;
+extern const char *txtBufferGlobalData;
 extern const char *txtBufferLights;
 extern const char *txtBufferLightMVPs;
 
@@ -130,6 +131,7 @@ void VulkanShaderMaker::updateShaderCode()
         fragmentMainShaderCode += txtBufferLights;
         fragmentMainShaderCode += txtBufferLightMVPs;
     }
+    fragmentMainShaderCode += txtBufferGlobalData;
 
     // Fragment Samplers
     fragmentMainShaderCode += txtSamplerAlbedo;
@@ -407,6 +409,14 @@ layout(set = 0, binding = 9) buffer Bones                                   \n\
     BoneData boneData[128];                                                 \n\
 };\n";
 
+const char *txtBufferGlobalData =
+    "layout(set = 0, binding = 3) uniform BufferGlobalData {    \n\
+     vec4 ambientColor;                                         \n\
+     vec4 cameraPosition;                                       \n\
+     uint useRadianceMap;                                       \n\
+     float radienceMapFactor;                                   \n\
+} globalData;\n";
+
 const char *txtBufferBonesDataStruct =
     "struct BoneData {          \n\
     int boneIndex[5];       \n\
@@ -478,19 +488,19 @@ const char *txtVertexLightCalculation =
 }\n\n";
 
 const char *txtColorLayout =
-    "vec4 textureColor = texture(albedoTexSampler, UV); \n\
+    "vec4 textureColor = texture(albedoTexSampler, inUV); \n\
 vec3 color = textureColor.xyz;                      \n\
 float alpha = textureColor.a;                       \n\
 vec3 ambientColor = globalData.ambientColor.xyz;\n\n";
 
 const char *txtRadiance =
     "if (globalData.useRadianceMap != 0) {                                              \n\
-    vec3 worldDifference = globalData.cameraPosition.xyz - worldPosition.xyz;       \n\
-    vec3 V = normalize(worldDifference);                                            \n\
-    vec2 uv = sampleSphericalMap(normal);                                           \n\
-    vec2 uv2 = sampleSphericalMap(normalize(reflect(-V, normal)));                  \n\
-    vec3 irradiance = texture(radianceTexSampler, vec2(uv.x, 1.0 - uv.y)).rgb;      \n\
-    ambientColor += irradiance * globalData.radienceMapFactor;                      \n\
+    vec3 worldDifference = globalData.cameraPosition.xyz - inWorldPosition.xyz;         \n\
+    vec3 V = normalize(worldDifference);                                                \n\
+    vec2 uv = sampleSphericalMap(inNormal);                                             \n\
+    vec2 uv2 = sampleSphericalMap(normalize(reflect(-V, inNormal)));                    \n\
+    vec3 irradiance = texture(radianceTexSampler, vec2(uv.x, 1.0 - uv.y)).rgb;          \n\
+    ambientColor += irradiance * globalData.radienceMapFactor;                          \n\
 };\n\n";
 
 const char *txtFragmentLightning =
