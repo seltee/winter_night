@@ -7,6 +7,8 @@ namespace wne
     {
     public:
         void updateShaderCode();
+        void updateNames();
+        void updateSpirVCache();
 
         inline const char *getVertexMainShaderCode()
         {
@@ -80,5 +82,15 @@ namespace wne
         std::string vertexDepthShaderCode;
         std::string fragmentMainShaderCode;
         std::string fragmentDepthShaderCode;
+
+        std::string vertexMainShaderName;
+        std::string vertexDepthShaderName;
+        std::string fragmentMainShaderName;
+        std::string fragmentDepthShaderName;
+
+        std::string vertexMainShaderCachePath;
+        std::string vertexDepthShaderCachePath;
+        std::string fragmentMainShaderCachePath;
+        std::string fragmentDepthShaderCachePath;
     };
 };
