@@ -94,12 +94,6 @@ void main() {
 
             position += boneWeight * (mWorld * vec4(inPosition, 1.0));
             normal += boneWeight * (mat3(mWorld) * inNormal);
-
-            /*
-            normal += weight * mul(vin.normal, (float3x3)world);
-            tangent += weight * mul(vin.tangent, (float3x3)world);
-            bitangent += weight * mul(vin.bitangent, (float3x3)world);
-            */
         }
     } else {
         position = vec4(inPosition, 1.0);

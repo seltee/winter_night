@@ -144,9 +144,6 @@ void main() {
     vec3 result = (light + ambientColor) * color;
     vec3 gammaResult = vec3(pow(result.r, 1.0 / 1.2), pow(result.g, 1.0 / 1.2), pow(result.b, 1.0 / 1.2));
     outColor = vec4(gammaResult, textureColor.a);
-
-    // outColor = vec4(normal, 1.0);
-    // outColor = texture(texSampler, UV);
 }
 
 vec2 sampleSphericalMap(vec3 v) 

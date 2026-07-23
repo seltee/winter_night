@@ -69,24 +69,12 @@ namespace wne
             return stateMaskedEnabled;
         }
 
-        inline void setShadowingFactor(float value)
-        {
-            isDirty = true;
-            stateShadowingFactor = value;
-        }
-
-        inline float getShadowingFactor()
-        {
-            return stateShadowingFactor;
-        }
-
     protected:
         bool isDirty = true;
 
         bool stateLightsEnabled = false;
         bool stateBonesEnabled = false;
         bool stateMaskedEnabled = false;
-        float stateShadowingFactor = 0.0f;
 
         std::string vertexMainShaderCode;
         std::string vertexDepthShaderCode;
