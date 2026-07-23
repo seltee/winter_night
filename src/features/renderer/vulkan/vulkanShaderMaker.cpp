@@ -1,6 +1,7 @@
 #include "features/renderer/vulkan/vulkanShaderMaker.h"
 #include "features/renderer/vulkan/vulkanShaderSPIRV.h"
 #include "features/logger/logger.h"
+#include <cstring>
 
 using namespace wne;
 
