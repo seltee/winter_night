@@ -1,6 +1,7 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
+#include "features/renderer/vulkan/pipelines/vulkanPipelineUniversal.h"
 #include "features/renderer/materialFlat.h"
 #include "core/api.h"
 
@@ -58,6 +59,12 @@ namespace wne
         VkDescriptorSet descriptorSet = nullptr;
 
         VkDescriptorSet getDescriptorSetFlatTextured();
+        void clearPipelines();
+        void buildColorPipeline(bool enableBones);
+        
+        bool isPipelineDirty = true;
+        std::unique_ptr<VulkanPipelineUniversal> colorPipeline;
+        std::unique_ptr<VulkanPipelineUniversal> colorPipelineWithBones;
 
         uint64 currentImageLayout = 0;
         VkImageView currentImageView = nullptr;

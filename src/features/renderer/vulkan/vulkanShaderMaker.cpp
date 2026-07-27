@@ -45,7 +45,8 @@ extern const char *txtNormalZero;
 extern const char *txtNormalVertex;
 
 extern const char *txtUVLayout;
-extern const char *txtBonesCalculations;
+extern const char *txtBonesCalculationsMain;
+extern const char *txtBonesCalculationsSimple;
 extern const char *txtPositionOut;
 extern const char *txtNormalOut;
 
@@ -189,8 +190,8 @@ void VulkanShaderMaker::updateShaderCode()
     // Bones
     if (stateBonesEnabled)
     {
-        vertexMainShaderCode += txtBonesCalculations;
-        vertexDepthShaderCode += txtBonesCalculations;
+        vertexMainShaderCode += txtBonesCalculationsMain;
+        vertexDepthShaderCode += txtBonesCalculationsSimple;
     }
 
     // Position and normal output
@@ -318,15 +319,27 @@ void VulkanShaderMaker::updateSpirVCache()
     VulkanShaderSPIRV vertexMainShader(vertexMainShaderCode.c_str(), vertexMainShaderCachePath.c_str(), true);
     if (!vertexMainShader.attemptCompile())
         return;
+    vertexMainShaderCompiled.resize(vertexMainShader.getCompCodeLength());
+    memcpy(vertexMainShaderCompiled.data(), vertexMainShader.getCompCodeBytes(), vertexMainShader.getCompCodeLength());
+
     VulkanShaderSPIRV vertexDepthShader(vertexDepthShaderCode.c_str(), vertexDepthShaderCachePath.c_str(), true);
     if (!vertexDepthShader.attemptCompile())
         return;
+    vertexDepthShaderCompiled.resize(vertexDepthShader.getCompCodeLength());
+    memcpy(vertexDepthShaderCompiled.data(), vertexDepthShader.getCompCodeBytes(), vertexDepthShader.getCompCodeLength());
+
     VulkanShaderSPIRV fragmentMainShader(fragmentMainShaderCode.c_str(), fragmentMainShaderCachePath.c_str(), true);
     if (!fragmentMainShader.attemptCompile())
         return;
+    fragmentMainShaderCompiled.resize(fragmentMainShader.getCompCodeLength());
+    memcpy(fragmentMainShaderCompiled.data(), fragmentMainShader.getCompCodeBytes(), fragmentMainShader.getCompCodeLength());
+
     VulkanShaderSPIRV fragmentDepthShader(fragmentDepthShaderCode.c_str(), fragmentDepthShaderCachePath.c_str(), true);
     if (!fragmentDepthShader.attemptCompile())
         return;
+    fragmentDepthShaderCompiled.resize(fragmentDepthShader.getCompCodeLength());
+    memcpy(fragmentDepthShaderCompiled.data(), fragmentDepthShader.getCompCodeBytes(), fragmentDepthShader.getCompCodeLength());
+
     Logger::log << "Shader compiled succesfully" << endl;
 }
 
@@ -451,7 +464,7 @@ const char *txtUVLayout =
     "outUV.x = inUV.x * objectData.uvScaleX + objectData.uvShiftX; \n\
 outUV.y = inUV.y * objectData.uvScaleY + objectData.uvShiftY;\n\n";
 
-const char *txtBonesCalculations =
+const char *txtBonesCalculationsMain =
     "for (int i = 0; i < 5; i++) {\n\
     uint boneDataIndex = inVertexID + objectData.boneIndexesShift;\n\
     uint boneIndex = boneData[boneDataIndex].boneIndex[i] + objectData.boneMatrixesShift;\n\
@@ -459,6 +472,15 @@ const char *txtBonesCalculations =
     mat4 mWorld = mBufferBoneMatrixes.matrix[boneIndex];\n\
     position += boneWeight * (mWorld * vec4(inPosition, 1.0));\n\
     normal += boneWeight * (mat3(mWorld) * inNormal);\n\
+}\n\n";
+
+const char *txtBonesCalculationsSimple =
+    "for (int i = 0; i < 5; i++) {\n\
+    uint boneDataIndex = inVertexID + objectData.boneIndexesShift;\n\
+    uint boneIndex = boneData[boneDataIndex].boneIndex[i] + objectData.boneMatrixesShift;\n\
+    float boneWeight = boneData[boneDataIndex].boneWeight[i];\n\
+    mat4 mWorld = mBufferBoneMatrixes.matrix[boneIndex];\n\
+    position += boneWeight * (mWorld * vec4(inPosition, 1.0));\n\
 }\n\n";
 
 const char *txtPositionOut = "gl_Position = mMVPs.matrix[objectData.objectId] * position;\n";
@@ -478,7 +500,7 @@ const char *txtVertexLightCalculation =
         { \n\
             uint shadowId = lightData[id].shadowTextureId; \n\
             const float normalOffsetAmount = 0.06; \n\
-            vec3 offsetPos = worldPosition.xyz + normal * normalOffsetAmount;  // 0.05 – 0.2 often works \n\
+            vec3 offsetPos = outWorldPosition.xyz + normal * normalOffsetAmount;  // 0.05 – 0.2 often works \n\
             vec4 shadowCoord = mLightMvps.matrix[shadowId] * vec4(offsetPos, 1.0); \n\
             shadowCoord.xyz /= shadowCoord.w; \n\
             shadowCoord.xy = shadowCoord.xy * 0.5 + 0.5; \n\
@@ -512,14 +534,14 @@ for (uint i = 0; i < objectData.lightsAmount; i++)                              
     {                                                                                           \n\
         vec3 lightDir = lightData[id].direction.xyz;                                            \n\
         vec3 lightColor = lightData[id].color.xyz;                                              \n\
-        float diff = max(max(dot(normal, lightDir), 0.0), objectData.normalShadowingFactor);    \n\
+        float diff = max(max(dot(inNormal, lightDir), 0.0), objectData.normalShadowingFactor);    \n\
         float shadow = 0.0f;                                                                    \n\
         if (lightData[id].amountOfCascades > 0){                                                \n\
-            float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);                      \n\
+            float bias = max(0.05 * (1.0 - dot(inNormal, lightDir)), 0.005);                      \n\
             uint shadowId = lightData[id].shadowTextureId;                                      \n\
             const float texelSize = lightData[id].texelSize;                                    \n\
-            vec2 projCoords = lightClipPos[shadowId].xy;                                        \n\
-            float currentDepth = lightClipPos[shadowId].z;                                      \n\
+            vec2 projCoords = inLightClipPos[shadowId].xy;                                        \n\
+            float currentDepth = inLightClipPos[shadowId].z;                                      \n\
             for (int x = -1; x <= 1; ++x)                                                       \n\
             {                                                                                   \n\
                 for (int y = -1; y <= 1; ++y)                                                   \n\
@@ -540,10 +562,10 @@ for (uint i = 0; i < objectData.lightsAmount; i++)                              
         vec3 lightPos = lightData[id].position.xyz;                                             \n\
         vec3 lightColor = lightData[id].color.xyz;                                              \n\
         float affectRadius = lightData[id].affectRadius;                                        \n\
-        float dist = length(lightPos - worldPosition.xyz);                                      \n\
+        float dist = length(lightPos - inWorldPosition.xyz);                                      \n\
         float attenuation = clamp(1.0 - dist / affectRadius, 0.0, 1.0);                         \n\
-        vec3 lightDir = normalize(lightPos - worldPosition.xyz);                                \n\
-        float diff = max(max(dot(normal, lightDir), 0.0), objectData.normalShadowingFactor);    \n\
+        vec3 lightDir = normalize(lightPos - inWorldPosition.xyz);                                \n\
+        float diff = max(max(dot(inNormal, lightDir), 0.0), objectData.normalShadowingFactor);    \n\
         light += diff * lightColor * attenuation;                                               \n\
     }                                                                                           \n\
     if (lightData[id].enableSpot != 0)                                                          \n\
@@ -553,13 +575,13 @@ for (uint i = 0; i < objectData.lightsAmount; i++)                              
         float affectRadius = lightData[id].affectRadius;                                        \n\
         float cutOff = lightData[id].cutOff;                                                    \n\
         float outerCutOff = lightData[id].outerCutOff;                                          \n\
-        vec3 lightDir = normalize(lightPos - worldPosition.xyz);                                \n\
+        vec3 lightDir = normalize(lightPos - inWorldPosition.xyz);                                \n\
         float theta = dot(lightDir, lightData[id].direction.xyz);                               \n\
         float epsilon = cutOff - outerCutOff;                                                   \n\
         float intensity = clamp((theta - outerCutOff) / epsilon, 0.0, 1.0);                     \n\
-        float dist = length(lightPos - worldPosition.xyz);                                      \n\
+        float dist = length(lightPos - inWorldPosition.xyz);                                      \n\
         float attenuation = clamp(1.0 - dist / affectRadius, 0.0, 1.0);                         \n\
-        float diff = max(max(dot(normal, lightDir), 0.0), objectData.normalShadowingFactor);    \n\
+        float diff = max(max(dot(inNormal, lightDir), 0.0), objectData.normalShadowingFactor);    \n\
         light += diff * lightColor * attenuation * intensity;                                   \n\
     }                                                                                           \n\
 }\n\n";

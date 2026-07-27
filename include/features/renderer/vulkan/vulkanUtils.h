@@ -90,6 +90,13 @@ namespace wne
         void destroyDeviceMemoryPostponned(VkDeviceMemory deviceMemory);
         void processPostponnedRemoval();
 
+        void bindCustomPipeline(VulkanPipeline *vulkanPipeline);
+
+        inline uint getMSAASampleCount()
+        {
+            return MSAASampleCount;
+        }
+
         inline void swapSets()
         {
             vulkanObjectBuffers->swap();
@@ -269,5 +276,7 @@ namespace wne
         // destroyes device memory when it's not longer used in the frame rendering process
         std::vector<PostponnedDeviceMemory> postponnedRemovalDeviceMemory;
         std::mutex postponnedRemovalDeviceMemoryMutex;
+
+        uint MSAASampleCount = 1;
     };
 };

@@ -1,5 +1,6 @@
 #include "features/renderer/vulkan/vulkanShader.h"
 #include "features/renderer/vulkan/vulkanDefines.h"
+#include "features/logger/logger.h"
 #include "vulkan/vulkan.h"
 
 #include <iostream>
@@ -26,7 +27,7 @@ bool VulkanShader::makeFromFiles(const std::string &vertFilePath, const std::str
 {
     this->device = device;
 
-    std::vector<char> vertData, fragData;
+    std::vector<int8> vertData, fragData;
     try
     {
         vertData = readFile(vertFilePath);
@@ -59,9 +60,35 @@ bool VulkanShader::makeFromFiles(const std::string &vertFilePath, const std::str
     return true;
 }
 
-std::vector<char> VulkanShader::readFile(const std::string &path) // better: take std::string
+bool VulkanShader::makeFromMemory(const std::vector<int8> vertexCode, const std::vector<int8> fragmentCode, VkDevice device)
 {
-    // get rid of throw
+    this->device = device;
+    Logger::log << "Make from memory " << (int)vertexCode.size() << " " << (int)fragmentCode.size() << endl;
+
+    vertShaderModule = createShaderModule(vertexCode, device);
+    fragShaderModule = createShaderModule(fragmentCode, device);
+
+    shaderStages = new VkPipelineShaderStageCreateInfo[2];
+    memset(shaderStages, 0, sizeof(VkPipelineShaderStageCreateInfo) * 2);
+
+    // stage 1 - vertex
+    shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shaderStages[0].module = vertShaderModule;
+    shaderStages[0].pName = "main";
+
+    // stage 2 - fragment
+    shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    shaderStages[1].module = fragShaderModule;
+    shaderStages[1].pName = "main";
+
+    return true;
+}
+
+std::vector<int8> VulkanShader::readFile(const std::string &path)
+{
+    // todo get rid of throw
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     if (!file.is_open())
     {
@@ -77,9 +104,9 @@ std::vector<char> VulkanShader::readFile(const std::string &path) // better: tak
 
     file.seekg(0, std::ios::beg);
 
-    std::vector<char> buffer(size);
+    std::vector<int8> buffer(size);
 
-    if (!file.read(buffer.data(), size))
+    if (!file.read(reinterpret_cast<char *>(buffer.data()), size))
     {
         throw std::runtime_error("Failed to read shader file");
     }
@@ -87,7 +114,7 @@ std::vector<char> VulkanShader::readFile(const std::string &path) // better: tak
     return buffer;
 }
 
-VkShaderModule VulkanShader::createShaderModule(const std::vector<char> &code, VkDevice device)
+VkShaderModule VulkanShader::createShaderModule(const std::vector<int8> &code, VkDevice device)
 {
     VkShaderModuleCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;

@@ -331,11 +331,12 @@ bool VulkanUtils::rebuildPipelines(
     VulkanRenderPass *vulkanRenderPass,
     VulkanRenderPass *vulkanDepthPass,
     VulkanRenderPass *vulkanShadowDepthPass,
-    uint sampleCount)
+    uint MSAASampleCount)
 {
     this->vulkanRenderPass = vulkanRenderPass;
     this->vulkanDepthPass = vulkanDepthPass;
     this->vulkanShadowDepthPass = vulkanShadowDepthPass;
+    this->MSAASampleCount = MSAASampleCount;
 
     VkDevice device = vulkanDevice->getDevice();
     vkDeviceWaitIdle(device);
@@ -349,7 +350,7 @@ bool VulkanUtils::rebuildPipelines(
             vulkanShadowDepthPass,
             vulkanDescriptorPool.get(),
             vulkanObjectBuffers.get(),
-            getVkSampleCountFlagBits(sampleCount)))
+            getVkSampleCountFlagBits(MSAASampleCount)))
     {
         return false;
     }
@@ -526,4 +527,8 @@ void VulkanUtils::processPostponnedRemoval()
                         return true;
                     }
                 return false; });
+}
+
+void VulkanUtils::bindCustomPipeline(VulkanPipeline *vulkanPipeline)
+{
 }

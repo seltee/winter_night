@@ -16,13 +16,17 @@ VulkanShaderSPIRV::VulkanShaderSPIRV(const char *code, const char *path, bool is
 
 VulkanShaderSPIRV::~VulkanShaderSPIRV()
 {
-    shaderc_compiler_release(compiler);
-    shaderc_compile_options_release(options);
+    if (compiler)
+        shaderc_compiler_release(compiler);
+    if (options)
+        shaderc_compile_options_release(options);
+    if (result)
+        shaderc_result_release(result);
 }
 
 bool VulkanShaderSPIRV::attemptCompile()
 {
-    shaderc_compilation_result_t result =
+    result =
         shaderc_compile_into_spv(
             compiler,
             code,
@@ -39,6 +43,10 @@ bool VulkanShaderSPIRV::attemptCompile()
         logShaderCode(code);
         return false;
     }
+
+    compCodeLength = shaderc_result_get_length(result);
+    compCodeBytes = reinterpret_cast<const uint8 *>(shaderc_result_get_bytes(result));
+
     return true;
 }
 

@@ -91,6 +91,8 @@ void VulkanMaterialFlat::bindColor(
 {
     if (dataType == ModelDataType::Unknown)
         return;
+    if (isPipelineDirty)
+        clearPipelines();
 
     selectPipelineColor(dataType);
     selectDescriptorColor(dataType);
@@ -113,6 +115,22 @@ void VulkanMaterialFlat::selectPipelineDepth(ModelDataType dataType)
 
 void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType)
 {
+    /*
+            if (meshArmature)
+    {
+        if (!colorPipelineWithBones)
+            buildColorPipeline(true);
+        if (colorPipelineWithBones)
+            vulkanUtils->bindCustomPipeline(colorPipelineWithBones.get());
+    }
+    else
+    {
+        if (!colorPipeline)
+            buildColorPipeline(false);
+        if (colorPipeline)
+            vulkanUtils->bindCustomPipeline(colorPipelineWithBones.get());
+    }
+    */
     vulkanUtils->enablePipelineColorByType(dataType, colorBlending, flagIsLighted);
 }
 
@@ -229,6 +247,16 @@ void VulkanMaterialFlat::rebuild()
 {
 }
 
+void VulkanMaterialFlat::setAlbedoTexture(std::shared_ptr<Texture> albedoTexture)
+{
+    this->albedoTexture = albedoTexture;
+}
+
+std::shared_ptr<Texture> VulkanMaterialFlat::getAlbedoTexture()
+{
+    return this->albedoTexture;
+}
+
 VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
 {
     auto albedoImageLayout = static_cast<VulkanTexture *>(albedoTexture.get())->getImageLayout();
@@ -286,12 +314,29 @@ VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
     return descriptorSet;
 }
 
-void VulkanMaterialFlat::setAlbedoTexture(std::shared_ptr<Texture> albedoTexture)
+void VulkanMaterialFlat::clearPipelines()
 {
-    this->albedoTexture = albedoTexture;
+    isPipelineDirty = false;
+    colorPipeline = nullptr;
+    colorPipelineWithBones = nullptr;
 }
 
-std::shared_ptr<Texture> VulkanMaterialFlat::getAlbedoTexture()
+void VulkanMaterialFlat::buildColorPipeline(bool enableBones)
 {
-    return this->albedoTexture;
+    Logger::log << "BUILD " << vulkanUtils->getMSAASampleCount() << " " << vulkanUtils->getVkSampleCountFlagBits(vulkanUtils->getMSAASampleCount()) << endl;
+    // color pipeline
+    auto newPipeline = std::make_unique<VulkanPipelineUniversal>(vulkanUtils->getVulkanDevice());
+    VulkanPipelineUniversal::Options colorPipelineOptions{};
+    colorPipelineOptions.VkMSAASampleCountBit = vulkanUtils->getVkSampleCountFlagBits(vulkanUtils->getMSAASampleCount());
+    colorPipelineOptions.blendingMode = colorBlending;
+    colorPipelineOptions.enableLightning = flagIsLighted;
+    colorPipelineOptions.isMainColorPass = true;
+    colorPipelineOptions.enableBones = enableBones;
+    if (!newPipeline->setup(vulkanUtils->getCurrentRenderPass(), colorPipelineOptions))
+        newPipeline = nullptr;
+
+    if (enableBones)
+        colorPipelineWithBones = std::move(newPipeline);
+    else
+        colorPipeline = std::move(newPipeline);
 }
