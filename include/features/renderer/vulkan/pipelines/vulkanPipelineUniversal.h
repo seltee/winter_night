@@ -45,7 +45,7 @@ namespace wne
     protected:
         bool buildPipeline(
             uint32 stageAmount,
-            bool enableColorBlending,
+            bool enableColorWriting,
             bool enableDepthWrite,
             bool enableDepthTest,
             bool enableSampler,

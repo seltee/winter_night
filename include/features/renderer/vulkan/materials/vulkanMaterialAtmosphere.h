@@ -40,7 +40,7 @@ namespace wne
             const MeshArmature *meshArmature,
             ModelDataType dataType) override final;
 
-        void selectPipelineColor(ModelDataType dataType) override final;
+        void selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature) override final;
         void selectDescriptorColor(ModelDataType dataType) override final;
         void setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData, const MaterialBoneData &materialBoneData) override final;
 

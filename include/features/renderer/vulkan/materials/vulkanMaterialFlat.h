@@ -43,7 +43,7 @@ namespace wne
             ModelDataType dataType) override final;
 
         void selectPipelineDepth(ModelDataType dataType) override final;
-        void selectPipelineColor(ModelDataType dataType) override final;
+        void selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature) override final;
         void selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided) override final;
         void selectDescriptorColor(ModelDataType dataType) override final;
         void selectDescriptorDepth(ModelDataType dataType) override final;
@@ -55,18 +55,20 @@ namespace wne
         std::shared_ptr<Texture> getAlbedoTexture() override final;
 
     protected:
-        std::shared_ptr<Texture> albedoTexture;
-        VkDescriptorSet descriptorSet = nullptr;
+         void resetPipeline() override final;
 
-        VkDescriptorSet getDescriptorSetFlatTextured();
-        void clearPipelines();
-        void buildColorPipeline(bool enableBones);
-        
-        bool isPipelineDirty = true;
-        std::unique_ptr<VulkanPipelineUniversal> colorPipeline;
-        std::unique_ptr<VulkanPipelineUniversal> colorPipelineWithBones;
+         std::shared_ptr<Texture> albedoTexture;
+         VkDescriptorSet descriptorSet = nullptr;
 
-        uint64 currentImageLayout = 0;
-        VkImageView currentImageView = nullptr;
+         VkDescriptorSet getDescriptorSetFlatTextured();
+         void nullifyPipelines();
+         void buildColorPipeline(bool enableBones);
+
+         bool isPipelineDirty = true;
+         std::unique_ptr<VulkanPipelineUniversal> colorPipeline;
+         std::unique_ptr<VulkanPipelineUniversal> colorPipelineWithBones;
+
+         uint64 currentImageLayout = 0;
+         VkImageView currentImageView = nullptr;
     };
 };

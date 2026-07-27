@@ -328,19 +328,17 @@ void VulkanShaderMaker::updateSpirVCache()
     vertexDepthShaderCompiled.resize(vertexDepthShader.getCompCodeLength());
     memcpy(vertexDepthShaderCompiled.data(), vertexDepthShader.getCompCodeBytes(), vertexDepthShader.getCompCodeLength());
 
-    VulkanShaderSPIRV fragmentMainShader(fragmentMainShaderCode.c_str(), fragmentMainShaderCachePath.c_str(), true);
+    VulkanShaderSPIRV fragmentMainShader(fragmentMainShaderCode.c_str(), fragmentMainShaderCachePath.c_str(), false);
     if (!fragmentMainShader.attemptCompile())
         return;
     fragmentMainShaderCompiled.resize(fragmentMainShader.getCompCodeLength());
     memcpy(fragmentMainShaderCompiled.data(), fragmentMainShader.getCompCodeBytes(), fragmentMainShader.getCompCodeLength());
 
-    VulkanShaderSPIRV fragmentDepthShader(fragmentDepthShaderCode.c_str(), fragmentDepthShaderCachePath.c_str(), true);
+    VulkanShaderSPIRV fragmentDepthShader(fragmentDepthShaderCode.c_str(), fragmentDepthShaderCachePath.c_str(), false);
     if (!fragmentDepthShader.attemptCompile())
         return;
     fragmentDepthShaderCompiled.resize(fragmentDepthShader.getCompCodeLength());
     memcpy(fragmentDepthShaderCompiled.data(), fragmentDepthShader.getCompCodeBytes(), fragmentDepthShader.getCompCodeLength());
-
-    Logger::log << "Shader compiled succesfully" << endl;
 }
 
 const char *txtPadding = "\n";

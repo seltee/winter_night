@@ -37,7 +37,7 @@ namespace wne
         static std::shared_ptr<Material> createAtmosphere(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture);
 
         virtual void selectPipelineDepth(ModelDataType dataType);
-        virtual void selectPipelineColor(ModelDataType dataType);
+        virtual void selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature);
         virtual void selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided);
 
         virtual void selectDescriptorColor(ModelDataType dataType);
@@ -50,7 +50,14 @@ namespace wne
             lastDescriptorColorBond = nullptr;
         }
 
+        static void resetPipelines();
     protected:
+        static void addVulkanMaterial(VulkanMaterial *material);
+        static void removeVulkanMaterial(VulkanMaterial *material);
+        virtual void resetPipeline();
+
+        static std::vector<VulkanMaterial*> vulkanMaterialList;
+
         VulkanUtils *vulkanUtils = nullptr;
         static VulkanMaterial *lastDescriptorColorBond;
     };

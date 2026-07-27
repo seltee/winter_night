@@ -19,8 +19,6 @@ VulkanShader::~VulkanShader()
         vkDestroyShaderModule(device, vertShaderModule, nullptr);
     if (fragShaderModule)
         vkDestroyShaderModule(device, fragShaderModule, nullptr);
-    if (shaderStages)
-        delete[] shaderStages;
 }
 
 bool VulkanShader::makeFromFiles(const std::string &vertFilePath, const std::string &fragFilePath, VkDevice device)
@@ -42,8 +40,10 @@ bool VulkanShader::makeFromFiles(const std::string &vertFilePath, const std::str
     vertShaderModule = createShaderModule(vertData, device);
     fragShaderModule = createShaderModule(fragData, device);
 
-    shaderStages = new VkPipelineShaderStageCreateInfo[2];
-    memset(shaderStages, 0, sizeof(VkPipelineShaderStageCreateInfo) * 2);
+    if (!vertShaderModule || !fragShaderModule)
+        return false;
+
+    shaderStages.resize(2);
 
     // stage 1 - vertex
     shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -60,16 +60,17 @@ bool VulkanShader::makeFromFiles(const std::string &vertFilePath, const std::str
     return true;
 }
 
-bool VulkanShader::makeFromMemory(const std::vector<int8> vertexCode, const std::vector<int8> fragmentCode, VkDevice device)
+bool VulkanShader::makeFromMemory(const std::vector<int8> &vertexCode, const std::vector<int8> &fragmentCode, VkDevice device)
 {
     this->device = device;
-    Logger::log << "Make from memory " << (int)vertexCode.size() << " " << (int)fragmentCode.size() << endl;
 
     vertShaderModule = createShaderModule(vertexCode, device);
     fragShaderModule = createShaderModule(fragmentCode, device);
 
-    shaderStages = new VkPipelineShaderStageCreateInfo[2];
-    memset(shaderStages, 0, sizeof(VkPipelineShaderStageCreateInfo) * 2);
+    if (!vertShaderModule || !fragShaderModule)
+        return false;
+
+    shaderStages.resize(2);
 
     // stage 1 - vertex
     shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;

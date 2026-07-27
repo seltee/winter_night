@@ -531,4 +531,9 @@ void VulkanUtils::processPostponnedRemoval()
 
 void VulkanUtils::bindCustomPipeline(VulkanPipeline *vulkanPipeline)
 {
+    if (vulkanPipelines->getCurrentPipeline() != vulkanPipeline)
+    {
+        vulkanPipelines->setCurrentPipeline(vulkanPipeline);
+        currentCommandBuffer->bindPipeline(vulkanPipeline);
+    }
 }

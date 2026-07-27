@@ -16,11 +16,11 @@ namespace wne
         VulkanShader &operator=(const VulkanShader &) = delete;
 
         bool makeFromFiles(const std::string &vertFilePath, const std::string &fragFilePath, VkDevice device);
-        bool makeFromMemory(const std::vector<int8> vertexCode, const std::vector<int8> fragmentCode, VkDevice device);
+        bool makeFromMemory(const std::vector<int8> &vertexCode, const std::vector<int8> &fragmentCode, VkDevice device);
 
         inline VkPipelineShaderStageCreateInfo *getShaderStages()
         {
-            return shaderStages;
+            return shaderStages.data();
         }
 
     protected:
@@ -31,6 +31,6 @@ namespace wne
         std::vector<int8> readFile(const std::string &path);
         VkShaderModule createShaderModule(const std::vector<int8> &code, VkDevice device);
 
-        VkPipelineShaderStageCreateInfo *shaderStages;
+        std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
     };
 }

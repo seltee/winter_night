@@ -76,7 +76,7 @@ void VulkanMaterialAtmosphere::bindColor(
     if (dataType == ModelDataType::Unknown)
         return;
 
-    selectPipelineColor(dataType);
+    selectPipelineColor(dataType, meshArmature);
     selectDescriptorColor(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
 
@@ -84,7 +84,7 @@ void VulkanMaterialAtmosphere::bindColor(
     setPCData(objectId, lights, uvData, materialBoneData);
 }
 
-void VulkanMaterialAtmosphere::selectPipelineColor(ModelDataType dataType)
+void VulkanMaterialAtmosphere::selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature)
 {
     vulkanUtils->enablePipelineAtmosphere();
 }

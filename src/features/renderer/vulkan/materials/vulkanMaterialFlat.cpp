@@ -15,12 +15,14 @@ using namespace wne;
 
 VulkanMaterialFlat::VulkanMaterialFlat(VulkanUtils *vulkanUtils) : VulkanMaterial(vulkanUtils)
 {
+    addVulkanMaterial(this);
     VulkanShaderMaker shaderMaker;
     shaderMaker.updateShaderCode();
 }
 
 VulkanMaterialFlat::~VulkanMaterialFlat()
 {
+    removeVulkanMaterial(this);
 }
 
 void VulkanMaterialFlat::bindDepthShadow(
@@ -92,9 +94,9 @@ void VulkanMaterialFlat::bindColor(
     if (dataType == ModelDataType::Unknown)
         return;
     if (isPipelineDirty)
-        clearPipelines();
+        nullifyPipelines();
 
-    selectPipelineColor(dataType);
+    selectPipelineColor(dataType, meshArmature);
     selectDescriptorColor(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
 
@@ -113,10 +115,9 @@ void VulkanMaterialFlat::selectPipelineDepth(ModelDataType dataType)
     vulkanUtils->enablePipelineDepthByType(dataType, flagIsMasked);
 }
 
-void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType)
+void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature)
 {
-    /*
-            if (meshArmature)
+    if (meshArmature)
     {
         if (!colorPipelineWithBones)
             buildColorPipeline(true);
@@ -128,10 +129,10 @@ void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType)
         if (!colorPipeline)
             buildColorPipeline(false);
         if (colorPipeline)
-            vulkanUtils->bindCustomPipeline(colorPipelineWithBones.get());
+            vulkanUtils->bindCustomPipeline(colorPipeline.get());
     }
-    */
-    vulkanUtils->enablePipelineColorByType(dataType, colorBlending, flagIsLighted);
+
+    // vulkanUtils->enablePipelineColorByType(dataType, colorBlending, flagIsLighted);
 }
 
 void VulkanMaterialFlat::selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided)
@@ -257,6 +258,12 @@ std::shared_ptr<Texture> VulkanMaterialFlat::getAlbedoTexture()
     return this->albedoTexture;
 }
 
+void VulkanMaterialFlat::resetPipeline()
+{
+    // todo preserve shaders, recreate only pipelines 
+    nullifyPipelines();
+}
+
 VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
 {
     auto albedoImageLayout = static_cast<VulkanTexture *>(albedoTexture.get())->getImageLayout();
@@ -314,7 +321,7 @@ VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
     return descriptorSet;
 }
 
-void VulkanMaterialFlat::clearPipelines()
+void VulkanMaterialFlat::nullifyPipelines()
 {
     isPipelineDirty = false;
     colorPipeline = nullptr;
@@ -323,7 +330,6 @@ void VulkanMaterialFlat::clearPipelines()
 
 void VulkanMaterialFlat::buildColorPipeline(bool enableBones)
 {
-    Logger::log << "BUILD " << vulkanUtils->getMSAASampleCount() << " " << vulkanUtils->getVkSampleCountFlagBits(vulkanUtils->getMSAASampleCount()) << endl;
     // color pipeline
     auto newPipeline = std::make_unique<VulkanPipelineUniversal>(vulkanUtils->getVulkanDevice());
     VulkanPipelineUniversal::Options colorPipelineOptions{};

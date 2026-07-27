@@ -1,5 +1,6 @@
 #include "features/renderer/vulkan/vulkanInstance.h"
 #include "features/renderer/vulkan/vulkanDefines.h"
+#include "features/renderer/vulkan/materials/vulkanMaterial.h"
 #include "features/logger/logger.h"
 #include "vulkan/vulkan.h"
 #include <vector>
@@ -332,6 +333,8 @@ void VulkanInstance::changeSize(int32 width, int32 height)
         }
         frames.emplace_back(std::move(frame));
     }
+
+    VulkanMaterial::resetPipelines();
 }
 
 void VulkanInstance::setSyncState(bool syncEnabled)

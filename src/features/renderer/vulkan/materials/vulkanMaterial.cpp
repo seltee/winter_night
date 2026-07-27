@@ -6,11 +6,14 @@
 #include "features/renderer/vulkan/vulkanRendererState.h"
 #include "features/renderer/vulkan/rendererVulkanNT.h"
 #include "features/renderer/vulkan/vulkanDefines.h"
+#include "features/logger/logger.h"
 #include "vulkan/vulkan.h"
 #include <array>
 #include <iostream>
 
 using namespace wne;
+
+std::vector<VulkanMaterial *> VulkanMaterial::vulkanMaterialList;
 
 VulkanMaterial *VulkanMaterial::lastDescriptorColorBond = nullptr;
 
@@ -46,7 +49,7 @@ void VulkanMaterial::selectPipelineDepth(ModelDataType dataType)
 {
 }
 
-void VulkanMaterial::selectPipelineColor(ModelDataType dataType)
+void VulkanMaterial::selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature)
 {
 }
 
@@ -67,5 +70,26 @@ void VulkanMaterial::selectDescriptorDepthShadow(ModelDataType dataType, VulkanL
 }
 
 void VulkanMaterial::setPCData(uint64 objectId, const AffectingLights &lights, const Material::UVData &uvData, const MaterialBoneData &materialBoneData)
+{
+}
+
+void VulkanMaterial::resetPipelines()
+{
+    for (auto &material : vulkanMaterialList)
+        material->resetPipeline();
+}
+
+void VulkanMaterial::addVulkanMaterial(VulkanMaterial *material)
+{
+    vulkanMaterialList.emplace_back(material);
+}
+
+void VulkanMaterial::removeVulkanMaterial(VulkanMaterial *material)
+{
+    std::erase_if(vulkanMaterialList, [&](VulkanMaterial *listMaterial)
+                  { return listMaterial == material; });
+}
+
+void VulkanMaterial::resetPipeline()
 {
 }

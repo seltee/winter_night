@@ -55,13 +55,14 @@ bool VulkanPipelineUniversal::setup(VulkanRenderPass *renderPass, const Options 
     }
 
     uint32 stageAmount = 2;
-    bool colorBlending = options.blendingMode != ColorBlending::Solid;
+    bool colorBlending = options.isMainColorPass;
     bool depthWrite = !options.isMainColorPass;
     bool depthTest = true;
     bool sampler = true;
     bool faceCooling = true;
     bool doReverseFaceCooling = false;
-    bool equalDepthOnly = options.isMainColorPass && !colorBlending;
+    auto blendingMode = options.blendingMode;
+    bool equalDepthOnly = options.isMainColorPass && (blendingMode == ColorBlending::Solid);
 
     // if solid then it's solid stage and depth is prepared so op is equal
     if (!buildPipeline(
@@ -74,7 +75,7 @@ bool VulkanPipelineUniversal::setup(VulkanRenderPass *renderPass, const Options 
             doReverseFaceCooling,
             equalDepthOnly,
             options.VkMSAASampleCountBit,
-            options.blendingMode,
+            blendingMode,
             renderPass))
     {
         Logger::log << "Unable to build pipeline" << endl;
@@ -95,6 +96,14 @@ bool VulkanPipelineUniversal::buildShader(const Options &options)
         vulkanShaderMaker.setMaskedState(true);
     vulkanShaderMaker.updateShaderCode();
 
+    /*
+        Logger::log << "Shader code" << endl;
+        Logger::log << vulkanShaderMaker.getVertexMainShaderText();
+        Logger::log << endl
+                    << endl;
+        Logger::log << vulkanShaderMaker.getFragmentMainShaderText();
+    */
+
     auto device = vulkanDevice->getDevice();
     shader = std::make_unique<VulkanShader>();
     if (options.isMainColorPass)
@@ -110,8 +119,8 @@ bool VulkanPipelineUniversal::buildShader(const Options &options)
     else
     {
         if (!shader->makeFromMemory(
-                vulkanShaderMaker.getVertexMainShaderByteCode(),
-                vulkanShaderMaker.getFragmentMainShaderByteCode(), device))
+                vulkanShaderMaker.getVertexDepthShaderByteCode(),
+                vulkanShaderMaker.getFragmentDepthShaderByteCode(), device))
         {
             Logger::log << "Unable to compile textured depth shader" << endl;
             return false;
@@ -142,7 +151,7 @@ VulkanDescriptorSetLayout *VulkanPipelineUniversal::getDescriptorSetLayoutSample
 
 bool VulkanPipelineUniversal::buildPipeline(
     uint32 stageAmount,
-    bool enableColorBlending,
+    bool enableColorWriting,
     bool enableDepthWrite,
     bool enableDepthTest,
     bool enableSampler,
@@ -153,6 +162,15 @@ bool VulkanPipelineUniversal::buildPipeline(
     ColorBlending blending,
     VulkanRenderPass *renderPass)
 {
+
+    /*
+        Logger::log << "Pipeline info" << endl
+                << (enableColorWriting ? "Color writing enabled" : "No color write") << endl
+                << (enableDepthWrite ? "Depth write enabled" : "No depth write") << endl
+                << (faceCooling ? "Face cooling enabled" : "Face cooling disabled") << endl
+                << (opEqual ? "Equal depth enabled" : "Equal depth disabled") << endl
+                << "Blending " << (int)blending << endl;
+    */
 
     auto device = vulkanDevice->getDevice();
 
@@ -247,7 +265,7 @@ bool VulkanPipelineUniversal::buildPipeline(
 
     VkPipelineColorBlendAttachmentState colorBlendAttachment{};
     VkPipelineColorBlendStateCreateInfo colorBlending{};
-    if (enableColorBlending)
+    if (enableColorWriting)
     {
         // ColorBlending blending
         colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;

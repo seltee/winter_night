@@ -46,6 +46,11 @@ namespace wne
             vulkanDescriptorSets->updateShadowMap(shadowMaps, sampler);
         }
 
+        inline void setCurrentPipeline(VulkanPipeline *newCurrentPipeline)
+        {
+            currentPipeline = newCurrentPipeline;
+        }
+
         inline VulkanPipeline *getCurrentPipeline()
         {
             return currentPipeline;
