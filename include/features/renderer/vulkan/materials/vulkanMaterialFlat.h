@@ -42,7 +42,7 @@ namespace wne
             const MeshArmature *meshArmature,
             ModelDataType dataType) override final;
 
-        void selectPipelineDepth(ModelDataType dataType) override final;
+        void selectPipelineDepth(ModelDataType dataType, const MeshArmature *meshArmature) override final;
         void selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature) override final;
         void selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided) override final;
         void selectDescriptorColor(ModelDataType dataType) override final;
@@ -55,20 +55,23 @@ namespace wne
         std::shared_ptr<Texture> getAlbedoTexture() override final;
 
     protected:
-         void resetPipeline() override final;
+        void resetPipeline() override final;
 
-         std::shared_ptr<Texture> albedoTexture;
-         VkDescriptorSet descriptorSet = nullptr;
+        std::shared_ptr<Texture> albedoTexture;
+        VkDescriptorSet descriptorSet = nullptr;
 
-         VkDescriptorSet getDescriptorSetFlatTextured();
-         void nullifyPipelines();
-         void buildColorPipeline(bool enableBones);
+        VkDescriptorSet getDescriptorSetFlatTextured();
+        void nullifyPipelines();
+        void buildDepthPipeline(bool enableBones);
+        void buildColorPipeline(bool enableBones);
 
-         bool isPipelineDirty = true;
-         std::unique_ptr<VulkanPipelineUniversal> colorPipeline;
-         std::unique_ptr<VulkanPipelineUniversal> colorPipelineWithBones;
+        bool isPipelineDirty = true;
+        std::unique_ptr<VulkanPipelineUniversal> depthPipeline;
+        std::unique_ptr<VulkanPipelineUniversal> depthPipelineWithBones;
+        std::unique_ptr<VulkanPipelineUniversal> colorPipeline;
+        std::unique_ptr<VulkanPipelineUniversal> colorPipelineWithBones;
 
-         uint64 currentImageLayout = 0;
-         VkImageView currentImageView = nullptr;
+        uint64 currentImageLayout = 0;
+        VkImageView currentImageView = nullptr;
     };
 };

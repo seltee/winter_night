@@ -48,7 +48,7 @@ namespace wne
 
         inline void setCurrentPipeline(VulkanPipeline *newCurrentPipeline)
         {
-            currentPipeline = newCurrentPipeline;
+            this->currentPipeline = newCurrentPipeline;
         }
 
         inline VulkanPipeline *getCurrentPipeline()

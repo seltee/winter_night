@@ -67,7 +67,7 @@ void VulkanMaterialFlat::bindDepth(
         return;
 
     AffectingLights lights{};
-    selectPipelineDepth(dataType);
+    selectPipelineDepth(dataType, meshArmature);
     selectDescriptorDepth(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
 
@@ -110,9 +110,24 @@ void VulkanMaterialFlat::bindColor(
     setPCData(objectId, lights, uvData, materialBoneData);
 }
 
-void VulkanMaterialFlat::selectPipelineDepth(ModelDataType dataType)
+void VulkanMaterialFlat::selectPipelineDepth(ModelDataType dataType, const MeshArmature *meshArmature)
 {
-    vulkanUtils->enablePipelineDepthByType(dataType, flagIsMasked);
+    if (meshArmature)
+    {
+        if (!depthPipelineWithBones)
+            buildDepthPipeline(true);
+        if (depthPipelineWithBones)
+            vulkanUtils->bindCustomPipeline(depthPipelineWithBones.get());
+    }
+    else
+    {
+        if (!depthPipeline)
+            buildDepthPipeline(false);
+        if (depthPipeline)
+            vulkanUtils->bindCustomPipeline(depthPipeline.get());
+    }
+
+    // vulkanUtils->enablePipelineDepthByType(dataType, flagIsMasked);
 }
 
 void VulkanMaterialFlat::selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature)
@@ -260,7 +275,7 @@ std::shared_ptr<Texture> VulkanMaterialFlat::getAlbedoTexture()
 
 void VulkanMaterialFlat::resetPipeline()
 {
-    // todo preserve shaders, recreate only pipelines 
+    // todo preserve shaders, recreate only pipelines
     nullifyPipelines();
 }
 
@@ -328,6 +343,25 @@ void VulkanMaterialFlat::nullifyPipelines()
     colorPipelineWithBones = nullptr;
 }
 
+void VulkanMaterialFlat::buildDepthPipeline(bool enableBones)
+{
+    // depth pipeline
+    auto newPipeline = std::make_unique<VulkanPipelineUniversal>(vulkanUtils->getVulkanDevice());
+    VulkanPipelineUniversal::Options depthPipelineOptions{};
+    depthPipelineOptions.isMainColorPass = false;
+    depthPipelineOptions.enableBones = enableBones;
+    depthPipelineOptions.VkMSAASampleCountBit = vulkanUtils->getVkSampleCountFlagBits(vulkanUtils->getMSAASampleCount());
+    depthPipelineOptions.enableMasked = flagIsMasked;
+
+    if (!newPipeline->setup(vulkanUtils->getCurrentDepthPass(), depthPipelineOptions))
+        newPipeline = nullptr;
+
+    if (enableBones)
+        depthPipelineWithBones = std::move(newPipeline);
+    else
+        depthPipeline = std::move(newPipeline);
+}
+
 void VulkanMaterialFlat::buildColorPipeline(bool enableBones)
 {
     // color pipeline
@@ -338,6 +372,8 @@ void VulkanMaterialFlat::buildColorPipeline(bool enableBones)
     colorPipelineOptions.enableLightning = flagIsLighted;
     colorPipelineOptions.isMainColorPass = true;
     colorPipelineOptions.enableBones = enableBones;
+    colorPipelineOptions.enableMasked = flagIsMasked;
+
     if (!newPipeline->setup(vulkanUtils->getCurrentRenderPass(), colorPipelineOptions))
         newPipeline = nullptr;
 

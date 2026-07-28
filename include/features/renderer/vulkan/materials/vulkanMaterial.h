@@ -36,7 +36,7 @@ namespace wne
         static std::shared_ptr<MaterialFlat> createFlat(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture);
         static std::shared_ptr<Material> createAtmosphere(VulkanUtils *vulkanUtils, std::shared_ptr<Texture> texture);
 
-        virtual void selectPipelineDepth(ModelDataType dataType);
+        virtual void selectPipelineDepth(ModelDataType dataType, const MeshArmature *meshArmature);
         virtual void selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature);
         virtual void selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided);
 

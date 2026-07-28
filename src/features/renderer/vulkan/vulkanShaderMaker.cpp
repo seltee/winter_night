@@ -31,7 +31,8 @@ extern const char *txtOutColorSolid;
 extern const char *txtBufferMVPs;
 extern const char *txtBufferMModels;
 extern const char *txtBufferMNormals;
-extern const char *txtBufferBones;
+extern const char *txtBufferBonesMain;
+extern const char *txtBufferBonesDepth;
 extern const char *txtBufferGlobalData;
 extern const char *txtBufferLights;
 extern const char *txtBufferLightMVPs;
@@ -122,8 +123,8 @@ void VulkanShaderMaker::updateShaderCode()
     vertexDepthShaderCode += txtBufferMModels;
     if (stateBonesEnabled)
     {
-        vertexMainShaderCode += txtBufferBones;
-        vertexDepthShaderCode += txtBufferBones;
+        vertexMainShaderCode += txtBufferBonesMain;
+        vertexDepthShaderCode += txtBufferBonesDepth;
     }
     if (stateLightsEnabled)
     {
@@ -377,7 +378,7 @@ const char *txtFragmentInLightClipPos = "layout(location = 3) in vec4 inLightCli
 
 const char *txtFragmentOutColor = "layout(location = 0) out vec4 outColor;\n";
 
-const char *txtAlbedoAlpha = "float color = texture(albedoTexSampler, UV).a;\n";
+const char *txtAlbedoAlpha = "float color = texture(albedoTexSampler, inUV).a;\n";
 const char *txtDiscardMaskedAlpha = "if (color < 0.9) discard;\n";
 
 const char *txtSamplerAlbedo = "layout(set = 1, binding = 0) uniform sampler2D albedoTexSampler;\n";
@@ -411,13 +412,21 @@ const char *txtBufferLightMVPs =
     mat4 matrix[16];                                    \n\
 } mLightMvps;\n";
 
-const char *txtBufferBones =
+const char *txtBufferBonesMain =
     "layout(set = 0, binding = 8, std430) readonly buffer BufferBoneMatrixes {  \n\
-    mat4 matrix[4096];                                                      \n\
-} mBufferBoneMatrixes;                                                      \n\
-layout(set = 0, binding = 9) buffer Bones                                   \n\
-{                                                                           \n\
-    BoneData boneData[128];                                                 \n\
+    mat4 matrix[4096];                                                          \n\
+} mBufferBoneMatrixes;                                                          \n\
+layout(set = 0, binding = 9) buffer Bones                                       \n\
+{                                                                               \n\
+    BoneData boneData[128];                                                     \n\
+};\n";
+const char *txtBufferBonesDepth =
+    "layout(set = 0, binding = 1, std430) readonly buffer BufferBoneMatrixes {  \n\
+    mat4 matrix[4096];                                                          \n\
+} mBufferBoneMatrixes;                                                          \n\
+layout(set = 0, binding = 2) buffer Bones                                       \n\
+{                                                                               \n\
+    BoneData boneData[128];                                                     \n\
 };\n";
 
 const char *txtBufferGlobalData =

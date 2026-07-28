@@ -45,7 +45,7 @@ std::shared_ptr<Material> VulkanMaterial::createAtmosphere(VulkanUtils *vulkanUt
     return material;
 }
 
-void VulkanMaterial::selectPipelineDepth(ModelDataType dataType)
+void VulkanMaterial::selectPipelineDepth(ModelDataType dataType, const MeshArmature *meshArmature)
 {
 }
 

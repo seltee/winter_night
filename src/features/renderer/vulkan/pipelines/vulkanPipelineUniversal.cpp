@@ -41,10 +41,21 @@ bool VulkanPipelineUniversal::setup(VulkanRenderPass *renderPass, const Options 
     }
 
     descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
-    if (!descriptorSetLayoutPipeline->setupTexturedColor())
+    if (options.isMainColorPass)
     {
-        Logger::log << "Unable to setup textured color pipeline" << endl;
-        return false;
+        if (!descriptorSetLayoutPipeline->setupTexturedColor())
+        {
+            Logger::log << "Unable to setup textured color pipeline" << endl;
+            return false;
+        }
+    }
+    else
+    {
+        if (!descriptorSetLayoutPipeline->setupTexturedDepth())
+        {
+            Logger::log << "Unable to setup textured depth pipeline" << endl;
+            return false;
+        }
     }
 
     descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
@@ -164,13 +175,14 @@ bool VulkanPipelineUniversal::buildPipeline(
 {
 
     /*
-        Logger::log << "Pipeline info" << endl
+    Logger::log << "Pipeline info" << endl
                 << (enableColorWriting ? "Color writing enabled" : "No color write") << endl
                 << (enableDepthWrite ? "Depth write enabled" : "No depth write") << endl
                 << (faceCooling ? "Face cooling enabled" : "Face cooling disabled") << endl
                 << (opEqual ? "Equal depth enabled" : "Equal depth disabled") << endl
+                << "Multisampling " << VkMSAASampleCountBit << endl
                 << "Blending " << (int)blending << endl;
-    */
+    */         
 
     auto device = vulkanDevice->getDevice();
 

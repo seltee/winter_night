@@ -55,7 +55,7 @@ void VulkanMaterialAtmosphere::bindDepth(
         return;
 
     AffectingLights lights{};
-    selectPipelineDepth(dataType);
+    selectPipelineDepth(dataType, meshArmature);
     selectDescriptorDepth(dataType);
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
 
