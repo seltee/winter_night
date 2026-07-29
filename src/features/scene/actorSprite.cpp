@@ -116,7 +116,17 @@ void ActorSprite::renderColor(bool isBlendingPhase)
     {
         auto state = renderer->getState();
         AffectingLights lights = materialToUse->isLighted() ? currentScene->collectAffectingLights(getPosition(), 0.0f) : AffectingLights{};
-        materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), uvModifier, nullptr, mesh->getDataType());
+        Texture *radience = currentScene ? currentScene->getAtmosphereRadienceTexture().get() : nullptr;
+        materialToUse->bindColor(
+            objectId,
+            lights,
+            state->getViewProjectionMatrix() * getModelMatrix(),
+            getModelMatrix(),
+            getNormalMatrix(),
+            uvModifier,
+            nullptr,
+            radience,
+            mesh->getDataType());
         mesh->render(renderer->getFrameData());
     }
 }

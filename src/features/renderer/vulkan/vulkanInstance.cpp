@@ -252,7 +252,7 @@ void VulkanInstance::changeSize(int32 width, int32 height)
     frames.clear();
     frameColorBuffer.reset();
     frameDepthBuffer.reset();
-    vulkanUtils->destroyPipelines();
+    // vulkanUtils->destroyPipelines();
     renderPass.reset();
     depthPass.reset();
     shadowDepthPass.reset();

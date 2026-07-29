@@ -49,7 +49,7 @@ bool VulkanUtils::setup()
     vulkanShadowSampler = std::make_unique<VulkanSampler>(this);
     if (!vulkanShadowSampler->setup(false))
     {
-        Logger::log << "Unable to create sampler" << endl;
+        Logger::log << "Unable to create shadow sampler" << endl;
         return false;
     }
 
@@ -67,7 +67,28 @@ bool VulkanUtils::setup()
         return false;
     }
 
-    vulkanPipelines = std::make_unique<VulkanPipelines>(vulkanDevice);
+    vulkanDescriptorSetLayoutColor = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!vulkanDescriptorSetLayoutColor->setupTexturedColor())
+    {
+        Logger::log << "Unalbe to setup descriptor color layout" << endl;
+        return false;
+    }
+
+    vulkanDescriptorSetLayoutDepth = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!vulkanDescriptorSetLayoutDepth->setupTexturedDepth())
+    {
+        Logger::log << "Unable to setup descriptor depth layout" << endl;
+        return false;
+    }
+
+    vulkanDescriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
+    if (!vulkanDescriptorSetLayoutSampler->setupSampler())
+    {
+        Logger::log << "Unable to setup textured color pipeline" << endl;
+        return false;
+    }
+
+    vulkanPipelines = std::make_unique<VulkanPipelines>();
     vulkanShadowMaps = std::make_unique<VulkanShadowMaps>();
 
     uint8 pixels[16];
@@ -321,11 +342,6 @@ void VulkanUtils::copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width
     endSingleTimeCommands(commandBuffer);
 }
 
-void VulkanUtils::destroyPipelines()
-{
-    vulkanPipelines->reset();
-}
-
 bool VulkanUtils::rebuildPipelines(
     VulkanSwapChain *vulkanSwapChain,
     VulkanRenderPass *vulkanRenderPass,
@@ -338,29 +354,14 @@ bool VulkanUtils::rebuildPipelines(
     this->vulkanShadowDepthPass = vulkanShadowDepthPass;
     this->MSAASampleCount = MSAASampleCount;
 
-    VkDevice device = vulkanDevice->getDevice();
-    vkDeviceWaitIdle(device);
-    destroyPipelines();
-    vkDeviceWaitIdle(device);
-
-    if (!vulkanPipelines->build(
-            vulkanSwapChain,
-            vulkanRenderPass,
-            vulkanDepthPass,
-            vulkanShadowDepthPass,
-            vulkanDescriptorPool.get(),
-            vulkanObjectBuffers.get(),
-            getVkSampleCountFlagBits(MSAASampleCount)))
-    {
-        return false;
-    }
+    VulkanMaterial::resetPipelines();
 
     return true;
 }
 
 void VulkanUtils::updatePipelineShadowMaps()
 {
-    vulkanPipelines->updatePipelineShadowMaps(vulkanShadowMaps.get(), vulkanShadowSampler.get());
+    // vulkanPipelines->updatePipelineShadowMaps(vulkanShadowMaps.get(), vulkanShadowSampler.get());
 }
 
 bool VulkanUtils::createImage(
@@ -501,9 +502,9 @@ void VulkanUtils::destroyImagePostponned(VkImage image)
 
 void VulkanUtils::destroyDeviceMemoryPostponned(VkDeviceMemory deviceMemory)
 {
-    std::lock_guard<std::mutex> lock(postponnedRemovalDeviceMemoryMutex);
+    std::lock_guard<std::mutex> lock(postponnedRemovalDeviceMutex);
 
-    postponnedRemovalDeviceMemory.push_back({deviceMemory, currentFrameNumber + 2});
+    postponnedRemovalDevice.push_back({deviceMemory, currentFrameNumber + 2});
 }
 
 void VulkanUtils::processPostponnedRemoval()
@@ -518,8 +519,8 @@ void VulkanUtils::processPostponnedRemoval()
                     }
                 return false; });
 
-    std::lock_guard<std::mutex> lockDeviceMemoryRemoval(postponnedRemovalDeviceMemoryMutex);
-    std::erase_if(postponnedRemovalDeviceMemory, [&](PostponnedDeviceMemory deviceMemory)
+    std::lock_guard<std::mutex> lockDeviceMemoryRemoval(postponnedRemovalDeviceMutex);
+    std::erase_if(postponnedRemovalDevice, [&](PostponnedDevice deviceMemory)
                   { 
                     if ( deviceMemory.frame == currentFrameNumber)
                     {

@@ -80,6 +80,11 @@ namespace wne
             return renderer;
         }
 
+        inline std::shared_ptr<Texture> getAtmosphereRadienceTexture()
+        {
+            return atmosphereRadiance;
+        }
+
     protected:
         void addActor(std::shared_ptr<Actor> actor);
 

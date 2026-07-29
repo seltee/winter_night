@@ -13,6 +13,7 @@ namespace wne
     class VulkanDescriptorLayout;
     class VulkanRenderPass;
     class VulkanDevice;
+    class VulkanUtils;
 
     class WNE_API VulkanPipelineUniversal : public VulkanPipeline
     {
@@ -22,15 +23,23 @@ namespace wne
             uint64 VkMSAASampleCountBit;
             ColorBlending blendingMode;
 
+            // enable bone animations
             bool enableBones;
+
+            // shader will calculate lightning if enabled
             bool enableLightning;
+
+            // pixels will be disscarded by alpha treeshold
             bool enableMasked;
 
             // Main color pass otherwise it's depth
             bool isMainColorPass;
+
+            // ignore z buffer and always draw
+            bool ignoreDepth;
         };
 
-        VulkanPipelineUniversal(VulkanDevice *vulkanDevice);
+        VulkanPipelineUniversal(VulkanUtils *vulkanUtils);
         ~VulkanPipelineUniversal();
 
         bool setup(VulkanRenderPass *renderPass, const Options &options);
@@ -38,9 +47,6 @@ namespace wne
 
         VkPipeline getGraphicsPipeline() override final;
         VkPipelineLayout getPipelineLayout() override final;
-
-        VulkanDescriptorSetLayout *getDescriptorSetLayoutPipeline() override final;
-        VulkanDescriptorSetLayout *getDescriptorSetLayoutSampler() override final;
 
     protected:
         bool buildPipeline(
@@ -56,11 +62,10 @@ namespace wne
             ColorBlending blending,
             VulkanRenderPass *renderPass);
 
-        std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayoutPipeline;
-        std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayoutSampler;
-
         std::unique_ptr<VulkanShader> shader;
         VkPipelineLayout pipelineLayout = nullptr;
         VkPipeline graphicsPipeline = nullptr;
+
+        VulkanUtils *vulkanUtils = nullptr;
     };
 };

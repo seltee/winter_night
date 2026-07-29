@@ -53,11 +53,11 @@ void VulkanMaterial::selectPipelineColor(ModelDataType dataType, const MeshArmat
 {
 }
 
-void VulkanMaterial::selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided)
+void VulkanMaterial::selectPipelineShadowDepth(ModelDataType dataType, const MeshArmature *meshArmature, bool isDoubleSided)
 {
 }
 
-void VulkanMaterial::selectDescriptorColor(ModelDataType dataType)
+void VulkanMaterial::selectDescriptorColor(ModelDataType dataType, VulkanTexture *radianceMap)
 {
 }
 

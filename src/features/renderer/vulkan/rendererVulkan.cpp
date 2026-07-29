@@ -100,7 +100,8 @@ void RendererVulkan::renderDebug()
         material->bindColor(
             debugIds[idCounter], lights,
             state->getViewProjectionMatrix() * mModel, mModel, mNormal,
-            uvModifier, nullptr, defaultCube->getDataType());
+            uvModifier, nullptr, nullptr,
+            defaultCube->getDataType());
         defaultCube->render(getFrameData());
         debugLine.oneFrameShown = true;
 
@@ -120,7 +121,8 @@ void RendererVulkan::renderDebug()
         material->bindColor(
             debugIds[idCounter], lights,
             state->getViewProjectionMatrix() * mModel, mModel, mNormal,
-            uvModifier, nullptr, defaultCube->getDataType());
+            uvModifier, nullptr, nullptr,
+            defaultCube->getDataType());
         defaultCube->render(getFrameData());
         debugCube.oneFrameShown = true;
 
@@ -142,14 +144,17 @@ void RendererVulkan::renderAtmosphereMap(std::shared_ptr<Material> atmoMaterial)
     Matrix4x4 mModel = Matrix4x4::translation(state->getCameraPosition());
     static Matrix3x3 mNormal = Matrix3x3::identity();
     static AffectingLights lights{};
-    atmoMaterial->bindColor(atmoSphereMeshId, lights, state->getViewProjectionMatrix() * mModel, mModel, mNormal, uvModifier, nullptr, atmoSphere->getDataType());
+    atmoMaterial->bindColor(
+        atmoSphereMeshId, lights,
+        state->getViewProjectionMatrix() * mModel, mModel, mNormal,
+        uvModifier, nullptr, nullptr,
+        atmoSphere->getDataType());
     atmoSphere->render(getFrameData());
 }
 
 void RendererVulkan::provideSceneData(const Vector4 &ambientColor, const Vector4 &cameraPosition, Texture *radianceMap, float radienceMapFactor)
 {
     instance->getVulkanUtils()->getObjectBuffers()->setGlobalData(ambientColor, cameraPosition, radianceMap != nullptr, radienceMapFactor);
-    instance->getVulkanUtils()->setRadianceMap((VulkanTexture *)radianceMap);
 }
 
 void RendererVulkan::setMSAASampleCount(uint sampleCount)

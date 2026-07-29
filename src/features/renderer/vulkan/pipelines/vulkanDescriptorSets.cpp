@@ -1,7 +1,6 @@
 #include "features/renderer/vulkan/pipelines/vulkanDescriptorSets.h"
 #include "features/renderer/vulkan/pipelines/vulkanDescriptorSetLayout.h"
-#include "features/renderer/vulkan/pipelines/vulkanPipelineTextured.h"
-#include "features/renderer/vulkan/pipelines/vulkanPipelineColored.h"
+#include "features/renderer/vulkan/pipelines/vulkanPipelineUniversal.h"
 #include "features/renderer/vulkan/vulkanShadowMaps.h"
 #include "features/renderer/vulkan/vulkanDepthBuffer.h"
 #include "features/renderer/vulkan/vulkanSampler.h"
@@ -16,49 +15,60 @@
 
 using namespace wne;
 
-VulkanDescriptorSets::VulkanDescriptorSets(VulkanDevice *vulkanDevice, VulkanDescriptorPool *vulkanDescriptorPool, VulkanObjectBuffers *vulkanObjectBuffers)
+VulkanDescriptorSets::VulkanDescriptorSets(VulkanUtils *vulkanUtils)
 {
-    this->vulkanDescriptorPool = vulkanDescriptorPool;
-    this->vulkanDevice = vulkanDevice;
-    this->vulkanObjectBuffers = vulkanObjectBuffers;
+    this->vulkanDescriptorPool = vulkanUtils->getDescriptorPool();
+    this->vulkanDevice = vulkanUtils->getVulkanDevice();
+    this->vulkanObjectBuffers = vulkanUtils->getObjectBuffers();
+    this->vulkanUtils = vulkanUtils;
+    Logger::log << "Created descriptor set" << endl;
 }
 
 VulkanDescriptorSets::~VulkanDescriptorSets()
 {
+    Logger::log << "Destroyed decriptor set" << endl;
 }
 
-bool VulkanDescriptorSets::setup(
-    VulkanPipelineTextured *pipelineTexturedDepth,
-    VulkanPipelineTextured *pipelineTexturedColor)
+bool VulkanDescriptorSets::setup()
+{
+    if (!setupColor())
+        return false;
+    if (!setupDepth())
+        return false;
+    return true;
+}
+
+bool VulkanDescriptorSets::setupColor()
+{
+
+    uint maxFramesInFlight = vulkanObjectBuffers->getFramesMaxInFlight();
+    descriptorSetColor.resize(maxFramesInFlight);
+
+    for (uint frame = 0; frame < maxFramesInFlight; frame++)
+    {
+        if (!initDescriptorSetTexturedColor(
+                frame,
+                &descriptorSetColor[frame],
+                vulkanUtils->getDescriptorSetLayoutColor(),
+                vulkanUtils->getDescriptorSetLayoutSampler()))
+            return false;
+    }
+    return true;
+}
+
+bool VulkanDescriptorSets::setupDepth()
 {
     uint maxFramesInFlight = vulkanObjectBuffers->getFramesMaxInFlight();
-    descriptorSetColoredDepth.resize(maxFramesInFlight);
-    descriptorSetColoredColor.resize(maxFramesInFlight);
-    descriptorSetTexturedDepth.resize(maxFramesInFlight);
-    descriptorSetTexturedColor.resize(maxFramesInFlight);
+    descriptorSetDepth.resize(maxFramesInFlight);
 
     for (uint32 frame = 0; frame < maxFramesInFlight; frame++)
     {
-        if (!initDescriptorSetColoredDepth(frame, &descriptorSetColoredDepth[frame]))
-            return false;
-
-        if (!initDescriptorSetColoredColor(frame, &descriptorSetColoredColor[frame]))
-            return false;
-
         if (!initDescriptorSetTexturedDepth(
                 frame,
-                &descriptorSetTexturedDepth[frame],
-                pipelineTexturedDepth->getDescriptorSetLayoutPipeline()))
-            return false;
-
-        if (!initDescriptorSetTexturedColor(
-                frame,
-                &descriptorSetTexturedColor[frame],
-                pipelineTexturedColor->getDescriptorSetLayoutPipeline(),
-                pipelineTexturedColor->getDescriptorSetLayoutSampler()))
+                &descriptorSetDepth[frame],
+                vulkanUtils->getDescriptorSetLayoutDepth()))
             return false;
     }
-
     return true;
 }
 
@@ -85,7 +95,7 @@ void VulkanDescriptorSets::updateShadowMap(VulkanShadowMaps *shadowMaps, VulkanS
 
     VkWriteDescriptorSet write{};
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write.dstSet = descriptorSetTexturedColor[vulkanObjectBuffers->getFrameInFlight()];
+    write.dstSet = descriptorSetColor[vulkanObjectBuffers->getFrameInFlight()];
     write.dstBinding = 6;
     write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     write.descriptorCount = 16;
@@ -103,7 +113,7 @@ void VulkanDescriptorSets::updateRadianceMap(VulkanTexture *texture, VulkanSampl
 
     VkWriteDescriptorSet write{};
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write.dstSet = descriptorSetTexturedColor[vulkanObjectBuffers->getFrameInFlight()];
+    write.dstSet = descriptorSetColor[vulkanObjectBuffers->getFrameInFlight()];
     write.dstBinding = 7;
     write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     write.descriptorCount = 1;

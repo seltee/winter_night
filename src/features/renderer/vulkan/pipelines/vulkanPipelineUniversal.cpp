@@ -13,8 +13,9 @@
 
 using namespace wne;
 
-VulkanPipelineUniversal::VulkanPipelineUniversal(VulkanDevice *vulkanDevice) : VulkanPipeline(vulkanDevice)
+VulkanPipelineUniversal::VulkanPipelineUniversal(VulkanUtils *vulkanUtils) : VulkanPipeline(vulkanUtils->getVulkanDevice())
 {
+    this->vulkanUtils = vulkanUtils;
 }
 
 VulkanPipelineUniversal::~VulkanPipelineUniversal()
@@ -40,35 +41,10 @@ bool VulkanPipelineUniversal::setup(VulkanRenderPass *renderPass, const Options 
         return false;
     }
 
-    descriptorSetLayoutPipeline = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
-    if (options.isMainColorPass)
-    {
-        if (!descriptorSetLayoutPipeline->setupTexturedColor())
-        {
-            Logger::log << "Unable to setup textured color pipeline" << endl;
-            return false;
-        }
-    }
-    else
-    {
-        if (!descriptorSetLayoutPipeline->setupTexturedDepth())
-        {
-            Logger::log << "Unable to setup textured depth pipeline" << endl;
-            return false;
-        }
-    }
-
-    descriptorSetLayoutSampler = std::make_unique<VulkanDescriptorSetLayout>(vulkanDevice);
-    if (!descriptorSetLayoutSampler->setupSampler())
-    {
-        Logger::log << "Unable to setup textured color pipeline" << endl;
-        return false;
-    }
-
     uint32 stageAmount = 2;
     bool colorBlending = options.isMainColorPass;
     bool depthWrite = !options.isMainColorPass;
-    bool depthTest = true;
+    bool depthTest = !options.ignoreDepth;
     bool sampler = true;
     bool faceCooling = true;
     bool doReverseFaceCooling = false;
@@ -150,16 +126,6 @@ VkPipelineLayout VulkanPipelineUniversal::getPipelineLayout()
     return pipelineLayout;
 }
 
-VulkanDescriptorSetLayout *VulkanPipelineUniversal::getDescriptorSetLayoutPipeline()
-{
-    return descriptorSetLayoutPipeline.get();
-}
-
-VulkanDescriptorSetLayout *VulkanPipelineUniversal::getDescriptorSetLayoutSampler()
-{
-    return descriptorSetLayoutSampler.get();
-}
-
 bool VulkanPipelineUniversal::buildPipeline(
     uint32 stageAmount,
     bool enableColorWriting,
@@ -182,7 +148,7 @@ bool VulkanPipelineUniversal::buildPipeline(
                 << (opEqual ? "Equal depth enabled" : "Equal depth disabled") << endl
                 << "Multisampling " << VkMSAASampleCountBit << endl
                 << "Blending " << (int)blending << endl;
-    */         
+    */
 
     auto device = vulkanDevice->getDevice();
 
@@ -338,9 +304,10 @@ bool VulkanPipelineUniversal::buildPipeline(
 
     if (enableSampler)
     {
+        // todo - make sure it's color pipeline descriptor
         VkDescriptorSetLayout layouts[2] = {
-            descriptorSetLayoutPipeline->getDescriptorSetLayout(),
-            descriptorSetLayoutSampler->getDescriptorSetLayout()};
+            vulkanUtils->getDescriptorSetLayoutColor()->getDescriptorSetLayout(),
+            vulkanUtils->getDescriptorSetLayoutSampler()->getDescriptorSetLayout()};
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -357,7 +324,8 @@ bool VulkanPipelineUniversal::buildPipeline(
     }
     else
     {
-        VkDescriptorSetLayout layouts[1] = {descriptorSetLayoutPipeline->getDescriptorSetLayout()};
+        // todo - make sure it's depth pipeline descriptor
+        VkDescriptorSetLayout layouts[1] = {vulkanUtils->getDescriptorSetLayoutDepth()->getDescriptorSetLayout()};
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;

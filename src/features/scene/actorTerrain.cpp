@@ -184,7 +184,17 @@ void ActorTerrain::renderColor(bool isBlendingPhase)
     {
         auto state = renderer->getState();
         AffectingLights lights = currentScene->collectAffectingLights(getPosition(), 0.0f);
-        materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * getModelMatrix(), getModelMatrix(), getNormalMatrix(), uvModifier, nullptr, mesh->getDataType());
+        Texture *radience = currentScene ? currentScene->getAtmosphereRadienceTexture().get() : nullptr;
+        materialToUse->bindColor(
+            objectId,
+            lights,
+            state->getViewProjectionMatrix() * getModelMatrix(),
+            getModelMatrix(),
+            getNormalMatrix(),
+            uvModifier,
+            nullptr,
+            radience,
+            mesh->getDataType());
         mesh->render(renderer->getFrameData());
     }
 }

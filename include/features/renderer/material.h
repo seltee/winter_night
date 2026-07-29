@@ -56,6 +56,7 @@ namespace wne
             const Matrix3x3 &mNormal,
             const UVData &uvData,
             const MeshArmature *meshArmature,
+            Texture *radianceMap,
             ModelDataType dataType);
 
         void setMasked(bool masked)

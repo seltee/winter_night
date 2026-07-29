@@ -40,12 +40,13 @@ namespace wne
             const Matrix3x3 &mNormal,
             const UVData &uvData,
             const MeshArmature *meshArmature,
+            Texture *radianceMap,
             ModelDataType dataType) override final;
 
         void selectPipelineDepth(ModelDataType dataType, const MeshArmature *meshArmature) override final;
         void selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature) override final;
-        void selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided) override final;
-        void selectDescriptorColor(ModelDataType dataType) override final;
+        void selectPipelineShadowDepth(ModelDataType dataType, const MeshArmature *meshArmature, bool isDoubleSided) override final;
+        void selectDescriptorColor(ModelDataType dataType, VulkanTexture *radianceMap) override final;
         void selectDescriptorDepth(ModelDataType dataType) override final;
         void selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData) override final;
         void setPCData(uint64 objectId, const AffectingLights &lights, const Material::UVData &uvData, const MaterialBoneData &materialBoneData) override final;
@@ -60,6 +61,8 @@ namespace wne
         std::shared_ptr<Texture> albedoTexture;
         VkDescriptorSet descriptorSet = nullptr;
 
+        VulkanTexture *radianceMap = nullptr;
+
         VkDescriptorSet getDescriptorSetFlatTextured();
         void nullifyPipelines();
         void buildDepthPipeline(bool enableBones);
@@ -68,8 +71,11 @@ namespace wne
         bool isPipelineDirty = true;
         std::unique_ptr<VulkanPipelineUniversal> depthPipeline;
         std::unique_ptr<VulkanPipelineUniversal> depthPipelineWithBones;
+        std::unique_ptr<VulkanDescriptorSets> depthPipelineDescriptorSets;
+
         std::unique_ptr<VulkanPipelineUniversal> colorPipeline;
         std::unique_ptr<VulkanPipelineUniversal> colorPipelineWithBones;
+        std::unique_ptr<VulkanDescriptorSets> colorPipelineDescriptorSets;
 
         uint64 currentImageLayout = 0;
         VkImageView currentImageView = nullptr;

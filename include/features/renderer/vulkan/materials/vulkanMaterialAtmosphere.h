@@ -1,6 +1,7 @@
 #pragma once
 #include "features/renderer/vulkan/vulkanDefines.h"
 #include "features/renderer/vulkan/materials/vulkanMaterial.h"
+#include "features/renderer/vulkan/pipelines/vulkanPipelineUniversal.h"
 #include "core/api.h"
 
 namespace wne
@@ -38,10 +39,11 @@ namespace wne
             const Matrix3x3 &mNormal,
             const UVData &uvData,
             const MeshArmature *meshArmature,
+            Texture *radianceMap,
             ModelDataType dataType) override final;
 
         void selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature) override final;
-        void selectDescriptorColor(ModelDataType dataType) override final;
+        void selectDescriptorColor(ModelDataType dataType, VulkanTexture *radianceMap) override final;
         void setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData, const MaterialBoneData &materialBoneData) override final;
 
         inline void setAtmosphereTexture(std::shared_ptr<Texture> texture)
@@ -50,8 +52,15 @@ namespace wne
         }
 
     protected:
+        void resetPipeline() override final;
+        void buildColorPipeline();
+        void nullifyPipelines();
+
         std::shared_ptr<Texture> atmosphereTexture;
         VkDescriptorSet descriptorSet = nullptr;
+
+        std::unique_ptr<VulkanPipelineUniversal> colorPipeline;
+        std::unique_ptr<VulkanDescriptorSets> colorPipelineDescriptorSets;
 
         VkDescriptorSet getDescriptorSetAtmoTexture();
     };

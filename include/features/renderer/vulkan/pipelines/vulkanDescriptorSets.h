@@ -8,40 +8,33 @@ namespace wne
 {
     class VulkanDescriptorPool;
     class VulkanDevice;
-    class VulkanPipelineTextured;
+    class VulkanPipelineUniversal;
     class VulkanDescriptorSetLayout;
     class VulkanObjectBuffers;
     class VulkanShadowMaps;
     class VulkanSampler;
+    class VulkanUtils;
 
     class VulkanDescriptorSets
     {
     public:
-        VulkanDescriptorSets(VulkanDevice *vulkanDevice, VulkanDescriptorPool *vulkanDescriptorPool, VulkanObjectBuffers *vulkanObjectBuffers);
+        VulkanDescriptorSets(VulkanUtils *vulkanUtils);
         ~VulkanDescriptorSets();
 
-        bool setup(
-            VulkanPipelineTextured *pipelineTexturedDepth,
-            VulkanPipelineTextured *pipelineTexturedColor);
+        bool setup();
+        bool setupColor();
+        bool setupDepth();
 
         void updateShadowMap(VulkanShadowMaps *shadowMaps, VulkanSampler *sampler);
         void updateRadianceMap(VulkanTexture *texture, VulkanSampler *sampler);
 
-        inline VkDescriptorSet getDescriptorSetColoredColor()
-        {
-            return descriptorSetColoredColor[vulkanObjectBuffers->getFrameInFlight()];
-        }
-        inline VkDescriptorSet getDescriptorSetColoredDepth()
-        {
-            return descriptorSetColoredDepth[vulkanObjectBuffers->getFrameInFlight()];
-        }
         inline VkDescriptorSet getDescriptorSetTexturedColor()
         {
-            return descriptorSetTexturedColor[vulkanObjectBuffers->getFrameInFlight()];
+            return descriptorSetColor[vulkanObjectBuffers->getFrameInFlight()];
         }
         inline VkDescriptorSet getDescriptorSetTexturedDepth()
         {
-            return descriptorSetTexturedDepth[vulkanObjectBuffers->getFrameInFlight()];
+            return descriptorSetDepth[vulkanObjectBuffers->getFrameInFlight()];
         }
 
     protected:
@@ -60,13 +53,12 @@ namespace wne
             VulkanDescriptorSetLayout *descriptorSetLayoutPipeline,
             VulkanDescriptorSetLayout *descriptorSetLayoutSampler);
 
-        std::vector<VkDescriptorSet> descriptorSetColoredColor;
-        std::vector<VkDescriptorSet> descriptorSetColoredDepth;
-        std::vector<VkDescriptorSet> descriptorSetTexturedColor;
-        std::vector<VkDescriptorSet> descriptorSetTexturedDepth;
+        std::vector<VkDescriptorSet> descriptorSetColor;
+        std::vector<VkDescriptorSet> descriptorSetDepth;
 
         VulkanDescriptorPool *vulkanDescriptorPool;
         VulkanDevice *vulkanDevice;
         VulkanObjectBuffers *vulkanObjectBuffers;
+        VulkanUtils *vulkanUtils;
     };
 };

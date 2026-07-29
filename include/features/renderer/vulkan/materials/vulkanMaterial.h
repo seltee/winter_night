@@ -9,6 +9,9 @@
 namespace wne
 {
     class VulkanLightCascadeData;
+    class VulkanTexture;
+    class VulkanSampler;
+
     struct PushConstantObject
     {
         uint32 objectId;
@@ -38,9 +41,9 @@ namespace wne
 
         virtual void selectPipelineDepth(ModelDataType dataType, const MeshArmature *meshArmature);
         virtual void selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature);
-        virtual void selectPipelineShadowDepth(ModelDataType dataType, bool isDoubleSided);
+        virtual void selectPipelineShadowDepth(ModelDataType dataType, const MeshArmature *meshArmature, bool isDoubleSided);
 
-        virtual void selectDescriptorColor(ModelDataType dataType);
+        virtual void selectDescriptorColor(ModelDataType dataType, VulkanTexture *radianceMap);
         virtual void selectDescriptorDepth(ModelDataType dataType);
         virtual void selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData);
         virtual void setPCData(uint64 objectId, const AffectingLights &lights, const Material::UVData &uvData, const MaterialBoneData &materialBoneData);
@@ -56,7 +59,7 @@ namespace wne
         static void removeVulkanMaterial(VulkanMaterial *material);
         virtual void resetPipeline();
 
-        static std::vector<VulkanMaterial*> vulkanMaterialList;
+        static std::vector<VulkanMaterial *> vulkanMaterialList;
 
         VulkanUtils *vulkanUtils = nullptr;
         static VulkanMaterial *lastDescriptorColorBond;

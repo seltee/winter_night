@@ -102,7 +102,11 @@ void UINodeText::render(const ContextRender &context)
     static const Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
     auto state = renderer->getState();
     AffectingLights lights{};
-    materialToUse->bindColor(objectId, lights, state->getViewProjectionMatrix() * mModel, mModel, Matrix3x3::identity(), uvModifier, nullptr, mesh->getDataType());
+    materialToUse->bindColor(
+        objectId, lights,
+        state->getViewProjectionMatrix() * mModel, mModel, Matrix3x3::identity(),
+        uvModifier, nullptr, nullptr,
+        mesh->getDataType());
     mesh->render(renderer->getFrameData());
 }
 

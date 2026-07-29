@@ -13,6 +13,7 @@ using namespace wne;
 
 VulkanMaterialAtmosphere::VulkanMaterialAtmosphere(VulkanUtils *vulkanUtils) : VulkanMaterial(vulkanUtils)
 {
+    colorPipelineDescriptorSets = std::make_unique<VulkanDescriptorSets>(vulkanUtils);
 }
 
 VulkanMaterialAtmosphere::~VulkanMaterialAtmosphere()
@@ -34,7 +35,7 @@ void VulkanMaterialAtmosphere::bindDepthShadow(
         return;
 
     AffectingLights lights{};
-    selectPipelineShadowDepth(dataType, isDoubleSided);
+    selectPipelineShadowDepth(dataType, meshArmature, isDoubleSided);
     selectDescriptorDepthShadow(dataType, cascadeData);
     cascadeData->updateObjectData(objectId, mMVP);
 
@@ -71,13 +72,14 @@ void VulkanMaterialAtmosphere::bindColor(
     const Matrix3x3 &mNormal,
     const UVData &uvData,
     const MeshArmature *meshArmature,
+    Texture *radianceMap,
     ModelDataType dataType)
 {
     if (dataType == ModelDataType::Unknown)
         return;
 
     selectPipelineColor(dataType, meshArmature);
-    selectDescriptorColor(dataType);
+    selectDescriptorColor(dataType, reinterpret_cast<VulkanTexture *>(radianceMap));
     vulkanUtils->getObjectBuffers()->updateObjectData(objectId, mModel, Matrix4x4(mNormal), mMVP);
 
     MaterialBoneData materialBoneData{};
@@ -86,20 +88,20 @@ void VulkanMaterialAtmosphere::bindColor(
 
 void VulkanMaterialAtmosphere::selectPipelineColor(ModelDataType dataType, const MeshArmature *meshArmature)
 {
-    vulkanUtils->enablePipelineAtmosphere();
+    if (!colorPipeline)
+        buildColorPipeline();
+    if (colorPipeline)
+        vulkanUtils->bindCustomPipeline(colorPipeline.get());
 }
 
-void VulkanMaterialAtmosphere::selectDescriptorColor(ModelDataType dataType)
+void VulkanMaterialAtmosphere::selectDescriptorColor(ModelDataType dataType, VulkanTexture *radianceMap)
 {
     if (lastDescriptorColorBond == this)
         return;
     lastDescriptorColorBond = this;
 
-    auto descriptorSets = vulkanUtils->getDescriptorSets();
-    if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
-    {
-    }
-    else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
+    auto descriptorSets = colorPipelineDescriptorSets.get();
+    if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
     {
         auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
         auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
@@ -134,17 +136,45 @@ void VulkanMaterialAtmosphere::setPCData(uint64 objectId, const AffectingLights 
     );
 }
 
+void VulkanMaterialAtmosphere::resetPipeline()
+{
+    nullifyPipelines();
+}
+
+void VulkanMaterialAtmosphere::buildColorPipeline()
+{
+    // color pipeline
+    auto newPipeline = std::make_unique<VulkanPipelineUniversal>(vulkanUtils);
+    VulkanPipelineUniversal::Options colorPipelineOptions{};
+    colorPipelineOptions.VkMSAASampleCountBit = vulkanUtils->getVkSampleCountFlagBits(vulkanUtils->getMSAASampleCount());
+    colorPipelineOptions.blendingMode = ColorBlending::Solid;
+    colorPipelineOptions.enableLightning = flagIsLighted;
+    colorPipelineOptions.isMainColorPass = true;
+    colorPipelineOptions.enableMasked = flagIsMasked;
+    colorPipelineOptions.ignoreDepth = true;
+
+    if (!newPipeline->setup(vulkanUtils->getCurrentRenderPass(), colorPipelineOptions))
+        newPipeline = nullptr;
+
+    colorPipeline = std::move(newPipeline);
+    colorPipelineDescriptorSets->setupColor();
+}
+
+void VulkanMaterialAtmosphere::nullifyPipelines()
+{
+    colorPipeline = nullptr;
+}
+
 VkDescriptorSet VulkanMaterialAtmosphere::getDescriptorSetAtmoTexture()
 {
     if (descriptorSet)
         return descriptorSet;
     auto device = vulkanUtils->getVulkanDevice()->getDevice();
-    auto pipeline = vulkanUtils->getCurrentPipeline();
 
-    auto descriptorSetLayout = pipeline->getDescriptorSetLayoutSampler();
+    auto descriptorSetLayout = vulkanUtils->getDescriptorSetLayoutSampler();
     if (!descriptorSetLayout)
     {
-        Logger::log << "Unable to get descriptor set layout" << endl;
+        Logger::log << "Unable to get sampler descriptor set layout" << endl;
         return nullptr;
     }
 

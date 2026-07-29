@@ -218,16 +218,6 @@ bool VulkanPipelineTextured::setupAtmosphere(VulkanRenderPass *renderPass, uint6
     return true;
 }
 
-VulkanDescriptorSetLayout *VulkanPipelineTextured::getDescriptorSetLayoutPipeline()
-{
-    return descriptorSetLayoutPipeline.get();
-}
-
-VulkanDescriptorSetLayout *VulkanPipelineTextured::getDescriptorSetLayoutSampler()
-{
-    return descriptorSetLayoutSampler.get();
-}
-
 bool VulkanPipelineTextured::buildShaderColor()
 {
     auto device = vulkanDevice->getDevice();

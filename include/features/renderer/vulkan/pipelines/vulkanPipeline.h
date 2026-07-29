@@ -16,8 +16,6 @@ namespace wne
         virtual ~VulkanPipeline();
         virtual VkPipeline getGraphicsPipeline();
         virtual VkPipelineLayout getPipelineLayout();
-        virtual VulkanDescriptorSetLayout *getDescriptorSetLayoutPipeline();
-        virtual VulkanDescriptorSetLayout *getDescriptorSetLayoutSampler();
 
     protected:
         VulkanPipeline(VulkanDevice *vulkanDevice);

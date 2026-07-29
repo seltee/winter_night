@@ -32,9 +32,21 @@ namespace wne
             uint64 frame;
         };
 
-        struct PostponnedDeviceMemory
+        struct PostponnedDevice
         {
             VkDeviceMemory deviceMemory;
+            uint64 frame;
+        };
+
+        struct PostponnedVulkanPipeline
+        {
+            std::shared_ptr<VulkanPipeline> pipelineShared;
+            uint64 frame;
+        };
+
+        struct PostponnedVulkanPipelineDescriptorSet
+        {
+            std::shared_ptr<VulkanDescriptorSets> descriptorSetShared;
             uint64 frame;
         };
 
@@ -57,7 +69,7 @@ namespace wne
         bool copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint64 size);
         void transitionImageLayout(VkImage image, uint64 format, uint64 oldLayout, uint64 newLayout);
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32 width, uint32 height);
-        void destroyPipelines();
+        // void destroyPipelines();
         bool rebuildPipelines(
             VulkanSwapChain *vulkanSwapChain,
             VulkanRenderPass *vulkanRenderPass,
@@ -163,32 +175,6 @@ namespace wne
             return vulkanPipelines->getCurrentPipeline();
         }
 
-        inline void enablePipelineDepthByType(ModelDataType dataType, bool isMasked)
-        {
-            if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
-                vulkanPipelines->enablePipelineColored(currentCommandBuffer, true);
-            else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
-                vulkanPipelines->enablePipelineTexturedDepth(currentCommandBuffer, isMasked);
-        }
-
-        inline void enablePipelineColorByType(ModelDataType dataType, ColorBlending blending, bool isLightEnabled)
-        {
-            if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
-                vulkanPipelines->enablePipelineColored(currentCommandBuffer, false);
-            else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
-                vulkanPipelines->enablePipelineTextured(currentCommandBuffer, isLightEnabled, blending);
-        }
-
-        inline void enablePipelineShadowByType(ModelDataType dataType, bool isMasked, bool isDoubleSided)
-        {
-            vulkanPipelines->enablePipelineTexturedShadowDepth(currentCommandBuffer, isMasked, isDoubleSided);
-        }
-
-        inline void enablePipelineAtmosphere()
-        {
-            vulkanPipelines->enablePipelineAtmosphere(currentCommandBuffer);
-        }
-
         inline VulkanRenderPass *getCurrentRenderPass()
         {
             return vulkanRenderPass;
@@ -219,16 +205,6 @@ namespace wne
             return presentQueue;
         }
 
-        inline VulkanDescriptorSets *getDescriptorSets()
-        {
-            return vulkanPipelines->getDescriptorSets();
-        }
-
-        inline void setRadianceMap(VulkanTexture *radianceMap)
-        {
-            vulkanPipelines->getDescriptorSets()->updateRadianceMap(radianceMap ? radianceMap : dummyTexture.get(), vulkanSampler.get());
-        }
-
         // global current frame number
         inline uint64 getCurrentFrameNumber()
         {
@@ -240,12 +216,31 @@ namespace wne
             currentFrameNumber++;
         }
 
+        inline VulkanDescriptorSetLayout *getDescriptorSetLayoutColor()
+        {
+            return vulkanDescriptorSetLayoutColor.get();
+        }
+
+        inline VulkanDescriptorSetLayout *getDescriptorSetLayoutDepth()
+        {
+            return vulkanDescriptorSetLayoutDepth.get();
+        }
+
+        inline VulkanDescriptorSetLayout *getDescriptorSetLayoutSampler()
+        {
+            return vulkanDescriptorSetLayoutSampler.get();
+        }
+
     protected:
         std::unique_ptr<VulkanDescriptorPool> vulkanDescriptorPool;
         std::unique_ptr<VulkanObjectBuffers> vulkanObjectBuffers;
         std::unique_ptr<VulkanSampler> vulkanSampler;
         std::unique_ptr<VulkanSampler> vulkanShadowSampler;
         std::unique_ptr<VulkanShadowMaps> vulkanShadowMaps;
+
+        std::unique_ptr<VulkanDescriptorSetLayout> vulkanDescriptorSetLayoutColor;
+        std::unique_ptr<VulkanDescriptorSetLayout> vulkanDescriptorSetLayoutDepth;
+        std::unique_ptr<VulkanDescriptorSetLayout> vulkanDescriptorSetLayoutSampler;
 
         // pipelines
         std::unique_ptr<VulkanPipelines> vulkanPipelines;
@@ -274,8 +269,8 @@ namespace wne
         std::mutex postponnedRemovalImageMutex;
 
         // destroyes device memory when it's not longer used in the frame rendering process
-        std::vector<PostponnedDeviceMemory> postponnedRemovalDeviceMemory;
-        std::mutex postponnedRemovalDeviceMemoryMutex;
+        std::vector<PostponnedDevice> postponnedRemovalDevice;
+        std::mutex postponnedRemovalDeviceMutex;
 
         uint MSAASampleCount = 1;
     };

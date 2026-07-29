@@ -198,6 +198,7 @@ void ActorAnimatedMesh::renderColor(bool isBlendingPhase)
     auto state = renderer->getState();
     static const Material::UVData uvModifier = {0.0f, 0.0f, 1.0f, 1.0f};
     AffectingLights lights = currentScene->collectAffectingLights(getPosition(), 0.0f);
+    Texture *radience = currentScene ? currentScene->getAtmosphereRadienceTexture().get() : nullptr;
 
     for (uint i = 0; i < count; i++)
     {
@@ -209,15 +210,15 @@ void ActorAnimatedMesh::renderColor(bool isBlendingPhase)
             {
                 MeshArmature *meshArmature = nodes[i].armature ? nodes[i].armature->meshArmature.get() : nullptr;
                 Matrix4x4 transformation = meshArmature ? Matrix4x4::identity() : nodes[i].transfotmation;
-                materialToUse->bindColor(
-                    nodes[i].getObjectId(),
-                    lights,
-                    state->getViewProjectionMatrix() * transformation,
-                    transformation,
-                    getNormalMatrix(),
-                    uvModifier,
-                    meshArmature,
-                    (*mesh)[i].mesh->getDataType());
+                materialToUse->bindColor(nodes[i].getObjectId(),
+                                         lights,
+                                         state->getViewProjectionMatrix() * transformation,
+                                         transformation,
+                                         getNormalMatrix(),
+                                         uvModifier,
+                                         meshArmature,
+                                         radience,
+                                         (*mesh)[i].mesh->getDataType());
                 (*mesh)[i].mesh->render(renderer->getFrameData());
             }
         }

@@ -160,6 +160,7 @@ void UINodeContainer::render(const ContextRender &context)
             Matrix3x3::identity(),
             uvModifier,
             nullptr,
+            nullptr,
             mesh->getDataType());
         mesh->render(renderer->getFrameData());
     }

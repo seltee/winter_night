@@ -31,9 +31,6 @@ namespace wne
         bool setupMaskedDepthShadow(VulkanRenderPass *depthPass, bool isDoubleSided);
         bool setupAtmosphere(VulkanRenderPass *renderPass, uint64 MSAASmapleCountBit);
 
-        VulkanDescriptorSetLayout *getDescriptorSetLayoutPipeline() override final;
-        VulkanDescriptorSetLayout *getDescriptorSetLayoutSampler() override final;
-
     protected:
         bool buildShaderColor();
         bool buildShaderColorNoLights();
