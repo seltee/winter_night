@@ -32,6 +32,9 @@ namespace wne
             // pixels will be disscarded by alpha treeshold
             bool enableMasked;
 
+            // if enabled - counter clockwise instead of clockwise
+            bool enableReversePolygonDirection;
+
             // Main color pass otherwise it's depth
             bool isMainColorPass;
 
@@ -56,6 +59,7 @@ namespace wne
             bool enableDepthTest,
             bool enableSampler,
             bool faceCooling,
+            bool reversePolygonDirection,
             bool reverseFaceCooling,
             bool opEqual,
             uint64 MSAASmapleCountBit,

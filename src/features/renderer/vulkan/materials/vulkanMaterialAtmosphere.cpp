@@ -155,6 +155,7 @@ void VulkanMaterialAtmosphere::buildColorPipeline()
     colorPipelineOptions.isMainColorPass = true;
     colorPipelineOptions.enableMasked = flagIsMasked;
     colorPipelineOptions.ignoreDepth = true;
+    colorPipelineOptions.enableReversePolygonDirection = true;
 
     if (!newPipeline->setup(vulkanUtils->getCurrentRenderPass(), colorPipelineOptions))
         newPipeline = nullptr;

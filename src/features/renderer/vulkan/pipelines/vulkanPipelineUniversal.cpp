@@ -47,6 +47,7 @@ bool VulkanPipelineUniversal::setup(VulkanRenderPass *renderPass, const Options 
     bool depthTest = !options.ignoreDepth;
     bool sampler = true;
     bool faceCooling = true;
+    bool reversePolygonDirection = options.enableReversePolygonDirection;
     bool doReverseFaceCooling = false;
     auto blendingMode = options.blendingMode;
     bool equalDepthOnly = options.isMainColorPass && depthTest && (blendingMode == ColorBlending::Solid);
@@ -59,6 +60,7 @@ bool VulkanPipelineUniversal::setup(VulkanRenderPass *renderPass, const Options 
             depthTest,
             sampler,
             faceCooling,
+            reversePolygonDirection,
             doReverseFaceCooling,
             equalDepthOnly,
             options.VkMSAASampleCountBit,
@@ -133,6 +135,7 @@ bool VulkanPipelineUniversal::buildPipeline(
     bool enableDepthTest,
     bool enableSampler,
     bool faceCooling,
+    bool reversePolygonDirection,
     bool reverseFaceCooling,
     bool opEqual,
     uint64 VkMSAASampleCountBit,
@@ -226,7 +229,7 @@ bool VulkanPipelineUniversal::buildPipeline(
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = faceCooling ? (reverseFaceCooling ? VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_BACK_BIT) : VK_CULL_MODE_NONE;
-    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    rasterizer.frontFace = reversePolygonDirection ? VK_FRONT_FACE_COUNTER_CLOCKWISE : VK_FRONT_FACE_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.depthBiasConstantFactor = 0.0f; // Optional
     rasterizer.depthBiasClamp = 0.0f;          // Optional
