@@ -49,7 +49,7 @@ bool VulkanPipelineUniversal::setup(VulkanRenderPass *renderPass, const Options 
     bool faceCooling = true;
     bool doReverseFaceCooling = false;
     auto blendingMode = options.blendingMode;
-    bool equalDepthOnly = options.isMainColorPass && (blendingMode == ColorBlending::Solid);
+    bool equalDepthOnly = options.isMainColorPass && depthTest && (blendingMode == ColorBlending::Solid);
 
     // if solid then it's solid stage and depth is prepared so op is equal
     if (!buildPipeline(
@@ -305,8 +305,9 @@ bool VulkanPipelineUniversal::buildPipeline(
     if (enableSampler)
     {
         // todo - make sure it's color pipeline descriptor
+        auto layout = enableColorWriting ? vulkanUtils->getDescriptorSetLayoutColor() : vulkanUtils->getDescriptorSetLayoutDepth();
         VkDescriptorSetLayout layouts[2] = {
-            vulkanUtils->getDescriptorSetLayoutColor()->getDescriptorSetLayout(),
+            layout->getDescriptorSetLayout(),
             vulkanUtils->getDescriptorSetLayoutSampler()->getDescriptorSetLayout()};
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};

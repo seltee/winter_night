@@ -4,7 +4,7 @@ int main()
 {
     wne::Engine::getInstance()->enableLogger();
 
-    auto window = wne::Window::create("Example 1", 2560, 1440);
+    auto window = wne::Window::create("Example 5", 2560, 1440);
     if (!window)
         return 1;
 

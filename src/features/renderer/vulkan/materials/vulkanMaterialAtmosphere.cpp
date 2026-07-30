@@ -14,6 +14,7 @@ using namespace wne;
 VulkanMaterialAtmosphere::VulkanMaterialAtmosphere(VulkanUtils *vulkanUtils) : VulkanMaterial(vulkanUtils)
 {
     colorPipelineDescriptorSets = std::make_unique<VulkanDescriptorSets>(vulkanUtils);
+    colorPipelineDescriptorSets->setupColor();
 }
 
 VulkanMaterialAtmosphere::~VulkanMaterialAtmosphere()
@@ -100,13 +101,15 @@ void VulkanMaterialAtmosphere::selectDescriptorColor(ModelDataType dataType, Vul
         return;
     lastDescriptorColorBond = this;
 
-    auto descriptorSets = colorPipelineDescriptorSets.get();
     if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
     {
         auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
-        auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
+        auto pipelineLayout = colorPipeline->getPipelineLayout();
+        colorPipelineDescriptorSets->updateRadianceMap(vulkanUtils->getDummyTexture(), vulkanUtils->getSampler());
 
-        VkDescriptorSet sets[2] = {descriptorSets->getDescriptorSetTexturedColor(), getDescriptorSetAtmoTexture()};
+        VkDescriptorSet sets[2] = {
+            colorPipelineDescriptorSets->getDescriptorSetTexturedColor(),
+            getDescriptorSetAtmoTexture()};
         if (sets[0] && sets[1])
             vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 2, sets, 0, nullptr);
     }
@@ -115,7 +118,7 @@ void VulkanMaterialAtmosphere::selectDescriptorColor(ModelDataType dataType, Vul
 void VulkanMaterialAtmosphere::setPCData(uint64 objectId, const AffectingLights &lights, const UVData &uvData, const MaterialBoneData &materialBoneData)
 {
     auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
-    auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
+    auto pipelineLayout = colorPipeline->getPipelineLayout();
 
     PushConstantObject pco{};
     pco.objectId = objectId;
@@ -147,8 +150,8 @@ void VulkanMaterialAtmosphere::buildColorPipeline()
     auto newPipeline = std::make_unique<VulkanPipelineUniversal>(vulkanUtils);
     VulkanPipelineUniversal::Options colorPipelineOptions{};
     colorPipelineOptions.VkMSAASampleCountBit = vulkanUtils->getVkSampleCountFlagBits(vulkanUtils->getMSAASampleCount());
-    colorPipelineOptions.blendingMode = ColorBlending::Solid;
-    colorPipelineOptions.enableLightning = flagIsLighted;
+    colorPipelineOptions.blendingMode = ColorBlending::Alpha;
+    colorPipelineOptions.enableLightning = false;
     colorPipelineOptions.isMainColorPass = true;
     colorPipelineOptions.enableMasked = flagIsMasked;
     colorPipelineOptions.ignoreDepth = true;
@@ -157,7 +160,6 @@ void VulkanMaterialAtmosphere::buildColorPipeline()
         newPipeline = nullptr;
 
     colorPipeline = std::move(newPipeline);
-    colorPipelineDescriptorSets->setupColor();
 }
 
 void VulkanMaterialAtmosphere::nullifyPipelines()

@@ -20,7 +20,9 @@ VulkanMaterialFlat::VulkanMaterialFlat(VulkanUtils *vulkanUtils) : VulkanMateria
     shaderMaker.updateShaderCode();
 
     depthPipelineDescriptorSets = std::make_unique<VulkanDescriptorSets>(vulkanUtils);
+    depthPipelineDescriptorSets->setupDepth();
     colorPipelineDescriptorSets = std::make_unique<VulkanDescriptorSets>(vulkanUtils);
+    colorPipelineDescriptorSets->setupColor();
 }
 
 VulkanMaterialFlat::~VulkanMaterialFlat()
@@ -182,15 +184,12 @@ void VulkanMaterialFlat::selectDescriptorColor(ModelDataType dataType, VulkanTex
     lastDescriptorColorBond = this;
 
     auto descriptorSets = colorPipelineDescriptorSets.get();
-    if (this->radianceMap != radianceMap)
-    {
-        this->radianceMap = radianceMap;
-        descriptorSets->updateRadianceMap(radianceMap, vulkanUtils->getSampler());
-    }
+    descriptorSets->updateRadianceMap(radianceMap, vulkanUtils->getSampler());
+
     if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
     {
         auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
-        auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
+        auto pipelineLayout = colorPipeline->getPipelineLayout();
 
         VkDescriptorSet sets[2] = {descriptorSets->getDescriptorSetTexturedColor(), getDescriptorSetFlatTextured()};
         if (sets[0] && sets[1])
@@ -201,13 +200,10 @@ void VulkanMaterialFlat::selectDescriptorColor(ModelDataType dataType, VulkanTex
 void VulkanMaterialFlat::selectDescriptorDepth(ModelDataType dataType)
 {
     auto descriptorSets = depthPipelineDescriptorSets.get();
-    if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
-    {
-    }
-    else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
+    if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
     {
         auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
-        auto pipelineLayout = vulkanUtils->getCurrentPipeline()->getPipelineLayout();
+        auto pipelineLayout = depthPipeline->getPipelineLayout();
 
         if (flagIsMasked)
         {
@@ -226,15 +222,11 @@ void VulkanMaterialFlat::selectDescriptorDepth(ModelDataType dataType)
 
 void VulkanMaterialFlat::selectDescriptorDepthShadow(ModelDataType dataType, VulkanLightCascadeData *cascadeData)
 {
-    if (dataType == ModelDataType::VertexColoredInd16 || dataType == ModelDataType::VertexColoredInd32)
-    {
-    }
-    else if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
+    if (dataType == ModelDataType::VertexTexturedInd16 || dataType == ModelDataType::VertexTexturedInd32)
     {
         // should be depth
-        auto pipeline = vulkanUtils->getCurrentPipeline();
         auto commandBuffer = vulkanUtils->getCurrentCommandBuffer()->getCommandBuffer();
-        auto pipelineLayout = pipeline->getPipelineLayout();
+        auto pipelineLayout = depthPipeline->getPipelineLayout();
 
         if (flagIsMasked)
         {
@@ -349,9 +341,7 @@ VkDescriptorSet VulkanMaterialFlat::getDescriptorSetFlatTextured()
     descriptorWrite.descriptorCount = 1;
     descriptorWrite.pImageInfo = &imageInfo;
 
-    Logger::log << "Set 2" << endl;
     vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
-    Logger::log << "Set 2adsf" << endl;
 
     currentImageLayout = imageInfo.imageLayout;
     currentImageView = imageInfo.imageView;
@@ -382,12 +372,10 @@ void VulkanMaterialFlat::buildDepthPipeline(bool enableBones)
     if (enableBones)
     {
         depthPipelineWithBones = std::move(newPipeline);
-        depthPipelineDescriptorSets->setupDepth();
     }
     else
     {
         depthPipeline = std::move(newPipeline);
-        depthPipelineDescriptorSets->setupDepth();
     }
 }
 
@@ -409,14 +397,9 @@ void VulkanMaterialFlat::buildColorPipeline(bool enableBones)
     if (enableBones)
     {
         colorPipelineWithBones = std::move(newPipeline);
-        colorPipelineDescriptorSets->setupColor();
     }
     else
     {
         colorPipeline = std::move(newPipeline);
-        colorPipelineDescriptorSets->setupColor();
     }
-    colorPipelineDescriptorSets->updateRadianceMap(
-        radianceMap ? radianceMap : vulkanUtils->getDummyTexture(),
-        vulkanUtils->getSampler());
 }

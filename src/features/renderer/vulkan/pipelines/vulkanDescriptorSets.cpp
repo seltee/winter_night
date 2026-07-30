@@ -21,12 +21,10 @@ VulkanDescriptorSets::VulkanDescriptorSets(VulkanUtils *vulkanUtils)
     this->vulkanDevice = vulkanUtils->getVulkanDevice();
     this->vulkanObjectBuffers = vulkanUtils->getObjectBuffers();
     this->vulkanUtils = vulkanUtils;
-    Logger::log << "Created descriptor set" << endl;
 }
 
 VulkanDescriptorSets::~VulkanDescriptorSets()
 {
-    Logger::log << "Destroyed decriptor set" << endl;
 }
 
 bool VulkanDescriptorSets::setup()
@@ -40,7 +38,6 @@ bool VulkanDescriptorSets::setup()
 
 bool VulkanDescriptorSets::setupColor()
 {
-
     uint maxFramesInFlight = vulkanObjectBuffers->getFramesMaxInFlight();
     descriptorSetColor.resize(maxFramesInFlight);
 
@@ -120,18 +117,6 @@ void VulkanDescriptorSets::updateRadianceMap(VulkanTexture *texture, VulkanSampl
     write.pImageInfo = &radianceImageInfo;
     write.dstArrayElement = 0;
     vkUpdateDescriptorSets(vulkanDevice->getDevice(), 1, &write, 0, nullptr);
-}
-
-bool VulkanDescriptorSets::initDescriptorSetColoredDepth(uint frame, VkDescriptorSet *descriptorSet)
-{
-    *descriptorSet = nullptr;
-    return true;
-}
-
-bool VulkanDescriptorSets::initDescriptorSetColoredColor(uint frame, VkDescriptorSet *descriptorSet)
-{
-    *descriptorSet = nullptr;
-    return true;
 }
 
 bool VulkanDescriptorSets::initDescriptorSetTexturedDepth(

@@ -38,10 +38,6 @@ namespace wne
         }
 
     protected:
-        bool initDescriptorSetColoredDepth(uint frame, VkDescriptorSet *descriptorSet);
-
-        bool initDescriptorSetColoredColor(uint frame, VkDescriptorSet *descriptorSet);
-
         bool initDescriptorSetTexturedDepth(
             uint frame,
             VkDescriptorSet *descriptorSet,
